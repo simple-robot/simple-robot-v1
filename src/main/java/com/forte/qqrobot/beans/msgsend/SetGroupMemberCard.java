@@ -12,7 +12,7 @@ public class SetGroupMemberCard {
     groupid，QQID，newcard
      */
     /** 设置群成员名片 */
-    private final Integer act = 126;
+    private static final Integer act = 126;
     /** 群号 */
     private String groupid;
     /** qq号 */

@@ -13,7 +13,7 @@ public class SetGroupMemberBanned {
     QQID，groupid，duration
      */
     /** 禁言编码 */
-    private final Integer act = 121;
+    private static final Integer act = 121;
     /** qq号 */
     private String QQID;
     /** 群号 */

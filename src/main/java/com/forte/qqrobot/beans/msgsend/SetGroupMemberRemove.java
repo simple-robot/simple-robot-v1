@@ -13,7 +13,7 @@ public class SetGroupMemberRemove {
      */
 
     /** 群踢人编码 */
-    private final Integer act = 120;
+    private static final Integer act = 120;
     /** 移除qq号 */
     private String QQID;
     /** 群号 */

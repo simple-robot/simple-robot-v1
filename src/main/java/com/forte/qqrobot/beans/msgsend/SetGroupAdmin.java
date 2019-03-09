@@ -11,13 +11,13 @@ public class SetGroupAdmin {
     122, 置群管理员
     QQID，groupid，setadmin
      */
-    private final Integer act = 122;
+    private static final Integer act = 122;
     /** 设置的qq */
     private String QQID;
     /** 群号 */
     private String groupid;
     /** 是否设置为群管理 */
-    private String setadmin;
+    private Boolean setadmin;
 
 
     public Integer getAct() {
@@ -40,11 +40,11 @@ public class SetGroupAdmin {
         this.groupid = groupid;
     }
 
-    public String getSetadmin() {
+    public Boolean getSetadmin() {
         return setadmin;
     }
 
-    public void setSetadmin(String setadmin) {
+    public void setSetadmin(Boolean setadmin) {
         this.setadmin = setadmin;
     }
 }

@@ -12,7 +12,7 @@ public class SetFriendAddRequest {
     responseoperation，remark，responseflag
      */
 
-    private final Integer act = 150;
+    private static final Integer act = 150;
 
     private String responseoperation;
     private String remark;

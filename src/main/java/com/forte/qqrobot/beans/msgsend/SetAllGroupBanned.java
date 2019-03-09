@@ -12,7 +12,7 @@ public class SetAllGroupBanned {
     QQID，groupid，enableban
      */
     /** 设置全群禁言 */
-    private final Integer act = 123;
+    private static final Integer act = 123;
     /** qq号-不知道有什么用 */
     private String QQID;
     /** qun号 */

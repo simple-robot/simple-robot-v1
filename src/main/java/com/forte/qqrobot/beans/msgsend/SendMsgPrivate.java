@@ -12,7 +12,7 @@ public class SendMsgPrivate {
     QQID,msg
      */
     /** 私聊送信编码 */
-    private final Integer act = 106;
+    private static final Integer act = 106;
     /** qq号 */
     private String QQID;
     /** 消息内容 */

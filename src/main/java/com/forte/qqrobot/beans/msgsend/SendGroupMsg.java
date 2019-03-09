@@ -12,7 +12,7 @@ public class SendGroupMsg {
     groupid,msg
      */
     /** 群消息编号 */
-    private final Integer act = 101;
+    private static final Integer act = 101;
     /** 群号 */
     private String groupid;
     /** 信息 */

@@ -13,11 +13,11 @@ public class SetGroupMemberSpecialTitle {
      */
 
     /** 编号 */
-    private final Integer act = 128;
-    /** 群号 */
-    private String groupid;
+    private static final Integer act = 128;
     /** qq号 */
     private String QQID;
+    /** 群号 */
+    private String groupid;
     /** 设置时间，单位大概是秒 */
     private Long duration;
     /** 专属头衔 */

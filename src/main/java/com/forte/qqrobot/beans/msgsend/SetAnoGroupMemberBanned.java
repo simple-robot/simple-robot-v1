@@ -12,7 +12,7 @@ public class SetAnoGroupMemberBanned {
     groupid，duration，anomymous
      */
     /** 设置匿名群员禁言编码 */
-    private final Integer act = 124;
+    private static final Integer act = 124;
     /** 群id */
     private String groupid;
     /** 禁言时间，秒为单位 */

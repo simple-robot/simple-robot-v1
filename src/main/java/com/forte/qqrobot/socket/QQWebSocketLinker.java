@@ -25,7 +25,6 @@ public class QQWebSocketLinker {
         int times = 0;
         while(true){
             try {
-                System.out.println(client);
                 cc = client.getConstructor(URI.class).newInstance(new URI(url));
 //                cc = new QQWebSocketClient( new URI( url ) );
                 System.out.println("连接阻塞中...");

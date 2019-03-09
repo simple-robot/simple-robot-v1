@@ -12,7 +12,7 @@ public class SetDisGroupExit {
     discussid
      */
     /** 编号 */
-    private final Integer act = 140;
+    private static final Integer act = 140;
     /** 要退出的讨论组 */
     private String discussid;
 

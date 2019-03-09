@@ -1,10 +1,10 @@
 package com.forte.qqrobot.utils;
 
-import com.forte.qqrobot.beans.types.CQCodeType;
+import com.forte.qqrobot.beans.CQCode;
+import com.forte.qqrobot.beans.types.CQCodeTypes;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * CQ码生成器
@@ -38,7 +38,7 @@ public class CQCodeUtil {
      * ] -> &#93;
      * @return 转义后的字符串
      */
-    public static String escapeOutCQCode(String msgOutCQCode){
+    public String escapeOutCQCode(String msgOutCQCode){
         return msgOutCQCode
                 .replaceAll("\\&" , "&amp;")
                 .replaceAll("\\[" , "&#91;")
@@ -57,7 +57,7 @@ public class CQCodeUtil {
      * @param value
      * @return
      */
-    private static String escapeValue(String value){
+    private String escapeValue(String value){
         return value
                 .replaceAll("\\&" , "&amp;")
                 .replaceAll("\\[" , "&#91;")
@@ -74,7 +74,7 @@ public class CQCodeUtil {
      *                  如果对应索引为null则视为忽略参数
      * @return  CQCode字符串
      */
-    private static String getCQCodeString(CQCodeType type, String... params){
+    private String getCQCodeString(CQCodeTypes type, String... params){
         Objects.requireNonNull(params);
         //获取此CQ码的类型
         String function = type.getFunction();
@@ -89,7 +89,7 @@ public class CQCodeUtil {
         for (int i = 0; i < keys.length; i++) {
             String key = keys[i];
             //获取value值并转义，如果参数不存在则标记为null
-            String value = Optional.ofNullable(params[i]).map(CQCodeUtil::escapeValue).orElse(null);
+            String value = Optional.ofNullable(params[i]).map(this::escapeValue).orElse(null);
             //如果参数不为null则说明不需要忽略
             if(value != null){
                 joiner.add(key+"="+value);
@@ -106,8 +106,8 @@ public class CQCodeUtil {
      * @param id  moji字符的unicode编号
      * @return    emoji的CQ码
      */
-    public static String getCQCode_face(String id){
-        return getCQCodeString(CQCodeType.face, id);
+    public String getCQCode_face(String id){
+        return getCQCodeString(CQCodeTypes.face, id);
     }
 
     /**
@@ -115,8 +115,8 @@ public class CQCodeUtil {
      * @param id 原创表情的ID
      * @return  原创表情CQ
      */
-    public static String getCQCode_bface(String id){
-        return getCQCodeString(CQCodeType.bface, id);
+    public String getCQCode_bface(String id){
+        return getCQCodeString(CQCodeTypes.bface, id);
     }
 
     /**
@@ -124,8 +124,8 @@ public class CQCodeUtil {
      * @param id 小表情的ID
      * @return 小表情CQ
      */
-    public static String getCQCode_sface(String id){
-        return getCQCodeString(CQCodeType.sface, id);
+    public String getCQCode_sface(String id){
+        return getCQCodeString(CQCodeTypes.sface, id);
     }
 
     /**
@@ -133,8 +133,8 @@ public class CQCodeUtil {
      * @param file  图片文件名称
      * @return      自定义图片CQ
      */
-    public static String getCQCode_image(String file){
-        return getCQCodeString(CQCodeType.image, file);
+    public String getCQCode_image(String file){
+        return getCQCodeString(CQCodeTypes.image, file);
     }
 
     /**
@@ -143,8 +143,8 @@ public class CQCodeUtil {
      * @param magic 是否为变声
      * @return  发送语音CQ
      */
-    public static String getCQCode_record(String file, Boolean magic){
-        return getCQCodeString(CQCodeType.record, file, Optional.ofNullable(magic).map(Object::toString).orElse(null));
+    public String getCQCode_record(String file, Boolean magic){
+        return getCQCodeString(CQCodeTypes.record, file, Optional.ofNullable(magic).map(Object::toString).orElse(null));
     }
 
     /**
@@ -152,8 +152,8 @@ public class CQCodeUtil {
      * @param file  音频文件名称
      * @return  发送语音CQ
      */
-    public static String getCQCode_record(String file){
-        return getCQCodeString(CQCodeType.record, file, null);
+    public String getCQCode_record(String file){
+        return getCQCodeString(CQCodeTypes.record, file, null);
     }
 
     /**
@@ -161,8 +161,8 @@ public class CQCodeUtil {
      * @param qq qq号
      * @return  at CQcode
      */
-    public static String getCQCode_at(String qq){
-        return getCQCodeString(CQCodeType.at, qq);
+    public String getCQCode_at(String qq){
+        return getCQCodeString(CQCodeTypes.at, qq);
     }
 
     /**
@@ -170,8 +170,8 @@ public class CQCodeUtil {
      * @param type  为猜拳结果的类型，暂不支持发送时自定义。该参数可被忽略。
      * @return  猜拳魔法表情CQCode
      */
-    public static String getCQCode_rps(String type){
-        return getCQCodeString(CQCodeType.rps, type);
+    public String getCQCode_rps(String type){
+        return getCQCodeString(CQCodeTypes.rps, type);
     }
 
     /**
@@ -179,16 +179,16 @@ public class CQCodeUtil {
      * @param type 对应掷出的点数，暂不支持发送时自定义。该参数可被忽略。
      * @return  掷骰子魔法表情CQCode
      */
-    public static String getCQCode_dice(String type){
-        return getCQCodeString(CQCodeType.dice, type);
+    public String getCQCode_dice(String type){
+        return getCQCodeString(CQCodeTypes.dice, type);
     }
 
     /**
      * 戳一戳 仅支持好友消息使用
      * @return 戳一戳CQCode
      */
-    public static String getCQCode_shake(){
-        return getCQCodeString(CQCodeType.shake);
+    public String getCQCode_shake(){
+        return getCQCodeString(CQCodeTypes.shake);
     }
 
     /**
@@ -196,20 +196,20 @@ public class CQCodeUtil {
      * 本CQ码需加在消息的开头。
      * @param ignore 当{1}为true时，代表不强制使用匿名，如果匿名失败将转为普通消息发送。
      *               当{1}为false或ignore参数被忽略时，代表强制使用匿名，如果匿名失败将取消该消息的发送。<br>
-     * @return
+     * @return 匿名发消息
      */
-    public static String getCQCode_anonymous(Boolean ignore){
-        return getCQCodeString(CQCodeType.anonymous, Optional.ofNullable(ignore).map(Object::toString).orElse(null));
+    public String getCQCode_anonymous(Boolean ignore){
+        return getCQCodeString(CQCodeTypes.anonymous, Optional.ofNullable(ignore).map(Object::toString).orElse(null));
     }
 
     /**
      * 匿名发消息（仅支持群消息使用）
      * 本CQ码需加在消息的开头。
      * 参数被忽略，代表强制使用匿名，如果匿名失败将取消该消息的发送。
-     * @return
+     * @return 匿名发消息
      */
-    public static String getCQCode_anonymous(){
-        return getCQCodeString(CQCodeType.anonymous, null);
+    public String getCQCode_anonymous(){
+        return getCQCodeString(CQCodeTypes.anonymous, null);
     }
 
 
@@ -218,10 +218,10 @@ public class CQCodeUtil {
      * 注意：音乐只能作为单独的一条消息发送
      * @param type  为音乐平台类型，目前支持qq、163、xiami
      * @param id    为对应音乐平台的数字音乐id
-     * @return
+     * @return 发送音乐
      */
-    public static String getCQCode_music(String type, String id){
-        return getCQCodeString(CQCodeType.music, type, id);
+    public String getCQCode_music(String type, String id){
+        return getCQCodeString(CQCodeTypes.music, type, id);
     }
 
     /**
@@ -233,8 +233,8 @@ public class CQCodeUtil {
      * @param image     为音乐的封面图片链接。若参数为空或被忽略，则显示默认图片。
      * @return  音乐自定义分享CQCode
      */
-    public static String getCQCode_music_custom(String url, String audio, String title, String content, String image){
-        return getCQCodeString(CQCodeType.music_custom,"custom", url, audio, title, content, image);
+    public String getCQCode_music_custom(String url, String audio, String title, String content, String image){
+        return getCQCodeString(CQCodeTypes.music_custom,"custom", url, audio, title, content, image);
     }
 
     /**
@@ -246,9 +246,39 @@ public class CQCodeUtil {
      * @param image     为分享的图片链接。若参数为空或被忽略，则显示默认图片。
      * @return  链接分享CQCode
      */
-    public static String getCQCode_share(String url, String title, String content, String image){
-        return getCQCodeString(CQCodeType.share, url, title, content, image);
+    public String getCQCode_share(String url, String title, String content, String image){
+        return getCQCodeString(CQCodeTypes.share, url, title, content, image);
     }
 
+    /** 用于从字符串中提取CQCode码字符串的正则表达式 */
+    private static final String CQCODE_EXTRACT_REGEX = "\\[CQ:((?!(\\[CQ:)).)+\\]";
+
+    /**
+     * 从信息字符串中提取出CQCode码的字符串
+     * @param msg 信息字符串
+     * @return 提取出CQCode码的字符串
+     */
+    public List<String> getCQCodeStrFromMsg(String msg){
+        return RegexUtil.getMatcher(msg, CQCODE_EXTRACT_REGEX);
+    }
+
+    /**
+     * 从信息字符串中提取出CQCode码对象
+     * @param msg 信息字符串
+     * @return 提取出CQCode码对象
+     */
+    public List<CQCode> getCQCodeFromMsg(String msg){
+        //CQ码list集合
+        List<String> cqStrList = getCQCodeStrFromMsg(msg);
+        return cqStrList.stream()
+                //移除[CQ:和],在以逗号分隔
+                .map(s -> s.substring(4, s.length() - 1).split("\\,"))
+                .map(arr -> {
+                    //参数数组
+                    String[] paramArr = new String[arr.length - 1];
+                    System.arraycopy(arr, 1, paramArr, 0, paramArr.length);
+                    return CQCode.of(arr[0], paramArr);
+                }).collect(Collectors.toList());
+    }
 
 }

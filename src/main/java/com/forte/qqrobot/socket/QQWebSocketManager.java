@@ -14,6 +14,7 @@ public class QQWebSocketManager {
     /** 用于保存全部的socketClient客户端 */
     private final Map<String, QQWebSocketClient> clientMap = new ConcurrentHashMap<>(3);
 
+    /** 主socket的名称 */
     private static final String MAIN_SOCKET_NAME = "MAIN";
 
     /**

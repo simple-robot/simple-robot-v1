@@ -12,7 +12,7 @@ public class SetGroupAno {
     groupid，enableanomymous
      */
     /** 设置群匿名编码 */
-    private final Integer act = 125;
+    private static final Integer act = 125;
     /** 群号 */
     private String groupid;
     /** 是否允许群匿名 */

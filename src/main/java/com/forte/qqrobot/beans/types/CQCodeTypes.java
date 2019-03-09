@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.types;
  * @date Created in 2019/3/8 14:55
  * @since JDK1.8
  **/
-public enum CQCodeType {
+public enum CQCodeTypes {
     /**
      *  [CQ:face,id={1}] - QQ表情
      *  {1}为emoji字符的unicode编号
@@ -113,10 +113,37 @@ public enum CQCodeType {
 
     ;
 
+
+    /**
+     * 根据function名(即[CQ:后面的名字)获取CQCodeTypes对象实例
+     * @param function 名称
+     * @return CQCodeTypes实例对象
+     */
+    public static CQCodeTypes getTypeByFunction(String function){
+        switch (function){
+            case "face":            return face;
+            case "bface":           return bface;
+            case "sface" :          return sface;
+            case "image" :          return image;
+            case "record" :         return record;
+            case "at" :             return at;
+            case "rps" :            return rps;
+            case "dice" :           return dice;
+            case "shake" :          return shake;
+            case "anonymous" :      return anonymous;
+            case "music" :          return music;
+            case "music_custom" :   return music_custom;
+            case "share" :          return share;
+            default:                return null;
+        }
+    }
+
+
+
     /** 类型名 */
-    private String funciton;
+    private final String funciton;
     /** 参数列表 */
-    private String[] keys;
+    private final String[] keys;
 
     /** 获取方法类型名称 */
     public String getFunction(){
@@ -127,7 +154,7 @@ public enum CQCodeType {
         return keys;
     }
     /** 构造 */
-    CQCodeType(String function, String[] keys){
+    CQCodeTypes(String function, String[] keys){
         this.funciton = function;
         this.keys = keys;
     }

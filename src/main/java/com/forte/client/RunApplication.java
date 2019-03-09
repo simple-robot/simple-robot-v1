@@ -4,8 +4,7 @@ import com.forte.qqrobot.RobotApplication;
 import com.forte.qqrobot.config.LinkConfiguration;
 import com.forte.qqrobot.socket.QQWebSocketClient;
 import com.forte.qqrobot.socket.QQWebSocketManager;
-import com.forte.qqrobot.socket.QQWebSocketMsgCreater;
-import com.forte.qqrobot.utils.CQCodeUtil;
+import com.forte.qqrobot.socket.QQWebSocketMsgCreator;
 import org.quartz.SchedulerException;
 
 /**
@@ -50,7 +49,7 @@ public class RunApplication extends RobotApplication {
 //            }
 //        }
 //        System.out.println("发完了");
-        mainSocket.send(QQWebSocketMsgCreater.getResponseJson_sendGroupMsg("581250423", "嘤嘤嘤！"));
+//        mainSocket.send(QQWebSocketMsgCreator.getResponseJson_sendGroupMsg("581250423", "嘤嘤嘤！"));
 
 
         //创建定时任务

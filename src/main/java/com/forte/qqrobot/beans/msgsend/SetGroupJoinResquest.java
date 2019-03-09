@@ -12,7 +12,7 @@ public class SetGroupJoinResquest {
     requesttype，responseoperation，reason，responseflag
     */
     /** 编号 */
-    private final Integer act = 151;
+    private static final Integer act = 151;
 
     private String requesttype;
     private String responseoperation;

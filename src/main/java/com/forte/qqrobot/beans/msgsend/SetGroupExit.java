@@ -13,7 +13,7 @@ public class SetGroupExit {
      */
 
     /** 编码 */
-    private final Integer act = 127;
+    private static final Integer act = 127;
     /** 群号 */
     private String groupid;
     /** 大概是是否退群..? */

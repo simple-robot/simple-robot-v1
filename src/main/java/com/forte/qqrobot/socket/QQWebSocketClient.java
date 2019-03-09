@@ -13,12 +13,15 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * socket连接
+ * socket客户端连接
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/6 18:08
  * @since JDK1.8
  **/
 public class QQWebSocketClient extends WebSocketClient {
+
+    /** 送信者 */
+    private QQWebSocketMsgSender sender;
 
     /**
      * 构造
@@ -52,8 +55,9 @@ public class QQWebSocketClient extends WebSocketClient {
         //消息的封装类
         Object beanForJson = MsgGetTypes.getByAct(act).getBeanForJson(s);
 
-
-
+        /*
+            获取封装类后，一，分发给监听器
+         */
 
 
     }
@@ -78,6 +82,7 @@ public class QQWebSocketClient extends WebSocketClient {
         System.out.println("出现异常！");
         e.printStackTrace();
     }
+
 
 
 

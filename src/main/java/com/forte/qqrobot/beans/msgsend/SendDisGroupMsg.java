@@ -11,7 +11,7 @@ public class SendDisGroupMsg {
     103, 发送讨论组消息
     discussid,msg
      */
-    private final Integer act = 103;
+    private static final Integer act = 103;
     /** 讨论组id */
     private String discussid;
     /** 消息 */

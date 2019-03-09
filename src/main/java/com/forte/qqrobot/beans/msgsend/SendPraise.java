@@ -13,7 +13,7 @@ public class SendPraise {
     QQID
      */
     /** 发送赞编码 */
-    private final Integer act = 110;
+    private static final Integer act = 110;
     /** qq号 */
     private String QQID;
 
