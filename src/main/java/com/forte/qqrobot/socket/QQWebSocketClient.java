@@ -9,13 +9,12 @@ import com.forte.qqrobot.beans.types.MsgGetTypes;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.utils.CQCodeUtil;
-import com.forte.qqrobot.utils.ConstantData;
+import com.forte.client.utils.ConstantData;
 import com.forte.qqrobot.utils.ListenerUtils;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -43,18 +42,21 @@ public class QQWebSocketClient extends WebSocketClient {
      * @param serverURI 父类{@link WebSocketClient}所需参数，用于连接
      * @param listeners 监听器列表
      */
-    public QQWebSocketClient(URI serverURI/*, QQWebSocketMsgSender sender*/, Set<SocketListener> listeners) {
+    public QQWebSocketClient(URI serverURI/*, QQWebSocketMsgSender sender*/, Set<SocketListener> listeners, Set<InitListener> initListeners) {
         super(serverURI);
         this.sender = QQWebSocketMsgSender.of(this);
         this.listeners = listeners;
+        this.initListeners = initListeners;
     }
 
     /**
      * 连接成功
      */
     @Override
-    public void onOpen(ServerHandshake serverHandshake) {
-        System.out.println("已成功连接到服务器");
+    public final void onOpen(ServerHandshake serverHandshake) {
+        CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
+        //连接成功后，调用全部的初始化监听器
+        initListeners.forEach(l -> l.init(cqCodeUtil, sender));
     }
 
     /**
@@ -64,8 +66,6 @@ public class QQWebSocketClient extends WebSocketClient {
     @Override
     public final void onMessage(String s) {
         System.out.println("接收到了消息！" + "["+ JSONObject.parseObject(s) +"]");
-        //简单复读一下
-//        doReport(s);
 
         //接收到了消息，获取act编号
         Integer act = JSONObject.parseObject(s).getInteger("act");

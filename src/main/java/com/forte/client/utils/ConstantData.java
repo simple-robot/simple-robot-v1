@@ -1,4 +1,4 @@
-package com.forte.qqrobot.utils;
+package com.forte.client.utils;
 
 /**
  * 常量类

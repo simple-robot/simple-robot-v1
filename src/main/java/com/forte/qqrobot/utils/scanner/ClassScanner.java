@@ -23,7 +23,6 @@ public class ClassScanner extends BasePackageScanner {
     }
 
 
-
     /**
      * 构造
      * @param classList

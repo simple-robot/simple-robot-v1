@@ -37,7 +37,7 @@ public class QQWebSocketLinker {
                         linkConfiguration.getListeners(),
                         linkConfiguration.getInitListeners()
                 };
-                cc = client.getConstructor(URI.class, Set.class).newInstance(params);
+                cc = client.getConstructor(URI.class, Set.class, Set.class).newInstance(params);
 //                cc = new QQWebSocketClient( new URI( url ) );
                 System.out.println("连接阻塞中...");
                 boolean b = cc.connectBlocking();

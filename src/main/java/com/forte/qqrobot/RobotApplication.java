@@ -88,7 +88,7 @@ public abstract class RobotApplication {
         //连接之前
         application.beforeLink(ResourceDispatchCenter.getLinkConfiguration());
         //连接socket
-//        QQWebSocketManager qqWebSocketManager = lineSocket();
+        QQWebSocketManager qqWebSocketManager = lineSocket();
         //连接之后
         application.afterLink(/* 连接socket */);
 
