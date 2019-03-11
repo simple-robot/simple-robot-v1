@@ -1,6 +1,5 @@
 package com.forte.client.listener;
 
-import com.alibaba.fastjson.JSONObject;
 import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.msgget.MsgGroup;
 import com.forte.qqrobot.listener.MsgGroupListener;
@@ -12,7 +11,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 复读监听器
+ * DEMO-复读监听器
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/11 11:59
  * @since JDK1.8
@@ -53,9 +52,7 @@ public class ReportListener implements MsgGroupListener {
                     //如果与上次一样，且没有复读，则复读并标记为已复读
                     if(!isReport){
                         System.out.println(fromGroup + ":" + msg);
-                        sender.sendResponse_sendGroupMsg(fromGroup, msg);
-//                        sender.sendResponse_sendMsgPrivate("1149159218", "hi!");
-//                        sender.sendResponse_sendGroupMsg("581250423", "老司机傻逼！");
+                        sender.sendGroupMsg(fromGroup, msg);
                         objects[1] = true;
                     }
 

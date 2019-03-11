@@ -6,6 +6,7 @@ import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.MsgGetTypes;
+import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.ConstantData;
@@ -33,6 +34,9 @@ public class QQWebSocketClient extends WebSocketClient {
 
     /** 监听器列表 */
     private Set<SocketListener> listeners;
+
+    /** 初始化监听器 */
+    private Set<InitListener> initListeners;
 
     /**
      * 构造
@@ -198,7 +202,7 @@ public class QQWebSocketClient extends WebSocketClient {
                     //如果与上次一样，且没有复读，则复读并标记为已复读
                     if(!isReport){
                         System.out.println(fromGroup + ":" + msg);
-                        sender.sendResponse_sendGroupMsg(msg, fromGroup);
+                        sender.sendGroupMsg(msg, fromGroup);
                         System.out.println("send~");
                         objects[1] = true;
                     }
@@ -224,7 +228,7 @@ public class QQWebSocketClient extends WebSocketClient {
 
             String fromQQ = JSON.parseObject(s).getString("fromQQ");
 
-            sender.sendResponse_sendMsgPrivate(remsg, fromQQ);
+            sender.sendMsgPrivate(remsg, fromQQ);
         }
     }
 

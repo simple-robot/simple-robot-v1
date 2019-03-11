@@ -31,8 +31,12 @@ public class QQWebSocketLinker {
         int times = 0;
         while(true){
             try {
-                //参数需要：URI、QQWebSocketMsgSender sender、Set<SocketListener> listeners
-                Object[] params = new Object[]{new URI(url), linkConfiguration.getListeners()};
+                //参数需要：URI、QQWebSocketMsgSender sender、Set<SocketListener> listeners、set<InitListener> initListeners
+                Object[] params = new Object[]{
+                        new URI(url),
+                        linkConfiguration.getListeners(),
+                        linkConfiguration.getInitListeners()
+                };
                 cc = client.getConstructor(URI.class, Set.class).newInstance(params);
 //                cc = new QQWebSocketClient( new URI( url ) );
                 System.out.println("连接阻塞中...");

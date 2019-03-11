@@ -1,6 +1,7 @@
 package com.forte.qqrobot.config;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.socket.QQWebSocketClient;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
@@ -27,6 +28,9 @@ public final class LinkConfiguration {
     /** 全部监听器 */
     private Set<SocketListener> listenerSet = new HashSet<>();
 
+    /** 全部初始化监听器 */
+    private Set<InitListener> initListeners = new HashSet<>();
+
 
     /**
      * 注册监听器
@@ -34,6 +38,21 @@ public final class LinkConfiguration {
      */
     public void registerListeners(SocketListener... listeners){
         listenerSet.addAll(Arrays.asList(listeners));
+    }
+
+    /**
+     * 注册初始化监听器
+     * @param listeners 初始化监听器
+     */
+    public void registerInitListeners(InitListener... listeners){
+        initListeners.addAll(Arrays.asList(listeners));
+    }
+
+    /**
+     * 获取初始化监听器
+     */
+    public Set<InitListener> getInitListeners(){
+        return initListeners;
     }
 
     /**

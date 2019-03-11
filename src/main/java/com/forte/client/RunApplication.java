@@ -1,13 +1,16 @@
 package com.forte.client;
 
 import com.forte.client.listener.ReportListener;
+import com.forte.client.listener.TimeTaskListener;
 import com.forte.qqrobot.RobotApplication;
 import com.forte.qqrobot.config.LinkConfiguration;
-import com.forte.qqrobot.socket.QQWebSocketClient;
-import com.forte.qqrobot.socket.QQWebSocketManager;
 import org.quartz.SchedulerException;
 
 /**
+ * DEMO-如何使用
+ * 继承RobotApplication类，
+ * 实现两个抽象方法，并在{{@link #beforeLink}方法中进行配置
+ * 创建main方法并将本类实例放入父类run 方法中执行
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/8 10:16
  * @since JDK1.8
@@ -16,8 +19,6 @@ public class RunApplication extends RobotApplication {
 
     /**
      * 主程序执行
-     * @param args
-     * @throws SchedulerException
      */
     public static void main(String[] args) {
         run(new RunApplication());
@@ -30,8 +31,11 @@ public class RunApplication extends RobotApplication {
      */
     @Override
     public void beforeLink(LinkConfiguration configuration) {
+        //服务器地址
         configuration.setLinkIp("139.199.116.5");
-        //注册一个监听器
+        //注册初始化监听器
+        configuration.registerInitListeners(new TimeTaskListener());
+        //注册监听器
         configuration.registerListeners(new ReportListener());
     }
 
@@ -39,28 +43,11 @@ public class RunApplication extends RobotApplication {
      * socket连接之后
      */
     @Override
-    public void afterLink(QQWebSocketManager manager) {
-        QQWebSocketClient mainSocket = manager.getMainSocket();
-//        mainSocket.sendMsgToPrivate("连接了\r\n换个行", "1149159218");
-//        for(int i = 170;i>=0;i--){
-//            String s = CQCodeUtil.getCQCode_face(i+"");
-//            System.out.println(s);
-//            mainSocket.sendMsgToPrivate(s, "511371712");
-//            try {
-//                Thread.sleep(500);
-//            } catch (InterruptedException e) {
-//            }
-//        }
-//        System.out.println("发完了");
-//        mainSocket.send(QQWebSocketMsgCreator.getResponseJson_sendGroupMsg("581250423", "嘤嘤嘤！"));
-
-
+    public void afterLink() {
         //创建定时任务
 //        try {
 //            new TimeTasks().run();
 //        } catch (SchedulerException ignore) {
 //        }
     }
-
-
 }

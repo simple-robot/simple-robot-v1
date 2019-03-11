@@ -90,7 +90,7 @@ public abstract class RobotApplication {
         //连接socket
 //        QQWebSocketManager qqWebSocketManager = lineSocket();
         //连接之后
-        application.afterLink(/* 连接socket */lineSocket());
+        application.afterLink(/* 连接socket */);
 
     }
 
@@ -98,7 +98,7 @@ public abstract class RobotApplication {
     /** socket连接之前 */
     public abstract void beforeLink(LinkConfiguration configuration);
     /** socket连接之后 */
-    public abstract void afterLink(QQWebSocketManager manager);
+    public abstract void afterLink();
 
 
 }
