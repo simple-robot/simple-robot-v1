@@ -32,7 +32,7 @@ public class RunApplication extends RobotApplication {
     @Override
     public void beforeLink(LinkConfiguration configuration) {
         //服务器地址
-        configuration.setLinkIp("139.199.116.5");
+        configuration.setLinkIp("localhost");
         //注册初始化监听器
         configuration.registerInitListeners(new TimeTaskListener());
         //注册监听器
