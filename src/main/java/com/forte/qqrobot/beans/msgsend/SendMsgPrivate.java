@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 11:34
  * @since JDK1.8
  **/
-public class SendMsgPrivate {
+public class SendMsgPrivate implements MsgSend {
     /*
     106, 发送私聊消息
     QQID,msg

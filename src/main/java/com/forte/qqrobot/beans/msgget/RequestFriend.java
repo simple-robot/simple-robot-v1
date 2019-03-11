@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgget;
  * @date Created in 2019/3/8 11:17
  * @since JDK1.8
  **/
-public class RequestFriend {
+public class RequestFriend implements MsgGet {
     /*
     301 请求-好友添加
     subType，sendTime，fromQQ，msg（附言），responseFlag（反馈标识-处理请求用）

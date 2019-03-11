@@ -264,10 +264,13 @@ public class CQCodeUtil {
 
     /**
      * 从信息字符串中提取出CQCode码对象
-     * @param msg 信息字符串
+     * @param msg 信息字符串 如果为空则返回空字符串
      * @return 提取出CQCode码对象
      */
     public List<CQCode> getCQCodeFromMsg(String msg){
+        if(msg == null){
+            return Collections.emptyList();
+        }
         //CQ码list集合
         List<String> cqStrList = getCQCodeStrFromMsg(msg);
         return cqStrList.stream()
@@ -279,6 +282,18 @@ public class CQCodeUtil {
                     System.arraycopy(arr, 1, paramArr, 0, paramArr.length);
                     return CQCode.of(arr[0], paramArr);
                 }).collect(Collectors.toList());
+    }
+
+    /**
+     * 判断是否存在at某个qq
+     * @return 是否at了自己
+     */
+    public boolean isAt(String msg, String qq){
+        if(msg == null){
+            return false;
+        }
+        //如果存在at的CQ码并且参数‘qq’是自身qq号
+        return getCQCodeFromMsg(msg).stream().anyMatch(cq -> cq.getCQCodeTypes().equals(CQCodeTypes.at) && cq.getParams().get("qq").equals(qq));
     }
 
 }

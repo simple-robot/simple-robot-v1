@@ -1,8 +1,10 @@
 package com.forte.qqrobot;
 
 import com.forte.qqrobot.config.LinkConfiguration;
+import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.socket.QQWebSocketManager;
 import com.forte.qqrobot.socket.QQWebSocketMsgCreator;
+import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.SingleFactory;
 
@@ -43,11 +45,19 @@ public class ResourceDispatchCenter {
     }
 
     /**
-     * 储存一个LinkConfiguration对象到单例工厂
-     * @param linkConfiguration 单例对象
+     * 储存一个configuration对象到单例工厂
+     * @param configuration 单例对象
      */
-    static void saveLinkConfiguration(LinkConfiguration linkConfiguration){
-        SingleFactory.set(linkConfiguration);
+    static void saveLinkConfiguration(LinkConfiguration configuration){
+        SingleFactory.set(configuration);
+    }
+
+    /**
+     * 储存一个送信者
+     * @param defaultWholeListener
+     */
+    static void saveDefaultWholeListener(DefaultWholeListener defaultWholeListener){
+        SingleFactory.set(defaultWholeListener);
     }
 
         /* ———————————————— 获取方法 ———————————————— */
@@ -85,5 +95,12 @@ public class ResourceDispatchCenter {
         return SingleFactory.get(LinkConfiguration.class);
     }
 
+    /**
+     * 获取一个DefaultWholeListener单例对象
+     * @return DefaultWholeListener单例对象
+     */
+    public static DefaultWholeListener getDefaultWholeListener(){
+        return SingleFactory.get(DefaultWholeListener.class);
+    }
 
 }

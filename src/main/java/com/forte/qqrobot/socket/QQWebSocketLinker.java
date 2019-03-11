@@ -1,8 +1,12 @@
 package com.forte.qqrobot.socket;
 
+import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.config.LinkConfiguration;
+
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Set;
 
 /**
  * QQWebSocket连接器
@@ -22,10 +26,14 @@ public class QQWebSocketLinker {
      */
     public static QQWebSocketClient link(Class<? extends QQWebSocketClient> client, String url, int retryTime){
         QQWebSocketClient cc = null;
+        //获取连接配置
+        LinkConfiguration linkConfiguration = ResourceDispatchCenter.getLinkConfiguration();
         int times = 0;
         while(true){
             try {
-                cc = client.getConstructor(URI.class).newInstance(new URI(url));
+                //参数需要：URI、QQWebSocketMsgSender sender、Set<SocketListener> listeners
+                Object[] params = new Object[]{new URI(url), linkConfiguration.getListeners()};
+                cc = client.getConstructor(URI.class, Set.class).newInstance(params);
 //                cc = new QQWebSocketClient( new URI( url ) );
                 System.out.println("连接阻塞中...");
                 boolean b = cc.connectBlocking();

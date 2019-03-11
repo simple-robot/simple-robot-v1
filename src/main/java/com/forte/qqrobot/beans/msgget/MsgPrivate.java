@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgget;
  * @date Created in 2019/3/7 10:52
  * @since JDK1.8
  **/
-public class MsgPrivate {
+public class MsgPrivate implements MsgGet {
     /*
      {
             "nick":     "法欧特桑",
@@ -21,25 +21,25 @@ public class MsgPrivate {
             "msg":      "hi"
     }
      */
+            /** 消息类型：
+             * 21：私聊信息，subType （子类型，11/来自好友 1/来自在线状态 2/来自群 3/来自讨论组）
+             * 2：群消息，   "subType": "1"
+             * 4：讨论组消息，subType （子类型，11/来自好友 1/来自在线状态 2/来自群 3/来自讨论组）
+             * 事件类型：
+             * 101：群事件-管理员变动，   subType（1/被取消管理员 2/被设置管理员）
+             * 102：群事件-群成员减少，   subType（子类型，1/群员离开 2/群员被踢 3/自己(即登录号)被踢）
+             * 103：群事件-群成员增加，   subType（子类型，1/管理员已同意 2/管理员邀请）
+             * 201：好友事件-好友已添加， subType
+             * 301：请求-好友添加，      subType
+             * 302：请求-群添加         subType（子类型，1/他人申请入群 2/自己(即登录号)受邀入群）
+             * */
+            private Integer act;
              /** 昵称 */
              private String nick;
              /** 性别，0：男，1：女 */
              private Integer sex;
              /** 年龄 */
              private Integer age;
-             /** 消息类型：
-              * 21：私聊信息，subType （子类型，11/来自好友 1/来自在线状态 2/来自群 3/来自讨论组）
-              * 2：群消息，   "subType": "1"
-              * 4：讨论组消息，subType （子类型，11/来自好友 1/来自在线状态 2/来自群 3/来自讨论组）
-              * 事件类型：
-              * 101：群事件-管理员变动，   subType（1/被取消管理员 2/被设置管理员）
-              * 102：群事件-群成员减少，   subType（子类型，1/群员离开 2/群员被踢 3/自己(即登录号)被踢）
-              * 103：群事件-群成员增加，   subType（子类型，1/管理员已同意 2/管理员邀请）
-              * 201：好友事件-好友已添加， subType
-              * 301：请求-好友添加，      subType
-              * 302：请求-群添加         subType（子类型，1/他人申请入群 2/自己(即登录号)受邀入群）
-              * */
-             private String act;
              /** 来自的QQ号 */
              private String fromQQ;
              /** 信息子类型 */
@@ -88,11 +88,11 @@ public class MsgPrivate {
         this.error = error;
     }
 
-    public String getAct() {
+    public Integer getAct() {
         return act;
     }
 
-    public void setAct(String act) {
+    public void setAct(Integer act) {
         this.act = act;
     }
 

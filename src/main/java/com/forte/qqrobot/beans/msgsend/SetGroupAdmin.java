@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 11:44
  * @since JDK1.8
  **/
-public class SetGroupAdmin {
+public class SetGroupAdmin implements MsgSend {
     /*
     122, 置群管理员
     QQID，groupid，setadmin

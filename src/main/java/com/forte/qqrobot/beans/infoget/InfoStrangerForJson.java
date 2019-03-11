@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.infoget;
  * @date Created in 2019/3/8 14:30
  * @since JDK1.8
  **/
-public class InfoStrangerForJson {
+public class InfoStrangerForJson implements InfoGet {
     /*
     25304,以json串方式返回陌生人信息
     QQID,nocache
@@ -14,7 +14,7 @@ public class InfoStrangerForJson {
     error, act, return,QQID,nick,sex,age  (各字段具体含义详见本帖19楼说明)
      */
     /** 编号 */
-    private final Integer act = 25304;
+    private static final Integer act = 25304;
     /** qq号 */
     private String QQID;
     /** 大概是是否缓存？ */

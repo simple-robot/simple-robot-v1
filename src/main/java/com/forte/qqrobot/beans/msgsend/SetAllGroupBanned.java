@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 11:46
  * @since JDK1.8
  **/
-public class SetAllGroupBanned {
+public class SetAllGroupBanned implements MsgSend {
     /*
     123, 置全群禁言
     QQID，groupid，enableban

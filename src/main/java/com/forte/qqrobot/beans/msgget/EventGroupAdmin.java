@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgget;
  * @date Created in 2019/3/8 10:55
  * @since JDK1.8
  **/
-public class EventGroupAdmin {
+public class EventGroupAdmin implements MsgGet {
     /*
     101 群事件-管理员变动
     subType（1/被取消管理员 2/被设置管理员），sendTime，fromGroup，beingOperateQQ

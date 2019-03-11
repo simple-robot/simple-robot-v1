@@ -1,5 +1,6 @@
 package com.forte.qqrobot.socket;
 
+import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.msgsend.*;
 
 import java.util.Map;
@@ -19,10 +20,18 @@ public class QQWebSocketMsgSender {
     private final QQWebSocketMsgCreator creator;
 
     /** 构造 */
-    public QQWebSocketMsgSender(QQWebSocketClient client, QQWebSocketMsgCreator creator){
+    private QQWebSocketMsgSender(QQWebSocketClient client, QQWebSocketMsgCreator creator){
         this.client = client;
         this.creator = creator;
 
+    }
+
+    /**
+     * 工厂方法
+     * @return QQWebSocketMsgSender实例对象
+     */
+    public static QQWebSocketMsgSender of(QQWebSocketClient client){
+        return new QQWebSocketMsgSender(client, ResourceDispatchCenter.getQQWebSocketMsgCreator());
     }
 
     /* ———————————————— 信息发送方法 ———————————————— */
@@ -32,7 +41,7 @@ public class QQWebSocketMsgSender {
      * @param discussid 讨论组
      * @param msg       消息
      */
-    public void sendResponseJson_sendDisGroupMsg(String discussid, String msg){
+    public void sendResponse_sendDisGroupMsg(String discussid, String msg){
         client.send(creator.getResponseJson_sendDisGroupMsg(discussid, msg));
     }
 
@@ -41,7 +50,7 @@ public class QQWebSocketMsgSender {
      * @param groupid   群号
      * @param msg       消息
      */
-    public void sendResponseJson_sendGroupMsg(String groupid, String msg){
+    public void sendResponse_sendGroupMsg(String groupid, String msg){
         client.send(creator.getResponseJson_sendGroupMsg(groupid, msg));
     }
 
@@ -50,9 +59,7 @@ public class QQWebSocketMsgSender {
      * @param QQID  qq号
      * @param msg   消息
      */
-    public void sendResponseJson_sendMsgPrivate(String QQID, String msg){
-        System.out.println(creator.getResponseJson_sendMsgPrivate(QQID, msg));
-        System.out.println(client);
+    public void sendResponse_sendMsgPrivate(String QQID, String msg){
         client.send(creator.getResponseJson_sendMsgPrivate(QQID, msg));
     }
 
@@ -60,7 +67,7 @@ public class QQWebSocketMsgSender {
      * 赞
      * @param QQID qq号
      */
-    public void sendResponseJson_sendPraise(String QQID){
+    public void sendResponse_sendPraise(String QQID){
         client.send(creator.getResponseJson_sendPraise(QQID));
     }
 
@@ -70,7 +77,7 @@ public class QQWebSocketMsgSender {
      * @param groupid   群号
      * @param enableban 是否开启禁言
      */
-    public void sendResponseJson_setAllGroupBanned(String QQID, String groupid, String enableban){
+    public void sendResponse_setAllGroupBanned(String QQID, String groupid, String enableban){
         client.send(creator.getResponseJson_setAllGroupBanned(QQID, groupid, enableban));
     }
 
@@ -80,7 +87,7 @@ public class QQWebSocketMsgSender {
      * @param duration  时间，单位 秒
      * @param anomymous 匿名群员名称，大概
      */
-    public void sendResponseJson_setAnoGroupMemberBanned(String groupid, Long duration, String anomymous){
+    public void sendResponse_setAnoGroupMemberBanned(String groupid, Long duration, String anomymous){
         client.send(creator.getResponseJson_setAnoGroupMemberBanned(groupid, duration, anomymous));
     }
 
@@ -88,7 +95,7 @@ public class QQWebSocketMsgSender {
      * 讨论组退出
      * @param discussid 讨论组id
      */
-    public void sendResponseJson_setDisGroupExit(String discussid){
+    public void sendResponse_setDisGroupExit(String discussid){
         client.send(creator.getResponseJson_setDisGroupExit(discussid));
     }
 
@@ -98,7 +105,7 @@ public class QQWebSocketMsgSender {
      * @param remark
      * @param responseflag
      */
-    public void sendResponseJson_setFriendAddRequest(String responseoperation, String remark, String responseflag){
+    public void sendResponse_setFriendAddRequest(String responseoperation, String remark, String responseflag){
         client.send(creator.getResponseJson_setFriendAddRequest(responseoperation, remark, responseflag));
     }
 
@@ -108,7 +115,7 @@ public class QQWebSocketMsgSender {
      * @param groupid   群号
      * @param setadmin  是否设置为管理员
      */
-    public void sendResponseJson_setGroupAdmin(String QQID, String groupid, Boolean setadmin){
+    public void sendResponse_setGroupAdmin(String QQID, String groupid, Boolean setadmin){
         client.send(creator.getResponseJson_setGroupAdmin(QQID, groupid, setadmin));
     }
 
@@ -117,7 +124,7 @@ public class QQWebSocketMsgSender {
      * @param groupid           群号
      * @param enableanomymous   是否开启群匿名
      */
-    public void sendResponseJson_setGroupAno(String groupid, Boolean enableanomymous){
+    public void sendResponse_setGroupAno(String groupid, Boolean enableanomymous){
         client.send(creator.getResponseJson_setGroupAno(groupid, enableanomymous));
     }
 
@@ -126,7 +133,7 @@ public class QQWebSocketMsgSender {
      * @param groupid   群号
      * @param isdismiss 是否退出
      */
-    public void sendResponseJson_setGroupExit(String groupid, Boolean isdismiss){
+    public void sendResponse_setGroupExit(String groupid, Boolean isdismiss){
         client.send(creator.getResponseJson_setGroupExit(groupid, isdismiss));
     }
 
@@ -138,7 +145,7 @@ public class QQWebSocketMsgSender {
      * @param reason
      * @param responseflag
      */
-    public void sendResponseJson_setGroupJoinResquest(String requesttype, String responseoperation, String reason, String responseflag){
+    public void sendResponse_setGroupJoinResquest(String requesttype, String responseoperation, String reason, String responseflag){
         client.send(creator.getResponseJson_setGroupJoinResquest(requesttype, responseoperation, reason, responseflag));
     }
 
@@ -148,7 +155,7 @@ public class QQWebSocketMsgSender {
      * @param groupid   群号
      * @param duration  禁言时间，单位为秒
      */
-    public void sendResponseJson_setGroupMemberBanned(String QQID, String groupid, Long duration){
+    public void sendResponse_setGroupMemberBanned(String QQID, String groupid, Long duration){
         client.send(creator.getResponseJson_setGroupMemberBanned(QQID, groupid, duration));
     }
 
@@ -158,7 +165,7 @@ public class QQWebSocketMsgSender {
      * @param groupid   群号
      * @param newcard   新名片
      */
-    public void sendResponseJson_setGroupMemberCard(String QQID, String groupid, String newcard){
+    public void sendResponse_setGroupMemberCard(String QQID, String groupid, String newcard){
         client.send(creator.getResponseJson_setGroupMemberCard(QQID, groupid, newcard));
     }
 
@@ -168,7 +175,7 @@ public class QQWebSocketMsgSender {
      * @param groupid           群号
      * @param rejectaddrequest  是否拒绝添加请求
      */
-    public void sendResponseJson_setGroupMemberRemove(String QQID, String groupid, Boolean rejectaddrequest){
+    public void sendResponse_setGroupMemberRemove(String QQID, String groupid, Boolean rejectaddrequest){
         client.send(creator.getResponseJson_setGroupMemberRemove(QQID, groupid, rejectaddrequest));
     }
 
@@ -179,7 +186,7 @@ public class QQWebSocketMsgSender {
      * @param duration          设置时间，单位大概是秒
      * @param newspecialtitle   专属头衔
      */
-    public void sendResponseJson_setGroupMemberSpecialTitle(String QQID, String groupid, Long duration, String newspecialtitle){
+    public void sendResponse_setGroupMemberSpecialTitle(String QQID, String groupid, Long duration, String newspecialtitle){
         client.send(creator.getResponseJson_setGroupMemberSpecialTitle(QQID, groupid, duration, newspecialtitle));
     }
 

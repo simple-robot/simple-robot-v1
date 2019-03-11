@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 11:52
  * @since JDK1.8
  **/
-public class SetGroupAno {
+public class SetGroupAno implements MsgSend {
     /*
     125, 置群匿名设置
     groupid，enableanomymous

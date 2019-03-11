@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 11:36
  * @since JDK1.8
  **/
-public class SendPraise {
+public class SendPraise implements MsgSend {
 
     /*
     110, 发送赞

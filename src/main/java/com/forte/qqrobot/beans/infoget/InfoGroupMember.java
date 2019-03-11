@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.infoget;
  * @date Created in 2019/3/8 12:03
  * @since JDK1.8
  **/
-public class InfoGroupMember {
+public class InfoGroupMember implements InfoGet {
     /*
     130, 取群成员信息（注，info返回的是base64字节流，需要经过处理之后获取信息，如果需要以json串方式获取群成员信息请见25303）
     groupid，QQID，nocache
@@ -14,7 +14,7 @@ public class InfoGroupMember {
     error, act, return,info
      */
 
-    private final Integer act = 130;
+    private static final Integer act = 130;
     private String groupid;
     private String QQID;
     private String nocache;

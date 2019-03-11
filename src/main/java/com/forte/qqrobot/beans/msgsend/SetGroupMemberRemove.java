@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 11:38
  * @since JDK1.8
  **/
-public class SetGroupMemberRemove {
+public class SetGroupMemberRemove implements MsgSend {
     /*
     120, 置群员移除
     QQID，groupid，rejectaddrequest

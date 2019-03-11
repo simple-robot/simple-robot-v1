@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 12:08
  * @since JDK1.8
  **/
-public class SetDisGroupExit {
+public class SetDisGroupExit implements MsgSend {
     /*
     140, 置讨论组退出
     discussid

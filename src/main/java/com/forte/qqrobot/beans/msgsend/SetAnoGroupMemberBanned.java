@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 11:50
  * @since JDK1.8
  **/
-public class SetAnoGroupMemberBanned {
+public class SetAnoGroupMemberBanned implements MsgSend {
     /*
     124, 置匿名群员禁言
     groupid，duration，anomymous

@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgget;
  * @date Created in 2019/3/8 11:21
  * @since JDK1.8
  **/
-public class RequestGroup {
+public class RequestGroup implements MsgGet {
 
     /*
     302 请求-群添加

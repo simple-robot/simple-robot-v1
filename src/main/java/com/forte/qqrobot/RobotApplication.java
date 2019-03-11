@@ -1,8 +1,8 @@
 package com.forte.qqrobot;
 
-import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.forte.qqrobot.config.LinkConfiguration;
+import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.socket.*;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
@@ -49,6 +49,8 @@ public abstract class RobotApplication {
         ResourceDispatchCenter.saveCQCodeUtil(new CQCodeUtil());
         //将QQWebSocketMsgCreator放入资源调度中心
         ResourceDispatchCenter.saveQQWebSocketMsgCreator(new QQWebSocketMsgCreator());
+        //将DefaultWholeListener放入资源调度中心
+        ResourceDispatchCenter.saveDefaultWholeListener(new DefaultWholeListener());
     }
 
     /**

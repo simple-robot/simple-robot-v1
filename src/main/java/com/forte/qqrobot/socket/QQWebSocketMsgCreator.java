@@ -50,7 +50,6 @@ public class QQWebSocketMsgCreator {
             e.printStackTrace();
         }
 
-
         return JSON.toJSONString(bean);
     }
 

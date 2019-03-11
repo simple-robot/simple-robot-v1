@@ -1,10 +1,10 @@
 package com.forte.client;
 
+import com.forte.client.listener.ReportListener;
 import com.forte.qqrobot.RobotApplication;
 import com.forte.qqrobot.config.LinkConfiguration;
 import com.forte.qqrobot.socket.QQWebSocketClient;
 import com.forte.qqrobot.socket.QQWebSocketManager;
-import com.forte.qqrobot.socket.QQWebSocketMsgCreator;
 import org.quartz.SchedulerException;
 
 /**
@@ -23,13 +23,16 @@ public class RunApplication extends RobotApplication {
         run(new RunApplication());
     }
 
+
     /**
      * socket连接之前
+     * @param configuration 连接配置文件
      */
     @Override
     public void beforeLink(LinkConfiguration configuration) {
-        configuration.setSocketClient(MyRobotApplication.class);
         configuration.setLinkIp("139.199.116.5");
+        //注册一个监听器
+        configuration.registerListeners(new ReportListener());
     }
 
     /**

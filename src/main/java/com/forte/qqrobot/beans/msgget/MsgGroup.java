@@ -5,7 +5,7 @@ package com.forte.qqrobot.beans.msgget;
  * @date Created in 2019/3/7 11:09
  * @since JDK1.8
  **/
-public class MsgGroup {
+public class MsgGroup implements MsgGet {
     /*
     {
          "username":        "泰兰德",

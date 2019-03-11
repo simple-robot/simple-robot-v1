@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.infoget;
  * @date Created in 2019/3/8 14:28
  * @since JDK1.8
  **/
-public class InfoGroupMemberForJson {
+public class InfoGroupMemberForJson implements InfoGet {
     /*
     25303,以json串方式返回群成员信息
     groupid,QQID,nocache
@@ -18,7 +18,7 @@ public class InfoGroupMemberForJson {
      */
 
     /** 编号 */
-    private final Integer act = 25303;
+    private static final Integer act = 25303;
     /** 群号 */
     private String groupid;
     /** qq号 */

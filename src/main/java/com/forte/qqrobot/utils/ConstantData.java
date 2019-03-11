@@ -9,7 +9,7 @@ package com.forte.qqrobot.utils;
 public class ConstantData {
 
     /** 自身的qq号 */
-//    public static final String MY_QQ_CODE = "2257290268";
+    public static final String MY_QQ_CODE = "2257290268";
 
     /** 群号 */
 //    public static final String MY_GROUP_CODE = "581250423";

@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 11:30
  * @since JDK1.8
  **/
-public class SendGroupMsg {
+public class SendGroupMsg implements MsgSend {
     /*
     101, 发送群消息
     groupid,msg

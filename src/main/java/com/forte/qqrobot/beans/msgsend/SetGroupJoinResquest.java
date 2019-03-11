@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 14:24
  * @since JDK1.8
  **/
-public class SetGroupJoinResquest {
+public class SetGroupJoinResquest implements MsgSend {
     /*
     151, 置群添加请求
     requesttype，responseoperation，reason，responseflag

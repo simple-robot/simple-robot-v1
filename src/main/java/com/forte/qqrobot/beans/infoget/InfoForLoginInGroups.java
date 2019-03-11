@@ -7,7 +7,7 @@ package com.forte.qqrobot.beans.infoget;
  * @date Created in 2019/3/8 14:32
  * @since JDK1.8
  **/
-public class InfoForLoginInGroups {
+public class InfoForLoginInGroups implements InfoGet {
     /*
     25305,获取指定QQ号所在的所有群id和群名称
     QQID(此QQID仅为标记用，无论填写的QQ为多少，返回的群列表都是酷Q当前登录QQ号所在的群)
@@ -15,7 +15,7 @@ public class InfoForLoginInGroups {
     error，act，return，QQID，GroupList
      */
     /** 编号 */
-    private final Integer act = 25305;
+    private static final Integer act = 25305;
     /** qq号 (此QQID仅为标记用，无论填写的QQ为多少，返回的群列表都是酷Q当前登录QQ号所在的群) */
     private String QQID;
 

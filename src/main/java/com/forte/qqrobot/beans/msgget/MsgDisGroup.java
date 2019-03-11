@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgget;
  * @date Created in 2019/3/8 10:46
  * @since JDK1.8
  **/
-public class MsgDisGroup {
+public class MsgDisGroup implements MsgGet {
     /*
     4 讨论组消息
     subType，sendTime，fromDiscuss，fromQQ，msg，font, nick, sex, age

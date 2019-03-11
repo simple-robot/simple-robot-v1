@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.infoget;
  * @date Created in 2019/3/8 14:27
  * @since JDK1.8
  **/
-public class InfoLoginNick {
+public class InfoLoginNick implements InfoGet {
     /*
     25302,获取登录昵称
     请求json串只有一个act
@@ -14,7 +14,7 @@ public class InfoLoginNick {
     error, act, return,LoginNick
      */
     /** 编号 */
-    private final Integer act = 25302;
+    private static final Integer act = 25302;
 
     public Integer getAct() {
         return act;

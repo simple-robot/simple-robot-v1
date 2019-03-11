@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 12:00
  * @since JDK1.8
  **/
-public class SetGroupMemberSpecialTitle {
+public class SetGroupMemberSpecialTitle implements MsgSend {
     /*
     128, 置群成员专属头衔
     groupid，QQID，duration，newspecialtitle

@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 12:09
  * @since JDK1.8
  **/
-public class SetFriendAddRequest {
+public class SetFriendAddRequest implements MsgSend {
     /*
     150, 置好友添加请求
     responseoperation，remark，responseflag

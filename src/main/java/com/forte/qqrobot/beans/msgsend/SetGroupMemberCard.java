@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgsend;
  * @date Created in 2019/3/8 11:53
  * @since JDK1.8
  **/
-public class SetGroupMemberCard {
+public class SetGroupMemberCard implements MsgSend {
     /*
         126, 置群成员名片
     groupid，QQID，newcard

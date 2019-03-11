@@ -39,6 +39,8 @@ public enum MsgGetTypes {
     /** 请求-群添加 */
     requestGroup(302, RequestGroup.class),
 
+    /** 未知的消息 */
+    unknownMsg(-999, UnknownMsg.class),
     ;
 
 
@@ -96,7 +98,7 @@ public enum MsgGetTypes {
             case 102: return eventGroupMemberReduce;
             case 301: return requestFriend;
             case 302: return requestGroup;
-            default: return null;
+            default: return unknownMsg;
         }
     }
 
