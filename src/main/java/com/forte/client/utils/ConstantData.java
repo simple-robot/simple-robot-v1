@@ -15,7 +15,7 @@ public class ConstantData {
 //    public static final String MY_GROUP_CODE = "581250423";
 
     /** 服务器ip：139.199.116.5 */
-//    public static String LEMOC_URL = "ws://139.199.116.5:25303";
+    public static String LEMOC_IP = "139.199.116.5";
 
 
 }

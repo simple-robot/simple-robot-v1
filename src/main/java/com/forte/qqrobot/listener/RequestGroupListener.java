@@ -12,5 +12,5 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  **/
 public interface RequestGroupListener extends SocketListener{
 
-    void onMessage(RequestGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender);
+    boolean onMessage(RequestGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender);
 }

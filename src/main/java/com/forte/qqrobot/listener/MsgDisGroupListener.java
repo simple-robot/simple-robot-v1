@@ -13,6 +13,6 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  **/
 public interface MsgDisGroupListener extends SocketListener{
 
-    void onMessage(MsgDisGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender);
+    boolean onMessage(MsgDisGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender);
 
 }

@@ -2,6 +2,7 @@ package com.forte.qqrobot.utils;
 
 import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.types.CQCodeTypes;
+import sun.java2d.pipe.SpanIterator;
 
 import java.util.*;
 import java.util.stream.Collectors;

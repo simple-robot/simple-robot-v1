@@ -8,16 +8,9 @@ import javax.script.ScriptException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.SimpleTimeZone;
-import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * 方法执行工具
@@ -40,10 +33,10 @@ public class MethodUtil {
     public static Object invoke(Object obj, Object[] args, Method method) throws InvocationTargetException, IllegalAccessException {
         //获取参数的数据类型数组，准备转化数据类型
         Parameter[] parameters = method.getParameters();
-        //如果传入参数与方法参数数量不符 ，
+        //如果传入参数与方法参数数量不符 ，抛出异常
         //不知道是否能识别 String... args 这种参数
         if (args.length != parameters.length) {
-            throw new RuntimeException("参数长度错误！");
+            throw new RuntimeException("参数长度不匹配");
         }
         //创建一个新的Object数组保存转化后的参数，如果使用原数组的话会抛异常：ArrayStoreException
         Object[] newArr = new Object[args.length];
@@ -83,6 +76,16 @@ public class MethodUtil {
 
 
     /**
+     * Filter out the Object Methods<br>
+     * 过滤掉Object中继承来的方法
+     * @param methods       需要过滤的方法列表
+     */
+    public static List<Method> getOriginal(List<Method> methods){
+        return methods.stream().parallel().filter(m -> Arrays.stream(Object.class.getMethods()).noneMatch(om -> om.equals(m))).collect(Collectors.toList());
+    }
+
+
+    /**
      * 将一个方法存至缓存
      */
     private void saveChcheMethod() {
@@ -93,7 +96,6 @@ public class MethodUtil {
 
     /**
      * js中的eval函数，应该是只能进行简单的计算
-     * 只能执行js代码字符串
      * 利用js脚本完成
      *
      * @param str 需要进行eval执行的函数
@@ -108,5 +110,7 @@ public class MethodUtil {
         return eval;
     }
 
+
 }
+
 

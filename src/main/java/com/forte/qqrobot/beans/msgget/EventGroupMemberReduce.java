@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgget;
  * @date Created in 2019/3/8 11:01
  * @since JDK1.8
  **/
-public class EventGroupMemberReduce implements MsgGet {
+public class EventGroupMemberReduce implements EventGet {
 
     /*
     102 群事件-群成员减少

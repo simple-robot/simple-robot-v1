@@ -4,7 +4,6 @@ import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.socket.QQWebSocketClient;
-import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 
 import java.util.*;
 
@@ -22,7 +21,7 @@ public final class LinkConfiguration {
     /** 连接端口号，默认为25303 */
     private Integer port = 25303;
 
-    /** 连接用的客户端class对象 */
+    /** 连接用的客户端class对象，默认为{@link QQWebSocketClient} */
     private Class<? extends QQWebSocketClient> socketClient = QQWebSocketClient.class;
 
     /** 全部监听器 */
@@ -31,6 +30,11 @@ public final class LinkConfiguration {
     /** 全部初始化监听器 */
     private Set<InitListener> initListeners = new HashSet<>();
 
+    /** 本机QQ号 */
+    private String localQQCode = "";
+
+
+    /*  ————————————————  监听器执行策略 ———————————————— */
 
     /**
      * 注册监听器
@@ -67,12 +71,22 @@ public final class LinkConfiguration {
                 });
     }
 
+
     /** 获取连接的完整地址 */
     public String getLinkUrl(){
         return "ws://"+ linkIp +":" + port;
     }
 
 
+    /* —————————————— getter & setter —————————————— */
+
+    public String getLocalQQCode() {
+        return localQQCode;
+    }
+
+    public void setLocalQQCode(String localQQCode) {
+        this.localQQCode = localQQCode;
+    }
 
     public String getLinkIp() {
         return linkIp;

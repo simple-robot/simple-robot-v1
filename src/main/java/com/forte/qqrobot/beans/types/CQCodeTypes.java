@@ -111,6 +111,11 @@ public enum CQCodeTypes {
      */
     share("share", new String[]{"url", "title", "content", "image"}),
 
+    /**
+     * emoji表情
+     */
+    emoji("emoji", new String[]{"id"}),
+
     ;
 
 
@@ -134,6 +139,7 @@ public enum CQCodeTypes {
             case "music" :          return music;
             case "music_custom" :   return music_custom;
             case "share" :          return share;
+            case "emoji" :          return emoji;
             default:                return null;
         }
     }

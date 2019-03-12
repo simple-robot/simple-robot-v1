@@ -3,6 +3,8 @@ package com.forte.qqrobot;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.forte.qqrobot.config.LinkConfiguration;
 import com.forte.qqrobot.listener.DefaultWholeListener;
+import com.forte.qqrobot.listener.invoker.ListenerFilter;
+import com.forte.qqrobot.listener.invoker.ListenerInvoker;
 import com.forte.qqrobot.socket.*;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
@@ -18,12 +20,6 @@ public abstract class RobotApplication {
 
     /** 主客户端 */
     public static QQWebSocketClient mainClient;
-
-//    /** 自身对象 */
-//    private static RobotApplication application;
-
-//    /** 连接时的配置 */
-//    private static final LinkConfiguration configuration;
 
     /**
      * 初始化
@@ -51,6 +47,10 @@ public abstract class RobotApplication {
         ResourceDispatchCenter.saveQQWebSocketMsgCreator(new QQWebSocketMsgCreator());
         //将DefaultWholeListener放入资源调度中心
         ResourceDispatchCenter.saveDefaultWholeListener(new DefaultWholeListener());
+        //将ListenerInvoker放入资源调度中心
+        ResourceDispatchCenter.saveListenerInvoker(new ListenerInvoker());
+        //将ListenerFilter放入资源调度中心
+        ResourceDispatchCenter.saveListenerFilter(new ListenerFilter());
     }
 
     /**
@@ -88,7 +88,7 @@ public abstract class RobotApplication {
         //连接之前
         application.beforeLink(ResourceDispatchCenter.getLinkConfiguration());
         //连接socket
-        QQWebSocketManager qqWebSocketManager = lineSocket();
+        lineSocket();
         //连接之后
         application.afterLink(/* 连接socket */);
 

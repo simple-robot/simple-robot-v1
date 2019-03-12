@@ -1,4 +1,4 @@
-package com.forte.qqrobot.utils.scanner;
+package com.forte.qqrobot.scanner;
 
 import java.io.File;
 import java.io.FileFilter;

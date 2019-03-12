@@ -1,10 +1,12 @@
 package com.forte.client;
 
+import com.forte.client.listener.KeywordListener;
+import com.forte.client.listener.LaoSiJiSbListener;
 import com.forte.client.listener.ReportListener;
 import com.forte.client.listener.TimeTaskListener;
+import com.forte.client.utils.ConstantData;
 import com.forte.qqrobot.RobotApplication;
 import com.forte.qqrobot.config.LinkConfiguration;
-import org.quartz.SchedulerException;
 
 /**
  * DEMO-如何使用
@@ -32,11 +34,18 @@ public class RunApplication extends RobotApplication {
     @Override
     public void beforeLink(LinkConfiguration configuration) {
         //服务器地址
-        configuration.setLinkIp("localhost");
+        configuration.setLinkIp( ConstantData.LEMOC_IP );
         //注册初始化监听器
         configuration.registerInitListeners(new TimeTaskListener());
         //注册监听器
-        configuration.registerListeners(new ReportListener());
+        configuration.registerListeners(
+                new ReportListener(),
+                new LaoSiJiSbListener(),
+                new KeywordListener()
+        );
+        //记录本机QQ号
+        configuration.setLocalQQCode(ConstantData.MY_QQ_CODE);
+
     }
 
     /**
@@ -44,10 +53,5 @@ public class RunApplication extends RobotApplication {
      */
     @Override
     public void afterLink() {
-        //创建定时任务
-//        try {
-//            new TimeTasks().run();
-//        } catch (SchedulerException ignore) {
-//        }
     }
 }

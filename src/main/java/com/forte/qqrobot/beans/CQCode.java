@@ -91,12 +91,22 @@ public class CQCode {
     }
 
     /**
+     * 获取某个参数
+     * @param key key
+     * @return  参数
+     */
+    public String getParam(String key){
+        return PARAMS.get(key);
+    }
+
+    /**
      * 私有构造
      */
     private CQCode(CQCodeTypes cqCodeTypes, Map<String, String> params){
         this.CQ_CODE_TYPE = cqCodeTypes;
         this.PARAMS = params;
         //构建toString字符串
+        System.out.println(CQ_CODE_TYPE);
         StringJoiner joiner = getJoiner(CQ_CODE_TYPE.getFunction());
         PARAMS.forEach((k,v) -> joiner.add(k+"="+v));
         this.TO_STRING = joiner.toString();

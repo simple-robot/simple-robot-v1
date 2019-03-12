@@ -6,7 +6,7 @@ package com.forte.qqrobot.beans.msgget;
  * @date Created in 2019/3/8 11:14
  * @since JDK1.8
  **/
-public class EventFriendAdded implements MsgGet {
+public class EventFriendAdded implements EventGet {
     /*
     201 好友事件-好友已添加
     subType，sendTime，fromQQ

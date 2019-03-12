@@ -16,8 +16,6 @@ import java.util.Set;
  **/
 public class QQWebSocketLinker {
 
-
-
     /**
      * 连接qqwebsocket
      * @param url        连接地址
@@ -29,7 +27,28 @@ public class QQWebSocketLinker {
         //获取连接配置
         LinkConfiguration linkConfiguration = ResourceDispatchCenter.getLinkConfiguration();
         int times = 0;
-        while(true){
+        boolean localB = true;
+
+        //连接的时候先尝试一次本地连接
+        try {
+        Object[] localParams = new Object[]{
+                new URI("localhost"),
+                linkConfiguration.getListeners(),
+                linkConfiguration.getInitListeners()
+        };
+            cc = client.getConstructor(URI.class, Set.class, Set.class).newInstance(localParams);
+            localB = cc.connectBlocking();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | InterruptedException | URISyntaxException e) {
+            System.out.println("本地连接失败");
+            e.printStackTrace();
+        }
+
+        if(localB){
+            System.out.println("本地连接成功");
+        }
+
+        //如果本地连接失败，正常连接
+        while(!localB){
             try {
                 //参数需要：URI、QQWebSocketMsgSender sender、Set<SocketListener> listeners、set<InitListener> initListeners
                 Object[] params = new Object[]{
@@ -38,7 +57,6 @@ public class QQWebSocketLinker {
                         linkConfiguration.getInitListeners()
                 };
                 cc = client.getConstructor(URI.class, Set.class, Set.class).newInstance(params);
-//                cc = new QQWebSocketClient( new URI( url ) );
                 System.out.println("连接阻塞中...");
                 boolean b = cc.connectBlocking();
                 System.out.println(b?"连接成功":"连接失败");
@@ -65,6 +83,9 @@ public class QQWebSocketLinker {
                 }
             }
         }
+
+        //循环结束即认定为连接成功
+        linkSuccess();
         return cc;
     }
 
@@ -84,6 +105,17 @@ public class QQWebSocketLinker {
      */
     public static QQWebSocketClient link(String url){
         return link(QQWebSocketClient.class, url, -1);
+    }
+
+
+    /**
+     * 连接成功回调方法
+     */
+    private static void linkSuccess(){
+        //获取连接配置
+        LinkConfiguration linkConfiguration = ResourceDispatchCenter.getLinkConfiguration();
+        //加载普通监听器
+        linkConfiguration.getListeners().forEach(ResourceDispatchCenter.getListenerInvoker()::loadListener);
     }
 
 

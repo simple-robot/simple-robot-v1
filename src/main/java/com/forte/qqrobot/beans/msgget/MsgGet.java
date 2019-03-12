@@ -8,4 +8,7 @@ import com.forte.qqrobot.beans.MsgBean;
  * @since JDK1.8
  **/
 public interface MsgGet extends MsgBean {
+
+    String getMsg();
+
 }

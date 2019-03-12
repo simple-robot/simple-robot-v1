@@ -1,9 +1,9 @@
-package com.forte.qqrobot.utils.scanner;
+package com.forte.qqrobot.scanner;
 
 import java.util.List;
 
 /**
- * 包扫描工具
+ * 包扫描工具（BUG）
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/9 17:09
  * @since JDK1.8
@@ -22,10 +22,15 @@ public class ClassScanner extends BasePackageScanner {
         classList.add(klass);
     }
 
+    /**
+     * 获取扫描list
+     */
+    public List<Class> getList(){
+        return classList;
+    }
 
     /**
      * 构造
-     * @param classList
      */
     public ClassScanner(List<Class> classList){
         this.classList = classList;
