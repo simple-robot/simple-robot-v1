@@ -37,14 +37,17 @@ public class RunApplication extends RobotApplication {
         configuration.setLinkIp( ConstantData.LEMOC_IP );
         //注册初始化监听器
         configuration.registerInitListeners(new TimeTaskListener());
-        //注册监听器
-        configuration.registerListeners(
-                new ReportListener(),
-                new LaoSiJiSbListener(),
-                new KeywordListener()
-        );
+//        //注册监听器
+//        configuration.registerListeners(
+//                new ReportListener(),
+//                new LaoSiJiSbListener(),
+//                new KeywordListener()
+//        );
         //记录本机QQ号
         configuration.setLocalQQCode(ConstantData.MY_QQ_CODE);
+
+        //扫描加载普通监听器
+        configuration.scannerListener("com.forte.client.listener");
 
     }
 

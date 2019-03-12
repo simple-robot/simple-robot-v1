@@ -3,9 +3,11 @@ package com.forte.qqrobot.config;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
+import com.forte.qqrobot.scanner.ScanningFile;
 import com.forte.qqrobot.socket.QQWebSocketClient;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 连接前的配置类
@@ -34,7 +36,7 @@ public final class LinkConfiguration {
     private String localQQCode = "";
 
 
-    /*  ————————————————  监听器执行策略 ———————————————— */
+    /*  ————————————————  参数配置 ———————————————— */
 
     /**
      * 注册监听器
@@ -70,6 +72,47 @@ public final class LinkConfiguration {
                     return set;
                 });
     }
+
+    /**
+     * 包扫描普通监听器
+     * @param packageName   包名
+     */
+    public void scannerListener(String packageName){
+        List<Class> list = new ScanningFile(packageName, SocketListener.class).find().getEleStrategyList();
+
+        registerListeners(list.stream().map(lc -> {
+            try {
+                return (SocketListener) lc.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+                System.err.println("监听器[" + lc + "]实例化异常：没有无参构造");
+                return null;
+            }
+        }).filter(Objects::nonNull).toArray(SocketListener[]::new));
+    }
+
+
+    /**
+     * 包扫描初始化监听器
+     * @param packageName   包名
+     * @return
+     */
+    public void scannerInitListener(String packageName){
+        List<Class> list = new ScanningFile(packageName, InitListener.class).find().getEleStrategyList();
+
+        registerInitListeners(list.stream().map(lc -> {
+            try {
+                return (InitListener) lc.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+                System.err.println("监听器[" + lc + "]实例化异常：没有无参构造");
+                return null;
+            }
+        }).filter(Objects::nonNull).toArray(InitListener[]::new));
+
+    }
+
+
 
 
     /** 获取连接的完整地址 */

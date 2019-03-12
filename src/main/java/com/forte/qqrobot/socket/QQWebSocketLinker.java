@@ -16,6 +16,8 @@ import java.util.Set;
  **/
 public class QQWebSocketLinker {
 
+    private static final String LOCAL_IP_WITH_HEAD = "ws://localhost:";
+
     /**
      * 连接qqwebsocket
      * @param url        连接地址
@@ -31,8 +33,10 @@ public class QQWebSocketLinker {
 
         //连接的时候先尝试一次本地连接
         try {
-        Object[] localParams = new Object[]{
-                new URI("localhost"),
+            System.out.println("尝试本地连接...");
+            //准备参数
+            Object[] localParams = new Object[]{
+                new URI(LOCAL_IP_WITH_HEAD + linkConfiguration.getPort()),
                 linkConfiguration.getListeners(),
                 linkConfiguration.getInitListeners()
         };
