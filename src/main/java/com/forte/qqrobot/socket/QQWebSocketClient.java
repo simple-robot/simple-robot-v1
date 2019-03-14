@@ -102,7 +102,7 @@ public class QQWebSocketClient extends WebSocketClient {
      * @param msg       信息内容
      * @return  传给监听器的参数
      */
-    private Object[] getParams(MsgGet msgGet, String msg){
+    private final Object[] getParams(MsgGet msgGet, String msg){
         //配置参数
         //获取cqCodeUtil
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();

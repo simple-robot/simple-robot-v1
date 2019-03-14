@@ -44,7 +44,6 @@ public final class LinkConfiguration {
     public void registerListeners(SocketListener... listeners){
         listenerSet.addAll(Arrays.asList(listeners));
     }
-
     /**
      * 注册初始化监听器
      * @param listeners 初始化监听器
@@ -52,14 +51,12 @@ public final class LinkConfiguration {
     public void registerInitListeners(InitListener... listeners){
         initListeners.addAll(Arrays.asList(listeners));
     }
-
     /**
      * 获取初始化监听器
      */
     public Set<InitListener> getInitListeners(){
         return initListeners;
     }
-
     /**
      * 获取所有监听器，如果没有注册监听器则使用默认的监听器
      * @return 获取所有注册的监听器

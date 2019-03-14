@@ -11,11 +11,47 @@
 
 ## 使用说明
 
-1、新建一个项目，导入jar包（maven暂时没有上传，所以暂时没有依赖）
+> 标记了*的步骤为非必要步骤
+
+- ##### 新建一个项目，导入jar包（maven暂时没有上传，所以暂时没有依赖）
+
+- ##### 创建一个类，继承  `com.forte.qqrobot.RobotApplication` 类
+
+  此类为抽象类，有两个抽象方法：
+
+  ```java
+  /** socket连接前 */
+  public abstract void beforeLink(LinkConfiguration configuration);
+  /** socket连接后 */
+  public abstract void afterLink();
+  ```
 
 
 
+​	其中，方法`beforeLink(LinkConfiguration configuration)`的参数：`LinkConfiguration` 为连接配置对象，使用它来配置连接信息：
 
+```java
+//配置装有LEMOC插件的服务器IP地址，不配置则默认为"localhost"
+setLinkIp("127.0.0.1");
+//配置LEMOC插件配置的端口号，不配置默认为25303
+setPort(25303);
+//配置客户端，一般情况下不需要配置，如果想要自行配置请参考后续步骤
+setSocketClient(Class<? extends QQWebSocketClient> socketClient);
+//配置信息接收监听器，监听器的配置请参考后续步骤
+registerListeners(SocketListener... listeners);
+//使用包扫描加载监听器，(有可能存在BUG)
+scannerListener(String packageName);
+//配置初始化连接监听器，初始化监听器的配置请参考后续步骤
+registerInitListeners(InitListener... listeners);
+//使用包扫描加载监听器，(有可能存在BUG)
+scannerInitListener(String packageName);
+//设定本机QQ号，如果不配置默认为空，则将会无法正常获取是否at的信息
+setLocalQQCode(String qqCode);
+```
+
+
+
+（未完待续）
 
 
 
