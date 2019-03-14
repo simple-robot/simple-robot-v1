@@ -19,7 +19,7 @@ public class QQWebSocketMsgSender {
     /** 响应信息字符串生成器 MsgCreator */
     private final QQWebSocketMsgCreator creator;
 
-    /** 构造 */
+    /** 私有构造 */
     private QQWebSocketMsgSender(QQWebSocketClient client, QQWebSocketMsgCreator creator){
         this.client = client;
         this.creator = creator;

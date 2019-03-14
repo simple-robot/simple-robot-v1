@@ -3,11 +3,10 @@ package com.forte.qqrobot.config;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
-import com.forte.qqrobot.scanner.ScanningFile;
+import com.forte.qqrobot.scanner.FileScanner;
 import com.forte.qqrobot.socket.QQWebSocketClient;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 连接前的配置类
@@ -78,7 +77,7 @@ public final class LinkConfiguration {
      * @param packageName   包名
      */
     public void scannerListener(String packageName){
-        List<Class> list = new ScanningFile(packageName, SocketListener.class).find().getEleStrategyList();
+        List<Class> list = new FileScanner(packageName, SocketListener.class).find().getEleStrategyList();
 
         registerListeners(list.stream().map(lc -> {
             try {
@@ -98,7 +97,7 @@ public final class LinkConfiguration {
      * @return
      */
     public void scannerInitListener(String packageName){
-        List<Class> list = new ScanningFile(packageName, InitListener.class).find().getEleStrategyList();
+        List<Class> list = new FileScanner(packageName, InitListener.class).find().getEleStrategyList();
 
         registerInitListeners(list.stream().map(lc -> {
             try {
