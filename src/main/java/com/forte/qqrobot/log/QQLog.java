@@ -18,7 +18,7 @@ public class QQLog {
     }
 
     public static void debug(String msg){
-        System.out.println(getHead(DEBUG_HEAD) + " : " + msg);
+        System.err.println(getHead(DEBUG_HEAD) + " : " + msg);
     }
 
     private static String getHead(String head){

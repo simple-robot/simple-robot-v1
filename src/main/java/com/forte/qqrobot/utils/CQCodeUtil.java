@@ -296,13 +296,13 @@ public class CQCodeUtil {
 
     /**
      * 判断是否存在at某个qq
-     * @return 是否at了自己
+     * @return 是否at了某个qq
      */
     public boolean isAt(String msg, String qq){
         if(msg == null){
             return false;
         }
-        //如果存在at的CQ码并且参数‘qq’是自身qq号
+        //如果存在at的CQ码并且参数‘qq’是某个qq
         return getCQCodeFromMsg(msg).stream().anyMatch(cq -> cq.getCQCodeTypes().equals(CQCodeTypes.at) && cq.getParams().get("qq").equals(qq));
     }
 

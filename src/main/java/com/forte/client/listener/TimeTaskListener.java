@@ -1,6 +1,7 @@
 package com.forte.client.listener;
 
-import com.forte.client.timetask.MyJob;
+import com.forte.client.timetask.AdvanceBanJob;
+import com.forte.client.timetask.BanJob;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
@@ -37,25 +38,55 @@ public class TimeTaskListener implements InitListener {
      * @throws SchedulerException
      */
     public void run(CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) throws SchedulerException {
-        //创建一个jobDetail的实例，将该实例与HelloJob Class绑定
-        JobDetail jobDetail = JobBuilder.newJob(MyJob.class).withIdentity("banJob").build();
 
+        /* ———————— 创造工作类 ———————— */
+
+        //创建一个jobDetail的实例，将该实例与Ban Class绑定,每日执行禁言
+        JobDetail BanJob = JobBuilder.newJob(BanJob.class).withIdentity("banJob").build();
         //向工作类传递参数
-        jobDetail.getJobDataMap().put("sender", sender);
-        jobDetail.getJobDataMap().put("cqCodeUtil", cqCodeUtil);
+        BanJob.getJobDataMap().put("sender", sender);
+        BanJob.getJobDataMap().put("cqCodeUtil", cqCodeUtil);
 
-        //创建一个Trigger触发器的实例，定义该job立即执行，并且每2秒执行一次，一直执行
-        CronTrigger cronTrigger = TriggerBuilder.newTrigger()
+
+        //创建一个jobDetail的实例，将该实例与
+        JobDetail advanceBanJob = JobBuilder.newJob(AdvanceBanJob.class).withIdentity("advanceBanJob").build();
+        //向工作类传递参数
+        advanceBanJob.getJobDataMap().put("sender", sender);
+        advanceBanJob.getJobDataMap().put("cqCodeUtil", cqCodeUtil);
+
+
+
+
+
+        /* ———————— 创建Trigger触发器的实例 ———————— */
+
+
+        //创建一个Trigger触发器的实例，每天12点执行
+        CronTrigger cronTrigger_12_00 = TriggerBuilder.newTrigger()
                 .withIdentity("banTrigger")
                 .startNow()
                 //每天0点执行
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 * * ?")).build();
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 * * ? *")).build();
+
+
+        //创建一个Trigger触发器的实例，每天差5分钟12点执行
+        CronTrigger cronTrigger_11_55 = TriggerBuilder.newTrigger()
+                .withIdentity("advanceBanTrigger")
+                .startNow()
+                //每天0点执行
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 55 23 * * ? *")).build();
+
+        /* ———————— 创建schedule实例 ———————— */
+
         //创建schedule实例
         StdSchedulerFactory factory = new StdSchedulerFactory();
         Scheduler scheduler = factory.getScheduler();
         //执行任务
         scheduler.start();
-        scheduler.scheduleJob(jobDetail, cronTrigger);
+        //11点55执行的任务
+        scheduler.scheduleJob(advanceBanJob, cronTrigger_11_55);
+        //12点执行ban任务
+        scheduler.scheduleJob(BanJob, cronTrigger_12_00);
     }
 
 }
