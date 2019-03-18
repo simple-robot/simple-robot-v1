@@ -39,7 +39,6 @@ public class ReportHelper {
         if(at){
             return false;
         }
-
         //消息
         String msg = msgGroup.getMsg();
         //发信人qq
@@ -128,7 +127,7 @@ public class ReportHelper {
         //如果此群有记录，查看记录
         }else{
             //如果群员qq相同，追加记录
-            if(groupMsgs[1].groupMemberCode.equals(groupCode)){
+            if(groupMsgs[1].groupMemberCode.equals(fromQQ)){
                 groupMsgs[1].addMsg(msg);
             }else{
                 //如果群员qq不同，将本次记录转移至上次，并记录本次
@@ -160,7 +159,7 @@ public class ReportHelper {
         //如果需要复读，将当前消息放至上一条消息并复读
         if(needReport){
             setLastGroupMsg(groupCode, thisMsgs);
-            thisMsgs.doReport(groupCode, sender, 950L);
+            thisMsgs.doReport(groupCode, sender,900L,  950L);
         }
 
         return needReport;
@@ -237,107 +236,129 @@ public class ReportHelper {
 
     }
 
+}
+
+/**
+ * ——————内部类，记录群员消息
+ */
+class GroupMsg{
+    /** 群员qq号 */
+    final String groupMemberCode;
+    /** 上次说的话 */
+    final List<String> msgs = new ArrayList<>();
+
+    /** 默认的空消息 */
+    static final GroupMsg defaultNullMsg = new GroupMsg("00000", "");
+
+    /** 此消息是否已经被复读
+     *
+     * */
+    boolean report = false;
     /**
-     * ——————内部类，记录群员消息
+     * 记录一句话
+     * @param msg 消息
      */
-    private static class GroupMsg{
-        /** 群员qq号 */
-        private final String groupMemberCode;
-        /** 上次说的话 */
-        private final List<String> msgs = new ArrayList<>();
+    void addMsg(String msg){
+        msgs.add(msg);
+    }
 
-        /** 此消息是否已经被复读
-         *
-         * */
-        private boolean report = false;
-        /**
-         * 记录一句话
-         * @param msg 消息
-         */
-        public void addMsg(String msg){
-            msgs.add(msg);
+    /**
+     * 判断两个人说的话是否相同
+     * @param groupMsg  另一个人说的话记录
+     */
+    boolean isSame(GroupMsg groupMsg){
+        //如果为null，直接返回null
+        if(groupMsg == null){
+            return false;
         }
 
-        /**
-         * 判断两个人说的话是否相同
-         * @param groupMsg  另一个人说的话记录
-         */
-        public boolean isSame(GroupMsg groupMsg){
-            //如果为null，直接返回null
-            if(groupMsg == null){
-                return false;
-            }
+        return groupMsg.msgs.equals(this.msgs);
+    }
 
-            return groupMsg.msgs.equals(this.msgs);
+    /**
+     * 传入上一次的消息集，判断是否需要复读
+     */
+    boolean needReport(GroupMsg lastMsg){
+        if(lastMsg == null){
+            return false;
         }
 
-        /**
-         * 传入上一次的消息集，判断是否需要复读
-         * @return
-         */
-        private boolean needReport(GroupMsg groupMsg){
-            if(groupMsg == null){
-                return false;
-            }
-
-            //如果上一条消息被复读了，且当前消息与他相同，标记为已复读
-            if(groupMsg.isReport() && this.isSame(groupMsg)){
-                reported();
-                return false;
+        //如果上一条消息被复读了，且当前消息与他相同，标记为已复读
+        if(lastMsg.isReport() && this.isSame(lastMsg)){
+            reported();
+            return false;
             //如果上一条被标记为已复读，但是当前消息与上一条不同，标记为未复读
-            }else if(groupMsg.isReport() && (!this.isSame(groupMsg))){
-                notReported();
-                return false;
+        }else if(lastMsg.isReport() && (!this.isSame(lastMsg))) {
+            notReported();
+            return false;
+            //如果当前消息只有一条且与上一条的最后一条相同，也复读
+        }else if(this.msgs.size() == 1 && lastMsg.msgs.get(lastMsg.msgs.size() - 1).equals(this.msgs.get(0))){
+            lastMsg.reported();
+            reported();
+            return true;
             //如果上一天消息没有被标记复读，而且当前消息与上一条一样，标记两者为已经复读，返回true
-            }else if((!groupMsg.isReport()) && this.isSame(groupMsg)){
-                groupMsg.reported();
-                reported();
-                return true;
+        }else if((!lastMsg.isReport()) && this.isSame(lastMsg)){
+            lastMsg.reported();
+            reported();
+            return true;
             // 否则返回false
-            }else return false;
+        }else return false;
+    }
+
+    /**
+     * 是否被复读了
+     */
+    boolean isReport(){
+        return report;
+    }
+
+    /**
+     * 标记为已经复读
+     */
+    void reported(){
+        this.report = true;
+    }
+    /**
+     * 标记为未复读
+     */
+    void notReported(){
+        this.report = false;
+    }
+
+    /**
+     * 进行复读
+     */
+    void doReport(String groupCode, QQWebSocketMsgSender sender, Long waitTime){
+        doReport(groupCode, sender, 0L, waitTime);
+    }
+
+    /**
+     * 进行复读
+     */
+    void doReport(String groupCode, QQWebSocketMsgSender sender, Long firstWait, Long waitTime){
+        //先等待
+        try {
+            Thread.sleep(firstWait);
+        } catch (InterruptedException ignore) {
+            //who care ?
         }
 
-        /**
-         * 是否被复读了
-         */
-        private boolean isReport(){
-            return report;
-        }
+        //遍历消息
+        msgs.forEach(msg -> {
+            sender.sendGroupMsg(groupCode, msg);
+            try {
+                Thread.sleep(waitTime);
+            } catch (InterruptedException ignore) {
+                //who care ?
+            }
+        });
+    }
 
-        /**
-         * 标记为已经复读
-         */
-        private void reported(){
-            this.report = true;
-        }
-        /**
-         * 标记为未复读
-         */
-        private void notReported(){
-            this.report = false;
-        }
-
-        /**
-         * 进行复读
-         */
-        private void doReport(String groupCode, QQWebSocketMsgSender sender, Long waitTime){
-            //遍历消息
-            msgs.forEach(msg -> {
-                sender.sendGroupMsg(groupCode, msg);
-                try {
-                    Thread.sleep(waitTime);
-                } catch (InterruptedException ignore) {
-                    //who care ?
-                }
-            });
-        }
-
-        /**
-         * 构造一个新的消息记录
-         */
-        GroupMsg(String groupMemberCode, String msg){
-            this.groupMemberCode = groupMemberCode;
-            this.msgs.add(msg);
-        }
+    /**
+     * 构造一个新的消息记录
+     */
+    GroupMsg(String groupMemberCode, String msg){
+        this.groupMemberCode = groupMemberCode;
+        this.msgs.add(msg);
     }
 }
