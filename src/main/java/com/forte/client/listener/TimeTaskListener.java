@@ -3,6 +3,7 @@ package com.forte.client.listener;
 import com.forte.client.timetask.AdvanceBanJob;
 import com.forte.client.timetask.BanJob;
 import com.forte.qqrobot.listener.InitListener;
+import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import org.quartz.*;
@@ -84,9 +85,21 @@ public class TimeTaskListener implements InitListener {
         //执行任务
         scheduler.start();
         //11点55执行的任务
-        scheduler.scheduleJob(advanceBanJob, cronTrigger_11_55);
+        scheduleJob(scheduler, advanceBanJob, cronTrigger_11_55);
         //12点执行ban任务
-        scheduler.scheduleJob(BanJob, cronTrigger_12_00);
+        scheduleJob(scheduler, BanJob, cronTrigger_12_00);
+    }
+
+    /**
+     * 加载定时任务
+     */
+    private void scheduleJob(Scheduler scheduler, JobDetail job, CronTrigger cronTrigger){
+        try {
+            scheduler.scheduleJob(job, cronTrigger);
+            QQLog.info("加载定时任务["+ job.getJobClass() +"]成功");
+        } catch (SchedulerException e) {
+            QQLog.debug("加载定时任务["+ job.getJobClass() +"]失败！");
+        }
     }
 
 }
