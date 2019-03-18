@@ -4,11 +4,15 @@ import com.forte.qqrobot.config.LinkConfiguration;
 import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerInvoker;
+import com.forte.qqrobot.socket.QQWebSocketInfoReturnManager;
 import com.forte.qqrobot.socket.QQWebSocketManager;
 import com.forte.qqrobot.socket.QQWebSocketMsgCreator;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
+import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.SingleFactory;
+
+import java.util.concurrent.Executor;
 
 /**
  *     资源调度中心，名字基本是纯机翻
@@ -78,6 +82,14 @@ public class ResourceDispatchCenter {
         SingleFactory.set(listenerFilter);
     }
 
+    /**
+     * 储存一个消息响应器
+     * @param qqWebSocketInfoReturnManager 消息响应器
+     */
+    static void saveQQWebSocketInfoReturnManager(QQWebSocketInfoReturnManager qqWebSocketInfoReturnManager){
+        SingleFactory.set(qqWebSocketInfoReturnManager);
+    }
+
         /* ———————————————— 获取方法 ———————————————— */
 
     /**
@@ -135,6 +147,27 @@ public class ResourceDispatchCenter {
      */
     public static ListenerFilter getListenerFilter(){
         return SingleFactory.get(ListenerFilter.class);
+    }
+
+    /**
+     * 获取一个QQWebSocketInfoReturnManager单例对象
+     * @return  QQWebSocketInfoReturnManager单例对象
+     */
+    public static QQWebSocketInfoReturnManager getQQWebSocketInfoReturnManager(){
+       return SingleFactory.get(QQWebSocketInfoReturnManager.class);
+    }
+
+    /**
+     * 获取线程池的名称
+     */
+    private final static String THREAD_POOL_NAME = "QQ_ROBOT_ONMESSAGE_THREAD_POOL";
+
+    /**
+     * 获取线程池
+     * @return  线程池单例
+     */
+    public static Executor getThreadPool(){
+        return BaseLocalThreadPool.getThreadPool(THREAD_POOL_NAME);
     }
 
 }

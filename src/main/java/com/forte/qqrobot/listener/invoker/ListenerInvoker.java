@@ -5,6 +5,7 @@ import com.forte.qqrobot.anno.Spare;
 import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.msgget.MsgGet;
 import com.forte.qqrobot.listener.SocketListener;
+import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.FieldUtils;
 
 import java.lang.reflect.Method;
@@ -113,8 +114,8 @@ public class ListenerInvoker {
      * 执行监听器方法
      * @param listener  监听器
      * @param methodFilterArray 监听器的方法
-     * @param params
-     * @return
+     * @param params    参数
+     * @return          执行成功的次数
      */
     private int invokeListener(SocketListener listener, Method[] methodFilterArray, Object[] params){
         //取出需要的参数
@@ -154,7 +155,7 @@ public class ListenerInvoker {
         //记录缓存
         listenerMethods.putIfAbsent(listener, collect);
         //log
-        System.out.println("加载监听器["+ listener.getClass() +"]方法" + methodArray.length + "个");
+        QQLog.info("加载监听器["+ listener.getClass() +"]方法" + methodArray.length + "个");
         return collect;
     }
 
@@ -170,7 +171,6 @@ public class ListenerInvoker {
                 m -> FieldUtils.isChild(m.getParameterTypes()[0], MsgGet.class)
                         &&
                         m.getParameterTypes()[0].equals(params0.getClass())).toArray(Method[]::new);
-
     }
 
 }

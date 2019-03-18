@@ -264,12 +264,21 @@ public class CQCodeUtil {
     }
 
     /**
+     * 从信息字符串中移除CQCode字符串
+     * @param msg
+     * @return
+     */
+    public String removeCQCodeFromMsg(String msg){
+        return msg.replaceAll(CQCODE_EXTRACT_REGEX, "");
+    }
+
+    /**
      * 从信息字符串中提取出CQCode码对象
      * @param msg 信息字符串 如果为空则返回空字符串
      * @return 提取出CQCode码对象
      */
     public List<CQCode> getCQCodeFromMsg(String msg){
-        if(msg == null){
+        if(msg == null || msg.trim().length() <= 0){
             return Collections.emptyList();
         }
         //CQ码list集合

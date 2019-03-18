@@ -8,6 +8,8 @@ import com.forte.qqrobot.beans.types.MsgGetTypes;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.listener.invoker.ListenerInvoker;
+import com.forte.qqrobot.log.QQLog;
+import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -52,7 +54,15 @@ public class QQWebSocketClient extends WebSocketClient {
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
         //连接成功后，调用全部的初始化监听器
         initListeners.forEach(l -> l.init(cqCodeUtil, sender));
+        onOpened(serverHandshake);
     }
+
+    /**
+     * 可重写的连接成功回调, 此时已经加载完初始化监听器
+     */
+    public void onOpened(ServerHandshake serverHandshake){
+    }
+
 
     /**
      * 接收消息，不可重写
@@ -60,28 +70,49 @@ public class QQWebSocketClient extends WebSocketClient {
      */
     @Override
     public final void onMessage(String s) {
+        //多线程接收消息
+        ResourceDispatchCenter.getThreadPool().execute(() -> onMessaged(s));
+    }
+
+    /**
+     * 处理接收到的消息
+     * @param s
+     */
+    private final void onMessaged(String s){
         //接收到了消息，获取act编号
         Integer act = JSONObject.parseObject(s).getInteger("act");
         String msg  =  JSONObject.parseObject(s).getString("msg");
-        //接收到的消息的封装类
-        MsgGet msgGet = (MsgGet) MsgGetTypes.getByAct(act).getBeanForJson(s);
 
-        //组装参数
-        Object[] params = getParams(msgGet, msg);
-
+        //判断信息类型
+        if(act != 0){
+            //接收到的消息的封装类
+            MsgGet msgGet = (MsgGet) MsgGetTypes.getByAct(act).getBeanForJson(s);
+            //组装参数
+            Object[] params = getParams(msgGet, msg);
         /*
             获取封装类后，一，分发给监听器
          */
-        ListenerInvoker listenerInvoker = ResourceDispatchCenter.getListenerInvoker();
-        listenerInvoker.invokeListenerByParams(listeners, params);
-
+            ListenerInvoker listenerInvoker = ResourceDispatchCenter.getListenerInvoker();
+            listenerInvoker.invokeListenerByParams(listeners, params);
+        }else{
+            //如果act为0则说明这个消息是响应消息
+            System.out.println("响应消息：" + s);
+        }
     }
 
     /**
      * 连接关闭
      */
     @Override
-    public void onClose(int i, String s, boolean b) {
+    public final void onClose(int i, String s, boolean b) {
+        //连接关闭回调
+        onClosed(i, s, b);
+    }
+
+    /**
+     * 可重写的连接关闭回调方法
+     */
+    public void onClosed(int i, String s, boolean b){
         System.out.println("连接关闭！["+ i +"] " + s);
     }
 
@@ -90,8 +121,20 @@ public class QQWebSocketClient extends WebSocketClient {
      * @param e 异常
      */
     @Override
-    public void onError(Exception e) {
-        System.out.println("出现异常！");
+    public final void onError(Exception e) {
+        onErrored(e);
+        //出现异常后尝试关闭连接
+        try{
+            this.close();
+        }catch (Exception ignore){}
+    }
+
+    /**
+     * 可以重写的异常处理方法
+     * @param e 异常
+     */
+    public void onErrored(Exception e){
+        QQLog.debug("出现异常！");
         e.printStackTrace();
     }
 

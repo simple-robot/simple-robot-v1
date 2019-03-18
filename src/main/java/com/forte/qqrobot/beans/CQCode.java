@@ -106,7 +106,6 @@ public class CQCode {
         this.CQ_CODE_TYPE = cqCodeTypes;
         this.PARAMS = params;
         //构建toString字符串
-        System.out.println(CQ_CODE_TYPE);
         StringJoiner joiner = getJoiner(CQ_CODE_TYPE.getFunction());
         PARAMS.forEach((k,v) -> joiner.add(k+"="+v));
         this.TO_STRING = joiner.toString();

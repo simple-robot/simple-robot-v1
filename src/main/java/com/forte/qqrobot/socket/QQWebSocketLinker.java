@@ -2,6 +2,7 @@ package com.forte.qqrobot.socket;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.config.LinkConfiguration;
+import com.forte.qqrobot.log.QQLog;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -43,12 +44,12 @@ public class QQWebSocketLinker {
             cc = client.getConstructor(URI.class, Set.class, Set.class).newInstance(localParams);
             localB = cc.connectBlocking();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | InterruptedException | URISyntaxException e) {
-            System.out.println("本地连接失败");
+            QQLog.debug("本地连接失败");
             e.printStackTrace();
         }
 
         if(localB){
-            System.out.println("本地连接成功");
+            QQLog.info("本地连接成功");
         }
 
         //如果本地连接失败，正常连接
@@ -61,9 +62,9 @@ public class QQWebSocketLinker {
                         linkConfiguration.getInitListeners()
                 };
                 cc = client.getConstructor(URI.class, Set.class, Set.class).newInstance(params);
-                System.out.println("连接阻塞中...");
+                QQLog.info("连接阻塞中...");
                 boolean b = cc.connectBlocking();
-                System.out.println(b?"连接成功":"连接失败");
+                QQLog.info(b?"连接成功":"连接失败");
                 if(b){
                     //如果成功，跳出无限连接循环
                     break;
@@ -71,7 +72,7 @@ public class QQWebSocketLinker {
                     Thread.sleep(1000);
                 }
             } catch (URISyntaxException | InterruptedException e) {
-                System.err.println("连接出现异常");
+                QQLog.debug("连接出现异常");
                 e.printStackTrace();
                 try {
                     Thread.sleep(1500);

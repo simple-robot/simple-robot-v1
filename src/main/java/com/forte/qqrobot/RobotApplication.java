@@ -6,7 +6,13 @@ import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerInvoker;
 import com.forte.qqrobot.socket.*;
+import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
+
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
@@ -29,6 +35,26 @@ public abstract class RobotApplication {
         TypeUtils.compatibleWithJavaBean = true;
         //资源初始化
         resourceInit();
+        //线程工厂初始化
+        threadPoolInit();
+    }
+
+    /**
+     * 线程工厂初始化
+     */
+    private static void threadPoolInit(){
+        BaseLocalThreadPool.setTimeUnit(TimeUnit.SECONDS);
+        //空线程存活时间
+        BaseLocalThreadPool.setKeepAliveTime(60);
+        //线程池工厂
+        AtomicLong nums = new AtomicLong(0);
+        BaseLocalThreadPool.setDefaultThreadFactory(r -> new Thread(r, "ROBOT-" + nums.addAndGet(1) + "-Thread"));
+        //核心池数量，可同时执行的线程数量
+        BaseLocalThreadPool.setCorePoolSize(500);
+        //线程池最大数量
+        BaseLocalThreadPool.setMaximumPoolSize(1200);
+        //对列策略
+        BaseLocalThreadPool.setWorkQueue(new LinkedBlockingQueue());
     }
 
 
@@ -51,14 +77,8 @@ public abstract class RobotApplication {
         ResourceDispatchCenter.saveListenerInvoker(new ListenerInvoker());
         //将ListenerFilter放入资源调度中心
         ResourceDispatchCenter.saveListenerFilter(new ListenerFilter());
-    }
-
-    /**
-     * 获取配置
-     * @return
-     */
-    public static LinkConfiguration getLinkConfiguration(){
-        return ResourceDispatchCenter.getLinkConfiguration();
+        //将QQWebSocketInfoReturnManager放入资源调度中心
+        ResourceDispatchCenter.saveQQWebSocketInfoReturnManager(new QQWebSocketInfoReturnManager());
     }
 
     /**

@@ -17,7 +17,6 @@ public class InfoLoginQQ implements InfoGet {
     private static final Integer act = 25301;
 
 
-
     public Integer getAct() {
         return act;
     }
