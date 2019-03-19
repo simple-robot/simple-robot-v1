@@ -21,4 +21,7 @@ public interface InfoReturn extends MsgBean {
     Integer getReturn();
     Integer getError();
 
+    @Override
+    String toString();
+
 }

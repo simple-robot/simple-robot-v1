@@ -45,7 +45,7 @@ public class QQWebSocketInfoReturnManager {
 
     /**
      * 更新一次数据
-     * @param act           act码
+     * @param act           act码，也是接收到的消息的return对象信息
      * @param infoReturn    infoReturn对象
      */
     void update(int act, InfoReturn infoReturn){
@@ -84,8 +84,40 @@ public class QQWebSocketInfoReturnManager {
             }
 
         }while(infoReturn == null);
+
         return infoReturn;
     }
+
+
+    /**
+     * 获取
+     * @param act           act码
+     * @return              infoReturn对象
+     */
+    public <T extends InfoReturn> T get(int act, Class<T> infoReturnClass){
+        InfoReturn infoReturn = null;
+
+        do{
+            //持续获取，直到最后一次请求时间小于最后一次获取使时间
+
+            AtomicReference<InfoReturnBean> returnBean = infoReturnMap.get(act);
+            if(returnBean == null || returnBean.get() == null){
+                continue;
+            }
+            InfoReturnBean infoReturnBean = returnBean.get();
+            //获取两个时间
+            Long lastUpdateTime = infoReturnMap.get(act).get().returnTime;
+            Long lastSend = lastSendTime.get(act).get();
+            //如果最后更新时间大于最后请求时间，则认为获取到了
+            if(lastUpdateTime >= lastSend){
+                infoReturn = infoReturnBean.getInfoReturn();
+            }
+
+        }while(infoReturn == null);
+
+        return (T) infoReturn;
+    }
+
 
 
     /**

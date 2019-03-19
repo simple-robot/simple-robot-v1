@@ -1,5 +1,6 @@
 package com.forte.client.timetask.ban;
 
+import com.forte.client.timetask.MyJob;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.RandomUtil;
@@ -16,11 +17,7 @@ import java.time.LocalDate;
  * @date Created in 2019/3/18 16:41
  * @since JDK1.8
  **/
-public class AdvanceBanJob implements Job {
-
-    /** 群号 */
-    private static final String GROUP_CODE = "581250423";
-//    private static final String GROUP_CODE = "699465940";
+public class AdvanceBanJob implements MyJob {
 
 
     /**

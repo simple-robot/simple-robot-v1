@@ -1,5 +1,6 @@
-package com.forte.client.timetask;
+package com.forte.client.timetask.hello;
 
+import com.forte.client.timetask.MyJob;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.RandomUtil;
@@ -12,12 +13,8 @@ import org.quartz.JobExecutionException;
  * @date Created in 2019/3/18 18:24
  * @since JDK1.8
  **/
-public class MorningJob implements Job {
+public class MorningJob implements MyJob {
 
-    /**
-     * 群号
-     */
-    private static final String GROUP_CODE = "581250423";
 
     /**
      * 早上打招呼

@@ -38,11 +38,20 @@ public enum InfoReturnTypes {
         }
     }
 
-
     /** 返回值编码 */
     private final int returnCode;
+
     /** 具体的class类 */
     private final Class<? extends InfoReturn> returnClass;
+
+
+    public int getReturnCode(){
+        return this.returnCode;
+    }
+
+    public Class<? extends InfoReturn> getReturnClass(){
+        return this.returnClass;
+    }
 
     /**
      * 构造

@@ -85,4 +85,16 @@ public class ReturnStranger implements InfoReturn {
     public void setAge(Integer age) {
         this.age = age;
     }
+
+    @Override
+    public String toString() {
+        return "ReturnStranger{" +
+                "returnCode=" + returnCode +
+                ", error=" + error +
+                ", QQID='" + QQID + '\'' +
+                ", nick='" + nick + '\'' +
+                ", sex=" + sex +
+                ", age=" + age +
+                '}';
+    }
 }

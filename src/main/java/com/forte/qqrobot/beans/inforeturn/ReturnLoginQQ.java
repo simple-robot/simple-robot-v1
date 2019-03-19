@@ -54,4 +54,13 @@ public class ReturnLoginQQ implements InfoReturn {
     public void setLoginQQ(String loginQQ) {
         LoginQQ = loginQQ;
     }
+
+    @Override
+    public String toString() {
+        return "ReturnLoginQQ{" +
+                "returnCode=" + returnCode +
+                ", error=" + error +
+                ", LoginQQ='" + LoginQQ + '\'' +
+                '}';
+    }
 }

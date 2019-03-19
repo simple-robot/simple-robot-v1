@@ -3,7 +3,9 @@ package com.forte.qqrobot.socket;
 import com.alibaba.fastjson.JSONObject;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.CQCode;
+import com.forte.qqrobot.beans.inforeturn.InfoReturn;
 import com.forte.qqrobot.beans.msgget.MsgGet;
+import com.forte.qqrobot.beans.types.InfoReturnTypes;
 import com.forte.qqrobot.beans.types.MsgGetTypes;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
@@ -51,10 +53,10 @@ public class QQWebSocketClient extends WebSocketClient {
      */
     @Override
     public final void onOpen(ServerHandshake serverHandshake) {
+        onOpened(serverHandshake);
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
         //连接成功后，调用全部的初始化监听器
-        initListeners.forEach(l -> l.init(cqCodeUtil, sender));
-        onOpened(serverHandshake);
+        ResourceDispatchCenter.getThreadPool().execute(() -> initListeners.forEach(l -> l.init(cqCodeUtil, sender)));
     }
 
     /**
@@ -96,7 +98,16 @@ public class QQWebSocketClient extends WebSocketClient {
             listenerInvoker.invokeListenerByParams(listeners, params);
         }else{
             //如果act为0则说明这个消息是响应消息
-            System.out.println("响应消息：" + s);
+            JSONObject returnInfoJson = JSONObject.parseObject(s);
+            //获取返回码
+            Integer returnCode = returnInfoJson.getInteger("return");
+            Class<? extends InfoReturn> typeClass = InfoReturnTypes.getInfoReturnTypesByReturn(returnCode).getReturnClass();
+
+            //封装为对象
+            InfoReturn infoReturnBean = returnInfoJson.toJavaObject(typeClass);
+            //更新对象
+            ResourceDispatchCenter.getQQWebSocketInfoReturnManager().update(returnCode, infoReturnBean);
+
         }
     }
 
@@ -126,7 +137,7 @@ public class QQWebSocketClient extends WebSocketClient {
         //出现异常后尝试关闭连接
         try{
             this.close();
-        }catch (Exception ignore){}
+        }catch (Exception ignored){}
     }
 
     /**

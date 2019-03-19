@@ -1,6 +1,7 @@
 package com.forte.qqrobot.socket;
 
 import com.alibaba.fastjson.JSON;
+import com.forte.qqrobot.beans.infoget.*;
 import com.forte.qqrobot.beans.msgsend.*;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -292,6 +293,65 @@ public class QQWebSocketMsgCreator {
                 new Object[]{"newspecialtitle", newspecialtitle}
         );
         return mapToBeanJson(new SetGroupMemberSpecialTitle(), paramMap);
+    }
+
+
+    /**
+     * 请求获取群列表信息
+     * @param QQID 作为标记
+     * @return 请求群列表信息
+     */
+    public String getResponseJson_InfoForLoginInGroups(String QQID){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"QQID", QQID}
+        );
+        return mapToBeanJson(new SetGroupMemberSpecialTitle(), paramMap);
+    }
+
+    /**
+     * 请求获取群中某用户信息
+     * @param groupid   群号
+     * @param QQID      群员qq号
+     * @param nocache   1或0之类的
+     * @return 请求获取群中某用户信息
+     */
+    public String getResponseJson_InfoGroupMember(String groupid, String QQID, String nocache){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"groupid", groupid},
+                new Object[]{"QQID", QQID},
+                new Object[]{"nocache", nocache}
+        );
+        return mapToBeanJson(new InfoGroupMemberForJson(), paramMap);
+    }
+
+    /**
+     * 请求获取当前账号的昵称
+     * @return 请求获取当前账号的昵称
+     */
+    public String getResponseJson_InfoLoginNick(){
+        return JSON.toJSONString(new InfoLoginNick());
+    }
+
+    /**
+     * 请求获取当前账号的qq
+     * @return 请求获取当前账号的qq
+     */
+    public String getResponseJson_InfoLoginQQ(){
+        return JSON.toJSONString(new InfoLoginQQ());
+    }
+
+    /**
+     * 请求获取陌生人信息
+     * @param QQID      qq号
+     * @param nocache   1 或 0 之类的
+     * @return  请求获取陌生人信息
+     */
+    public String getResponseJson_InfoStranger(String QQID, String nocache){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"QQID", QQID},
+                new Object[]{"nocache", nocache}
+        );
+        return mapToBeanJson(new InfoStrangerForJson(), paramMap);
     }
 
 }

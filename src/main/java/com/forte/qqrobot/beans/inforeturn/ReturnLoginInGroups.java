@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -67,7 +68,10 @@ public class ReturnLoginInGroups implements InfoReturn {
     }
 
     public GroupInfo[] getGroupInfos() {
-        return Optional.ofNullable(this.GroupList).map(listStr -> JSON.parseArray(listStr).stream().map(str -> new GroupInfo(str.toString())).toArray(GroupInfo[]::new)).orElse(new GroupInfo[0]);
+        if(groupInfos == null){
+            groupInfos = Optional.ofNullable(this.GroupList).map(listStr -> JSON.parseArray(listStr).stream().map(str -> new GroupInfo(str.toString())).toArray(GroupInfo[]::new)).orElse(new GroupInfo[0]);
+        }
+        return this.groupInfos;
     }
 
     public void setReturn(Integer returnCode) {
@@ -108,6 +112,23 @@ public class ReturnLoginInGroups implements InfoReturn {
             return groupName;
         }
 
+        @Override
+        public String toString() {
+            return "GroupInfo{" +
+                    "groupId='" + groupId + '\'' +
+                    ", groupName='" + groupName + '\'' +
+                    '}';
+        }
     }
 
+    @Override
+    public String toString() {
+        return "ReturnLoginInGroups{" +
+                "returnCode=" + returnCode +
+                ", error=" + error +
+                ", QQID='" + QQID + '\'' +
+                ", GroupList='" + GroupList + '\'' +
+                ", groupInfos=" + Arrays.toString(groupInfos) +
+                '}';
+    }
 }

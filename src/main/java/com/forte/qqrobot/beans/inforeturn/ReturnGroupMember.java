@@ -194,4 +194,27 @@ public class ReturnGroupMember implements InfoReturn {
     public void setReturnCode(Integer returnCode) {
         this.returnCode = returnCode;
     }
+
+    @Override
+    public String toString() {
+        return "ReturnGroupMember{" +
+                "returnCode=" + returnCode +
+                ", error=" + error +
+                ", groupid='" + groupid + '\'' +
+                ", QQID='" + QQID + '\'' +
+                ", username='" + username + '\'' +
+                ", nick='" + nick + '\'' +
+                ", sex=" + sex +
+                ", age=" + age +
+                ", area='" + area + '\'' +
+                ", jointime='" + jointime + '\'' +
+                ", lastsent=" + lastsent +
+                ", level_name='" + level_name + '\'' +
+                ", permission=" + permission +
+                ", unfriendly=" + unfriendly +
+                ", title='" + title + '\'' +
+                ", titleExpiretime=" + titleExpiretime +
+                ", nickcanchange=" + nickcanchange +
+                '}';
+    }
 }

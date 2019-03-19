@@ -1,9 +1,7 @@
 package com.forte.qqrobot.socket;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.beans.msgsend.*;
-
-import java.util.Map;
+import com.forte.qqrobot.beans.inforeturn.*;
 
 /**
  * QQWebsocket信息发送器
@@ -42,7 +40,7 @@ public class QQWebSocketMsgSender {
      * @param msg       消息
      */
     public void sendDisGroupMsg(String discussid, String msg){
-        client.send(creator.getResponseJson_sendDisGroupMsg(discussid, msg));
+        send(creator.getResponseJson_sendDisGroupMsg(discussid, msg));
     }
 
     /**
@@ -51,7 +49,7 @@ public class QQWebSocketMsgSender {
      * @param msg       消息
      */
     public void sendGroupMsg(String groupid, String msg){
-        client.send(creator.getResponseJson_sendGroupMsg(groupid, msg));
+        send(creator.getResponseJson_sendGroupMsg(groupid, msg));
     }
 
     /**
@@ -60,7 +58,7 @@ public class QQWebSocketMsgSender {
      * @param msg   消息
      */
     public void sendMsgPrivate(String QQID, String msg){
-        client.send(creator.getResponseJson_sendMsgPrivate(QQID, msg));
+        send(creator.getResponseJson_sendMsgPrivate(QQID, msg));
     }
 
     /**
@@ -68,7 +66,7 @@ public class QQWebSocketMsgSender {
      * @param QQID qq号
      */
     public void sendPraise(String QQID){
-        client.send(creator.getResponseJson_sendPraise(QQID));
+        send(creator.getResponseJson_sendPraise(QQID));
     }
 
     /**
@@ -78,7 +76,7 @@ public class QQWebSocketMsgSender {
      * @param enableban 是否开启禁言
      */
     public void setAllGroupBanned(String QQID, String groupid, String enableban){
-        client.send(creator.getResponseJson_setAllGroupBanned(QQID, groupid, enableban));
+        send(creator.getResponseJson_setAllGroupBanned(QQID, groupid, enableban));
     }
 
     /**
@@ -88,7 +86,7 @@ public class QQWebSocketMsgSender {
      * @param anomymous 匿名群员名称，大概
      */
     public void setAnoGroupMemberBanned(String groupid, Long duration, String anomymous){
-        client.send(creator.getResponseJson_setAnoGroupMemberBanned(groupid, duration, anomymous));
+        send(creator.getResponseJson_setAnoGroupMemberBanned(groupid, duration, anomymous));
     }
 
     /**
@@ -96,7 +94,7 @@ public class QQWebSocketMsgSender {
      * @param discussid 讨论组id
      */
     public void setDisGroupExit(String discussid){
-        client.send(creator.getResponseJson_setDisGroupExit(discussid));
+        send(creator.getResponseJson_setDisGroupExit(discussid));
     }
 
     /**
@@ -106,7 +104,7 @@ public class QQWebSocketMsgSender {
      * @param responseflag
      */
     public void setFriendAddRequest(String responseoperation, String remark, String responseflag){
-        client.send(creator.getResponseJson_setFriendAddRequest(responseoperation, remark, responseflag));
+        send(creator.getResponseJson_setFriendAddRequest(responseoperation, remark, responseflag));
     }
 
     /**
@@ -116,7 +114,7 @@ public class QQWebSocketMsgSender {
      * @param setadmin  是否设置为管理员
      */
     public void setGroupAdmin(String QQID, String groupid, Boolean setadmin){
-        client.send(creator.getResponseJson_setGroupAdmin(QQID, groupid, setadmin));
+        send(creator.getResponseJson_setGroupAdmin(QQID, groupid, setadmin));
     }
 
     /**
@@ -125,7 +123,7 @@ public class QQWebSocketMsgSender {
      * @param enableanomymous   是否开启群匿名
      */
     public void setGroupAno(String groupid, Boolean enableanomymous){
-        client.send(creator.getResponseJson_setGroupAno(groupid, enableanomymous));
+        send(creator.getResponseJson_setGroupAno(groupid, enableanomymous));
     }
 
     /**
@@ -134,7 +132,7 @@ public class QQWebSocketMsgSender {
      * @param isdismiss 是否退出
      */
     public void setGroupExit(String groupid, Boolean isdismiss){
-        client.send(creator.getResponseJson_setGroupExit(groupid, isdismiss));
+        send(creator.getResponseJson_setGroupExit(groupid, isdismiss));
     }
 
     /**
@@ -146,7 +144,7 @@ public class QQWebSocketMsgSender {
      * @param responseflag
      */
     public void setGroupJoinResquest(String requesttype, String responseoperation, String reason, String responseflag){
-        client.send(creator.getResponseJson_setGroupJoinResquest(requesttype, responseoperation, reason, responseflag));
+        send(creator.getResponseJson_setGroupJoinResquest(requesttype, responseoperation, reason, responseflag));
     }
 
     /**
@@ -156,7 +154,7 @@ public class QQWebSocketMsgSender {
      * @param duration  禁言时间，单位为秒
      */
     public void setGroupMemberBanned(String QQID, String groupid, Long duration){
-        client.send(creator.getResponseJson_setGroupMemberBanned(QQID, groupid, duration));
+        send(creator.getResponseJson_setGroupMemberBanned(QQID, groupid, duration));
     }
 
     /**
@@ -166,7 +164,7 @@ public class QQWebSocketMsgSender {
      * @param newcard   新名片
      */
     public void setGroupMemberCard(String QQID, String groupid, String newcard){
-        client.send(creator.getResponseJson_setGroupMemberCard(QQID, groupid, newcard));
+        send(creator.getResponseJson_setGroupMemberCard(QQID, groupid, newcard));
     }
 
     /**
@@ -176,7 +174,7 @@ public class QQWebSocketMsgSender {
      * @param rejectaddrequest  是否拒绝添加请求
      */
     public void setGroupMemberRemove(String QQID, String groupid, Boolean rejectaddrequest){
-        client.send(creator.getResponseJson_setGroupMemberRemove(QQID, groupid, rejectaddrequest));
+        send(creator.getResponseJson_setGroupMemberRemove(QQID, groupid, rejectaddrequest));
     }
 
     /**
@@ -187,10 +185,101 @@ public class QQWebSocketMsgSender {
      * @param newspecialtitle   专属头衔
      */
     public void setGroupMemberSpecialTitle(String QQID, String groupid, Long duration, String newspecialtitle){
-        client.send(creator.getResponseJson_setGroupMemberSpecialTitle(QQID, groupid, duration, newspecialtitle));
+        send(creator.getResponseJson_setGroupMemberSpecialTitle(QQID, groupid, duration, newspecialtitle));
+    }
+
+
+    /* ———————————————— 获取信息 ———————————————— */
+
+    /**
+     * 获取全部群信息
+     * @param QQID 标记用QQ号
+     * @return 群信息的列表
+     */
+    public ReturnLoginInGroups getLoginInGroups(String QQID){
+        int act = 25305;
+        send(creator.getResponseJson_InfoForLoginInGroups(QQID));
+        //获取返回值
+        QQWebSocketInfoReturnManager manager = getSoocketInfoReturnManager();
+        //标记一次更新
+        manager.send(act);
+
+        return manager.get(act, ReturnLoginInGroups.class);
+    }
+
+    /**
+     * 获取某个群员的信息
+     * @param groupid   群id
+     * @param QQID      qq号
+     * @param nocache   1 或 0之类的
+     * @return 某个群员的信息
+     */
+    public ReturnGroupMember getGroupMember(String groupid, String QQID, String nocache){
+        int act = 25303;
+        send(creator.getResponseJson_InfoGroupMember(groupid, QQID, nocache));
+        //获取返回值
+        QQWebSocketInfoReturnManager manager = getSoocketInfoReturnManager();
+        //标记一次更新
+        manager.send(act);
+
+        return manager.get(act, ReturnGroupMember.class);
+
+    }
+
+    /**
+     * 获取登录账号的昵称
+     * @return 昵称
+     */
+    public ReturnLoginNick getLoginNick(){
+        int act = 25302;
+        send(creator.getResponseJson_InfoLoginNick());
+        //获取返回值
+        QQWebSocketInfoReturnManager manager = getSoocketInfoReturnManager();
+        manager.send(act);
+
+        return manager.get(act, ReturnLoginNick.class);
+    }
+
+    /**
+     * 获取当前登录账号的qq号
+     * @return 当前登录账号的qq号
+     */
+    public ReturnLoginQQ getLoginQQ(){
+        int act = 25301;
+        send(creator.getResponseJson_InfoLoginQQ());
+        //获取返回值
+        QQWebSocketInfoReturnManager manager = getSoocketInfoReturnManager();
+        manager.send(act);
+
+        return manager.get(act, ReturnLoginQQ.class);
+    }
+
+    /**
+     * 获取陌生人信息
+     * @return
+     */
+    public ReturnStranger getStrangerInfo(String QQID, String nocache){
+        int act = 25304;
+        send(creator.getResponseJson_InfoStranger(QQID, nocache));
+        //获取返回值
+        QQWebSocketInfoReturnManager manager = getSoocketInfoReturnManager();
+        manager.send(act);
+
+        return manager.get(act, ReturnStranger.class);
     }
 
 
 
+    /**
+     * 发送消息 - 在一条新的线程中发送消息
+     */
+    public void send(String text){
+        ResourceDispatchCenter.getThreadPool().execute(() -> client.send(text));
+    }
+
+
+    private QQWebSocketInfoReturnManager getSoocketInfoReturnManager(){
+        return ResourceDispatchCenter.getQQWebSocketInfoReturnManager();
+    }
 
 }

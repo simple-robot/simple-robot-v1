@@ -2,6 +2,7 @@ package com.forte.client.listener;
 
 import com.forte.client.timetask.ban.AdvanceBanJob;
 import com.forte.client.timetask.ban.BanJob;
+import com.forte.client.timetask.hello.HelloJob;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
@@ -29,14 +30,12 @@ public class TimeTaskListener implements InitListener {
         try {
             run(cqCodeUtil, sender);
         } catch (SchedulerException e) {
-            e.printStackTrace();
-            System.err.println("定时任务创建失败！");
+            QQLog.error("定时任务创建失败！", e);
         }
     }
 
     /**
      * 创建定时任务
-     * @throws SchedulerException
      */
     public void run(CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) throws SchedulerException {
 
@@ -49,13 +48,18 @@ public class TimeTaskListener implements InitListener {
         BanJob.getJobDataMap().put("cqCodeUtil", cqCodeUtil);
 
 
-        //创建一个jobDetail的实例，将该实例与
+        //创建一个jobDetail的实例，将该实例与AdvanceBanJob绑定
         JobDetail advanceBanJob = JobBuilder.newJob(AdvanceBanJob.class).withIdentity("advanceBanJob").build();
         //向工作类传递参数
         advanceBanJob.getJobDataMap().put("sender", sender);
         advanceBanJob.getJobDataMap().put("cqCodeUtil", cqCodeUtil);
 
 
+        //创建一个JobDetail的实例，与HelloJob绑定
+        JobDetail helloJob = JobBuilder.newJob(HelloJob.class).withIdentity("helloJob").build();
+        //向工作类传递参数
+        advanceBanJob.getJobDataMap().put("sender", sender);
+        advanceBanJob.getJobDataMap().put("cqCodeUtil", cqCodeUtil);
 
 
 
@@ -63,31 +67,41 @@ public class TimeTaskListener implements InitListener {
 
 
         //创建一个Trigger触发器的实例，每天12点执行
-        CronTrigger cronTrigger_12_00 = TriggerBuilder.newTrigger()
+        CronTrigger cronTrigger_00_00 = TriggerBuilder.newTrigger()
                 .withIdentity("banTrigger")
                 .startNow()
                 //每天0点执行
                 .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 * * ? *")).build();
-//                .withSchedule(CronScheduleBuilder.cronSchedule("0 0/2 * * * ? *")).build();
+//                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 11 * * ? *")).build();
 
 
         //创建一个Trigger触发器的实例，每天差5分钟12点执行
-        CronTrigger cronTrigger_11_55 = TriggerBuilder.newTrigger()
+        CronTrigger cronTrigger_23_55 = TriggerBuilder.newTrigger()
                 .withIdentity("advanceBanTrigger")
                 .startNow()
                 //每天11点55执行
                 .withSchedule(CronScheduleBuilder.cronSchedule("0 55 23 * * ? *")).build();
-//                .withSchedule(CronScheduleBuilder.cronSchedule("0 0/1 * * * ? *")).build();
+//                .withSchedule(CronScheduleBuilder.cronSchedule("0 55 10 * * ? *")).build();
+
+        //创建一个Trigger触发器的实例，每天差5分钟12点执行
+        CronTrigger cronTrigger_12_00 = TriggerBuilder.newTrigger()
+                .withIdentity("helloTrigger")
+                .startNow()
+                //每天11点55执行
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 12 * * ? *")).build();
+
 
         /* ———————— 创建schedule实例 ———————— */
 
         //创建schedule实例
         StdSchedulerFactory factory = new StdSchedulerFactory();
         Scheduler scheduler = factory.getScheduler();
-        //11点55执行的任务
-        scheduleJob(scheduler, advanceBanJob, cronTrigger_11_55);
-        //12点执行ban任务
-        scheduleJob(scheduler, BanJob, cronTrigger_12_00);
+        //23点55执行的任务
+        scheduleJob(scheduler, advanceBanJob, cronTrigger_23_55);
+        //00点执行ban任务
+        scheduleJob(scheduler, BanJob, cronTrigger_00_00);
+        //中午12点执行任务
+        scheduleJob(scheduler, helloJob, cronTrigger_12_00);
 
         //执行任务
         scheduler.start();
@@ -102,6 +116,7 @@ public class TimeTaskListener implements InitListener {
             QQLog.info("加载定时任务["+ job.getJobClass() +"]成功");
         } catch (SchedulerException e) {
             QQLog.debug("加载定时任务["+ job.getJobClass() +"]失败！");
+            e.printStackTrace();
         }
     }
 

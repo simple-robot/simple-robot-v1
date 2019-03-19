@@ -51,4 +51,13 @@ public class ReturnLoginNick implements InfoReturn {
     public void setLoginNick(String loginNick) {
         LoginNick = loginNick;
     }
+
+    @Override
+    public String toString() {
+        return "ReturnLoginNick{" +
+                "returnCode=" + returnCode +
+                ", error=" + error +
+                ", LoginNick='" + LoginNick + '\'' +
+                '}';
+    }
 }

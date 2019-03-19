@@ -45,7 +45,6 @@ public class QQWebSocketLinker {
             localB = cc.connectBlocking();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | InterruptedException | URISyntaxException e) {
             QQLog.debug("本地连接失败");
-            e.printStackTrace();
         }
 
         if(localB){
