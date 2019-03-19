@@ -1,4 +1,4 @@
-package com.forte.client.timetask;
+package com.forte.client.timetask.ban;
 
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
@@ -15,6 +15,7 @@ public class BanJob implements Job {
      * 群号
      */
     private static final String GROUP_CODE = "581250423";
+//    private static final String GROUP_CODE = "699465940";
 
     /**
      * 任务逻辑
@@ -25,6 +26,7 @@ public class BanJob implements Job {
         CQCodeUtil cqCodeUtil = (CQCodeUtil) jobExecutionContext.getMergedJobDataMap().get("cqCodeUtil");
         //群里除了群主和自己的全部qq号
         String codesStr = "1401333425,1770674146,1359589084,2209278137,1278568310,294657142,867604122,1341020356,826744761,875065714,1462974622,1224829665,1216231723,1064843896,1041946577,2857633943,2303723088,469207122,1510125787";
+//        String codesStr = "2209278137";
         String[] codes = codesStr.split(",");
 
         sender.sendGroupMsg(GROUP_CODE, "12点了！！！！");
@@ -46,7 +48,7 @@ public class BanJob implements Job {
 
         sender.sendGroupMsg(GROUP_CODE, "是" + at + " 哒！");
 
-        sleep(1000);
+        sleep(1100);
 
         //设置禁言
         sender.setGroupMemberBanned(qqCode, GROUP_CODE, banLong * 60);

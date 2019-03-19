@@ -1,4 +1,4 @@
-package com.forte.client.timetask;
+package com.forte.client.timetask.ban;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.log.QQLog;
@@ -66,10 +66,13 @@ public class BanUtils {
      * 重新随机禁言时间
      */
     public static Long updateBanTime(int[] arr){
-        banLong = Integer.toUnsignedLong(RandomUtil.getNumber$right(arr[0], arr[1]));
-        return banLong;
+        return updateBanTime(arr[0], arr[1]);
     }
 
+    /**
+     * 获取禁言时间
+     * @return
+     */
     public static long getBanLong(){
         return banLong;
     }
