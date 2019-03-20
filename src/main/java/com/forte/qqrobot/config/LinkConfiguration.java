@@ -1,12 +1,15 @@
 package com.forte.qqrobot.config;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.listener.DefaultInitListener;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.scanner.FileScanner;
 import com.forte.qqrobot.socket.QQWebSocketClient;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 连接前的配置类
@@ -28,12 +31,14 @@ public final class LinkConfiguration {
     /** 全部监听器 */
     private Set<SocketListener> listenerSet = new HashSet<>();
 
-    /** 全部初始化监听器 */
-    private Set<InitListener> initListeners = new HashSet<>();
+    /** 全部初始化监听器, 默认携带默认监听器 */
+    private Set<InitListener> initListeners = new HashSet<>(Stream.of(new DefaultInitListener()).collect(Collectors.toSet()));
 
     /** 本机QQ号 */
     private String localQQCode = "";
 
+    /** 本机QQ的昵称 */
+    private String localQQNick = "";
 
     /*  ————————————————  参数配置 ———————————————— */
 
@@ -118,6 +123,14 @@ public final class LinkConfiguration {
 
 
     /* —————————————— getter & setter —————————————— */
+
+    public String getLocalQQNick() {
+        return localQQNick;
+    }
+
+    public void setLocalQQNick(String localQQNick) {
+        this.localQQNick = localQQNick;
+    }
 
     public String getLocalQQCode() {
         return localQQCode;

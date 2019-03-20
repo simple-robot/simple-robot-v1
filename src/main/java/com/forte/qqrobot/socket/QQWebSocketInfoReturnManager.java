@@ -3,8 +3,11 @@ package com.forte.qqrobot.socket;
 import com.forte.qqrobot.beans.inforeturn.InfoReturn;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -18,6 +21,9 @@ public class QQWebSocketInfoReturnManager {
 
     /** 获取并保存返回的信息，共5种返回值信息 */
     private static Map<Integer, AtomicReference<InfoReturnBean>> infoReturnMap = new ConcurrentHashMap<>(5);
+
+    /** 所有返回值的缓冲列表 */
+    private static Map<Integer, ConcurrentLinkedQueue<InfoReturnBean>> returnLinkedMap = new ConcurrentHashMap<>(5);
 
     /** 对应的请求的最后一次请求时间 */
     private static Map<Integer, AtomicLong> lastSendTime = new ConcurrentHashMap<>(5);
@@ -51,15 +57,28 @@ public class QQWebSocketInfoReturnManager {
     void update(int act, InfoReturn infoReturn){
         //当前时间戳
         long now = Instant.now().toEpochMilli();
-        AtomicReference<InfoReturnBean> lastUpdateInfo = infoReturnMap.get(act);
-        //如果不存在，创建
-        if(lastUpdateInfo == null){
-            lastUpdateInfo = new AtomicReference<>(new InfoReturnBean(infoReturn, now));
-            infoReturnMap.putIfAbsent(act, lastUpdateInfo);
+        //将更新的数据放入缓冲区
+        ConcurrentLinkedQueue<InfoReturnBean> returnLink = returnLinkedMap.get(act);
+
+        //如果没有，创建
+        if(returnLink == null){
+            returnLink = new ConcurrentLinkedQueue<>();
+            returnLink.add(new InfoReturnBean(infoReturn, now));
+            returnLinkedMap.putIfAbsent(act, returnLink);
+        }else{
+            //如果存在，将返回结果放至尾部
+            returnLink.add(new InfoReturnBean(infoReturn, now));
         }
 
-        //更新
-        lastUpdateInfo.updateAndGet(i -> i.getReturnTime() < now ? new InfoReturnBean(infoReturn, now) : i);
+//        AtomicReference<InfoReturnBean> lastUpdateInfo = infoReturnMap.get(act);
+//        //如果不存在，创建
+//        if(lastUpdateInfo == null){
+//            lastUpdateInfo = new AtomicReference<>(new InfoReturnBean(infoReturn, now));
+//            infoReturnMap.putIfAbsent(act, lastUpdateInfo);
+//        }
+//
+//        //更新
+//        lastUpdateInfo.updateAndGet(i -> i.getReturnTime() < now ? new InfoReturnBean(infoReturn, now) : i);
     }
 
 
@@ -68,24 +87,21 @@ public class QQWebSocketInfoReturnManager {
      * @param act           act码
      * @return              infoReturn对象
      */
-    public InfoReturn get(int act){
-        InfoReturn infoReturn = null;
+    public synchronized InfoReturn get(int act){
+        InfoReturnBean infoReturnBean = null;
 
         do{
-            //持续获取，直到最后一次请求时间小于最后一次获取使时间
-
-            InfoReturnBean infoReturnBean = infoReturnMap.get(act).get();
-            //获取两个时间
-            Long lastUpdateTime = infoReturnMap.get(act).get().returnTime;
-            Long lastSend = lastSendTime.get(act).get();
-            //如果最后更新时间大于最后请求时间，则认为获取到了
-            if(lastUpdateTime >= lastSend){
-                infoReturn = infoReturnBean.getInfoReturn();
+            //从缓冲队列中持续获取，理论上缓冲队列不会为null
+            ConcurrentLinkedQueue<InfoReturnBean> infoB = returnLinkedMap.get(act);
+            if(infoB != null){
+                //从缓冲队列中获取
+                infoReturnBean = infoB.poll();
             }
 
-        }while(infoReturn == null);
+            //持续获取缓冲区的首部
+        }while(infoReturnBean == null);
 
-        return infoReturn;
+        return infoReturnBean.getInfoReturn();
     }
 
 
@@ -95,27 +111,7 @@ public class QQWebSocketInfoReturnManager {
      * @return              infoReturn对象
      */
     public <T extends InfoReturn> T get(int act, Class<T> infoReturnClass){
-        InfoReturn infoReturn = null;
-
-        do{
-            //持续获取，直到最后一次请求时间小于最后一次获取使时间
-
-            AtomicReference<InfoReturnBean> returnBean = infoReturnMap.get(act);
-            if(returnBean == null || returnBean.get() == null){
-                continue;
-            }
-            InfoReturnBean infoReturnBean = returnBean.get();
-            //获取两个时间
-            Long lastUpdateTime = infoReturnMap.get(act).get().returnTime;
-            Long lastSend = lastSendTime.get(act).get();
-            //如果最后更新时间大于最后请求时间，则认为获取到了
-            if(lastUpdateTime >= lastSend){
-                infoReturn = infoReturnBean.getInfoReturn();
-            }
-
-        }while(infoReturn == null);
-
-        return (T) infoReturn;
+        return (T) get(act);
     }
 
 

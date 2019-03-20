@@ -87,7 +87,7 @@ public class TimeTaskListener implements InitListener {
         CronTrigger cronTrigger_12_00 = TriggerBuilder.newTrigger()
                 .withIdentity("helloTrigger")
                 .startNow()
-                //每天11点55执行
+                //每天12点执行
                 .withSchedule(CronScheduleBuilder.cronSchedule("0 0 12 * * ? *")).build();
 
 

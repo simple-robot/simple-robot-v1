@@ -55,8 +55,8 @@ public class QQWebSocketClient extends WebSocketClient {
     public final void onOpen(ServerHandshake serverHandshake) {
         onOpened(serverHandshake);
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
-        //连接成功后，调用全部的初始化监听器
-        ResourceDispatchCenter.getThreadPool().execute(() -> initListeners.forEach(l -> l.init(cqCodeUtil, sender)));
+        //连接成功后，调用全部的初始化监听器，在新线程种进行初始化且并行执行
+        ResourceDispatchCenter.getThreadPool().execute(() -> initListeners.parallelStream().forEach(l -> l.init(cqCodeUtil, sender)));
     }
 
     /**

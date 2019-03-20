@@ -22,13 +22,13 @@ public class AInitListener implements InitListener {
      */
     @Override
     public void init(CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
-        ReturnLoginQQ loginQQ = sender.getLoginQQ();
-        System.out.println("loginQQ : " + loginQQ);
-        ReturnGroupMember groupMember = sender.getGroupMember("581250423", "1149159218", "1");
-        System.out.println("groupMember : " + groupMember);
-        ReturnLoginNick loginNick = sender.getLoginNick();
-        System.out.println("loginNick : " + loginNick);
-        ReturnStranger strangerInfo = sender.getStrangerInfo("469207122", "1");
-        System.out.println("strangerInfo : " + strangerInfo);
+//        ReturnLoginQQ loginQQ = sender.getLoginQQ();
+//        System.out.println("loginQQ : " + loginQQ);
+//        ReturnGroupMember groupMember = sender.getGroupMember("581250423", "1149159218", "1");
+//        System.out.println("groupMember : " + groupMember);
+//        ReturnLoginNick loginNick = sender.getLoginNick();
+//        System.out.println("loginNick : " + loginNick);
+//        ReturnStranger strangerInfo = sender.getStrangerInfo("469207122", "1");
+//        System.out.println("strangerInfo : " + strangerInfo);
     }
 }

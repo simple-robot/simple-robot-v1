@@ -44,9 +44,6 @@ public class RunApplication extends RobotApplication {
 
         //扫描加载普通监听器
         configuration.scannerListener("com.forte.client.listener");
-
-        //记录本机QQ号
-        configuration.setLocalQQCode(ConstantData.MY_QQ_CODE);
     }
 
     /**

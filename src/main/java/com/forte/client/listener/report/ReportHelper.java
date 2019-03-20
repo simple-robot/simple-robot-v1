@@ -291,6 +291,21 @@ class GroupMsg{
         }else if(lastMsg.isReport() && (!this.isSame(lastMsg))) {
             notReported();
             return false;
+            //如果当前消息数量大于1，且小于上一次发言，判断尾部
+        }else if((this.msgs.size() > 1) && (this.msgs.size() < lastMsg.msgs.size())){
+                //根据长度截取上一次消息的尾部
+            List<String> sub = lastMsg.msgs.subList(lastMsg.msgs.size() - this.msgs.size(), lastMsg.msgs.size());
+
+            //如果截取结果与当前消息一致，则需要复读
+            if(this.msgs.equals(sub)){
+                lastMsg.reported();
+                reported();
+                return true;
+            }else{
+                //否则，不复读
+                notReported();
+                return false;
+            }
             //如果当前消息只有一条且与上一条的最后一条相同，也复读
         }else if(this.msgs.size() == 1 && lastMsg.msgs.get(lastMsg.msgs.size() - 1).equals(this.msgs.get(0))){
             lastMsg.reported();

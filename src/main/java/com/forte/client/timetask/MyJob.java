@@ -10,8 +10,8 @@ import org.quartz.Job;
 public interface MyJob extends Job {
 
     /** 群号 */
-//    String GROUP_CODE = "581250423";
-    String GROUP_CODE = "699465940";
+    String GROUP_CODE = "581250423";
+//    String GROUP_CODE = "699465940";
 
 
 

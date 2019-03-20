@@ -16,7 +16,7 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  * @date Created in 2019/3/12 16:08
  * @since JDK1.8
  **/
-public class KeywordListener implements MsgGroupListener, MsgPrivateListener {
+public class KeywordListener implements MsgPrivateListener {
 
 
     @Override
@@ -29,15 +29,4 @@ public class KeywordListener implements MsgGroupListener, MsgPrivateListener {
         return true;
     }
 
-    @Override
-    @Filter(
-            value = {"aaaa", "bbbb"},
-            keywordMatchType = KeywordMatchType.CONTAINS,
-            mostType = MostType.ANY_MATCH,
-            at = true
-    )
-    public boolean onMessage(MsgGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
-        sender.sendGroupMsg(msg.getFromGroup(), "监听成功！");
-        return true;
-    }
 }
