@@ -53,10 +53,6 @@ public class AdvanceBanJob implements MyJob {
         sleep(1000);
 
         sender.sendGroupMsg(GROUP_CODE, "那么，各位5分钟后见~");
-
-        sleep(1000);
-
-        sender.sendGroupMsg(GROUP_CODE, "顺便一提，如果随机到了管理员的话...只能拜托群主手动禁言啦");
     }
 
     /**

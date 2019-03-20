@@ -1,9 +1,11 @@
 package com.forte.qqrobot.listener.invoker;
 
+import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
 import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.msgget.MsgGet;
+import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.lang.reflect.Method;
 
@@ -43,7 +45,14 @@ public class ListenerFilter {
                 if (value.length == 1) {
                     //如果只有一个参数，直接判断
                     String singleValue = value[0];
-                    return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
+                    //如果需要被at，判断的时候移除at的CQ码
+                    if(shouldAt){
+                        String qqCode = ResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
+                        String regex = "\\[CQ:at,qq="+ qqCode +"\\]";
+                        return filter.keywordMatchType().test(msgGet.getMsg().replaceAll(regex, ""), singleValue);
+                    }else{
+                        return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
+                    }
                 } else {
                     //如果有多个参数，按照规则判断
                     //根据获取规则匹配
