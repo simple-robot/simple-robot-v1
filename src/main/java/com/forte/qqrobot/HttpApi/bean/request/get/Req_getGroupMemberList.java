@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getGroupMemberList;
 
 /**
  * 「取群成员列表」
@@ -8,7 +9,7 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 16:57
  * @since JDK1.8
  **/
-public class Req_getGroupMemberList implements ReqBean {
+public class Req_getGroupMemberList implements ReqGetBean<Resp_getGroupMemberList> {
 
     private final String fun = "getGroupMemberList";
     /** 群号 */
@@ -25,5 +26,10 @@ public class Req_getGroupMemberList implements ReqBean {
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    @Override
+    public Class<Resp_getGroupMemberList> getResponseType() {
+        return Resp_getGroupMemberList.class;
     }
 }

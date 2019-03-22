@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getRecord;
 
 /**
  * 「接收语音文件」
@@ -9,7 +10,7 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 17:13
  * @since JDK1.8
  **/
-public class Req_getRecord implements ReqBean {
+public class Req_getRecord implements ReqGetBean<Resp_getRecord> {
 
     private final String fun = "getRecord";
 
@@ -47,6 +48,11 @@ public class Req_getRecord implements ReqBean {
 
     public void setNeedFile(Boolean needFile) {
         this.needFile = needFile;
+    }
+
+    @Override
+    public Class<Resp_getRecord> getResponseType() {
+        return Resp_getRecord.class;
     }
 
     /**

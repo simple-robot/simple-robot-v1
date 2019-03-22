@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getImageInfo;
 
 /**
  * 「取图片信息」
@@ -9,7 +10,7 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 17:04
  * @since JDK1.8
  **/
-public class Req_getImageInfo implements ReqBean {
+public class Req_getImageInfo implements ReqGetBean<Resp_getImageInfo> {
 
     private final String fun = "getImageInfo";
 
@@ -38,5 +39,10 @@ public class Req_getImageInfo implements ReqBean {
 
     public void setNeedFile(Boolean needFile) {
         this.needFile = needFile;
+    }
+
+    @Override
+    public Class<Resp_getImageInfo> getResponseType() {
+        return Resp_getImageInfo.class;
     }
 }

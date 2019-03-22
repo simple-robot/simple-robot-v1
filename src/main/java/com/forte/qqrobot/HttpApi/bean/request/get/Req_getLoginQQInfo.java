@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getLoginQQInfo;
 
 /**
  * 「取登录QQ的信息」
@@ -8,12 +9,17 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 17:06
  * @since JDK1.8
  **/
-public class Req_getLoginQQInfo implements ReqBean {
+public class Req_getLoginQQInfo implements ReqGetBean<Resp_getLoginQQInfo> {
 
     private final String fun = "getLoginQQInfo";
 
     @Override
     public String getFun() {
         return fun;
+    }
+
+    @Override
+    public Class<Resp_getLoginQQInfo> getResponseType() {
+        return Resp_getLoginQQInfo.class;
     }
 }

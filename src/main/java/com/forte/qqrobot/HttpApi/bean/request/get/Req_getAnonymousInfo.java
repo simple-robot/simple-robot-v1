@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getAnonymousInfo;
 
 /**
  * 「取匿名成员信息」
@@ -8,7 +9,7 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 15:29
  * @since JDK1.8
  **/
-public class Req_getAnonymousInfo implements ReqBean {
+public class Req_getAnonymousInfo implements ReqGetBean<Resp_getAnonymousInfo> {
     /*
     请求数据
     {
@@ -37,5 +38,10 @@ public class Req_getAnonymousInfo implements ReqBean {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    @Override
+    public Class<Resp_getAnonymousInfo> getResponseType() {
+        return Resp_getAnonymousInfo.class;
     }
 }

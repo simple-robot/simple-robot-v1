@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getGroupNoteList;
 
 /**
  * 「取群公告列表」
@@ -8,7 +9,7 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 16:59
  * @since JDK1.8
  **/
-public class Req_getGroupNoteList implements ReqBean {
+public class Req_getGroupNoteList implements ReqGetBean<Resp_getGroupNoteList> {
 
     private final String fun = "getGroupNoteList";
 
@@ -37,5 +38,10 @@ public class Req_getGroupNoteList implements ReqBean {
 
     public void setNumber(Integer number) {
         this.number = number;
+    }
+
+    @Override
+    public Class<Resp_getGroupNoteList> getResponseType() {
+        return Resp_getGroupNoteList.class;
     }
 }

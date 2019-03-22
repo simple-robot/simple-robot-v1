@@ -1,6 +1,6 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
-import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getStrangerInfo;
 
 /**
  * 「取陌生人信息」
@@ -10,7 +10,7 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 17:19
  * @since JDK1.8
  **/
-public class Req_getStrangerInfo implements ReqBean {
+public class Req_getStrangerInfo implements ReqGetBean<Resp_getStrangerInfo> {
 
     private final String fun = "getStrangerInfo";
 
@@ -39,5 +39,10 @@ public class Req_getStrangerInfo implements ReqBean {
 
     public void setCache(Boolean cache) {
         this.cache = cache;
+    }
+
+    @Override
+    public Class<Resp_getStrangerInfo> getResponseType() {
+        return Resp_getStrangerInfo.class;
     }
 }

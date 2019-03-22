@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getMoreQQInfo;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * @date Created in 2019/3/22 17:11
  * @since JDK1.8
  **/
-public class Req_getMoreQQInfo implements ReqBean {
+public class Req_getMoreQQInfo implements ReqGetBean<Resp_getMoreQQInfo> {
 
     private final String fun = "getMoreQQInfo";
 
@@ -36,5 +37,10 @@ public class Req_getMoreQQInfo implements ReqBean {
 
     public void setQqList(List<String> qqList) {
         setQqList(String.join("-", qqList));
+    }
+
+    @Override
+    public Class<Resp_getMoreQQInfo> getResponseType() {
+        return Resp_getMoreQQInfo.class;
     }
 }

@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getGroupList;
 
 /**
  * 「取群列表」 有异常
@@ -8,12 +9,17 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 16:55
  * @since JDK1.8
  **/
-public class Req_getGroupList implements ReqBean {
+public class Req_getGroupList implements ReqGetBean<Resp_getGroupList> {
 
     private final String fun = "getGroupList";
 
     @Override
     public String getFun() {
         return fun;
+    }
+
+    @Override
+    public Class<Resp_getGroupList> getResponseType() {
+        return Resp_getGroupList.class;
     }
 }

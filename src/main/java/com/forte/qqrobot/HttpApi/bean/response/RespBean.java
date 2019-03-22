@@ -24,7 +24,6 @@ public interface RespBean<T> {
 
     /**
      * 是否错误
-     * @return
      */
     default Boolean isErr(){
         return (getStatus() <= -400 || getStatus() >= -600);

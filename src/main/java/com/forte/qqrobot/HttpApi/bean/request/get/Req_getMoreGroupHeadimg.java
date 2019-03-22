@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getMoreGroupHeadimg;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
  * @date Created in 2019/3/22 17:07
  * @since JDK1.8
  **/
-public class Req_getMoreGroupHeadimg implements ReqBean {
+public class Req_getMoreGroupHeadimg implements ReqGetBean<Resp_getMoreGroupHeadimg> {
 
     private final String fun = "getMoreGroupHeadimg";
     /** 群列表，每个群用-分开，可空，空时表示取所有群的头像链接 */
@@ -37,5 +38,10 @@ public class Req_getMoreGroupHeadimg implements ReqBean {
 
     public void setGroupList(List<String> groupList) {
         this.setGroupList(String.join("-", groupList));
+    }
+
+    @Override
+    public Class<Resp_getMoreGroupHeadimg> getResponseType() {
+        return Resp_getMoreGroupHeadimg.class;
     }
 }

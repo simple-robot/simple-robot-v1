@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getGroupLinkList;
 
 /**
  * 「取群链接列表」
@@ -8,7 +9,7 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 16:53
  * @since JDK1.8
  **/
-public class Req_getGroupLinkList implements ReqBean {
+public class Req_getGroupLinkList implements ReqGetBean<Resp_getGroupLinkList> {
 
     private final String fun = "getGroupLinkList";
 
@@ -36,5 +37,10 @@ public class Req_getGroupLinkList implements ReqBean {
 
     public void setNumber(Integer number) {
         this.number = number;
+    }
+
+    @Override
+    public Class<Resp_getGroupLinkList> getResponseType() {
+        return Resp_getGroupLinkList.class;
     }
 }

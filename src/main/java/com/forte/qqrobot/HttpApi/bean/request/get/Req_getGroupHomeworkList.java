@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getGroupHomeworkList;
 
 /**
  * 「取群作业列表」
@@ -8,7 +9,7 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 16:47
  * @since JDK1.8
  **/
-public class Req_getGroupHomeworkList implements ReqBean {
+public class Req_getGroupHomeworkList implements ReqGetBean<Resp_getGroupHomeworkList> {
 
     private final String fun = "getGroupHomeworkList";
 
@@ -36,5 +37,10 @@ public class Req_getGroupHomeworkList implements ReqBean {
 
     public void setNumber(Integer number) {
         this.number = number;
+    }
+
+    @Override
+    public Class<Resp_getGroupHomeworkList> getResponseType() {
+        return Resp_getGroupHomeworkList.class;
     }
 }

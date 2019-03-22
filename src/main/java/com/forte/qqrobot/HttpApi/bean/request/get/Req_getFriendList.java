@@ -1,6 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.request.get;
 
 import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getFriendList;
 
 /**
  * 「取好友列表」  尚且有异常
@@ -8,12 +9,17 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
  * @date Created in 2019/3/22 16:45
  * @since JDK1.8
  **/
-public class Req_getFriendList implements ReqBean {
+public class Req_getFriendList implements ReqGetBean<Resp_getFriendList> {
 
     private final String fun = "getFriendList";
 
     @Override
     public String getFun() {
         return fun;
+    }
+
+    @Override
+    public Class<Resp_getFriendList> getResponseType() {
+        return Resp_getFriendList.class;
     }
 }
