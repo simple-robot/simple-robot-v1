@@ -13,4 +13,6 @@ public interface ReqSendBean extends ReqBean {
     String getMsg();
     void setMsg(String msg);
 
+
+
 }

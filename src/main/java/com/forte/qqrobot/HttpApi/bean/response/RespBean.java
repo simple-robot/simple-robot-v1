@@ -17,4 +17,17 @@ public interface RespBean<T> {
      */
     T getResult();
 
+    /**
+     * 错误信息
+     */
+    String getErrMsg();
+
+    /**
+     * 是否错误
+     * @return
+     */
+    default Boolean isErr(){
+        return (getStatus() <= -400 || getStatus() >= -600);
+    }
+
 }
