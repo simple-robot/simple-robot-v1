@@ -1,4 +1,4 @@
-package com.forte.client.listener;
+package com.forte.client.listener.mdzz;
 
 import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.msgget.MsgGroup;

@@ -1,4 +1,4 @@
-package com.forte.client.listener;
+package com.forte.client.listener.report;
 
 import com.forte.client.listener.report.ReportHelper;
 import com.forte.qqrobot.anno.Spare;

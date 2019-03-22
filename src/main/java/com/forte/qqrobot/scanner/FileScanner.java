@@ -6,9 +6,7 @@ import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -23,11 +21,11 @@ public class FileScanner {
 
     private Class<?> superStrategy; //接口类class 用于过滤 可以不要
 
-    private List<Class> eleStrategyList = new ArrayList<>();
+    private Set<Class> eleStrategyList = new HashSet<>();
 
     private ClassLoader classLoader = FileScanner.class.getClassLoader();//默认使用的类加载器
 
-    private final String STARATEGY_PATH;//需要扫描的策略包名
+    private final String STARATEGY_PATH;//需要扫描的策略包名s
 
     public FileScanner(String packageName, Class<?> superStrategy){
         this.STARATEGY_PATH = packageName;
@@ -138,7 +136,7 @@ public class FileScanner {
 
     }
 
-    public List<Class> getEleStrategyList() {
+    public Set<Class> getEleStrategyList() {
         return eleStrategyList;
     }
 }

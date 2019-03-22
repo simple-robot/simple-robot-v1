@@ -1,4 +1,4 @@
-package com.forte.client.listener;
+package com.forte.client.listener.mdzz;
 
 import com.alibaba.fastjson.JSON;
 import com.forte.qqrobot.anno.Filter;

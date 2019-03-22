@@ -1,15 +1,12 @@
 package com.forte.qqrobot.config;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.listener.DefaultInitListener;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.scanner.FileScanner;
 import com.forte.qqrobot.socket.QQWebSocketClient;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 连接前的配置类
@@ -32,7 +29,7 @@ public final class LinkConfiguration {
     private Set<SocketListener> listenerSet = new HashSet<>();
 
     /** 全部初始化监听器, 默认携带默认监听器 */
-    private Set<InitListener> initListeners = new HashSet<>(Stream.of(new DefaultInitListener()).collect(Collectors.toSet()));
+    private Set<InitListener> initListeners = new HashSet<>();
 
     /** 本机QQ号 */
     private String localQQCode = "";
@@ -79,7 +76,7 @@ public final class LinkConfiguration {
      * @param packageName   包名
      */
     public void scannerListener(String packageName){
-        List<Class> list = new FileScanner(packageName, SocketListener.class).find().getEleStrategyList();
+        Set<Class> list = new FileScanner(packageName, SocketListener.class).find().getEleStrategyList();
 
         registerListeners(list.stream().map(lc -> {
             try {
@@ -99,7 +96,7 @@ public final class LinkConfiguration {
      * @return
      */
     public void scannerInitListener(String packageName){
-        List<Class> list = new FileScanner(packageName, InitListener.class).find().getEleStrategyList();
+        Set<Class> list = new FileScanner(packageName, InitListener.class).find().getEleStrategyList();
 
         registerInitListeners(list.stream().map(lc -> {
             try {
