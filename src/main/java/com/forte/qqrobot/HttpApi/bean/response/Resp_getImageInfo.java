@@ -12,6 +12,16 @@ import java.util.Map;
 public class Resp_getImageInfo implements RespBean<Resp_getImageInfo.ImageInfo> {
     private Integer status;
     private ImageInfo result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {
@@ -30,6 +40,7 @@ public class Resp_getImageInfo implements RespBean<Resp_getImageInfo.ImageInfo> 
     public ImageInfo getResult() {
         return result;
     }
+
 
     /*
 {

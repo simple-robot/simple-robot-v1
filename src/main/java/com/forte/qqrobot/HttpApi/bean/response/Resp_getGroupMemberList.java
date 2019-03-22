@@ -8,6 +8,16 @@ package com.forte.qqrobot.HttpApi.bean.response;
 public class Resp_getGroupMemberList implements RespBean<Resp_getGroupMemberList.GroupMemberList[]> {
     private Integer status;
     private GroupMemberList[] result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {

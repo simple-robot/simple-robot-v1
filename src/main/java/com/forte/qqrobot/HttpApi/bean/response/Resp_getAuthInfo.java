@@ -10,6 +10,16 @@ public class Resp_getAuthInfo implements RespBean<Resp_getAuthInfo.AuthInfo> {
 
     private Integer status;
     private AuthInfo result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {

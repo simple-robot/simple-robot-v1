@@ -19,6 +19,16 @@ public class Resp_getAnonymousInfo implements RespBean<Resp_getAnonymousInfo.Ano
      */
     private Integer status;
     private AnonymousInfo result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {
