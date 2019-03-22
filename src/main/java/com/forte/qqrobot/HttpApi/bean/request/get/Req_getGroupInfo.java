@@ -1,14 +1,17 @@
-package com.forte.qqrobot.HttpApi.bean.request;
+package com.forte.qqrobot.HttpApi.bean.request.get;
+
+import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
 
 /**
- * 「取群中被禁言成员列表」
+ * 「取群详细信息」
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
- * @date Created in 2019/3/22 15:44
+ * @date Created in 2019/3/22 16:52
  * @since JDK1.8
  **/
-public class Req_getBanList implements ReqBean {
+public class Req_getGroupInfo implements ReqBean {
 
-    private final String fun = "getBanList";
+    private final String fun = "getGroupInfo";
+    /** 群号 */
     private String group;
 
     @Override
