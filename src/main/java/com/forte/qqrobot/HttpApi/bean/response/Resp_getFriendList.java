@@ -12,6 +12,16 @@ import java.util.Map;
 public class Resp_getFriendList implements RespBean<Resp_getFriendList.FriendList[]> {
     private Integer status;
     private FriendList[] result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {

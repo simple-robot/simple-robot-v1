@@ -12,6 +12,16 @@ import java.util.Map;
 public class Resp_getGroupLinkList implements RespBean<Resp_getGroupLinkList.GroupLinkList[]> {
     private Integer status;
     private GroupLinkList[] result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {

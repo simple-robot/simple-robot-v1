@@ -12,6 +12,16 @@ import java.util.Map;
 public class Resp_getGroupHomeworkList implements RespBean<Resp_getGroupHomeworkList.GroupHomeworkList[]> {
     private Integer status;
     private GroupHomeworkList[] result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {

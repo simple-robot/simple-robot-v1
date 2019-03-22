@@ -8,6 +8,16 @@ package com.forte.qqrobot.HttpApi.bean.response;
 public class Resp_getStrangerInfo implements RespBean<Resp_getStrangerInfo.StrangerInfo> {
     private Integer status;
     private StrangerInfo result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {

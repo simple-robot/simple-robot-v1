@@ -9,6 +9,16 @@ public class Resp_getBanList implements RespBean<Resp_getBanList.BanList[]> {
 
     private Integer status;
     private BanList[] result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {

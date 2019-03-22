@@ -8,6 +8,16 @@ package com.forte.qqrobot.HttpApi.bean.response;
 public class Resp_getRecord implements RespBean<Resp_getRecord.getRecord> {
     private Integer status;
     private getRecord result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {

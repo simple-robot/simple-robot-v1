@@ -9,6 +9,16 @@ public class Resp_getFileInfo implements RespBean<Resp_getFileInfo.FileInfo> {
 
     private Integer status;
     private FileInfo result;
+    private String errMsg;
+
+    @Override
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
 
     @Override
     public Integer getStatus() {
