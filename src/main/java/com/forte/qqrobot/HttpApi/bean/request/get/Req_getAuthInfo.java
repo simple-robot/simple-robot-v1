@@ -1,4 +1,6 @@
-package com.forte.qqrobot.HttpApi.bean.request;
+package com.forte.qqrobot.HttpApi.bean.request.get;
+
+import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
 
 /**
  * 「取权限信息」
