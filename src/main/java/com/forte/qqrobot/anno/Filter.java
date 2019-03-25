@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD}) //接口、类、枚举、注解、方法
 public @interface Filter {
 
-    /** 关键词过滤，如果有msg */
+       /** 关键词过滤，如果有msg */
     String[] value() default {};
 
     /** 如果上面的关键词过滤有内容，那么此处为匹配规则，默认为正则匹配 */
@@ -27,7 +27,8 @@ public @interface Filter {
     /** 如果上面的关键词过滤有多数内容，那么此处为多数匹配规则，是一个匹配的就好还是全部匹配才行之类的 */
     MostType mostType() default MostType.ANY_MATCH;
 
-    /** 是否需要被at才接收此消息，默认为false，※ 请注意！如果为私聊的话将会永远接收不到消息 */
+    /** 是否需要被at才接收此消息，默认为false<br>
+     * ※ 请注意！如果为私聊且at参数为true的话的话将会永远接收不到消息 */
     boolean at() default false;
 
 }

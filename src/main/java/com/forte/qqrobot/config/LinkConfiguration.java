@@ -119,6 +119,20 @@ public final class LinkConfiguration {
     }
 
 
+    //**************** 验证是否可以进行配置 ****************//
+
+    /**
+     * 验证需要的参数是否都存在，如果存在未填写的配置则会抛出异常
+     */
+    public void verification(){
+        //开始验证
+
+
+
+    }
+
+
+
     /* —————————————— getter & setter —————————————— */
 
     public String getLocalQQNick() {
