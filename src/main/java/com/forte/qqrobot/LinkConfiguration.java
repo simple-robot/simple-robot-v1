@@ -1,8 +1,6 @@
 package com.forte.qqrobot;
 
-import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.listener.InitListener;
-import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.log.QQLog;
@@ -26,6 +24,9 @@ public final class LinkConfiguration {
 
     /** 连接端口号，默认为25303 */
     private Integer port = 25303;
+
+    /** 服务器监听端口 by HTTP API */
+    private Integer listenerPort = 15514;
 
     /** 连接用的客户端class对象，默认为{@link QQWebSocketClient} */
     private Class<? extends QQWebSocketClient> socketClient = QQWebSocketClient.class;
@@ -62,6 +63,7 @@ public final class LinkConfiguration {
      * @param listeners 监听器列表
      */
     public void registerListeners(Object... listeners){
+        isScannedListener();
         //获取扫描器
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
         //遍历
@@ -84,6 +86,7 @@ public final class LinkConfiguration {
      * @param listeners 监听器列表
      */
     public void registerListeners(Class<?>... listeners){
+        isScannedListener();
         //获取扫描器
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
         //遍历
@@ -105,6 +108,7 @@ public final class LinkConfiguration {
      * @param listeners 初始化监听器
      */
     public void registerInitListeners(InitListener... listeners){
+        isScannedInitListener();
         initListeners.addAll(Arrays.asList(listeners));
     }
 
@@ -121,6 +125,7 @@ public final class LinkConfiguration {
      * @param packageName   包名
      */
     public void scannerListener(String packageName){
+        isScannedListener();
         Set<Class<?>> list = new FileScanner().find(packageName).get();
         registerListeners(list.toArray(new Class<?>[0]));
     }
@@ -153,6 +158,7 @@ public final class LinkConfiguration {
      * @return
      */
     public void scannerInitListener(String packageName){
+        isScannedInitListener();
         Set<Class<?>> list = new FileScanner().find(packageName, c -> FieldUtils.isChild(c, InitListener.class)).get();
 
         registerInitListeners(list.stream().map(lc -> {
@@ -178,6 +184,14 @@ public final class LinkConfiguration {
 
 
     /* —————————————— getter & setter —————————————— */
+
+    private void isScannedListener(){
+        this.scannedListner = true;
+    }
+
+    private void isScannedInitListener(){
+        this.scannedInitListener = true;
+    }
 
     public String getLocalQQNick() {
         return localQQNick;

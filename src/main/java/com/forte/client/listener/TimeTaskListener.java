@@ -58,8 +58,8 @@ public class TimeTaskListener implements InitListener {
         //创建一个JobDetail的实例，与HelloJob绑定
         JobDetail helloJob = JobBuilder.newJob(HelloJob.class).withIdentity("helloJob").build();
         //向工作类传递参数
-        advanceBanJob.getJobDataMap().put("sender", sender);
-        advanceBanJob.getJobDataMap().put("cqCodeUtil", cqCodeUtil);
+        helloJob.getJobDataMap().put("sender", sender);
+        helloJob.getJobDataMap().put("cqCodeUtil", cqCodeUtil);
 
 
 

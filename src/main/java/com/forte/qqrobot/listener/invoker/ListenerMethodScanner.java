@@ -7,7 +7,6 @@ import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.MethodUtil;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Predicate;
@@ -94,18 +93,19 @@ public class ListenerMethodScanner {
         //提前准备方法获取过滤器
         Predicate<Method> getFilter;
 
+        //创建过滤器，排除有忽略注解的方法和静态方法
         if(classListen != null){
             //如果存在监听, 获取所有公共方法
-            getFilter = m -> true;
+            getFilter = m -> !MethodUtil.isStatic(m) && (m.getAnnotation(Ignore.class) == null);
         }else{
             //如果不存在，获取有@Listen注解的公共方法
-            getFilter = m -> m.getAnnotation(Listen.class) != null;
+            getFilter = m -> !MethodUtil.isStatic(m) && (m.getAnnotation(Ignore.class) == null) && m.getAnnotation(Listen.class) != null;
         }
 
         //参数获取类型
         MsgGetTypes msgGetType = Optional.ofNullable(classListen).map(Listen::value).orElse(null);
-        //方法集合, 排除静态方法
-        Method[] publicMethods = Arrays.stream(MethodUtil.getPublicMethods(clazz, getFilter)).filter(m -> !MethodUtil.isStatic(m)).toArray(Method[]::new);
+        //方法集合, 排除静态方法，
+        Method[] publicMethods = Arrays.stream(MethodUtil.getPublicMethods(clazz, getFilter)).toArray(Method[]::new);
 
         //遍历并构建ListenerMethod对象
         for (Method method : publicMethods) {

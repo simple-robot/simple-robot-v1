@@ -4,7 +4,6 @@ import com.forte.client.timetask.MyJob;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.RandomUtil;
-import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 

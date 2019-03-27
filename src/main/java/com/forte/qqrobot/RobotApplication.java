@@ -9,6 +9,7 @@ import com.forte.qqrobot.socket.*;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
+import javax.security.auth.login.Configuration;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -108,23 +109,27 @@ public abstract class RobotApplication {
         //初始化方法
         init();
         //连接之前
-        application.beforeLink(ResourceDispatchCenter.getLinkConfiguration());
+        LinkConfiguration linkConfiguration = ResourceDispatchCenter.getLinkConfiguration();
+        application.before(linkConfiguration);
         //连接之后，如果没有进行扫描，则默认扫描启动类同级包且排除此启动类
+        String packageName = application.getClass().getPackage().getName();
 
+        //如果没有扫描过，扫描本包全部
+        linkConfiguration.scannerIfNotScanned(packageName, c -> !c.equals(application.getClass()));
 
 
         //连接socket
         lineSocket();
         //连接之后
-        application.afterLink();
+        application.after();
 
     }
 
 
-    /** socket连接之前 */
-    public abstract void beforeLink(LinkConfiguration configuration);
-    /** socket连接之后 */
-    public abstract void afterLink();
+    /** socket连接或服务器启动 之前 */
+    public abstract void before(LinkConfiguration configuration);
+    /** socket连接或服务器启动 之后 */
+    public abstract void after();
 
 
 }
