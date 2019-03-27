@@ -1,13 +1,12 @@
 package com.forte.qqrobot;
 
-import com.forte.qqrobot.config.LinkConfiguration;
 import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerInvoker;
+import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.socket.QQWebSocketInfoReturnManager;
 import com.forte.qqrobot.socket.QQWebSocketManager;
 import com.forte.qqrobot.socket.QQWebSocketMsgCreator;
-import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.SingleFactory;
@@ -90,6 +89,14 @@ public class ResourceDispatchCenter {
         SingleFactory.set(qqWebSocketInfoReturnManager);
     }
 
+    /**
+     * 储存一个监听函数扫描器
+     * @param listenerMethodScanner 监听函数扫描器
+     */
+    static void saveListenerMethodScanner(ListenerMethodScanner listenerMethodScanner){
+        SingleFactory.set(listenerMethodScanner);
+    }
+
         /* ———————————————— 获取方法 ———————————————— */
 
     /**
@@ -158,6 +165,14 @@ public class ResourceDispatchCenter {
     }
 
     /**
+     * 获取一个ListenerMethodScanner单例对象
+     * @return ListenerMethodScanner单例对象
+     */
+    public static ListenerMethodScanner getListenerMethodScanner(){
+        return SingleFactory.get(ListenerMethodScanner.class);
+    }
+
+    /**
      * 获取线程池的名称
      */
     private final static String THREAD_POOL_NAME = "QQ_ROBOT_ONMESSAGE_THREAD_POOL";
@@ -169,5 +184,6 @@ public class ResourceDispatchCenter {
     public static Executor getThreadPool(){
         return BaseLocalThreadPool.getThreadPool(THREAD_POOL_NAME);
     }
+
 
 }

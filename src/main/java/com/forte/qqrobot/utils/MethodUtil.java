@@ -7,9 +7,11 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -108,6 +110,72 @@ public class MethodUtil {
         //脚本执行并返回结果
         Object eval = se.eval(str);
         return eval;
+    }
+
+
+    /**
+     * 获取全部方法
+     * @param clazz clazz对象
+     * @param withoutObjMe 是否排除Object中继承来的方法
+     */
+    public static Method[] getMethods(Class clazz, Predicate<Method> filter, boolean withoutObjMe){
+        return Arrays.stream(clazz.getDeclaredMethods())
+                .filter(m -> !withoutObjMe || Arrays.stream(Object.class.getMethods()).noneMatch(om -> om.equals(m)))
+                .filter(filter)
+                .toArray(Method[]::new);
+    }
+
+
+    /**
+     * 获取全部方法，默认排除Object中继承来的方法
+     * @param clazz clazz对象
+     */
+    public static Method[] getMethods(Class clazz, Predicate<Method> filter){
+        return getMethods(clazz, filter, true);
+    }
+
+    /**
+     * 获取全部方法，默认排除Object中继承来的方法
+     * @param clazz clazz对象
+     */
+    public static Method[] getMethods(Class clazz){
+        return getMethods(clazz, m -> true, true);
+    }
+
+    /**
+     * 获取全部公共方法
+     * @param clazz clazz对象
+     * @param withoutObjMe 是否排除Object中继承来的方法
+     */
+    public static Method[] getPublicMethods(Class clazz, Predicate<Method> filter, boolean withoutObjMe){
+        return Arrays.stream(clazz.getMethods())
+                .filter(m -> !withoutObjMe || Arrays.stream(Object.class.getMethods()).noneMatch(om -> om.equals(m)))
+                .filter(filter)
+                .toArray(Method[]::new);
+    }
+
+    /**
+     * 获取全部公共方法，默认排除Object继承来的方法
+     * @param clazz clazz对象
+     */
+    public static Method[] getPublicMethods(Class clazz, Predicate<Method> filter){
+        return getPublicMethods(clazz,filter , true);
+    }
+
+    /**
+     * 获取全部公共方法，默认排除Object继承来的方法
+     * @param clazz clazz对象
+     */
+    public static Method[] getPublicMethods(Class clazz){
+        return getPublicMethods(clazz,m -> true, true);
+    }
+
+    /**
+     * 判断方法是否为静态方法
+     * @param method 方法对象
+     */
+    public static boolean isStatic(Method method){
+        return Modifier.isStatic(method.getModifiers());
     }
 
 

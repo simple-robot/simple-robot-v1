@@ -1,12 +1,17 @@
 package com.forte.qqrobot.scanner;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -19,37 +24,64 @@ import java.util.jar.JarFile;
  */
 public class FileScanner {
 
-    private Class<?> superStrategy; //接口类class 用于过滤 可以不要
+    /**
+     * 储存结果的Set集合
+     */
+    private Set<Class<?>> eleStrategySet = new HashSet<>();
 
-    private Set<Class> eleStrategyList = new HashSet<>();
+    /**
+     * 默认使用的类加载器
+     */
+    private ClassLoader classLoader = FileScanner.class.getClassLoader();   //默认使用的类加载器
 
-    private ClassLoader classLoader = FileScanner.class.getClassLoader();//默认使用的类加载器
-
-    private final String STARATEGY_PATH;//需要扫描的策略包名s
-
-    public FileScanner(String packageName, Class<?> superStrategy){
-        this.STARATEGY_PATH = packageName;
-        this.superStrategy = superStrategy;
+    /**
+     * 构造
+     */
+    public FileScanner(){
     }
 
-    public FileScanner find() {
-        addClass();
+    /**
+     * 根据过滤规则查询
+     * @param classFilter class过滤规则
+     * @throws FileNotFoundException
+     */
+    public FileScanner find(String packageName, Predicate<Class<?>> classFilter) {
+        eleStrategySet.addAll(addClass(packageName, classFilter));
+        return this;
+    }
+
+    /**
+     * 根据过滤规则查询, 查询全部
+     * @throws FileNotFoundException
+     */
+    public FileScanner find(String packageName) {
+        eleStrategySet.addAll(addClass(packageName, c -> true));
         return this;
     }
 
     /**
      * 获取包下所有实现了superStrategy的类并加入list
+     * @param classFilter class过滤器
      */
-    private void addClass() {
-        URL url = classLoader.getResource(STARATEGY_PATH.replace(".", "/"));
+    private Set<Class<?>> addClass(String packageName, Predicate<Class<?>> classFilter) {
+        URL url = classLoader.getResource(packageName.replace(".", "/"));
+        //如果路径为null，抛出异常
+        if(url == null){
+            throw new RuntimeException("路径不存在！");
+        }
+
+        //路径字符串
         String protocol = url.getProtocol();
+        //如果是文件类型，使用文件扫描
         if ("file".equals(protocol)) {
             // 本地自己可见的代码
-            findClassLocal(STARATEGY_PATH);
+            return findClassLocal(packageName, classFilter);
+            //如果是jar包类型，使用jar包扫描
         } else if ("jar".equals(protocol)) {
             // 引用jar包的代码
-            findClassJar(STARATEGY_PATH);
+            return findClassJar(packageName, classFilter);
         }
+        return Collections.EMPTY_SET;
     }
 
     /**
@@ -57,8 +89,9 @@ public class FileScanner {
      *
      * @param packName
      */
-    private void findClassLocal(final String packName) {
-        URI url = null;
+    private Set<Class<?>> findClassLocal(final String packName, final Predicate<Class<?>> classFilter) {
+        Set<Class<?>> set = new HashSet<>();
+        URI url;
         try {
             url = classLoader.getResource(packName.replace(".", "/")).toURI();
         } catch (URISyntaxException e1) {
@@ -68,7 +101,8 @@ public class FileScanner {
         File file = new File(url);
         file.listFiles(chiFile -> {
             if (chiFile.isDirectory()) {
-                findClassLocal(packName + "." + chiFile.getName());
+                //如果是文件夹，递归扫描
+                set.addAll(findClassLocal(packName + "." + chiFile.getName(), classFilter));
             }
             if (chiFile.getName().endsWith(".class")) {
                 Class<?> clazz = null;
@@ -77,14 +111,15 @@ public class FileScanner {
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-                if (superStrategy.isAssignableFrom(clazz)) {
-                    eleStrategyList.add(clazz);
+                if (clazz != null && classFilter.test(clazz)) {
+                    set.add(clazz);
                 }
                 return true;
             }
             return false;
         });
 
+        return set;
     }
 
     /**
@@ -92,11 +127,13 @@ public class FileScanner {
      *
      * @param packName
      */
-    private void findClassJar(final String packName) {
+    private Set<Class<?>> findClassJar(final String packName, final Predicate<Class<?>> classFilter) {
+        Set<Class<?>> set = new HashSet<>();
         String pathName = packName.replace(".", "/");
-        JarFile jarFile = null;
+        JarFile jarFile;
         try {
             URL url = classLoader.getResource(pathName);
+
             JarURLConnection jarURLConnection = (JarURLConnection) url.openConnection();
             jarFile = jarURLConnection.getJarFile();
         } catch (IOException e) {
@@ -117,7 +154,7 @@ public class FileScanner {
                     if (endIndex > 0) {
                         prefix = clazzName.substring(0, endIndex);
                     }
-                    findClassJar(prefix);
+                    set.addAll(findClassJar(prefix, classFilter));
                 }
                 if (jarEntry.getName().endsWith(".class")) {
                     Class<?> clazz = null;
@@ -126,17 +163,19 @@ public class FileScanner {
                     } catch (ClassNotFoundException e) {
                         e.printStackTrace();
                     }
-                    if (superStrategy.isAssignableFrom(clazz)) {
-                        eleStrategyList.add((Class<? extends String>) clazz);
+                    //判断，如果符合，添加
+                    if (clazz != null && classFilter.test(clazz)) {
+                        set.add(clazz);
                     }
                 }
             }
-
         }
-
+        return set;
     }
 
-    public Set<Class> getEleStrategyList() {
-        return eleStrategyList;
+
+    public Set<Class<?>> get(){
+        return this.eleStrategySet;
     }
+
 }

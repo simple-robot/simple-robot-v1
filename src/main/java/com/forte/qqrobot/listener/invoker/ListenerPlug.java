@@ -2,6 +2,7 @@ package com.forte.qqrobot.listener.invoker;
 
 import com.forte.qqrobot.listener.SocketListener;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -18,9 +19,12 @@ public class ListenerPlug {
 
     /**
      *  全局阻塞
-     *  即无视
-     *  */
-    private static final AtomicReference<SocketListener> GLOBAL_BLOCK = new AtomicReference<>(null);
+     *
+     **/
+    private static final AtomicReference<Method> GLOBAL_BLOCK = new AtomicReference<>(null);
+
+
+
 
 
 

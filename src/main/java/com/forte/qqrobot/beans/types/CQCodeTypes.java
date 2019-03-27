@@ -1,5 +1,8 @@
 package com.forte.qqrobot.beans.types;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * CQ码的全部function名
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
@@ -127,23 +130,29 @@ public enum CQCodeTypes {
      * @return CQCodeTypes实例对象
      */
     public static CQCodeTypes getTypeByFunction(String function){
-        switch (function){
-            case "face":            return face;
-            case "bface":           return bface;
-            case "sface" :          return sface;
-            case "image" :          return image;
-            case "record" :         return record;
-            case "at" :             return at;
-            case "rps" :            return rps;
-            case "dice" :           return dice;
-            case "shake" :          return shake;
-            case "anonymous" :      return anonymous;
-            case "music" :          return music;
-            case "music_custom" :   return music_custom;
-            case "share" :          return share;
-            case "emoji" :          return emoji;
-            default:                return defaultType;
+        for (CQCodeTypes type : getAllTypes()) {
+            if(type.functiton.equals(function)){
+                return type;
+            }
         }
+        return defaultType;
+//        switch (function){
+//            case "face":            return face;
+//            case "bface":           return bface;
+//            case "sface" :          return sface;
+//            case "image" :          return image;
+//            case "record" :         return record;
+//            case "at" :             return at;
+//            case "rps" :            return rps;
+//            case "dice" :           return dice;
+//            case "shake" :          return shake;
+//            case "anonymous" :      return anonymous;
+//            case "music" :          return music;
+//            case "music_custom" :   return music_custom;
+//            case "share" :          return share;
+//            case "emoji" :          return emoji;
+//            default:                return defaultType;
+//        }
     }
 
 
@@ -152,6 +161,8 @@ public enum CQCodeTypes {
     private final String functiton;
     /** 参数列表 */
     private final String[] keys;
+    /** 全部常量对象 */
+    private static final AtomicReference<CQCodeTypes[]> allTypes = new AtomicReference<>();
 
     /** 获取方法类型名称 */
     public String getFunction(){
@@ -166,5 +177,13 @@ public enum CQCodeTypes {
         this.functiton = function;
         this.keys = keys;
     }
+
+    /**
+     * 获取本类全部常量对象
+     */
+    private static CQCodeTypes[] getAllTypes(){
+        return Optional.ofNullable(CQCodeTypes.allTypes.get()).orElseGet(() -> CQCodeTypes.allTypes.updateAndGet(pe -> CQCodeTypes.class.getEnumConstants()));
+    }
+
 
 }

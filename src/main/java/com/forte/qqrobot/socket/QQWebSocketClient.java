@@ -11,6 +11,7 @@ import com.forte.qqrobot.listener.DefaultInitListener;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.listener.invoker.ListenerInvoker;
+import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
@@ -31,8 +32,10 @@ public class QQWebSocketClient extends WebSocketClient {
     /** 送信者 */
     private QQWebSocketMsgSender sender;
 
-    /** 监听器列表 */
-    private Set<SocketListener> listeners;
+//    /** 监听器列表 */
+//    private Set<SocketListener> listeners;
+    /** 监听函数管理器 */
+    private ListenerManager manager;
 
     /** 初始化监听器 */
     private Set<InitListener> initListeners;
@@ -40,12 +43,11 @@ public class QQWebSocketClient extends WebSocketClient {
     /**
      * 构造
      * @param serverURI 父类{@link WebSocketClient}所需参数，用于连接
-     * @param listeners 监听器列表
      */
-    public QQWebSocketClient(URI serverURI, Set<SocketListener> listeners, Set<InitListener> initListeners) {
+    public QQWebSocketClient(URI serverURI, ListenerManager manager, Set<InitListener> initListeners) {
         super(serverURI);
         this.sender = QQWebSocketMsgSender.of(this);
-        this.listeners = listeners;
+        this.manager = manager;
         this.initListeners = initListeners;
     }
 
@@ -83,7 +85,7 @@ public class QQWebSocketClient extends WebSocketClient {
      * 处理接收到的消息
      * @param s
      */
-    private final void onMessaged(String s){
+    private void onMessaged(String s){
         //接收到了消息，获取act编号
         Integer act = JSONObject.parseObject(s).getInteger("act");
         String msg  =  JSONObject.parseObject(s).getString("msg");
@@ -94,11 +96,13 @@ public class QQWebSocketClient extends WebSocketClient {
             MsgGet msgGet = (MsgGet) MsgGetTypes.getByAct(act).getBeanForJson(s);
             //组装参数
             Object[] params = getParams(msgGet, msg);
-        /*
-            获取封装类后，一，分发给监听器
-         */
-            ListenerInvoker listenerInvoker = ResourceDispatchCenter.getListenerInvoker();
-            listenerInvoker.invokeListenerByParams(listeners, params);
+            boolean at = (boolean) params[2];
+            /*
+                获取封装类后，一，分发给监听器
+            */
+//            ListenerInvoker listenerInvoker = ResourceDispatchCenter.getListenerInvoker();
+//            listenerInvoker.invokeListenerByParams(listeners, params);
+            manager.invoke(msgGet, params, at);
         }else{
             //如果act为0则说明这个消息是响应消息
             JSONObject returnInfoJson = JSONObject.parseObject(s);

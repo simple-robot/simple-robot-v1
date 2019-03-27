@@ -3,6 +3,9 @@ package com.forte.qqrobot.beans.types;
 import com.alibaba.fastjson.JSON;
 import com.forte.qqrobot.beans.msgget.*;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * 获取到的信息的枚举
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
@@ -45,7 +48,9 @@ public enum MsgGetTypes {
 
 
     private Integer act;
-    private Class<?> beanClass;
+    private Class<? extends MsgGet> beanClass;
+    //本类全部常量
+    private static final AtomicReference<MsgGetTypes[]> allTypes = new AtomicReference<>();
 
     /**
      * 获取act-消息类型
@@ -59,7 +64,7 @@ public enum MsgGetTypes {
      * 获取此类型对应的class对象
      * @return 此类型对应的class对象
      */
-    public Class getBeanClass(){
+    public Class<? extends MsgGet> getBeanClass(){
         return beanClass;
     }
 
@@ -74,33 +79,61 @@ public enum MsgGetTypes {
 
     /**
      * 构造
-     * @param act
-     * @param beanClass
+     * @param act       act码
+     * @param beanClass bean的class对象
      */
-    MsgGetTypes(Integer act, Class beanClass){
+    MsgGetTypes(Integer act, Class<? extends MsgGet> beanClass){
         this.act = act;
         this.beanClass = beanClass;
     }
 
     /**
      * 通过act获取枚举对象
-     * @param act
-     * @return
+     * @param act act
      */
     public static MsgGetTypes getByAct(Integer act){
-        switch (act){
-            case 21: return msgPrivate;
-            case 4: return msgDisGroup;
-            case 2: return msgGroup;
-            case 201: return eventFriendAdded;
-            case 101: return eventGroupAdmin;
-            case 103: return eventGroupMemberJoin;
-            case 102: return eventGroupMemberReduce;
-            case 301: return requestFriend;
-            case 302: return requestGroup;
-            default: return unknownMsg;
+        for (MsgGetTypes type : getAllTypes()) {
+            if(type.act.equals(act)){
+                return type;
+            }
         }
+        //没有找到，返回unknownMsg
+        return unknownMsg;
+//        switch (act){
+//            case 21: return msgPrivate;
+//            case 4: return msgDisGroup;
+//            case 2: return msgGroup;
+//            case 201: return eventFriendAdded;
+//            case 101: return eventGroupAdmin;
+//            case 103: return eventGroupMemberJoin;
+//            case 102: return eventGroupMemberReduce;
+//            case 301: return requestFriend;
+//            case 302: return requestGroup;
+//            default: return unknownMsg;
+//        }
     }
+
+    /**
+     * 通过class对象获取枚举对象
+     * @param clazz class对象
+     */
+    public static MsgGetTypes getByType(Class<? extends MsgGet> clazz){
+        for (MsgGetTypes type : getAllTypes()) {
+            if(type.beanClass.equals(clazz)){
+                return type;
+            }
+        }
+        //没有找到，返回unknownMsg
+        return unknownMsg;
+    }
+
+    /**
+     * 获取本类全部常量对象
+     */
+    private static MsgGetTypes[] getAllTypes(){
+        return Optional.ofNullable(MsgGetTypes.allTypes.get()).orElseGet(() -> MsgGetTypes.allTypes.updateAndGet(pe -> MsgGetTypes.class.getEnumConstants()));
+    }
+
 
 
 }

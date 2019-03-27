@@ -10,13 +10,4 @@ import java.util.function.Function;
  **/
 public enum SpareTypes {
 
-    ORDER_INVOKE(),
-
-
-
-
-    SpareTypes(){
-
-    }
-
 }

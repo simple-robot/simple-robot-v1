@@ -61,10 +61,11 @@ import java.util.stream.Collectors;
 public class FieldUtils {
 
 
-    //静态代码块加载字母顺序
+    //静态代码块加载
     static {
 
-        Map<String, Integer> wordNum = new HashMap<>();
+        //加载字母顺序
+        Map<String, Integer> wordNum = new HashMap<>(26);
 
         for (int i = 1; i <= 26; i++) {
             char c = (char) (97 + (i - 1));
@@ -75,6 +76,24 @@ public class FieldUtils {
         //保存
         WORD_NUMBER = wordNum;
 
+
+        Map<Class, Class> basisTypes = new HashMap<>(8);
+
+        //1、整型
+        basisTypes.put(byte.class, Byte.class);
+        basisTypes.put(short.class, Short.class);
+        basisTypes.put(int.class, Integer.class);
+        basisTypes.put(long.class, Long.class);
+        //2、浮点型
+        basisTypes.put(float.class, Float.class);
+        basisTypes.put(double.class, Double.class);
+        //3、字符型
+        basisTypes.put(char.class, Character.class);
+        //4、布尔型
+        basisTypes.put(boolean.class, Boolean.class);
+
+        //赋值保存
+        BASIS_TYPES_MAP = basisTypes;
     }
 
     /**
@@ -92,6 +111,39 @@ public class FieldUtils {
      */
     private static final Map<Class , HashMap<String , LevelCacheField>> LEVEL_FIELD_CACHE_MAP = Collections.synchronizedMap(new HashMap<>());
 
+    /**
+     * 8大基础数据类型的封装类和其对应的基础数据类型
+     */
+    private static final Map<Class , Class> BASIS_TYPES_MAP;
+
+    /**
+     * 8大基础数据类型的class对象数组
+     */
+    private static final Class[] BASIS_TYPE_ARRAY = new Class[]{
+            //1、整型
+            byte.class, short.class, int.class, long.class,
+            //2、浮点型
+            float.class, double.class,
+            //3、字符型
+            char.class,
+            //4、布尔型
+            boolean.class,
+    };
+
+
+    /**
+     * 8大基础数据类型的包装类的class对象数组
+     */
+    private static final Class[] BASIS_PACKAGE_TYPE_ARRAY = new Class[]{
+            //1、整型
+            Byte.class, Short.class, Integer.class, Long.class,
+            //2、浮点型
+            Float.class, Double.class,
+            //3、字符型
+            Character.class,
+            //4、布尔型
+            Boolean.class,
+    };
 
     /**
      * 获取Excel中列的数字坐标<br>
@@ -925,8 +977,15 @@ public class FieldUtils {
      * @return
      */
     public static boolean isChild(Class child, Class findFather) {
+        Objects.requireNonNull(child, "Parameter [child] can not be null");
+        Objects.requireNonNull(findFather, "Parameter [findFather] can not be null");
         //如果自身就是这个类，直接返回true
         if (child.equals(findFather)) {
+            return true;
+        }
+
+        //如果是基础数据类型或基础数据类型对应的封装类型，返回true
+        if(isBasis(child, findFather)){
             return true;
         }
 
@@ -972,6 +1031,10 @@ public class FieldUtils {
         return false;
     }
 
+
+
+
+
     /**
      * 判断一个Class对象是否为另一个对象的实现类
      *
@@ -983,6 +1046,43 @@ public class FieldUtils {
         return isChild(child.getClass(), findFather);
     }
 
+
+    /**
+     * 判断两个类是否为基础数据类型
+     * @param child
+     * @param findFather
+     * @return
+     */
+    private static boolean isBasis(Class child, Class findFather){
+        //如果双方有任意类不在基础数据类型或其封装类型中，直接false
+        if(
+                (
+                        Arrays.stream(BASIS_TYPE_ARRAY).noneMatch(bc -> bc.equals(child))
+                        &&
+                        Arrays.stream(BASIS_PACKAGE_TYPE_ARRAY).noneMatch(bpc -> bpc.equals(child))
+                )
+                ||
+                (
+                        Arrays.stream(BASIS_TYPE_ARRAY).noneMatch(bc -> bc.equals(findFather))
+                        &&
+                        Arrays.stream(BASIS_PACKAGE_TYPE_ARRAY).noneMatch(bpc -> bpc.equals(findFather))
+                )
+
+        ){
+            return false;
+        }
+
+        //**************** 已经保证双方至少都是基础数据类型或者其封装类了 ****************//
+
+        //如果是封装类型，则一定能拿到，获取不到说明是基础类型，不变
+        Class childBasis = BASIS_TYPES_MAP.getOrDefault(child, child);
+
+        //同上
+        Class findFatherBasis = BASIS_TYPES_MAP.getOrDefault(findFather, findFather);
+
+
+        return childBasis.equals(findFatherBasis);
+    }
 
 
     /**

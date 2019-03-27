@@ -1,6 +1,5 @@
 package com.forte.qqrobot.utils;
 
-import com.sun.istack.internal.NotNull;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -145,7 +144,7 @@ public class HttpClientUtil {
      * @param filepath
      * @return
      */
-    public static String download(String url, @NotNull String filepath) {
+    public static String download(String url, String filepath) {
 
         File file = null;
 
