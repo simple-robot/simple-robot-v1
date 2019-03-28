@@ -56,11 +56,12 @@ result[i]	object	第i+1个头像信息
 result[i].f	string	头像链接
 result[i].u	string	头像对应的群号
      */
-    class MoreGroupHeadimg {
+    public static class MoreGroupHeadimg {
         private String n;
         private String u;
         private String headimg;
         private Integer level;
+
         public String getN() {
 
             return n;

@@ -144,7 +144,7 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
         result.tags[i].tag	string	该标签的名称
         result.tags[i].u	number	该标签的创建者QQ
                   */
-    class GroupInfo {
+    public static class GroupInfo {
         private Integer ac_grade;
         private String ac_num;
         private Integer ac_open;

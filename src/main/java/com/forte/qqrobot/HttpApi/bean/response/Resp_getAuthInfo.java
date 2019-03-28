@@ -42,7 +42,7 @@ public class Resp_getAuthInfo implements RespBean<Resp_getAuthInfo.AuthInfo> {
     /**
      * ——————————内部类
      */
-    public class AuthInfo{
+    public static class AuthInfo{
         /*
        authCode	    int	AuthCode，似乎没什么用
        cookies	    string	Cookies

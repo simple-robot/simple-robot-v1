@@ -42,7 +42,7 @@ public class Resp_getRunStatus implements RespBean<Resp_getRunStatus.RunStatus> 
     "status":0
 }
      */
-    class RunStatus {
+    public static class RunStatus {
         //该函数无其余返回值，仅在插件未出现无响应状态时正常返回数据
         private String status;
 

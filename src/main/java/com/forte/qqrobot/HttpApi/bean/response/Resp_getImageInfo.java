@@ -64,7 +64,7 @@ result.url	string	图片的url地址，请注意QQ有防盗链机制，不能直
 result.addTime	int	图片上传到腾讯服务器的时间，时间戳形式
 result.file	string	图片文件内容，已Base64编码
      */
-    class ImageInfo {
+    public static class ImageInfo {
         private String md5;
         private Integer width;
         private String height;

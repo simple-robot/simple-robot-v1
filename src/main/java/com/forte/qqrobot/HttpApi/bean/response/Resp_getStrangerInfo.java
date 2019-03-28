@@ -1,5 +1,7 @@
 package com.forte.qqrobot.HttpApi.bean.response;
 
+import com.forte.qqrobot.HttpApi.bean.response.beaninter.RespGenderBean;
+
 /**
  * @author Ricardo
  * @create 2019-03-22 16:44
@@ -57,7 +59,7 @@ result.name	string	昵称
 result.headimg	string	头像链接
 result.level	int	QQ等级
      */
-    class StrangerInfo {
+    public static class StrangerInfo implements RespGenderBean {
         private String qq;
         private Integer gender;
         private Integer old;

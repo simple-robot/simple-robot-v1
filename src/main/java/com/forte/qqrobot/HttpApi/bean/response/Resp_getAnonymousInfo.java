@@ -51,7 +51,7 @@ public class Resp_getAnonymousInfo implements RespBean<Resp_getAnonymousInfo.Ano
     /**
      * ——————————————内部类，封装信息
      */
-    public class AnonymousInfo{
+    public static class AnonymousInfo{
         /*
          aid	int	匿名成员ID
          code	string	匿名成员代号，如大力鬼王

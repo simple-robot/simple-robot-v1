@@ -64,7 +64,7 @@ public class Resp_getGroupLinkList implements RespBean<Resp_getGroupLinkList.Gro
             result[i].uin	number	发布该链接的QQ
 
      */
-    class GroupLinkList {
+    public static class GroupLinkList {
         private String raw_url;
         private String seq;
         private String thumbnail;

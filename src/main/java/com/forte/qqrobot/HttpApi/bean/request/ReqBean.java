@@ -22,7 +22,7 @@ public interface ReqBean {
     /**
      * 将自身转化为JSON字符串
      */
-    default String getJson(){
+    default String toJson(){
         return JSON.toJSONString(this);
     }
 

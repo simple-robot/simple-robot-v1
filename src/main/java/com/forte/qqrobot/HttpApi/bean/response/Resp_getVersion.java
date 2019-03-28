@@ -49,7 +49,7 @@ result	object	QQ信息
 result.cq	string	酷Q版本，air/pro
 result.plugin	string	插件版本
      */
-    class Version {
+    public static class Version {
         private String cq;
         private String plugin;
 

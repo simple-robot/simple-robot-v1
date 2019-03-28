@@ -81,7 +81,7 @@ result[i].uploadnick	string	上传者的群名片
 result[i].uploadsize	number	上传的文件大小
 result[i].uploaduin	number	上传者的QQ
      */
-    class ShareList {
+    public static class ShareList {
         private String auditflag;
         private Integer busid;
         private String createtime;

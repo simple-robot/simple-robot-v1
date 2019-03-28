@@ -1,5 +1,8 @@
 package com.forte.qqrobot.HttpApi.bean.response;
 
+import com.forte.qqrobot.HttpApi.bean.response.beaninter.RespGenderBean;
+import com.forte.qqrobot.HttpApi.bean.response.beaninter.RespPowerBean;
+
 /**
  * @author Ricardo
  * @create 2019-03-22 16:44
@@ -78,7 +81,7 @@ result.allowChangeCard	int	允许修改名片，0/不允许，1/允许
 result.tipExpireTime	int	头衔有效期，时间戳形式，-1为永不到期
 result.headimg	string	QQ头像
      */
-    class GroupMemberInfo {
+    public static class GroupMemberInfo implements RespGenderBean, RespPowerBean {
         private String group;
         private String qq;
         private String name;

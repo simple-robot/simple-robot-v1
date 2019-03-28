@@ -49,7 +49,7 @@ result	object	文件信息
 result.name	string	转码后保存在语音目录下的文件名
 result.file	string	已Base64编码的文件内容
      */
-    class getRecord {
+    public static class getRecord {
         private String name;
         private String file;
 

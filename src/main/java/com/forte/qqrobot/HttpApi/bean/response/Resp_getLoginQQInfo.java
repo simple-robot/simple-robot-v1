@@ -53,11 +53,12 @@ result.qq	number	QQ号
 result.headimg	string	头像链接
 result.level	int	QQ等级
      */
-    class LoginQQInfo {
-        private String nick;
-        private String qq;
-        private String headimg;
-        private Integer level;
+    public static class LoginQQInfo {
+        //此类赋予默认值，防止在配置类中获取时出现空指针异常
+        private String nick = "";
+        private String qq = "";
+        private String headimg = "";
+        private Integer level = -1;
 
         public String getNick() {
             return nick;

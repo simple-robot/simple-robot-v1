@@ -90,7 +90,7 @@ public class Resp_getGroupHomeworkList implements RespBean<Resp_getGroupHomework
         result[i].team_id	int	该作业属于哪个团队的(根据官方政策，无用)
         result[i].ts_create	int	该作业的创建时间，时间戳形式
                   */
-    class GroupHomeworkList {
+    public static class GroupHomeworkList {
         //TODO 该作业的内容信息数组 该作业的内容/该作业的内容类型
         private List<Map<String, Object>> content = new ArrayList<>();
 

@@ -4,6 +4,7 @@ import com.forte.qqrobot.HttpApi.bean.request.ReqBean;
 import com.forte.qqrobot.HttpApi.bean.response.Resp_getGroupMemberInfo;
 
 /**
+ * 取群成员信息
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/22 16:55
  * @since JDK1.8
@@ -11,14 +12,15 @@ import com.forte.qqrobot.HttpApi.bean.response.Resp_getGroupMemberInfo;
 public class Req_getGroupMemberInfo implements ReqGetBean<Resp_getGroupMemberInfo> {
 
     private final String fun = "getGroupMemberInfo";
-    /** 群号 */
-    private String qq;
 
     /** qq号 */
-    private int cache;
+    private String qq;
+    /** 群号 */
+    private String group;
 
     /** 使用缓存，0/不使用，1/使用 */
-    private String group;
+    private Integer cache;
+
 
 
     @Override

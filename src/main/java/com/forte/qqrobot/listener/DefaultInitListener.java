@@ -1,5 +1,6 @@
 package com.forte.qqrobot.listener;
 
+import com.forte.qqrobot.HttpApi.bean.response.Resp_getLoginQQInfo;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.inforeturn.ReturnLoginNick;
 import com.forte.qqrobot.beans.inforeturn.ReturnLoginQQ;
@@ -22,17 +23,30 @@ public class DefaultInitListener implements InitListener {
     @Override
     public void init(CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
         //获取登录的QQ号
-        ReturnLoginQQ loginQQ = sender.getLoginQQ();
+//        ReturnLoginQQ loginQQ = sender.getLoginQQ();
 
         //获取登录的qq昵称
-        ReturnLoginNick loginNick = sender.getLoginNick();
+//        ReturnLoginNick loginNick = sender.getLoginNick();
+
+        Resp_getLoginQQInfo.LoginQQInfo loginQQInfo = sender.getResp_getLoginQQInfo().getResult();
+        String qq = loginQQInfo.getQq();
+        String nick = loginQQInfo.getNick();
+        Integer level = loginQQInfo.getLevel();
+        String headimg = loginQQInfo.getHeadimg();
 
         //设置并保存登录的QQ号和昵称
         LinkConfiguration linkConfiguration = ResourceDispatchCenter.getLinkConfiguration();
-        linkConfiguration.setLocalQQCode(loginQQ.getLoginQQ());
-        QQLog.info("获取本机QQ号：" + loginQQ.getLoginQQ());
-        linkConfiguration.setLocalQQNick(loginNick.getLoginNick());
-        QQLog.info("获取本机QQ昵称：" + loginNick.getLoginNick());
+//        linkConfiguration.setLocalQQCode(loginQQ.getLoginQQ());
+//        linkConfiguration.setLocalQQNick(loginNick.getLoginNick());
+//        linkConfiguration.setLocalQQCode(qq);
+//        linkConfiguration.setLocalQQNick(nick);
+        linkConfiguration.setLoginQQInfo(loginQQInfo);
+
+        QQLog.info("获取本机QQ号：" + qq);
+        QQLog.info("获取本机QQ昵称：" + nick);
+        QQLog.info("获取本机QQ等级："+ level);
+        QQLog.info("获取本机QQ头像地址："+ headimg);
+
 
 
     }

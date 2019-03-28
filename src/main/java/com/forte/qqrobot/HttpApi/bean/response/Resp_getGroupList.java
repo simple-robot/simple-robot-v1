@@ -58,7 +58,7 @@ result[i].name	string	群名，url编码
 result[i].group	number	群号
 result[i].headimg	string	群头像链接
      */
-    class getGroupList {
+    public static class getGroupList {
         private String name;
         private String group;
         private String headimg;

@@ -18,6 +18,7 @@ public class Resp_getMoreQQInfo implements RespBean<Resp_getMoreQQInfo.MoreQQInf
     public void setErrMsg(String errMsg) {
         this.errMsg = errMsg;
     }
+
     @Override
     public Integer getStatus() {
         return status;
@@ -61,7 +62,7 @@ result[i].u	string	QQ号
 result[i].headimg	string	头像链接
 result[i].level	int	QQ等级
      */
-    class MoreQQInfo {
+    public static class MoreQQInfo {
         private String f;
         private String u;
 

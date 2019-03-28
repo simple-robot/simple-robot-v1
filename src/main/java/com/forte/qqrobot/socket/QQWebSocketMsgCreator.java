@@ -1,6 +1,7 @@
 package com.forte.qqrobot.socket;
 
 import com.alibaba.fastjson.JSON;
+import com.forte.qqrobot.HttpApi.bean.request.get.*;
 import com.forte.qqrobot.beans.infoget.*;
 import com.forte.qqrobot.beans.msgsend.*;
 import org.apache.commons.beanutils.BeanUtils;
@@ -57,6 +58,11 @@ public class QQWebSocketMsgCreator {
 
     /* ———————————————— 参数转JSON方法集 ———————————————— */
 
+    //**************************************
+    //*             发送的消息
+    //**************************************
+
+
     /**
      * 讨论组消息
      * @return 讨论组消息
@@ -97,6 +103,12 @@ public class QQWebSocketMsgCreator {
         return mapToBeanJson(new SendMsgPrivate(), paramMap);
     }
 
+
+    //**************************************
+    //*             设置的消息 - socket
+    //**************************************
+
+
     /**
      * 赞
      * @param QQID qq号
@@ -106,6 +118,8 @@ public class QQWebSocketMsgCreator {
         Map<String, Object> paramMap = createParamMap(new Object[]{"QQID", QQID});
         return mapToBeanJson(new SendPraise(), paramMap);
     }
+
+
 
     /**
      * 设置全群禁言
@@ -296,6 +310,11 @@ public class QQWebSocketMsgCreator {
     }
 
 
+    //**************************************
+    //*             信息请求的消息 - socket
+    //**************************************
+
+
     /**
      * 请求获取群列表信息
      * @param QQID 作为标记
@@ -353,5 +372,276 @@ public class QQWebSocketMsgCreator {
         );
         return mapToBeanJson(new InfoStrangerForJson(), paramMap);
     }
+
+
+    //**************************************
+    //*             信息请求的消息 - HTTP API
+    //**************************************
+
+    /**
+     * 取匿名成员信息
+     * @param source 匿名成员的标识，即插件提交的参数fromAnonymous
+     * @return 匿名成员信息
+     */
+    public String getResponseJson_Req_getAnonymousInfo(String source){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"source", source}
+        );
+        return mapToBeanJson(new Req_getAnonymousInfo(), paramMap);
+    }
+
+    /**
+     * 取权限信息
+     * @return 权限信息
+     */
+    public String getResponseJson_Req_getAuthInfo(){
+        Map<String, Object> paramMap = createParamMap(0);
+        return mapToBeanJson(new Req_getAuthInfo(), paramMap);
+    }
+
+    /**
+     * 取群中被禁言成员列表
+     * @param group 群号
+     * @return 群中被禁言成员列表
+     */
+    public String getResponseJson_Req_getBanList(String group){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"group", group}
+        );
+
+        return mapToBeanJson(new Req_getBanList(), paramMap);
+    }
+
+    /**
+     * 取文件信息
+     * @param source 文件标识，即插件所提交的参数file
+     * @return 件信息
+     */
+    public String getResponseJson_Req_getFileInfo(String source){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"source", source}
+        );
+        return mapToBeanJson(new Req_getFileInfo(), paramMap);
+    }
+
+    /**
+     * 取好友列表 (尚且有异常
+     * @return 好友列表
+     */
+    @Deprecated
+    public String getResponseJson_Req_getFriendList(){
+        Map<String, Object> paramMap = createParamMap(0);
+        return mapToBeanJson(new Req_getFriendList(), paramMap);
+    }
+
+    /**
+     * 取群作业列表
+     * @param group 群号
+     * @param number 取出数量
+     * @return
+     */
+    public String getResponseJson_Req_getGroupHomeworkList(String group, Integer number){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"group", group},
+                new Object[]{"number", number}
+        );
+        return mapToBeanJson(new Req_getGroupHomeworkList(), paramMap);
+    }
+
+    /**
+     * 取群详细信息
+     * @param group 群号
+     * @return 群详细信息
+     */
+    public String getResponseJson_Req_getGroupInfo(String group){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"group", group}
+        );
+        return mapToBeanJson(new Req_getGroupInfo(), paramMap);
+    }
+
+    /**
+     * 取群链接列表
+     * @param group 群号
+     * @param number 取出数量
+     * @return 群链接列表
+     */
+    public String getResponseJson_Req_getGroupLinkList(String group, Integer number){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"group", group},
+                new Object[]{"number", number}
+        );
+        return mapToBeanJson(new Req_getGroupLinkList(), paramMap);
+    }
+
+    /**
+     * 取群列表 (尚有异常
+     * @return 群列表
+     */
+    @Deprecated
+    public String getResponseJson_Req_getGroupList(){
+        Map<String, Object> paramMap = createParamMap(0);
+        return mapToBeanJson(new Req_getGroupList(), paramMap);
+    }
+
+    /**
+     * 取群成员信息
+     * @param qq qq号
+     * @param group 群号
+     * @param cache 使用缓存，0/不使用，1/使用
+     * @return 群成员信息
+     */
+    public String getResponseJson_Req_getGroupMemberInfo(String qq, String group, Integer cache){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"qq", qq},
+                new Object[]{"group", group},
+                new Object[]{"cache", cache}
+        );
+        return mapToBeanJson(new Req_getGroupMemberInfo(), paramMap);
+    }
+
+    /**
+     * 取群成员列表
+     * @param group 群号
+     * @return 群成员列表
+     */
+    public String getResponseJson_Req_getGroupMemberList(String group){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"group", group}
+        );
+        return mapToBeanJson(new Req_getGroupMemberList(), paramMap);
+    }
+
+    /**
+     * 取群公告列表
+     * @return 群公告列表
+     */
+    public String getResponseJson_Req_getGroupNoteList(String group, Integer number){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"group", group},
+                new Object[]{"number", number}
+        );
+        return mapToBeanJson(new Req_getGroupNoteList(), paramMap);
+    }
+
+    /**
+     * 取群置顶公告
+     * @return 群置顶公告
+     */
+    public String getResponseJson_Req_getGroupTopNote(String group){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"group", group}
+        );
+        return mapToBeanJson(new Req_getGroupTopNote(), paramMap);
+    }
+
+    /**
+     * 取图片信息 ※ 只能获取酷Q接收到的图片
+     * @param source 图片文件名
+     * @param needFile 需要回传文件内容
+     * @return 图片信息
+     */
+    public String getResponseJson_Req_getImageInfo(String source, Boolean needFile){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"source", source},
+                new Object[]{"needFile", needFile}
+        );
+        return mapToBeanJson(new Req_getImageInfo(), paramMap);
+    }
+
+    /**
+     * 取登录QQ的信息
+     * @return 登录QQ的信息
+     */
+    public String getResponseJson_Req_getLoginQQInfo(){
+        Map<String, Object> paramMap = createParamMap(0);
+        return mapToBeanJson(new Req_getLoginQQInfo(), paramMap);
+    }
+
+    /**
+     * 批量取群头像
+     * @param groupList 群列表，每个群用-分开，可空，空时表示取所有群的头像链接
+     * @return
+     */
+    public String getResponseJson_Req_getMoreGroupHeadimg(String groupList){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"groupList", groupList}
+        );
+        return mapToBeanJson(new Req_getMoreGroupHeadimg(), paramMap);
+    }
+
+    /**
+     * 批量取QQ信息
+     * @param qqList Q列表，每个QQ用-分开
+     * @return 批量取QQ信息
+     */
+    public String getResponseJson_Req_getMoreQQInfo(String qqList){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"qqList", qqList}
+        );
+        return mapToBeanJson(new Req_getMoreQQInfo(), paramMap);
+    }
+
+    /**
+     * 接收语音文件 需要权限30
+     * @param source 文件名，必须是消息中的语音文件(file)
+     * @param format 目标编码，默认MP3, 目前支持 mp3,amr,wma,m4a,spx,ogg,wav,flac
+     * @param needFile 是否回传文件数据，true/回传，false/不回传
+     * @return
+     */
+    public String getResponseJson_Req_getRecord(String source, Req_getRecord.RecordType format, Boolean needFile){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"source", source},
+                new Object[]{"format", format},
+                new Object[]{"needFile", needFile}
+        );
+
+        return mapToBeanJson(new Req_getRecord(), paramMap);
+    }
+
+    /**
+     * 取运行状态
+     * @return 运行状态
+     */
+    public String getResponseJson_Req_getRunStatus(){
+        Map<String, Object> paramMap = createParamMap(0);
+        return mapToBeanJson(new Req_getRunStatus(), paramMap);
+    }
+
+    /**
+     * 取群文件列表
+     * @param group 群号
+     * @return 群文件列表
+     */
+    public String getResponseJson_Req_getShareList(String group){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"group", group}
+        );
+        return mapToBeanJson(new Req_getShareList(), paramMap);
+    }
+
+    /**
+     * 取陌生人信息
+     * 需要权限131
+     * 可能需要权限20
+     * @param cache 使用缓存，true/使用，false/不使用
+     * @return
+     */
+    public String getResponseJson_Req_getStrangerInfo(Boolean cache){
+        Map<String, Object> paramMap = createParamMap(
+                new Object[]{"cache", cache}
+        );
+        return mapToBeanJson(new Req_getStrangerInfo(), paramMap);
+    }
+
+    /**
+     * 获取版本？
+     * @return 版本？
+     */
+    public String getResponseJson_Req_getVersion(){
+        Map<String, Object> paramMap = createParamMap(0);
+        return mapToBeanJson(new Req_getVersion(), paramMap);
+    }
+
 
 }

@@ -57,7 +57,7 @@ public class Resp_getFileInfo implements RespBean<Resp_getFileInfo.FileInfo> {
          result.name	string	文件名
          result.id	string	文件ID
          */
-    class FileInfo {
+    public static class FileInfo {
         private String fun;
         private String source;
         private Long size;

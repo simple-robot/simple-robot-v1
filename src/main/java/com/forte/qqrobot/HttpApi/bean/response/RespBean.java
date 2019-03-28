@@ -7,6 +7,8 @@ package com.forte.qqrobot.HttpApi.bean.response;
  **/
 public interface RespBean<T> {
 
+
+
     /**
      * 获取返回值状态码
      */

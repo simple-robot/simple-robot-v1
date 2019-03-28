@@ -84,7 +84,7 @@ result[i].settings.is_show_edit_card	int	提醒群成员修改名片，1/提醒�
 result[i].type	int	公告类型ID
 result[i].u	number	发布人QQ
      */
-    class GroupNoteList {
+    public static class GroupNoteList {
         private String cn;
         private String fid;
         private String fn;

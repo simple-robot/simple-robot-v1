@@ -41,7 +41,7 @@ public class Resp_getBanList implements RespBean<Resp_getBanList.BanList[]> {
     /**
      * ——————————内部类
      */
-    public class BanList{
+    public static class BanList{
         /*
             manager	int	该成员是否为管理，此字段固定为1；当成员非管理时，此字段不存在
             nick	string	该成员的群名片

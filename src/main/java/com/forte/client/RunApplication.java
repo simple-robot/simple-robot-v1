@@ -32,10 +32,14 @@ public class RunApplication extends RobotApplication {
         //服务器地址
         configuration.setLinkIp( ConstantData.LEMOC_IP );
         //注册初始化监听器
-        configuration.scannerInitListener("com.forte.client.listener");
+        configuration.scannerInitListener("com.forte.client.demolistener");
 //        扫描加载普通监听器
-//        configuration.scannerListener("com.forte.client.listener");
         configuration.scannerListener("com.forte.client.demolistener");
+
+        //配置http api插件信息
+        configuration.setHTTP_API_ip("139.199.116.5");
+        configuration.setHTTP_API_port(8877);
+
     }
 
     /**

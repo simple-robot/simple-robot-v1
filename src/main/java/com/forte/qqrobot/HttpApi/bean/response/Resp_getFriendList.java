@@ -73,7 +73,7 @@ public class Resp_getFriendList implements RespBean<Resp_getFriendList.FriendLis
          result[i].mems[n].name	string	该用户的备注
          result[i].mems[n].uin	number	该用户的QQ号
                   */
-    class FriendList {
+    public static class FriendList {
         private String gname;
         //TODO 这里是一个分组下的所有好友
         private List<Map<String, String>> mems = new ArrayList<>();
