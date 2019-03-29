@@ -121,10 +121,14 @@ public abstract class RobotApplication extends BaseApplication {
 
         //连接socket
         QQWebSocketManager manager = lineSocket();
-
+        //获取client
         QQWebSocketClient mainSocket = manager.getMainSocket();
+
+        //获取CQCodeUtil实例
+        CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
+
         //连接之后
-        application.after(QQWebSocketMsgSender.of(mainSocket));
+        application.after(cqCodeUtil, QQWebSocketMsgSender.of(mainSocket));
 
     }
 

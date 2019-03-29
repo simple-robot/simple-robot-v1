@@ -1,6 +1,7 @@
 package com.forte.qqrobot;
 
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
+import com.forte.qqrobot.utils.CQCodeUtil;
 
 /**
  * 启动器的接口
@@ -12,7 +13,7 @@ public interface SimpleApplication {
 
     void before(LinkConfiguration configuration);
 
-    void after(QQWebSocketMsgSender sender);
+    void after(CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender);
 
     default String author(){
         return "@ForteScarlet";
