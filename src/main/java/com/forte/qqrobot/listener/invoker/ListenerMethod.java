@@ -4,6 +4,7 @@ import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
 import com.forte.qqrobot.anno.Spare;
 import com.forte.qqrobot.beans.types.MsgGetTypes;
+import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.FieldUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -42,6 +43,9 @@ public class ListenerMethod {
     /** 此方法所属的监听类型 */
     private final MsgGetTypes type;
 
+    /** 信息发送器，先创建字段以备后续使用 */
+    private final QQWebSocketMsgSender sender;
+
     /**
      * 全参数构造
      * @param bean          方法所在实例对象
@@ -51,13 +55,14 @@ public class ListenerMethod {
      * @param method        方法本体
      * @param type          监听类型
      */
-    private ListenerMethod(Object bean, Filter filter, BlockFilter blockFilter, Spare spare, Method method, MsgGetTypes type) {
+    private ListenerMethod(Object bean, Filter filter, BlockFilter blockFilter, Spare spare, Method method, MsgGetTypes type, QQWebSocketMsgSender sender) {
         this.listener = bean;
         this.filter = filter;
         this.blockFilter = blockFilter;
         this.spare = spare;
         this.method = method;
         this.type = type;
+        this.sender = sender;
     }
 
 
@@ -84,8 +89,6 @@ public class ListenerMethod {
             Class<?> type = parameterTypes[i];
             //从提供的数组中查找相同类型，理论上讲不会有相同类型，如果没有则使用null
             args[i] = giveArgs.stream().filter(p -> FieldUtils.isChild(p.getClass(), type)).findAny().orElse(null);
-            //TODO 临时对基础数据类型进行判断
-
         }
 
         //执行方法
@@ -197,6 +200,9 @@ public class ListenerMethod {
         return spare;
     }
 
+    public QQWebSocketMsgSender getSender() {
+        return sender;
+    }
 
     /**
      * 内部类，对象构建类
@@ -208,13 +214,14 @@ public class ListenerMethod {
         private final Method method;
         /** 此方法所属的监听类型 */
         private final MsgGetTypes type;
+        /** TODO 消息发送器 */
+        private final QQWebSocketMsgSender sender = null;
         /** 过滤器注解，如果没有则为null */
         private Filter filter = null;
         /** 阻塞过滤器注解，如果没有则为null */
         private BlockFilter blockFilter = null;
         /** 默认方法注解，如果没有则为null */
         private Spare spare = null;
-
         /**
          * 构造
          */
@@ -244,7 +251,7 @@ public class ListenerMethod {
          * 构建对象
          */
         public ListenerMethod build(){
-            return new ListenerMethod(listener, filter, blockFilter, spare, method, type);
+            return new ListenerMethod(listener, filter, blockFilter, spare, method, type, sender);
         }
 
 

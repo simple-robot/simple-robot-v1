@@ -1,5 +1,6 @@
 package com.forte.qqrobot.utils;
 
+import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.types.CQCodeTypes;
 import sun.java2d.pipe.SpanIterator;
@@ -332,5 +333,13 @@ public class CQCodeUtil {
         return types.contains(text);
     }
 
+    /**
+     * 公共静态方法，创建一个实例对象
+     * 如果无法从资源调度中心获取，则创建一个新的实例
+     * 本类不需要过于拘谨于单例，使用单例只是为了缩减对象的创建频率
+     */
+    public static CQCodeUtil build(){
+        return Optional.ofNullable(ResourceDispatchCenter.getCQCodeUtil()).orElseGet(CQCodeUtil::new);
+    }
 
 }
