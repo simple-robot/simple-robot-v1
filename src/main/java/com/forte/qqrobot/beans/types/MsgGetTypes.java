@@ -3,6 +3,7 @@ package com.forte.qqrobot.beans.types;
 import com.alibaba.fastjson.JSON;
 import com.forte.qqrobot.beans.msgget.*;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -131,7 +132,8 @@ public enum MsgGetTypes {
      * 获取本类全部常量对象
      */
     private static MsgGetTypes[] getAllTypes(){
-        return Optional.ofNullable(MsgGetTypes.allTypes.get()).orElseGet(() -> MsgGetTypes.allTypes.updateAndGet(pe -> MsgGetTypes.class.getEnumConstants()));
+        return values();
+//        return Optional.ofNullable(MsgGetTypes.allTypes.get()).orElseGet(() -> MsgGetTypes.allTypes.updateAndGet(pe -> MsgGetTypes.class.getEnumConstants()));
     }
 
 

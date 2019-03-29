@@ -1,6 +1,6 @@
 package com.forte.qqrobot;
 
-import com.forte.qqrobot.HttpApi.bean.response.Resp_getLoginQQInfo;
+import com.forte.qqrobot.beans.HttpApi.response.Resp_getLoginQQInfo;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -8,7 +8,6 @@ import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.scanner.FileScanner;
 import com.forte.qqrobot.socket.QQWebSocketClient;
 import com.forte.qqrobot.utils.FieldUtils;
-import com.mchange.v2.lang.StringUtils;
 
 import java.util.*;
 import java.util.function.Predicate;

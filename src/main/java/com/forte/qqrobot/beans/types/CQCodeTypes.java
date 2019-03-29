@@ -182,7 +182,8 @@ public enum CQCodeTypes {
      * 获取本类全部常量对象
      */
     private static CQCodeTypes[] getAllTypes(){
-        return Optional.ofNullable(CQCodeTypes.allTypes.get()).orElseGet(() -> CQCodeTypes.allTypes.updateAndGet(pe -> CQCodeTypes.class.getEnumConstants()));
+        return values();
+//        return Optional.ofNullable(CQCodeTypes.allTypes.get()).orElseGet(() -> CQCodeTypes.allTypes.updateAndGet(pe -> CQCodeTypes.class.getEnumConstants()));
     }
 
 

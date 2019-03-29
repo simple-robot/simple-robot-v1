@@ -3,6 +3,7 @@ package com.forte.qqrobot;
 import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerInvoker;
+import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.socket.QQWebSocketInfoReturnManager;
 import com.forte.qqrobot.socket.QQWebSocketManager;
@@ -66,11 +67,11 @@ public class ResourceDispatchCenter {
     }
 
     /**
-     * 储存一个监听器触发器
-     * @param listenerInvoker 单例对象
+     * 储存一个监听器管理器
+     * @param listenerManager 单例对象
      */
-    static void saveListenerInvoker(ListenerInvoker listenerInvoker){
-        SingleFactory.set(listenerInvoker);
+    static void saveListenerManager(ListenerManager listenerManager){
+        SingleFactory.set(listenerManager);
     }
 
     /**
@@ -144,8 +145,8 @@ public class ResourceDispatchCenter {
      * 获取一个ListenerInvoker单例对象
      * @return ListenerInvoker单例对象
      */
-    public static ListenerInvoker getListenerInvoker(){
-        return SingleFactory.get(ListenerInvoker.class);
+    public static ListenerManager getListenerManager(){
+        return SingleFactory.get(ListenerManager.class);
     }
 
     /**

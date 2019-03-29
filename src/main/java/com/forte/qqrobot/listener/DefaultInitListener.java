@@ -1,9 +1,7 @@
 package com.forte.qqrobot.listener;
 
-import com.forte.qqrobot.HttpApi.bean.response.Resp_getLoginQQInfo;
+import com.forte.qqrobot.beans.HttpApi.response.Resp_getLoginQQInfo;
 import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.beans.inforeturn.ReturnLoginNick;
-import com.forte.qqrobot.beans.inforeturn.ReturnLoginQQ;
 import com.forte.qqrobot.LinkConfiguration;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;

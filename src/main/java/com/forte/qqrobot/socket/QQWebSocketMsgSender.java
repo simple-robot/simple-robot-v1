@@ -1,14 +1,13 @@
 package com.forte.qqrobot.socket;
 
 import com.alibaba.fastjson.JSON;
-import com.forte.qqrobot.HttpApi.bean.request.get.*;
-import com.forte.qqrobot.HttpApi.bean.response.*;
+import com.forte.qqrobot.beans.HttpApi.request.get.*;
+import com.forte.qqrobot.beans.HttpApi.response.*;
 import com.forte.qqrobot.LinkConfiguration;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.inforeturn.*;
+import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.utils.HttpClientUtil;
-
-import java.util.Map;
 
 /**
  * QQWebsocket信息发送器
@@ -23,6 +22,9 @@ public class QQWebSocketMsgSender {
 
     /** 响应信息字符串生成器 MsgCreator */
     private final QQWebSocketMsgCreator creator;
+
+    /** 使用此信息发送器的是哪个方法 */
+    private ListenerMethod listenerMethod;
 
     /** 私有构造 */
     private QQWebSocketMsgSender(QQWebSocketClient client, QQWebSocketMsgCreator creator){
@@ -480,6 +482,7 @@ public class QQWebSocketMsgSender {
      * @param group 群号
      * @return 群文件列表
      */
+    @Deprecated
     public Resp_getShareList getResp_getShareList(String group){
         String json = creator.getResponseJson_Req_getShareList(group);
         return get(json, Resp_getShareList.class);

@@ -47,16 +47,16 @@ public class BanListener implements MsgGroupListener, MsgPrivateListener {
             return true;
         }else{
             //否则可以禁言
-            int timesByMin = 0;
+            long timesByMin = 0;
             if(msg.getMsg().contains("随机")){
                 //如果是随机，获取1-15直接的区间参数
-                timesByMin = RandomUtil.getNumber$right(1, 15);
+                timesByMin = RandomUtil.getNumber$right(1, 15) * 60L;
             }else{
                 //获取他的套餐时间
-                timesByMin = Integer.parseInt(RegexUtil.getMatcher(msg.getMsg(), "\\d+").get(0));
+                timesByMin = Long.parseLong(RegexUtil.getMatcher(msg.getMsg(), "\\d+").get(0)) * 60L;
             }
             //设置禁言，保底1分钟
-            sender.setGroupMemberBanned(fromQQ, fromGroup, timesByMin <= 0 ? 60 : (timesByMin*60L));
+            sender.setGroupMemberBanned(fromQQ, fromGroup, timesByMin <= 0 ? 60 : (timesByMin));
             return true;
         }
     }

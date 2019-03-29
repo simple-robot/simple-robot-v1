@@ -1,7 +1,7 @@
 package com.forte.qqrobot.socket;
 
 import com.alibaba.fastjson.JSON;
-import com.forte.qqrobot.HttpApi.bean.request.get.*;
+import com.forte.qqrobot.beans.HttpApi.request.get.*;
 import com.forte.qqrobot.beans.infoget.*;
 import com.forte.qqrobot.beans.msgsend.*;
 import org.apache.commons.beanutils.BeanUtils;

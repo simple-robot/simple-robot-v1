@@ -9,13 +9,10 @@ package com.forte.client.utils;
 public class ConstantData {
 
     /** 自身的qq号 */
-    public static final String MY_QQ_CODE = "2257290268";
+    public static final String MY_QQ_CODE = "1234567890";
 
-    /** 群号 */
-//    public static final String MY_GROUP_CODE = "581250423";
-
-    /** 服务器ip：139.199.116.5 */
-    public static String LEMOC_IP = "139.199.116.5";
+    /** 服务器ip*/
+    public static String LEMOC_IP = "127.0.0.1";
 
 
 }

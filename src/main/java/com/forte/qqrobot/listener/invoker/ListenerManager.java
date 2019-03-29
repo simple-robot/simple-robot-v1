@@ -30,11 +30,15 @@ public class ListenerManager {
      */
     private static final Map<Boolean, List<ListenerMethod>> EMPTY_MAP;
 
+    /**
+     * 空的list，用于应对空指针异常
+     */
+    private static final List<ListenerMethod> EMPTY_LIST = Collections.EMPTY_LIST;
 
     static{
         Map<Boolean, List<ListenerMethod>> emptyMap = new HashMap<>(2);
-        emptyMap.put(true , Collections.EMPTY_LIST);
-        emptyMap.put(false, Collections.EMPTY_LIST);
+        emptyMap.put(true , EMPTY_LIST);
+        emptyMap.put(false, EMPTY_LIST);
         EMPTY_MAP = emptyMap;
     }
 
@@ -135,7 +139,7 @@ public class ListenerManager {
      * @return 监听函数列表
      */
     private List<ListenerMethod> getNormalMethods(MsgGetTypes msgGetTypes){
-        return LISTENER_METHOD_SET.getOrDefault(msgGetTypes, EMPTY_MAP).get(true);
+        return LISTENER_METHOD_SET.getOrDefault(msgGetTypes, EMPTY_MAP).getOrDefault(true, EMPTY_LIST);
     }
 
 
@@ -145,9 +149,8 @@ public class ListenerManager {
      * @return 监听函数列表
      */
     private List<ListenerMethod> getSpareMethods(MsgGetTypes msgGetTypes){
-        return LISTENER_METHOD_SET.getOrDefault(msgGetTypes, EMPTY_MAP).get(false);
+        return LISTENER_METHOD_SET.getOrDefault(msgGetTypes, EMPTY_MAP).getOrDefault(false, EMPTY_LIST);
     }
-
 
 
 
@@ -169,7 +172,6 @@ public class ListenerManager {
                     return map.entrySet().stream();
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
 
     }
 }

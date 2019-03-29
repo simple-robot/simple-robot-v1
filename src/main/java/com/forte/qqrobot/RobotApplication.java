@@ -4,6 +4,7 @@ import com.alibaba.fastjson.util.TypeUtils;
 import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerInvoker;
+import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.socket.*;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
@@ -19,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date Created in 2019/3/6 18:10
  * @since JDK1.8
  **/
-public abstract class RobotApplication {
+public abstract class RobotApplication extends BaseApplication {
 
 //    /** socket对象 */
 //    public static QQWebSocketManager manager;
@@ -77,7 +78,7 @@ public abstract class RobotApplication {
         ListenerMethodScanner listenerMethodScanner = new ListenerMethodScanner();
         ResourceDispatchCenter.saveListenerMethodScanner(listenerMethodScanner);
         //将ListenerInvoker放入资源调度中心
-        ResourceDispatchCenter.saveListenerInvoker(new ListenerInvoker());
+        ResourceDispatchCenter.saveListenerManager(listenerMethodScanner.buildManager());
         //将ListenerFilter放入资源调度中心
         ResourceDispatchCenter.saveListenerFilter(new ListenerFilter());
         //将QQWebSocketInfoReturnManager放入资源调度中心
@@ -127,9 +128,9 @@ public abstract class RobotApplication {
 
 
     /** socket连接或服务器启动 之前 */
-    public abstract void before(LinkConfiguration configuration);
+//    public abstract void before(LinkConfiguration configuration);
     /** socket连接或服务器启动 之后 */
-    public abstract void after();
+//    public abstract void after();
 
 
 }
