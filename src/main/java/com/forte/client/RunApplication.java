@@ -3,6 +3,7 @@ package com.forte.client;
 import com.forte.client.utils.ConstantData;
 import com.forte.qqrobot.RobotApplication;
 import com.forte.qqrobot.LinkConfiguration;
+import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 
 /**
  * DEMO-如何使用
@@ -46,6 +47,6 @@ public class RunApplication extends RobotApplication {
      * socket连接之后
      */
     @Override
-    public void after() {
+    public void after(QQWebSocketMsgSender sender) {
     }
 }

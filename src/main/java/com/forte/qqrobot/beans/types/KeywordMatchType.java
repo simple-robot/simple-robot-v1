@@ -1,5 +1,7 @@
 package com.forte.qqrobot.beans.types;
 
+import com.forte.qqrobot.utils.CQCodeUtil;
+
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -11,26 +13,52 @@ import java.util.function.Predicate;
  **/
 public enum KeywordMatchType {
 
+    //**************** 正则匹配相关 ****************//
+
     /** 使用正则规则匹配 */
     REGEX(String::matches),
 
     /** 开头结尾去空后正则匹配 */
-    TRIM_REGEX((msg, kw) -> msg.trim().matches(kw)),
+    TRIM_REGEX((msg, regex) -> msg.trim().matches(regex)),
+
+    /** 移除掉所有CQ码后正则匹配 */
+    RE_CQCODE_REGEX((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).matches(regex)),
+
+    /** 移除掉所有CQ码并开头结尾去空后正则匹配 */
+    RE_CQCODE_TRIM_REGEX((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).trim().matches(regex)),
+
+    //**************** 相同匹配相关 ****************//
 
     /** 使用完全相同匹配 */
     EQUALS(String::equals),
 
     /** 开头结尾去空后相同匹配  */
-    TRIM_EQUALS((msg, kw) -> msg.trim().equals(kw)),
+    TRIM_EQUALS((msg, regex) -> msg.trim().equals(regex)),
+
+    /** 移除掉所有CQ码后相同匹配 */
+    RE_CQCODE_EQUALS((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).equals(regex)),
+
+    /** 移除掉所有CQ码并开头结尾去空后相同匹配 */
+    RE_CQCODE_TRIM_EQUALS((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).trim().equals(regex)),
+
+    //**************** 包含匹配相关 ****************//
 
     /** 包含匹配 */
     CONTAINS(String::contains),
 
     /** 去空的包含匹配 */
-    TRIM_CONTAINS((msg, kw) -> msg.trim().contains(kw)),
+    TRIM_CONTAINS((msg, regex) -> msg.trim().contains(regex)),
+
+    /** 移除掉所有CQ码后包含匹配 */
+    RE_CQCODE_CONTAINS((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).contains(regex)),
+
+    /** 移除掉所有CQ码并开头结尾去空后包含匹配 */
+    RE_CQCODE_TRIM_CONTAINS((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).trim().contains(regex)),
 
     ;
 
+    /** CQCodeUtil实例对象 */
+    private static CQCodeUtil cqCodeUtil = new CQCodeUtil();
 
     /**
      * 进行比对

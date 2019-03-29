@@ -1,5 +1,7 @@
 package com.forte.qqrobot;
 
+import com.forte.qqrobot.socket.QQWebSocketMsgSender;
+
 /**
  * 启动器的接口
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
@@ -10,6 +12,10 @@ public interface SimpleApplication {
 
     void before(LinkConfiguration configuration);
 
-    void after();
+    void after(QQWebSocketMsgSender sender);
+
+    default String author(){
+        return "@ForteScarlet";
+    }
 
 }

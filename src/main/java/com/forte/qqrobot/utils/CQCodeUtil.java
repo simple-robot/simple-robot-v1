@@ -84,13 +84,14 @@ public class CQCodeUtil {
         joiner.add(function);
         //获取参数列表
         String[] keys = type.getKeys();
-        //理论上，参数的数量应该不会小于keys的数量
+        //理论上，参数的数量应该不会小于keys的数量，如果长度不足，以null补位
 
         //遍历参数列表
         for (int i = 0; i < keys.length; i++) {
             String key = keys[i];
             //获取value值并转义，如果参数不存在则标记为null
-            String value = Optional.ofNullable(params[i]).map(this::escapeValue).orElse(null);
+            //如果参数的索引不足类型的索引，以null补位
+            String value = Optional.ofNullable(params.length >= (i+1) ? params[i] : null).map(this::escapeValue).orElse(null);
             //如果参数不为null则说明不需要忽略
             if(value != null){
                 joiner.add(key+"="+value);
@@ -251,8 +252,12 @@ public class CQCodeUtil {
         return getCQCodeString(CQCodeTypes.share, url, title, content, image);
     }
 
+    //**************** CQ码辅助方法 ****************//
+
+
     /** 用于从字符串中提取CQCode码字符串的正则表达式 */
-    private static final String CQCODE_EXTRACT_REGEX = "\\[CQ:((?!(\\[CQ:)).)+\\]";
+    private static final String CQCODE_EXTRACT_REGEX = CQCodeTypes.getCqcodeExtractRegex();
+
 
     /**
      * 从信息字符串中提取出CQCode码的字符串
@@ -263,13 +268,24 @@ public class CQCodeUtil {
         return RegexUtil.getMatcher(msg, CQCODE_EXTRACT_REGEX);
     }
 
+
     /**
      * 从信息字符串中移除CQCode字符串
-     * @param msg
-     * @return
+     * @param msg 字符串
+     * @return 移除后的字符串
      */
     public String removeCQCodeFromMsg(String msg){
-        return msg.replaceAll(CQCODE_EXTRACT_REGEX, "");
+        return removeCQCodeFromMsg(msg, null);
+    }
+
+    /**
+     * 从信息字符串中移除某种类型的CQCode字符串
+     * @param msg 字符串
+     * @param cqCodeTypes CQ码类型
+     * @return 移除后的字符串
+     */
+    public String removeCQCodeFromMsg(String msg, CQCodeTypes cqCodeTypes){
+        return msg.replaceAll(cqCodeTypes == null ? CQCODE_EXTRACT_REGEX : cqCodeTypes.getMatchRegex(), "");
     }
 
     /**
@@ -305,5 +321,16 @@ public class CQCodeUtil {
         //如果存在at的CQ码并且参数‘qq’是某个qq
         return getCQCodeFromMsg(msg).stream().anyMatch(cq -> cq.getCQCodeTypes().equals(CQCodeTypes.at) && cq.getParams().get("qq").equals(qq));
     }
+
+    /**
+     * 判断某个字符串中是否存在某类型的CQ码
+     * @param types CQ码类型
+     * @param text  字符串
+     * @return 是否包含
+     */
+    public boolean isContains(CQCodeTypes types, String text){
+        return types.contains(text);
+    }
+
 
 }

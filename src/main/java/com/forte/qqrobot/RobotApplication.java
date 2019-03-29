@@ -120,9 +120,11 @@ public abstract class RobotApplication extends BaseApplication {
 
 
         //连接socket
-        lineSocket();
+        QQWebSocketManager manager = lineSocket();
+
+        QQWebSocketClient mainSocket = manager.getMainSocket();
         //连接之后
-        application.after();
+        application.after(QQWebSocketMsgSender.of(mainSocket));
 
     }
 
