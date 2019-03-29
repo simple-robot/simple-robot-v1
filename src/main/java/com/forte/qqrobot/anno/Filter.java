@@ -1,5 +1,6 @@
 package com.forte.qqrobot.anno;
 
+import com.forte.qqrobot.beans.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.KeywordMatchType;
 import com.forte.qqrobot.beans.types.MostType;
 
@@ -7,6 +8,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.function.Consumer;
 
 /**
  * 监听消息过滤器
@@ -30,5 +32,7 @@ public @interface Filter {
     /** 是否需要被at才接收此消息，默认为false<br>
      * ※ 请注意！如果为私聊且at参数为true的话的话将会永远接收不到消息 */
     boolean at() default false;
+
+
 
 }

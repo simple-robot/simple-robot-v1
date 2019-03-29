@@ -10,7 +10,7 @@ public class UnknownMsg implements MsgGet {
 
     private static final Integer act = -999;
 
-    private static final String msg = null;
+    private static final String MSG = null;
 
     @Override
     public Integer getAct() {
@@ -19,7 +19,13 @@ public class UnknownMsg implements MsgGet {
 
     @Override
     public String getMsg() {
-        return null;
+        return MSG;
     }
+
+    @Override
+    public void setMsg(String msg) {
+    }
+
+
 }
 

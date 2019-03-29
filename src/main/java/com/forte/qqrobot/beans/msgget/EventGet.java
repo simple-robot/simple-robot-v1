@@ -16,4 +16,6 @@ public interface EventGet extends MsgGet {
         return null;
     }
 
+    default void setMsg(String msg){}
+
 }

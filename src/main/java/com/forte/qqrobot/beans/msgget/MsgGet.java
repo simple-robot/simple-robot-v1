@@ -11,4 +11,6 @@ public interface MsgGet extends MsgBean {
 
     String getMsg();
 
+    void setMsg(String msg);
+
 }
