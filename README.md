@@ -17,8 +17,9 @@
 >
 > 而且写文档好麻烦好累啊...
 
-<a target="_blank" href="//shang.qq.com/wpa/qunwpa?idkey=49b51808c33ec198f3799476e786f7577d9ca5ea6a857ba00bbac07dac03ca09"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="simple-coolQ扯" title="simple-coolQ扯"></a>
+qq群号：<a target="_blank" href="//shang.qq.com/wpa/qunwpa?idkey=49b51808c33ec198f3799476e786f7577d9ca5ea6a857ba00bbac07dac03ca09"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="simple-coolQ扯" title="simple-coolQ扯"></a>
 
+qq群号：782930037
 
 
 ## 使用说明
