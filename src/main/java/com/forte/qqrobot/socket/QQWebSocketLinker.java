@@ -3,6 +3,7 @@ package com.forte.qqrobot.socket;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.LinkConfiguration;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
+import com.forte.qqrobot.listener.invoker.ListenerPlug;
 import com.forte.qqrobot.log.QQLog;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,11 +37,11 @@ public class QQWebSocketLinker {
         boolean localB = true;
 
         //构建监听函数管理器
-        ListenerManager manager = ResourceDispatchCenter.getListenerMethodScanner().buildManager();
+        ListenerManager manager = ResourceDispatchCenter.getListenerManager();
 
         //连接的时候先尝试一次本地连接
         try {
-            System.out.println("尝试本地连接...");
+            QQLog.info("尝试本地连接...");
             //准备参数
             Object[] localParams = new Object[]{
                     new URI(LOCAL_IP_WITH_HEAD + linkConfiguration.getPort()),
@@ -138,7 +139,13 @@ public class QQWebSocketLinker {
 //        linkConfiguration.getListeners().forEach(ResourceDispatchCenter.getListenerInvoker()::loadListener);
         //构建监听函数管理器
         ListenerManager listenerManager = ResourceDispatchCenter.getListenerMethodScanner().buildManager();
+        ListenerPlug listenerPlug = ResourceDispatchCenter.getListenerMethodScanner().buildPlug();
         //保存监听函数
+        //将ListenerInvoker放入资源调度中心
+        ResourceDispatchCenter.saveListenerManager(listenerManager);
+        //将监听函数阻断器放入资源调度中心
+        ResourceDispatchCenter.saveListenerPlug(listenerPlug);
+
 
 
     }

@@ -21,9 +21,9 @@ import java.lang.annotation.Target;
 public @interface Listen {
 
     /**
-     * 监听器所监听的类型
+     * 监听器所监听的类型, 可以监听多个类型
      * 方法上的参数将会覆盖类上的参数
      */
-    MsgGetTypes value();
+    MsgGetTypes[] value();
 
 }

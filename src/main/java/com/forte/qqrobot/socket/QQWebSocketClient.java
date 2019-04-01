@@ -9,11 +9,8 @@ import com.forte.qqrobot.beans.types.InfoReturnTypes;
 import com.forte.qqrobot.beans.types.MsgGetTypes;
 import com.forte.qqrobot.listener.DefaultInitListener;
 import com.forte.qqrobot.listener.InitListener;
-import com.forte.qqrobot.listener.SocketListener;
-import com.forte.qqrobot.listener.invoker.ListenerInvoker;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.log.QQLog;
-import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -29,11 +26,12 @@ import java.util.Set;
  **/
 public class QQWebSocketClient extends WebSocketClient {
 
-    /** 送信者 */
-    private QQWebSocketMsgSender sender;
+    /** socket送信器 */
+    private QQWebSocketMsgSender socketSender;
 
-//    /** 监听器列表 */
-//    private Set<SocketListener> listeners;
+    /** http送信器 */
+    private QQHttpMsgSender httpSender;
+
     /** 监听函数管理器 */
     private ListenerManager manager;
 
@@ -46,7 +44,11 @@ public class QQWebSocketClient extends WebSocketClient {
      */
     public QQWebSocketClient(URI serverURI, ListenerManager manager, Set<InitListener> initListeners) {
         super(serverURI);
-        this.sender = QQWebSocketMsgSender.of(this);
+        //创建socket送信器
+        this.socketSender = QQWebSocketMsgSender.of(this);
+
+        // TODO: 2019/3/30 创建MsgSender对象
+
         this.manager = manager;
         this.initListeners = initListeners;
     }
@@ -58,10 +60,21 @@ public class QQWebSocketClient extends WebSocketClient {
     public final void onOpen(ServerHandshake serverHandshake) {
         onOpened(serverHandshake);
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
+
+
+        //初始化监听器暂时不属于ListenerMethod
         //先执行默认的初始化监听器
-        ResourceDispatchCenter.getThreadPool().execute(() -> new DefaultInitListener().init(cqCodeUtil, sender));
+        ResourceDispatchCenter.getThreadPool().execute(() -> new DefaultInitListener().init(cqCodeUtil, createNoMethodSender()));
         //连接成功后，调用全部的初始化监听器，在新线程种进行初始化且并行执行
-        ResourceDispatchCenter.getThreadPool().execute(() -> initListeners.forEach(l -> l.init(cqCodeUtil, sender)));
+        ResourceDispatchCenter.getThreadPool().execute(() -> initListeners.forEach(l -> l.init(cqCodeUtil, createNoMethodSender())));
+    }
+
+    /**
+     * 创建
+     * @return
+     */
+    public MsgSender createNoMethodSender(){
+        return MsgSender.build(socketSender, httpSender);
     }
 
     /**
@@ -174,7 +187,7 @@ public class QQWebSocketClient extends WebSocketClient {
         String localQQCode = ResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
         boolean at = cqCodeUtil.isAt(msg, localQQCode);
         //组装参数
-        return new Object[]{msgGet, cqCodes, at, cqCodeUtil, sender};
+        return new Object[]{msgGet, cqCodes, at, cqCodeUtil, socketSender};
     }
 
 

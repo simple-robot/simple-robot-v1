@@ -19,8 +19,8 @@ import java.util.concurrent.atomic.AtomicReference;
  **/
 public class QQWebSocketInfoReturnManager {
 
-    /** 获取并保存返回的信息，共5种返回值信息 */
-    private static Map<Integer, AtomicReference<InfoReturnBean>> infoReturnMap = new ConcurrentHashMap<>(5);
+//    /** 获取并保存返回的信息，共5种返回值信息 */
+//    private static Map<Integer, AtomicReference<InfoReturnBean>> infoReturnMap = new ConcurrentHashMap<>(5);
 
     /** 所有返回值的缓冲列表 */
     private static Map<Integer, ConcurrentLinkedQueue<InfoReturnBean>> returnLinkedMap = new ConcurrentHashMap<>(5);

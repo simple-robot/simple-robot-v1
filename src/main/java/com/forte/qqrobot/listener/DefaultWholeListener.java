@@ -2,6 +2,7 @@ package com.forte.qqrobot.listener;
 
 import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.msgget.*;
+import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
@@ -20,48 +21,49 @@ public class DefaultWholeListener implements EventFriendAddedListener,
                                                 MsgPrivateListener,
                                                 RequestFriendListener,
                                                 RequestGroupListener {
+
     @Override
-    public boolean onMessage(EventFriendAdded msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
+    public boolean onMessage(EventFriendAdded msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(EventGroupAdmin msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
+    public boolean onMessage(EventGroupAdmin msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(EventGroupMemberJoin msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
+    public boolean onMessage(EventGroupMemberJoin msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(EventGroupMemberReduce msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
+    public boolean onMessage(EventGroupMemberReduce msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(MsgDisGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
+    public boolean onMessage(MsgDisGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(MsgGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
+    public boolean onMessage(MsgGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(MsgPrivate msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
+    public boolean onMessage(MsgPrivate msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(RequestFriend msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
+    public boolean onMessage(RequestFriend msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(RequestGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender) {
+    public boolean onMessage(RequestGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 }

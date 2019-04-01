@@ -3,6 +3,7 @@ package com.forte.qqrobot.listener;
 import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.msgget.EventGroupMemberReduce;
 import com.forte.qqrobot.beans.msgget.MsgDisGroup;
+import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
@@ -13,6 +14,6 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  **/
 public interface MsgDisGroupListener extends SocketListener{
 
-    boolean onMessage(MsgDisGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender);
+    boolean onMessage(MsgDisGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
 
 }

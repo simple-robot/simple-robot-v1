@@ -2,12 +2,12 @@ package com.forte.qqrobot;
 
 import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
-import com.forte.qqrobot.listener.invoker.ListenerInvoker;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
+import com.forte.qqrobot.listener.invoker.ListenerPlug;
 import com.forte.qqrobot.socket.QQWebSocketInfoReturnManager;
 import com.forte.qqrobot.socket.QQWebSocketManager;
-import com.forte.qqrobot.socket.QQWebSocketMsgCreator;
+import com.forte.qqrobot.socket.QQJSONMsgCreator;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.SingleFactory;
@@ -43,11 +43,11 @@ public class ResourceDispatchCenter {
 
     /**
      * 储存一个QQWebSocketMsgCreator对象到单例工厂
-     * @param qqWebSocketMsgCreator 单例对象
+     * @param QQJSONMsgCreator 单例对象
      */
-    static void saveQQWebSocketMsgCreator(QQWebSocketMsgCreator qqWebSocketMsgCreator){
+    static void saveQQWebSocketMsgCreator(QQJSONMsgCreator QQJSONMsgCreator){
     //将CQCodeUtil放入单例工厂
-        SingleFactory.set(qqWebSocketMsgCreator);
+        SingleFactory.set(QQJSONMsgCreator);
     }
 
     /**
@@ -70,7 +70,7 @@ public class ResourceDispatchCenter {
      * 储存一个监听器管理器
      * @param listenerManager 单例对象
      */
-    static void saveListenerManager(ListenerManager listenerManager){
+    public static void saveListenerManager(ListenerManager listenerManager){
         SingleFactory.set(listenerManager);
     }
 
@@ -98,6 +98,14 @@ public class ResourceDispatchCenter {
         SingleFactory.set(listenerMethodScanner);
     }
 
+    /**
+     * 储存一个监听函数阻断器
+     * @param listenerPlug 监听函数阻断器
+     */
+    public static void saveListenerPlug(ListenerPlug listenerPlug){
+        SingleFactory.set(listenerPlug);
+    }
+
         /* ———————————————— 获取方法 ———————————————— */
 
     /**
@@ -121,8 +129,8 @@ public class ResourceDispatchCenter {
      * 获得一个QQWebSocketMsgCreator单例对象
      * @return  QQWebSocketMsgCreator单例对象
      */
-    public static QQWebSocketMsgCreator getQQWebSocketMsgCreator(){
-        return SingleFactory.get(QQWebSocketMsgCreator.class);
+    public static QQJSONMsgCreator getQQWebSocketMsgCreator(){
+        return SingleFactory.get(QQJSONMsgCreator.class);
     }
 
     /**
@@ -174,6 +182,14 @@ public class ResourceDispatchCenter {
     }
 
     /**
+     * 获取一个ListenerPlug单例对象
+     * @return ListenerPlug单例对象
+     */
+    public static ListenerPlug getListenerPlug(){
+        return SingleFactory.get(ListenerPlug.class);
+    }
+
+    /**
      * 获取线程池的名称
      */
     private final static String THREAD_POOL_NAME = "QQ_ROBOT_ONMESSAGE_THREAD_POOL";
@@ -185,6 +201,8 @@ public class ResourceDispatchCenter {
     public static Executor getThreadPool(){
         return BaseLocalThreadPool.getThreadPool(THREAD_POOL_NAME);
     }
+
+
 
 
 }

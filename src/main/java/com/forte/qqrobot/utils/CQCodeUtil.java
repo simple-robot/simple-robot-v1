@@ -23,6 +23,10 @@ public class CQCodeUtil {
     /** CQ码k-v分割符 */
     private static final String CQ_CODE_SPLIT = ",";
 
+    /** 仅存在一个单例 */
+    private static final CQCodeUtil CQ_CODE_UTIL = new CQCodeUtil();
+
+
     /**
      * 获取CQ码生成用StringJoiner
      * @return
@@ -339,7 +343,7 @@ public class CQCodeUtil {
      * 本类不需要过于拘谨于单例，使用单例只是为了缩减对象的创建频率
      */
     public static CQCodeUtil build(){
-        return Optional.ofNullable(ResourceDispatchCenter.getCQCodeUtil()).orElseGet(CQCodeUtil::new);
+        return CQ_CODE_UTIL;
     }
 
 }

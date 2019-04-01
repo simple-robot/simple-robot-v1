@@ -1,9 +1,11 @@
 package com.forte.qqrobot.listener.invoker;
 
+import com.forte.qqrobot.anno.Block;
 import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
 import com.forte.qqrobot.anno.Spare;
 import com.forte.qqrobot.beans.types.MsgGetTypes;
+import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.FieldUtils;
 
@@ -37,14 +39,14 @@ public class ListenerMethod {
     /** 默认方法注解，如果没有则为null */
     private final Spare spare;
 
+    /** 阻塞注解，如果没有则为null */
+    private final Block block;
+
     /** 方法本体 */
     private final Method method;
 
-    /** 此方法所属的监听类型 */
-    private final MsgGetTypes type;
-
-    /** 信息发送器，先创建字段以备后续使用 */
-    private final QQWebSocketMsgSender sender;
+    /** 此方法所属的监听类型, 多种类型 */
+    private final MsgGetTypes[] type;
 
     /**
      * 全参数构造
@@ -55,14 +57,14 @@ public class ListenerMethod {
      * @param method        方法本体
      * @param type          监听类型
      */
-    private ListenerMethod(Object bean, Filter filter, BlockFilter blockFilter, Spare spare, Method method, MsgGetTypes type, QQWebSocketMsgSender sender) {
+    private ListenerMethod(Object bean, Filter filter, BlockFilter blockFilter, Spare spare, Block block, Method method, MsgGetTypes[] type) {
         this.listener = bean;
         this.filter = filter;
         this.blockFilter = blockFilter;
         this.spare = spare;
+        this.block = block;
         this.method = method;
         this.type = type;
-        this.sender = sender;
     }
 
 
@@ -108,7 +110,7 @@ public class ListenerMethod {
     /**
      * 使用ListenerMethod对象构建
      */
-    static ListenerMethodBuilder build(Object bean, Method method, MsgGetTypes type){
+    static ListenerMethodBuilder build(Object bean, Method method, MsgGetTypes[] type){
         return new ListenerMethodBuilder(bean, method, type);
     }
 
@@ -145,6 +147,11 @@ public class ListenerMethod {
         return spare == null;
     }
 
+
+    public Block getBlock() {
+        return block;
+    }
+
     /**
      * 获取方法本体的toString字符串
      */
@@ -171,7 +178,7 @@ public class ListenerMethod {
     /**
      * 获取此方法的监听方法
      */
-    public MsgGetTypes getType(){
+    public MsgGetTypes[] getTypes(){
         return this.type;
     }
 
@@ -200,10 +207,6 @@ public class ListenerMethod {
         return spare;
     }
 
-    public QQWebSocketMsgSender getSender() {
-        return sender;
-    }
-
     /**
      * 内部类，对象构建类
      */
@@ -213,19 +216,19 @@ public class ListenerMethod {
         /** 方法本体 */
         private final Method method;
         /** 此方法所属的监听类型 */
-        private final MsgGetTypes type;
-        /** TODO 消息发送器 */
-        private final QQWebSocketMsgSender sender = null;
+        private final MsgGetTypes[] type;
         /** 过滤器注解，如果没有则为null */
         private Filter filter = null;
         /** 阻塞过滤器注解，如果没有则为null */
         private BlockFilter blockFilter = null;
         /** 默认方法注解，如果没有则为null */
         private Spare spare = null;
+        /** 阻塞注解，如果没有则为null */
+        private Block block = null;
         /**
          * 构造
          */
-        public ListenerMethodBuilder(Object listener, Method method, MsgGetTypes type) {
+        public ListenerMethodBuilder(Object listener, Method method, MsgGetTypes[] type) {
             this.listener = listener;
             this.method = method;
             this.type = type;
@@ -246,12 +249,17 @@ public class ListenerMethod {
             return this;
         }
 
+        public ListenerMethodBuilder block(Block block){
+            this.block = block;
+            return this;
+        }
+
 
         /**
          * 构建对象
          */
         public ListenerMethod build(){
-            return new ListenerMethod(listener, filter, blockFilter, spare, method, type, sender);
+            return new ListenerMethod(listener, filter, blockFilter, spare, block, method, type);
         }
 
 

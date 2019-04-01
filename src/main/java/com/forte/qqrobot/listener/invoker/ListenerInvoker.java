@@ -39,6 +39,8 @@ public class ListenerInvoker {
      * @param params                参数列表，[MsgBean, CQCode, boolean, CQCodeUtil, QQWebSocketMsgSender]
      */
     public void invokeListenerByParams(Collection<SocketListener> listenerCollection, Object[] params){
+
+
         //备用方法集
         Map<SocketListener, List<Method>> spareMethods = new HashMap<>(listenerCollection.size());
         //执行过的方法数量

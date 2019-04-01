@@ -13,12 +13,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * QQWebsocket-信息生成器，用于生成返回给服务器的方法
+ * QQ交互信息JSON生成器，用于生成返回给服务器的方法
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/8 18:37
  * @since JDK1.8
  **/
-public class QQWebSocketMsgCreator {
+public class QQJSONMsgCreator {
 
     /**
      * 创建一个参数map

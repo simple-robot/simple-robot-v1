@@ -3,14 +3,11 @@ package com.forte.qqrobot;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
-import com.forte.qqrobot.listener.invoker.ListenerInvoker;
-import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.socket.*;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
-import javax.security.auth.login.Configuration;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -69,16 +66,15 @@ public abstract class RobotApplication extends BaseApplication {
         //将连接时的配置对象加入资源调度中心
         ResourceDispatchCenter.saveLinkConfiguration(new LinkConfiguration());
         //将CQCodeUtil放入资源调度中心
-        ResourceDispatchCenter.saveCQCodeUtil(new CQCodeUtil());
+        ResourceDispatchCenter.saveCQCodeUtil(CQCodeUtil.build());
         //将QQWebSocketMsgCreator放入资源调度中心
-        ResourceDispatchCenter.saveQQWebSocketMsgCreator(new QQWebSocketMsgCreator());
+        ResourceDispatchCenter.saveQQWebSocketMsgCreator(new QQJSONMsgCreator());
         //将DefaultWholeListener放入资源调度中心
         ResourceDispatchCenter.saveDefaultWholeListener(new DefaultWholeListener());
         //将ListenerMethodScanner放入资源调度中心
         ListenerMethodScanner listenerMethodScanner = new ListenerMethodScanner();
         ResourceDispatchCenter.saveListenerMethodScanner(listenerMethodScanner);
-        //将ListenerInvoker放入资源调度中心
-        ResourceDispatchCenter.saveListenerManager(listenerMethodScanner.buildManager());
+
         //将ListenerFilter放入资源调度中心
         ResourceDispatchCenter.saveListenerFilter(new ListenerFilter());
         //将QQWebSocketInfoReturnManager放入资源调度中心

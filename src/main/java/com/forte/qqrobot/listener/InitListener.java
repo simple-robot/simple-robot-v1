@@ -1,6 +1,7 @@
 package com.forte.qqrobot.listener;
 
 
+import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
@@ -15,6 +16,6 @@ public interface InitListener {
     /**
      * 初始化方法
      */
-    void init(CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender);
+    void init(CQCodeUtil cqCodeUtil, MsgSender sender);
 
 }

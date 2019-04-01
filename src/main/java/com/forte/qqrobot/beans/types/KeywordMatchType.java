@@ -22,10 +22,10 @@ public enum KeywordMatchType {
     TRIM_REGEX((msg, regex) -> msg.trim().matches(regex)),
 
     /** 移除掉所有CQ码后正则匹配 */
-    RE_CQCODE_REGEX((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).matches(regex)),
+    RE_CQCODE_REGEX((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).matches(regex)),
 
     /** 移除掉所有CQ码并开头结尾去空后正则匹配 */
-    RE_CQCODE_TRIM_REGEX((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).trim().matches(regex)),
+    RE_CQCODE_TRIM_REGEX((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim().matches(regex)),
 
     //**************** 相同匹配相关 ****************//
 
@@ -36,10 +36,10 @@ public enum KeywordMatchType {
     TRIM_EQUALS((msg, regex) -> msg.trim().equals(regex)),
 
     /** 移除掉所有CQ码后相同匹配 */
-    RE_CQCODE_EQUALS((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).equals(regex)),
+    RE_CQCODE_EQUALS((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).equals(regex)),
 
     /** 移除掉所有CQ码并开头结尾去空后相同匹配 */
-    RE_CQCODE_TRIM_EQUALS((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).trim().equals(regex)),
+    RE_CQCODE_TRIM_EQUALS((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim().equals(regex)),
 
     //**************** 包含匹配相关 ****************//
 
@@ -50,15 +50,12 @@ public enum KeywordMatchType {
     TRIM_CONTAINS((msg, regex) -> msg.trim().contains(regex)),
 
     /** 移除掉所有CQ码后包含匹配 */
-    RE_CQCODE_CONTAINS((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).contains(regex)),
+    RE_CQCODE_CONTAINS((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).contains(regex)),
 
     /** 移除掉所有CQ码并开头结尾去空后包含匹配 */
-    RE_CQCODE_TRIM_CONTAINS((msg, regex) -> KeywordMatchType.cqCodeUtil.removeCQCodeFromMsg(msg).trim().contains(regex)),
+    RE_CQCODE_TRIM_CONTAINS((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim().contains(regex)),
 
     ;
-
-    /** CQCodeUtil实例对象 */
-    private static CQCodeUtil cqCodeUtil = new CQCodeUtil();
 
     /**
      * 进行比对

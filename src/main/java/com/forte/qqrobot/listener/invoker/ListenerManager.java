@@ -4,7 +4,6 @@ import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.MsgGetTypes;
 import com.forte.qqrobot.log.QQLog;
-import sun.invoke.empty.Empty;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -51,6 +50,11 @@ public class ListenerManager {
     public void invoke(MsgGet msgGet, Set<Object> args, boolean at){
         //获取消息类型
         MsgGetTypes type = MsgGetTypes.getByType(msgGet.getClass());
+
+        //todo 先查看是否存在阻断函数
+
+
+
         //先执行普通监听函数
         int invokeNum = invokeNormal(type, args, msgGet, at);
 
@@ -161,17 +165,39 @@ public class ListenerManager {
      */
     public ListenerManager(Collection<ListenerMethod> methods){
         //分组后赋值
-        this.LISTENER_METHOD_SET = methods.stream()
+        //第一层分组后
+        Map<MsgGetTypes[], Set<ListenerMethod>> collect = methods.stream()
                 //第一层分组
-                .collect(Collectors.groupingBy(ListenerMethod::getType))
-                //第二层分组
-                .entrySet().stream().flatMap(e -> {
-                    Map<Boolean, List<ListenerMethod>> collectBySpare = e.getValue().stream().collect(Collectors.groupingBy(ListenerMethod::isNormal));
-                    Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> map = new HashMap<>(1);
-                    map.put(e.getKey(), collectBySpare);
-                    return map.entrySet().stream();
-                })
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.groupingBy(ListenerMethod::getTypes, Collectors.toSet()));
+
+        //按照分类进行转化
+        HashMap<MsgGetTypes, Set<ListenerMethod>> firstMap = new HashMap<>(collect.size());
+
+        //遍历
+        collect.forEach((k, v) -> {
+            //遍历类型
+            for (MsgGetTypes types : k) {
+                Set<ListenerMethod> listenerMethods = firstMap.get(types);
+                if(listenerMethods != null){
+                    //如果存在，追加
+                    listenerMethods.addAll(v);
+                }else{
+                    //如果不存在，创建并保存
+                    listenerMethods = new HashSet<>(v);
+                    firstMap.put(types, listenerMethods);
+                }
+            }
+        });
+
+        //第二层，将参数按照是否为普通函数转化，转化完成后保存
+        this.LISTENER_METHOD_SET = firstMap.entrySet().stream().flatMap(e -> {
+            //准备数据
+            Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> result = new HashMap<>(firstMap.size());
+            result.put(e.getKey(), e.getValue().stream().collect(Collectors.groupingBy(lm -> !lm.isSpare())));
+            return result.entrySet().stream();
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+
 
     }
 }

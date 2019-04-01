@@ -1,9 +1,8 @@
 package com.forte.qqrobot.listener;
 
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.msgget.EventFriendAdded;
 import com.forte.qqrobot.beans.msgget.EventGroupAdmin;
-import com.forte.qqrobot.socket.QQWebSocketMsgSender;
+import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 /**
@@ -13,5 +12,5 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  **/
 public interface EventGroupAdminListener extends SocketListener{
 
-    boolean onMessage(EventGroupAdmin msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender);
+    boolean onMessage(EventGroupAdmin msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
 }

@@ -105,6 +105,7 @@ public class CQCode {
     private CQCode(CQCodeTypes cqCodeTypes, Map<String, String> params){
         this.CQ_CODE_TYPE = cqCodeTypes;
         this.PARAMS = params;
+
         //构建toString字符串
         StringJoiner joiner = getJoiner(CQ_CODE_TYPE.getFunction());
         PARAMS.forEach((k,v) -> joiner.add(k+"="+v));
