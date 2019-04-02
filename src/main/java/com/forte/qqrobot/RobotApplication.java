@@ -100,7 +100,6 @@ public abstract class RobotApplication extends BaseApplication {
 
     /**
      * 执行用主程序
-     * @param application
      */
     public static void run(RobotApplication application) {
         //初始化方法
