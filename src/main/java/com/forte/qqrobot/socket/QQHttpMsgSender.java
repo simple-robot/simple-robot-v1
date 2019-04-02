@@ -44,7 +44,7 @@ public class QQHttpMsgSender {
      * @param source 匿名成员的标识，即插件提交的参数fromAnonymous
      * @return 匿名成员信息
      */
-    public Optional<Resp_getAnonymousInfo> getResp_getAnonymousInfo(String source){
+    public Optional<Resp_getAnonymousInfo> getAnonymousInfo(String source){
         String json = creator.getResponseJson_Req_getAnonymousInfo(source);
         return get(json, Resp_getAnonymousInfo.class);
     }
@@ -53,7 +53,7 @@ public class QQHttpMsgSender {
      * 取权限信息
      * @return 权限信息
      */
-    public Optional<Resp_getAuthInfo> getResp_getAuthInfo(){
+    public Optional<Resp_getAuthInfo> getAuthInfo(){
         String json = creator.getResponseJson_Req_getAuthInfo();
         return get(json, Resp_getAuthInfo.class);
     }
@@ -63,7 +63,7 @@ public class QQHttpMsgSender {
      * @param group 群号
      * @return 群中被禁言成员列表
      */
-    public Optional<Resp_getBanList> getResp_getBanList(String group){
+    public Optional<Resp_getBanList> getBanList(String group){
         String json = creator.getResponseJson_Req_getBanList(group);
         return get(json, Resp_getBanList.class);
     }
@@ -73,7 +73,7 @@ public class QQHttpMsgSender {
      * @param source 文件标识，即插件所提交的参数file
      * @return 件信息
      */
-    public Optional<Resp_getFileInfo> getResp_getFileInfo(String source){
+    public Optional<Resp_getFileInfo> getFileInfo(String source){
         String json = creator.getResponseJson_Req_getFileInfo(source);
         return get(json, Resp_getFileInfo.class);
     }
@@ -83,7 +83,7 @@ public class QQHttpMsgSender {
      * @return 好友列表
      */
     @Deprecated
-    public Optional<Resp_getFriendList> getResp_getFriendList(){
+    public Optional<Resp_getFriendList> getFriendList(){
         String json = creator.getResponseJson_Req_getFriendList();
         return get(json, Resp_getFriendList.class);
     }
@@ -94,7 +94,7 @@ public class QQHttpMsgSender {
      * @param number 取出数量
      * @return
      */
-    public Optional<Resp_getGroupHomeworkList> getResp_getGroupHomeworkList(String group, Integer number){
+    public Optional<Resp_getGroupHomeworkList> getGroupHomeworkList(String group, Integer number){
         String json = creator.getResponseJson_Req_getGroupHomeworkList(group, number);
         return get(json, Resp_getGroupHomeworkList.class);
     }
@@ -104,7 +104,7 @@ public class QQHttpMsgSender {
      * @param group 群号
      * @return 群详细信息
      */
-    public Optional<Resp_getGroupInfo> getResp_getGroupInfo(String group){
+    public Optional<Resp_getGroupInfo> getGroupInfo(String group){
         String json = creator.getResponseJson_Req_getGroupInfo(group);
         return get(json, Resp_getGroupInfo.class);
     }
@@ -115,7 +115,7 @@ public class QQHttpMsgSender {
      * @param number 取出数量
      * @return 群链接列表
      */
-    public Optional<Resp_getGroupLinkList> getResp_getGroupLinkList(String group, Integer number){
+    public Optional<Resp_getGroupLinkList> getGroupLinkList(String group, Integer number){
         String json = creator.getResponseJson_Req_getGroupLinkList(group, number);
         return get(json, Resp_getGroupLinkList.class);
     }
@@ -125,7 +125,7 @@ public class QQHttpMsgSender {
      * @return 群列表
      */
     @Deprecated
-    public Optional<Resp_getGroupList> getResp_getGroupList(){
+    public Optional<Resp_getGroupList> getGroupList(){
         String json = creator.getResponseJson_Req_getGroupList();
         return get(json, Resp_getGroupList.class);
     }
@@ -137,7 +137,7 @@ public class QQHttpMsgSender {
      * @param cache 使用缓存，0/不使用，1/使用
      * @return 群成员信息
      */
-    public Optional<Resp_getGroupMemberInfo> getResp_getGroupMemberInfo(String qq, String group, Integer cache){
+    public Optional<Resp_getGroupMemberInfo> getGroupMemberInfo(String qq, String group, Integer cache){
         String json = creator.getResponseJson_Req_getGroupMemberInfo(qq, group, cache);
         return get(json, Resp_getGroupMemberInfo.class);
     }
@@ -147,7 +147,7 @@ public class QQHttpMsgSender {
      * @param group 群号
      * @return 群成员列表
      */
-    public Optional<Resp_getGroupMemberList> getResp_getGroupMemberList(String group){
+    public Optional<Resp_getGroupMemberList> getGroupMemberList(String group){
         String json = creator.getResponseJson_Req_getGroupMemberList(group);
         return get(json, Resp_getGroupMemberList.class);
     }
@@ -156,7 +156,7 @@ public class QQHttpMsgSender {
      * 取群公告列表
      * @return 群公告列表
      */
-    public Optional<Resp_getGroupNoteList> getResp_getGroupNoteList(String group, Integer number){
+    public Optional<Resp_getGroupNoteList> getGroupNoteList(String group, Integer number){
         String json = creator.getResponseJson_Req_getGroupNoteList(group, number);
         return get(json, Resp_getGroupNoteList.class);
     }
@@ -165,7 +165,7 @@ public class QQHttpMsgSender {
      * 取群置顶公告
      * @return 群置顶公告
      */
-    public Optional<Resp_getGroupTopNote> getResp_getGroupTopNote(String group){
+    public Optional<Resp_getGroupTopNote> getGroupTopNote(String group){
         String json = creator.getResponseJson_Req_getGroupTopNote(group);
         return get(json, Resp_getGroupTopNote.class);
     }
@@ -185,7 +185,7 @@ public class QQHttpMsgSender {
      * 取登录QQ的信息
      * @return 登录QQ的信息
      */
-    public Optional<Resp_getLoginQQInfo> getResp_getLoginQQInfo(){
+    public Optional<Resp_getLoginQQInfo> getLoginQQInfo(){
         String json = creator.getResponseJson_Req_getLoginQQInfo();
         return get(json, Resp_getLoginQQInfo.class);
     }
@@ -195,7 +195,7 @@ public class QQHttpMsgSender {
      * @param groupList 群列表，每个群用-分开，可空，空时表示取所有群的头像链接
      * @return
      */
-    public Optional<Resp_getMoreGroupHeadimg> getResp_getMoreGroupHeadimg(String groupList){
+    public Optional<Resp_getMoreGroupHeadimg> getMoreGroupHeadimg(String groupList){
         String json = creator.getResponseJson_Req_getMoreGroupHeadimg(groupList);
         return get(json, Resp_getMoreGroupHeadimg.class);
     }
@@ -205,7 +205,7 @@ public class QQHttpMsgSender {
      * @param qqList Q列表，每个QQ用-分开
      * @return 批量取QQ信息
      */
-    public Optional<Resp_getMoreQQInfo> getResp_getMoreQQInfo(String qqList){
+    public Optional<Resp_getMoreQQInfo> getMoreQQInfo(String qqList){
         String json = creator.getResponseJson_Req_getMoreQQInfo(qqList);
         return get(json, Resp_getMoreQQInfo.class);
     }
@@ -217,7 +217,7 @@ public class QQHttpMsgSender {
      * @param needFile 是否回传文件数据，true/回传，false/不回传
      * @return
      */
-    public Optional<Resp_getRecord> getResp_getRecord(String source, Req_getRecord.RecordType format, Boolean needFile){
+    public Optional<Resp_getRecord> getRecord(String source, Req_getRecord.RecordType format, Boolean needFile){
         String json = creator.getResponseJson_Req_getRecord(source, format, needFile);
         return get(json, Resp_getRecord.class);
     }
@@ -226,7 +226,7 @@ public class QQHttpMsgSender {
      * 取运行状态
      * @return 运行状态
      */
-    public Optional<Resp_getRunStatus> getResp_getRunStatus(){
+    public Optional<Resp_getRunStatus> getRunStatus(){
         String json = creator.getResponseJson_Req_getRunStatus();
         return get(json, Resp_getRunStatus.class);
     }
@@ -237,7 +237,7 @@ public class QQHttpMsgSender {
      * @return 群文件列表
      */
     @Deprecated
-    public Optional<Resp_getShareList> getResp_getShareList(String group){
+    public Optional<Resp_getShareList> getShareList(String group){
         String json = creator.getResponseJson_Req_getShareList(group);
         return get(json, Resp_getShareList.class);
     }
@@ -249,7 +249,7 @@ public class QQHttpMsgSender {
      * @param cache 使用缓存，true/使用，false/不使用
      * @return
      */
-    public Optional<Resp_getStrangerInfo> getResp_getStrangerInfo(Boolean cache){
+    public Optional<Resp_getStrangerInfo> getStrangerInfo(Boolean cache){
         String json = creator.getResponseJson_Req_getStrangerInfo(cache);
         return get(json, Resp_getStrangerInfo.class);
     }
@@ -258,7 +258,7 @@ public class QQHttpMsgSender {
      * 获取版本？
      * @return 版本？
      */
-    public Optional<Resp_getVersion> getResp_getVersion(){
+    public Optional<Resp_getVersion> getVersion(){
         String json = creator.getResponseJson_Req_getVersion();
         return get(json, Resp_getVersion.class);
     }

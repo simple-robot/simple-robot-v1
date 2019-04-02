@@ -4,10 +4,15 @@ import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.MsgGetTypes;
 import com.forte.qqrobot.log.QQLog;
+import com.forte.qqrobot.socket.MsgSender;
+import com.forte.qqrobot.socket.QQHttpMsgSender;
+import com.forte.qqrobot.socket.QQWebSocketClient;
+import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -47,22 +52,68 @@ public class ListenerManager {
      * @param args      参数列表
      * @param at        是否被at
      */
-    public void invoke(MsgGet msgGet, Set<Object> args, boolean at){
+    public void invoke(MsgGet msgGet, Set<Object> args, boolean at, QQWebSocketClient client){
+        //构建MsgSender对象
+
+        Function<ListenerMethod, Set<Object>> paramGetter = lm -> {
+            Set<Object> params = new HashSet<>(args);
+            QQWebSocketMsgSender socketSender = QQWebSocketMsgSender.build(client);
+            QQHttpMsgSender httpSender = QQHttpMsgSender.build();
+            params.add(socketSender);
+            params.add(httpSender);
+            params.add(MsgSender.build(socketSender, httpSender, lm));
+            return params;
+        };
+
         //获取消息类型
         MsgGetTypes type = MsgGetTypes.getByType(msgGet.getClass());
 
-        //todo 先查看是否存在阻断函数
+        //先查看是否存在阻断函数，如果存在阻断函数则执行仅执行阻断函数
+        //获取阻断器
+        ListenerPlug listenerPlug = ResourceDispatchCenter.getListenerPlug();
+        Set<ListenerMethod> blockMethod = listenerPlug.getBlockMethod(type);
+        if(blockMethod != null){
+            //如果存在阻断，执行阻断
+            invokeBlock(blockMethod, type, paramGetter, msgGet, at);
 
+        }else{
+            //如果不存在阻断，正常执行
+            //先执行普通监听函数
+            int invokeNum = invokeNormal(type, paramGetter, msgGet, at);
 
-
-        //先执行普通监听函数
-        int invokeNum = invokeNormal(type, args, msgGet, at);
-
-        //如果没有普通监听函数执行成功，则尝试执行备用监听函数
-        if(invokeNum <= 0){
-            invokeSpare(type, args, msgGet, at);
+            //如果没有普通监听函数执行成功，则尝试执行备用监听函数
+            if(invokeNum <= 0){
+                invokeSpare(type, paramGetter, msgGet, at);
+            }
         }
+
     }
+
+    /**
+     * 执行阻断函数
+     * @param blockMethod   阻断函数列表
+     * @param msgGetTypes   消息类型
+     * @param paramGetter   参数获取函数
+     * @param msgGet        接收到的消息
+     * @param at            是否被at
+     */
+    private void invokeBlock(Set<ListenerMethod> blockMethod, MsgGetTypes msgGetTypes, Function<ListenerMethod, Set<Object>> paramGetter, MsgGet msgGet, boolean at){
+        //过滤
+        //获取过滤器
+        ListenerFilter filter = ResourceDispatchCenter.getListenerFilter();
+        blockMethod.stream().filter(lisM -> filter.blockFilter(lisM, msgGet, at)).forEach(lisM -> {
+            //剩下的为过滤好的监听函数
+            try{
+                //执行函数
+                lisM.invoke(paramGetter.apply(lisM));
+
+            }catch (Exception e){
+                QQLog.error("阻断函数["+ lisM.getBeanToString() +"]执行函数["+ lisM.getMethodToString() +"]出现错误！", e);
+            }
+
+        });
+    }
+
 
     /**
      * 接收到了消息响应
@@ -70,19 +121,19 @@ public class ListenerManager {
      * @param args      参数列表
      * @param at        是否被at
      */
-    public void invoke(MsgGet msgGet, Object[] args, boolean at){
-        invoke(msgGet, Arrays.stream(args).collect(Collectors.toSet()), at);
+    public void invoke(MsgGet msgGet, Object[] args, boolean at, QQWebSocketClient socketClient){
+        invoke(msgGet, Arrays.stream(args).collect(Collectors.toSet()), at, socketClient);
     }
 
     /**
      * 执行默认监听函数
      * @param msgGetTypes   消息类型
-     * @param args          参数集合
+     * @param paramGetter   获取参数集合的函数
      * @param msgGet        接收的消息
      * @param at            是否被at
      * @return              执行成功函数数量
      */
-    private int invokeNormal(MsgGetTypes msgGetTypes, Set<Object> args, MsgGet msgGet, boolean at){
+    private int invokeNormal(MsgGetTypes msgGetTypes, Function<ListenerMethod, Set<Object>> paramGetter, MsgGet msgGet, boolean at){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
         //获取监听函数过滤器
@@ -94,11 +145,11 @@ public class ListenerManager {
         normalMethods.stream().filter(lm -> listenerFilter.filter(lm, msgGet, at)).forEach(lm -> {
             //过滤后，执行
             try {
-                boolean runTrue = lm.invoke(args);
+                boolean runTrue = lm.invoke(paramGetter.apply(lm));
                 //如果执行成功，计数+1
                 count.addAndGet(runTrue ? 1 : 0);
             } catch (InvocationTargetException | IllegalAccessException e) {
-                QQLog.error("监听器["+ lm.getBeanToString() +"]执行方法["+ lm.getMethodToString() +"]出现错误！", e);
+                QQLog.error("监听器["+ lm.getBeanToString() +"]执行函数["+ lm.getMethodToString() +"]出现错误！", e);
             }
         });
 
@@ -109,11 +160,11 @@ public class ListenerManager {
     /**
      * 执行备用监听函数
      * @param msgGetTypes   消息类型
-     * @param args          参数集合
+     * @param paramGetter          获取参数集合的方法
      * @param msgGet        接收的消息
      * @param at            是否被at
      */
-    private int invokeSpare(MsgGetTypes msgGetTypes, Set<Object> args, MsgGet msgGet, boolean at){
+    private int invokeSpare(MsgGetTypes msgGetTypes, Function<ListenerMethod, Set<Object>> paramGetter, MsgGet msgGet, boolean at){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
         //获取监听函数过滤器
@@ -125,11 +176,11 @@ public class ListenerManager {
         spareMethods.stream().filter(lm -> listenerFilter.filter(lm, msgGet, at)).forEach(lm -> {
             //过滤完成后执行方法
             try {
-                boolean runTrue = lm.invoke(args);
+                boolean runTrue = lm.invoke(paramGetter.apply(lm));
                 //如果执行成功，计数+1
                 count.addAndGet(runTrue ? 1 : 0);
             } catch (InvocationTargetException | IllegalAccessException e) {
-                QQLog.error("监听器["+ lm.getBeanToString() +"]执行方法["+ lm.getMethodToString() +"]出现错误！", e);
+                QQLog.error("监听器["+ lm.getBeanToString() +"]执行函数["+ lm.getMethodToString() +"]出现错误！", e);
             }
         });
 

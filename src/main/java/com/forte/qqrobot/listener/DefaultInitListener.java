@@ -25,7 +25,7 @@ public class DefaultInitListener implements InitListener {
     public void init(CQCodeUtil cqCodeUtil, MsgSender sender) {
         LinkConfiguration linkConfiguration = ResourceDispatchCenter.getLinkConfiguration();
 
-        Resp_getLoginQQInfo.LoginQQInfo loginQQInfo = sender.HTTP_MSG_SENDER.getResp_getLoginQQInfo().map(Resp_getLoginQQInfo::getResult).orElse(null);
+        Resp_getLoginQQInfo.LoginQQInfo loginQQInfo = sender.HTTP_MSG_SENDER.getLoginQQInfo().map(Resp_getLoginQQInfo::getResult).orElse(null);
         //如果HTTP请求到了，保存
         if(loginQQInfo != null){
             String qq = loginQQInfo.getQq();

@@ -25,6 +25,7 @@ public class ListenerFilter {
      * @param cqCode cqCode参数
      * @return 是否保留
      */
+    @Deprecated
     public Boolean filter(Method method, MsgGet msgGet, CQCode[] cqCode, Boolean at) {
         //过滤，留下没有注解的或注解合格的
         Filter filter = method.getAnnotation(Filter.class);
@@ -123,6 +124,7 @@ public class ListenerFilter {
      * @param cqCode cqCode参数
      * @return 是否保留
      */
+    @Deprecated
     public Boolean blockFilter(Method method, MsgGet msgGet, CQCode[] cqCode, Boolean at) {
         //过滤，留下没有注解的或注解合格的
         BlockFilter filter = method.getAnnotation(BlockFilter.class);
@@ -161,12 +163,14 @@ public class ListenerFilter {
      * @param at
      */
     public boolean blockFilter(ListenerMethod listenerMethod, MsgGet msgGet, boolean at){
-        //如果不存在filter注解，直接放过
-        if(!listenerMethod.hasFilter()){
-            return true;
+        //如果不存在filter注解，则使用普通过滤器判断
+        if(!listenerMethod.hasBlockFilter()){
+            return filter(listenerMethod, msgGet, at);
         }
         //获取过滤注解
         BlockFilter filter = listenerMethod.getBlockFilter();
+
+
 
         boolean shouldAt = filter.at();
         //根据是否需要被at判断

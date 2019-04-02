@@ -144,7 +144,7 @@ public final class LinkConfiguration {
     }
 
     /**
-     * 如果没有扫描过普通包，则扫描
+     * 如果没有扫描过普通包，则扫描启动器跟目录
      */
     void scannerIfNotScanned(String packageName){
         if(this.scannedListner){

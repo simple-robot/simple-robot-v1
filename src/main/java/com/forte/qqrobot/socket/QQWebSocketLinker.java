@@ -3,6 +3,7 @@ package com.forte.qqrobot.socket;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.LinkConfiguration;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
+import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.ListenerPlug;
 import com.forte.qqrobot.log.QQLog;
 
@@ -36,8 +37,13 @@ public class QQWebSocketLinker {
         int times = 0;
         boolean localB = true;
 
-        //构建监听函数管理器
-        ListenerManager manager = ResourceDispatchCenter.getListenerManager();
+        //构建监听函数管理器等扫描器所构建的
+        ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
+        ListenerManager manager = scanner.buildManager();
+        ListenerPlug plug = scanner.buildPlug();
+        //保存
+        ResourceDispatchCenter.saveListenerManager(manager);
+        ResourceDispatchCenter.saveListenerPlug(plug);
 
         //连接的时候先尝试一次本地连接
         try {
@@ -138,13 +144,13 @@ public class QQWebSocketLinker {
 //        加载普通监听器
 //        linkConfiguration.getListeners().forEach(ResourceDispatchCenter.getListenerInvoker()::loadListener);
         //构建监听函数管理器
-        ListenerManager listenerManager = ResourceDispatchCenter.getListenerMethodScanner().buildManager();
-        ListenerPlug listenerPlug = ResourceDispatchCenter.getListenerMethodScanner().buildPlug();
+//        ListenerManager listenerManager = ResourceDispatchCenter.getListenerMethodScanner().buildManager();
+//        ListenerPlug listenerPlug = ResourceDispatchCenter.getListenerMethodScanner().buildPlug();
         //保存监听函数
         //将ListenerInvoker放入资源调度中心
-        ResourceDispatchCenter.saveListenerManager(listenerManager);
+//        ResourceDispatchCenter.saveListenerManager(listenerManager);
         //将监听函数阻断器放入资源调度中心
-        ResourceDispatchCenter.saveListenerPlug(listenerPlug);
+//        ResourceDispatchCenter.saveListenerPlug(listenerPlug);
 
 
 

@@ -1,8 +1,9 @@
 package com.forte.qqrobot.socket;
 
-import com.forte.qqrobot.beans.msgsend.MsgSend;
+import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.exception.NoSuchBlockNameException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
-import org.apache.http.protocol.HTTP;
+import com.forte.qqrobot.listener.invoker.ListenerPlug;
 
 /**
  * 消息发送器整合器
@@ -53,26 +54,85 @@ public class MsgSender {
     //*             阻塞机制
     //**************************************
 
-    /**
-     * 开启或者关闭阻塞状态
-     * @param enable
-     */
-    private void block(boolean enable){
+    //**************** 普通阻塞 ****************//
 
+
+    /**
+     * 开启阻塞-普通阻塞
+     * 仅仅添加这一个，不根据名称关联其他
+     */
+    public void onBlockOnlyThis(boolean append){
+        //获取阻断器
+        getPlug().onBlockByMethod(this.LISTENER_METHOD, append);
     }
 
     /**
-     * 开启阻塞
+     * 开启阻塞-普通阻塞
+     * 根据当前函数的阻塞名称添加全部同名函数
      */
-    public void inBlock(){
-        block(true);
+    public void onBlockByThisName(boolean append){
+        //获取阻断器
+        getPlug().onBlockByname(this.LISTENER_METHOD, append);
     }
 
     /**
-     * 取消阻塞
+     * 取消普通阻塞-即清空阻塞函数容器
      */
     public void unBlock(){
-        block(false);
+        //获取阻断器
+        getPlug().unBlock();
+    }
+
+    /**
+     * 取消全部阻塞
+     */
+    public void unAllBlock(){
+        ListenerPlug plug = getPlug();
+        plug.unGlobalBlock();
+        plug.unBlock();
+    }
+
+
+    //**************** 全局阻塞 ****************//
+
+    /**
+     * 根据一个名称更新全局阻塞
+     */
+    public void onGlobalBlockByName(String name){
+        //获取阻断器
+        getPlug().onGlobalBlock(name);
+    }
+
+    /**
+     * 根据阻断名称的索引来更新全局阻塞
+     */
+    public void onGlobalBlockByNameIndex(int index) throws NoSuchBlockNameException {
+        //获取阻断器
+        getPlug().onGlobalBlock(this.LISTENER_METHOD, index);
+    }
+
+    /**
+     * 根据第一个阻断名称来更新全剧阻塞
+     */
+    public void onGlobalBlockByFirstName(){
+        //获取阻断器
+        getPlug().onGlobalBlock(this.LISTENER_METHOD);
+    }
+
+    /**
+     * 移除全局阻塞
+     */
+    public void unGlobalBlock(){
+        getPlug().unGlobalBlock();
+    }
+
+
+
+    /**
+     * 获取阻断器
+     */
+    private ListenerPlug getPlug(){
+        return ResourceDispatchCenter.getListenerPlug();
     }
 
 

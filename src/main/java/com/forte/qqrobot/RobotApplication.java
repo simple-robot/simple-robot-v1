@@ -124,7 +124,7 @@ public abstract class RobotApplication extends BaseApplication {
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
 
         //连接之后
-        application.after(cqCodeUtil, QQWebSocketMsgSender.of(mainSocket));
+        application.after(cqCodeUtil, QQWebSocketMsgSender.build(mainSocket));
 
     }
 

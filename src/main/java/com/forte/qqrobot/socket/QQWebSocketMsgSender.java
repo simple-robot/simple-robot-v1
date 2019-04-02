@@ -43,7 +43,7 @@ public class QQWebSocketMsgSender {
      *
      * @return QQWebSocketMsgSender实例对象
      */
-    public static QQWebSocketMsgSender of(QQWebSocketClient client) {
+    public static QQWebSocketMsgSender build(QQWebSocketClient client) {
         return new QQWebSocketMsgSender(client, ResourceDispatchCenter.getQQWebSocketMsgCreator());
     }
 
@@ -300,6 +300,12 @@ public class QQWebSocketMsgSender {
 
         return manager.get(act, clazz);
     }
+
+    //**************************************
+    //*             阻断相关
+    //**************************************
+
+
 
     /**
      * 获取socket信息获取管理器
