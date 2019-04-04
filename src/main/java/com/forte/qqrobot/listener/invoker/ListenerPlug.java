@@ -1,11 +1,15 @@
 package com.forte.qqrobot.listener.invoker;
 
 import com.forte.qqrobot.anno.Block;
+import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.beans.types.MsgGetTypes;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
 import com.forte.qqrobot.utils.Maputer;
+import org.apache.commons.collections.set.SynchronizedSet;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -29,15 +33,32 @@ public class ListenerPlug {
     private final AtomicReference<Map<MsgGetTypes, Set<ListenerMethod>>> GLOBAL_BLOCK = new AtomicReference<>(null);
 
     /**
+     * 处于全局阻断状态的阻断组名，在添加阻断的时候同步更新
+     */
+    private final AtomicReference<String> ON_GLOBAL_BLOCK_NAME = new AtomicReference<>(null);
+
+    /**
      * 分类型的阻塞容器
      * 普通的阻塞容器，当没有全局阻塞的时候此阻塞容器生效
      */
     private final AtomicReference<Map<MsgGetTypes, Set<ListenerMethod>>> NORMAL_BLOCK = new AtomicReference<>(null);
 
     /**
+     * 记录被添加至普通阻塞容器的组名<br>
+     * 注意：使用单体增加的监听函数将会使用获取默认名称的方式来记录名称而不是组名
+     *
+     */
+    private final Set<String> ON_NORMAL_BLOCK_NAMES = new CopyOnWriteArraySet<>();
+
+    /**
      * 保存全部监听函数的集合，根据block的名称分组
      */
     private final Map<String, Map<MsgGetTypes, Set<ListenerMethod>>> ALL_LISTENERMETHODS;
+
+    //**************************************
+    //*             进入阻断的方法
+    //**************************************
+
 
     /**
      * 将某名称的阻断函数进行阻断
@@ -49,28 +70,55 @@ public class ListenerPlug {
     public void onBlock(String blockName, boolean append) {
         //更新函数
         UnaryOperator<Map<MsgGetTypes, Set<ListenerMethod>>> update;
+
         //如果为追加
         if (append) {
             update = old -> {
                 //如果为空，直接返回名字下的分类结果
                 if(old == null){
-                    return ALL_LISTENERMETHODS.get(blockName);
+                    Map<MsgGetTypes, Set<ListenerMethod>> map = ALL_LISTENERMETHODS.get(blockName);
+                    if(map != null){
+                        //如果不为空，认为添加成功
+                        saveNormalName(blockName, append);
+
+                    }else{
+                        //如果为null，将会被赋值为null，则清空记录
+                        clearNormalName();
+                    }
+                    return map;
                 }
 
                 //向旧的里面追加
                 old.forEach((k, v) -> {
                     //获取指定名字下的分类
-                    Map<MsgGetTypes, Set<ListenerMethod>> map = ALL_LISTENERMETHODS.getOrDefault(blockName, Collections.EMPTY_MAP);
-                    //获取分类下的全部监听函数
-                    Set<ListenerMethod> listenerMethodSet = map.getOrDefault(k, Collections.EMPTY_SET);
-                    //添加
-                    v.addAll(listenerMethodSet);
+                    Map<MsgGetTypes, Set<ListenerMethod>> map = ALL_LISTENERMETHODS.get(blockName);
+                    if(map != null){
+                        //如果有值，则认为添加成功，记录为成功
+                        saveNormalName(blockName, append);
+
+                        //获取分类下的全部监听函数
+                        Set<ListenerMethod> set = map.get(k);
+                        if(set != null && set.size() > 0){
+                            //添加
+                            v.addAll(set);
+                        }
+                    }
                 });
+
                 return old;
             };
+
         } else {
             //如果是不追加，直接替换
-            update = old -> ALL_LISTENERMETHODS.get(blockName);
+            Map<MsgGetTypes, Set<ListenerMethod>> map = ALL_LISTENERMETHODS.get(blockName);
+            //如果不为null，则认为添加成功
+            if(map != null){
+                saveNormalName(blockName, append);
+            }else{
+                //如果为null，则会被赋值为null，清空名称记录
+                clearNormalName();
+            }
+            update = old -> map;
         }
 
         //更新
@@ -83,13 +131,13 @@ public class ListenerPlug {
      * @param listenerMethod    监听函数
      * @param append            是否追加
      */
-    public void onBlockByname(ListenerMethod listenerMethod, boolean append) {
+    public void onBlockByName(ListenerMethod listenerMethod, boolean append) {
         //将此名称下的全部加入阻断列表
+        //如果不追加，清空当前阻断
+        if (!append) {
+            unBlock();
+        }
         for (String name : getBlockNames(listenerMethod)) {
-            //如果不追加，清空当前阻断
-            if (!append) {
-                unBlock();
-            }
             onBlock(name, true);
         }
     }
@@ -117,6 +165,7 @@ public class ListenerPlug {
                         return set;
                     });
                 }
+
                 return old;
             };
         }else{
@@ -133,6 +182,9 @@ public class ListenerPlug {
             };
         }
 
+        //记录阻断名称
+        saveNormalName(getDefaultName(listenerMethod), append);
+
         //更新
         NORMAL_BLOCK.updateAndGet(update);
     }
@@ -142,6 +194,8 @@ public class ListenerPlug {
      */
     public void unBlock() {
         NORMAL_BLOCK.getAndSet(null);
+        //移除阻断记录
+        clearNormalName();
     }
 
 
@@ -150,11 +204,13 @@ public class ListenerPlug {
      */
     public void onGlobalBlock(String name){
         //更新
-        GLOBAL_BLOCK.updateAndGet(old -> ALL_LISTENERMETHODS.get(name));
+        GLOBAL_BLOCK.getAndSet(ALL_LISTENERMETHODS.get(name));
+        //同时更新名称
+        saveGlobalName(name);
     }
 
     /**
-     * 根据此监听函数的某指定索引的名称来添加阻塞队列
+     * 根据此监听函数的某指定索引的名称来添加全局阻塞
      */
     public void onGlobalBlock(ListenerMethod listenerMethod, int blockNameIndex) throws NoSuchBlockNameException {
         //获取名称
@@ -166,6 +222,9 @@ public class ListenerPlug {
         }
     }
 
+    /**
+     * 使用此监听器的第一个名称来启动全局阻塞
+     */
     public void onGlobalBlock(ListenerMethod listenerMethod){
         //获取名称能够保证至少长度为1
         try {
@@ -182,7 +241,72 @@ public class ListenerPlug {
     public void unGlobalBlock(){
         //设置为null
         GLOBAL_BLOCK.getAndSet(null);
+        //移除记录
+        removeGlobalName();
     }
+
+    //**************************************
+    //*             记录相关
+    //**************************************
+
+    /**
+     * 刷新全局阻塞的组名
+     * @param name
+     */
+    private void saveGlobalName(String name){
+        ON_GLOBAL_BLOCK_NAME.getAndSet(name);
+    }
+
+    /**
+     * 清除全局阻塞的组名
+     */
+    private void removeGlobalName(){
+        saveGlobalName(null);
+    }
+
+    /**
+     * 新增一个普通阻塞的名称
+     */
+    private void addNormalName(String name){
+        ON_NORMAL_BLOCK_NAMES.add(name);
+    }
+
+    /**
+     * 清空普通阻塞的名称
+     */
+    private void clearNormalName(){
+        ON_NORMAL_BLOCK_NAMES.clear();
+    }
+
+    /**
+     * 更新普通阻塞的名称
+     */
+    private void updateNormalName(String name){
+        //先清空，再保存
+        clearNormalName();
+        addNormalName(name);
+    }
+
+    /**
+     * 根据是否追加记录一个阻断信息
+     * @param name      阻断名
+     * @param append    是否追加
+     */
+    private void saveNormalName(String name, boolean append){
+        //记录阻断名称
+        if(append){
+            //如果追加，追加记录
+            addNormalName(name);
+        }else{
+            //清空后记录
+            updateNormalName(name);
+        }
+    }
+
+    //**************************************
+    //*             阻断状态判断
+    //**************************************
+
 
     /**
      * 判断是否存在阻塞函数
@@ -207,6 +331,103 @@ public class ListenerPlug {
     public boolean hasNormalBlock(){
         return NORMAL_BLOCK.get() != null;
     }
+
+
+    //**************************************
+    //*             阻断信息判断
+    //**************************************
+
+    /**
+     * 获取当前在全局阻塞状态的阻断名
+     * @return
+     */
+    public String getGlobalBlockName(){
+        return ON_GLOBAL_BLOCK_NAME.get();
+    }
+
+    /**
+     * 获取当前处于阻断状态的阻断名
+     * @return
+     */
+    public String[] getNormalBlockNameArray(){
+        return ON_NORMAL_BLOCK_NAMES.toArray(new String[0]);
+    }
+
+    /**
+     * 判断某个分组下的阻断是否处于阻断状态
+     */
+    public boolean isOnGlobalBlock(String blockName){
+        String onGlobal = ON_GLOBAL_BLOCK_NAME.get();
+        return onGlobal != null && onGlobal.equals(blockName);
+    }
+
+    /**
+     * 判断记录的开启阻断的列表中是否存在此名称
+     * @param name 阻断组名
+     * @return  是否存在
+     */
+    public boolean isOnNormalBlock(String name){
+        return ON_NORMAL_BLOCK_NAMES.contains(name);
+    }
+
+    /**
+     * 判断此监听函数的所有所在组是否都存在与阻断队列中
+     * @return 所有所在组是否都存在与阻断队列中
+     */
+    public boolean isAllOnNormalBlockByName(ListenerMethod listenerMethod){
+        //获取全部组名
+        String[] blockNames = getBlockNames(listenerMethod);
+
+        //判断是否所有的名称都存在于阻断队列
+        return Arrays.stream(blockNames).allMatch(this::isOnNormalBlock);
+    }
+
+    /**
+     * 判断此监听函数的所在组是否有任意存在于阻断队列中
+     * @return 是否有任意存在于阻断队列中
+     */
+    public boolean isAnyOnNormalBlockByName(ListenerMethod listenerMethod){
+        //获取全部组名
+        String[] blockNames = getBlockNames(listenerMethod);
+
+        //判断
+        return Arrays.stream(blockNames).anyMatch(this::isOnNormalBlock);
+    }
+
+    /**
+     * 判断此监听函数的所在组是否有没有任何存在于阻断队列中
+     * @return 是否有没有任何存在于阻断队列中
+     */
+    public boolean isNoneOnNormalBlockByName(ListenerMethod listenerMethod){
+        //获取全部组名
+        String[] blockNames = getBlockNames(listenerMethod);
+
+        //判断
+        return Arrays.stream(blockNames).noneMatch(this::isOnNormalBlock);
+    }
+
+    /**
+     * 根据组名或默认名称判断
+     */
+    public boolean isOnNormalBlockByThis(ListenerMethod listenerMethod){
+        //先根据组名，如果组名没有再判断默认名
+        return isAnyOnNormalBlockByName(listenerMethod) || ON_NORMAL_BLOCK_NAMES.contains(getDefaultName(listenerMethod));
+    }
+
+    /**
+     * 仅根据默认名称判断
+     */
+    public boolean osOnNormalBlockByOnlyThis(ListenerMethod listenerMethod){
+        return ON_NORMAL_BLOCK_NAMES.contains(getDefaultName(listenerMethod));
+    }
+
+
+
+
+    //**************************************
+    //*             阻断函数获取
+    //**************************************
+
 
     /**
      * 获取当前生效的阻塞函数（如果存在的话）<br>
@@ -264,12 +485,11 @@ public class ListenerPlug {
 
     /**
      * 为监听函数取一个默认名称
+     * 命名规则：函数名+@+listenerMethod的UUID
      */
     private static String getDefaultName(ListenerMethod listenerMethod) {
-        String lisName = listenerMethod.getListener().getClass().getName();
         String mName = listenerMethod.getMethod().getName();
-        String pName = Arrays.stream(listenerMethod.getMethod().getParameterTypes()).map(Class::getSimpleName).collect(Collectors.joining(","));
-        return lisName + "#" + mName + "(" + pName + ")";
+        return mName + "@" + listenerMethod.getUUID();
     }
 
     /**

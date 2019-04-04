@@ -15,6 +15,7 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +27,9 @@ import java.util.stream.Collectors;
 public class ListenerMethod {
 
     //**************** 所有字段均不可改变 ****************//
+
+    /** 为监听函数创建一个UUID */
+    private final String UUID;
 
     /** 监听器对象实例，用于执行方法 */
     private final Object listener;
@@ -48,6 +52,8 @@ public class ListenerMethod {
     /** 此方法所属的监听类型, 多种类型 */
     private final MsgGetTypes[] type;
 
+
+
     /**
      * 全参数构造
      * @param bean          方法所在实例对象
@@ -65,7 +71,18 @@ public class ListenerMethod {
         this.block = block;
         this.method = method;
         this.type = type;
+        //生成一个UUID
+        UUID = createUUIDString();
     }
+
+    /**
+     * 生成UUID
+     */
+    private static String createUUIDString(){
+        return java.util.UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+    }
+
+
 
 
     //**************************************
@@ -205,6 +222,10 @@ public class ListenerMethod {
 
     public Spare getSpare() {
         return spare;
+    }
+
+    public String getUUID() {
+        return UUID;
     }
 
     /**

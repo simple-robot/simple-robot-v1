@@ -51,8 +51,10 @@ public class MsgSender {
 
 
     //**************************************
-    //*             阻塞机制
+    //*             阻塞机制 默认值均为替换
     //**************************************
+
+    private static final boolean DEFAULT_APPEND = false;
 
     //**************** 普通阻塞 ****************//
 
@@ -62,8 +64,16 @@ public class MsgSender {
      * 仅仅添加这一个，不根据名称关联其他
      */
     public void onBlockOnlyThis(boolean append){
-        //获取阻断器
         getPlug().onBlockByMethod(this.LISTENER_METHOD, append);
+    }
+
+    /**
+     * 开启阻塞-普通阻塞
+     * 仅仅添加这一个，不根据名称关联其他
+     * 默认替换
+     */
+    public void onBlockOnlyThis(){
+        onBlockOnlyThis(DEFAULT_APPEND);
     }
 
     /**
@@ -71,8 +81,31 @@ public class MsgSender {
      * 根据当前函数的阻塞名称添加全部同名函数
      */
     public void onBlockByThisName(boolean append){
-        //获取阻断器
-        getPlug().onBlockByname(this.LISTENER_METHOD, append);
+        getPlug().onBlockByName(this.LISTENER_METHOD, append);
+    }
+
+    /**
+     * 开启阻塞-普通阻塞
+     * 根据当前函数的阻塞名称添加全部同名函数
+     * 默认替换
+     */
+    public void onBlockByThisName(){
+        onBlockByThisName(DEFAULT_APPEND);
+    }
+
+    /**
+     * 根据组名来使某个分组进入阻断状态
+     */
+    public void onBlockByName(String name, boolean append){
+        getPlug().onBlock(name, append);
+    }
+
+    /**
+     * 根据组名来使某个分组进入阻断状态
+     * 默认替换
+     */
+    public void onBlockByName(String name){
+        getPlug().onBlock(name, DEFAULT_APPEND);
     }
 
     /**
@@ -125,8 +158,62 @@ public class MsgSender {
     public void unGlobalBlock(){
         getPlug().unGlobalBlock();
     }
+        
+    
+    //**************** 获取阻断器部分信息 ****************//
 
+    /**
+     * 根据组名判断自己所在的组是否全部在阻断状态中
+     */
+    public boolean isAllOnBlockByName(){
+        return getPlug().isAllOnNormalBlockByName(this.LISTENER_METHOD);
+    }
 
+    /**
+     * 根据组名判断自己所在的组是否有任意在阻断状态中
+     */
+    public boolean isAnyOnBlockByName(){
+        return getPlug().isAnyOnNormalBlockByName(this.LISTENER_METHOD);
+    }
+
+    /**
+     * 根据组名判断自己所在的组是否全部没有在阻断状态中
+     */
+    public boolean isNoneOnBlockByName(){
+        return getPlug().isNoneOnNormalBlockByName(this.LISTENER_METHOD);
+    }
+
+    /**
+     * 判断自己是否存在于阻断队列
+     */
+    public boolean isOnBlock(){
+        return getPlug().isOnNormalBlockByThis(this.LISTENER_METHOD);
+    }
+
+    /**
+     * 判断自己是否作为单独的阻断被阻断了
+     */
+    public boolean isOnlyThisOnBlock(){
+        return getPlug().osOnNormalBlockByOnlyThis(this.LISTENER_METHOD);
+    }
+
+    /**
+     * 获取当前处于全局阻断状态下的阻断组名
+     * @return 阻断组名
+     */
+    public String getOnGlobalBlockName(){
+        return getPlug().getGlobalBlockName();
+    }
+
+    /**
+     * 获取当前处于普通阻断状态下的阻断组名列表
+     * @return 处于普通阻断状态下的阻断组名列表
+     */
+    public String[] getOnNormalBlockNameArray(){
+        return getPlug().getNormalBlockNameArray();
+    }
+
+    
 
     /**
      * 获取阻断器

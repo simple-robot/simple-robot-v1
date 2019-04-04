@@ -257,6 +257,15 @@ public class CQCodeUtil {
         return getCQCodeString(CQCodeTypes.share, url, title, content, image);
     }
 
+    /**
+     * 生成emoji
+     * @param id    emoji的id
+     * @return      emoji的CQCode
+     */
+    public String getCQCode_emoji(String id){
+        return getCQCodeString(CQCodeTypes.emoji, id);
+    }
+
     //**************** CQ码辅助方法 ****************//
 
 
