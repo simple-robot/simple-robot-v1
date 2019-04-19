@@ -43,6 +43,17 @@ public enum PrivateMsgType {
         return TYPE == FROM_DISCUSS.TYPE;
     }
 
+    /**
+     * 工厂获取
+     */
+    public static PrivateMsgType of(int type) {
+        for (PrivateMsgType value : values()) {
+            if (value.TYPE == type) {
+                return value;
+            }
+        }
+        return null;
+    }
 
 
 

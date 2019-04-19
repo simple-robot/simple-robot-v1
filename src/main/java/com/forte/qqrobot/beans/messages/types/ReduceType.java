@@ -14,10 +14,29 @@ public enum ReduceType {
     KICK_OUT(-1);
 
 
-    private final int TYPE;
+    public final int TYPE;
 
     ReduceType(int type){
         this.TYPE = type;
+    }
+
+    public boolean isLevel(){
+        return TYPE == LEAVE.TYPE;
+    }
+    public boolean isKickOut(){
+        return TYPE == KICK_OUT.TYPE;
+    }
+
+    /**
+     * 工厂获取
+     */
+    public static ReduceType of(int type) {
+        for (ReduceType value : values()) {
+            if (value.TYPE == type) {
+                return value;
+            }
+        }
+        return null;
     }
 
 }

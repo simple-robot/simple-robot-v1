@@ -32,4 +32,21 @@ public enum PowerType {
     @Override
     public String toString() {
         return TO_STRING;
-    }}
+    }
+
+    /**
+     * 工厂获取
+     */
+    public static PowerType of(int type) {
+        for (PowerType value : values()) {
+            if (value.TYPE == type) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+
+
+}
+

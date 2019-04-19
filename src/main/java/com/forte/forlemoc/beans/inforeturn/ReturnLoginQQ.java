@@ -1,13 +1,15 @@
 package com.forte.forlemoc.beans.inforeturn;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 
 /**
+ * 登录的QQ号
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/14 11:30
  * @since JDK1.8
  **/
-public class ReturnLoginQQ implements InfoReturn {
+public class ReturnLoginQQ implements LoginQQInfo {
 
     /** 返回编码,应该是25301 */
     @JSONField(name = "return")
@@ -38,7 +40,6 @@ public class ReturnLoginQQ implements InfoReturn {
         this.returnCode = returnCode;
     }
 
-    @Override
     public Integer getError() {
         return error;
     }
@@ -62,5 +63,37 @@ public class ReturnLoginQQ implements InfoReturn {
                 ", error=" + error +
                 ", LoginQQ='" + LoginQQ + '\'' +
                 '}';
+    }
+
+    /**
+     * 昵称
+     */
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    /**
+     * QQ号
+     */
+    @Override
+    public String getQQ() {
+        return LoginQQ;
+    }
+
+    /**
+     * 头像地址
+     */
+    @Override
+    public String getHeadUrl() {
+        return null;
+    }
+
+    /**
+     * 等级
+     */
+    @Override
+    public Integer getLevel() {
+        return null;
     }
 }

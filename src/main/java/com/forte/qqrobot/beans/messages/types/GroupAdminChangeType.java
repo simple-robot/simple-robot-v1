@@ -12,11 +12,29 @@ public enum GroupAdminChangeType {
     /** 被取消管理员 */
     CANCEL_ADMIN(-1);
 
-
-    private final int TYPE;
+    public final int TYPE;
 
     GroupAdminChangeType(int type){
         this.TYPE = type;
     }
+
+    public boolean isBecome(){
+        return TYPE == BECOME_ADMIN.TYPE;
+    }
+
+    public boolean isCancel(){
+        return TYPE == CANCEL_ADMIN.TYPE;
+    }
+
+    /** 工厂获取 */
+    public static GroupAdminChangeType of(int type){
+        for (GroupAdminChangeType value : values()) {
+            if(value.TYPE == type){
+                return value;
+            }
+        }
+        return null;
+    }
+
 
 }

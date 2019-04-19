@@ -1,8 +1,10 @@
 package com.forte.forlemoc.beans.inforeturn;
 
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.forte.qqrobot.beans.messages.result.GroupList;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -13,7 +15,7 @@ import java.util.Optional;
  * @date Created in 2019/3/14 10:49
  * @since JDK1.8
  **/
-public class ReturnLoginInGroups implements InfoReturn {
+public class ReturnLoginInGroups implements com.forte.qqrobot.beans.messages.result.GroupList {
 
     /** 返回标记编码, 应该为 25305 */
     @JSONField(name = "return")
@@ -78,9 +80,13 @@ public class ReturnLoginInGroups implements InfoReturn {
         this.returnCode = returnCode;
     }
 
-    @Override
     public Integer getReturn() {
         return this.returnCode;
+    }
+
+    @Override
+    public GroupInfo[] getList() {
+        return getGroupInfos();
     }
 
     /**
@@ -91,7 +97,7 @@ public class ReturnLoginInGroups implements InfoReturn {
      *  {"groupId": "3333","groupName": "法鸡粉丝群"}
      *]
      */
-    public class GroupInfo{
+    public class GroupInfo implements Group{
         /** 群号 */
         private final String groupId;
         /** 群名 */
@@ -118,6 +124,30 @@ public class ReturnLoginInGroups implements InfoReturn {
                     "groupId='" + groupId + '\'' +
                     ", groupName='" + groupName + '\'' +
                     '}';
+        }
+
+        /**
+         * 群名
+         */
+        @Override
+        public String getName() {
+            return groupName;
+        }
+
+        /**
+         * 群号
+         */
+        @Override
+        public String getCode() {
+            return groupId;
+        }
+
+        /**
+         * 群头像地址
+         */
+        @Override
+        public String getHeadUrl() {
+            return null;
         }
     }
 

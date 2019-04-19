@@ -8,7 +8,7 @@ import com.forte.qqrobot.beans.messages.types.SexType;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface GroupMemInfo extends InfoResult {
+public interface GroupMemberInfo extends InfoResult {
 
     /** 获取群号 */
     String getCode();

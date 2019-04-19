@@ -1,6 +1,8 @@
 package com.forte.forlemoc.beans.inforeturn;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.forte.qqrobot.beans.messages.result.StrangerInfo;
+import com.forte.qqrobot.beans.messages.types.SexType;
 
 /**
  * 25304,以json串方式返回陌生人信息
@@ -8,7 +10,7 @@ import com.alibaba.fastjson.annotation.JSONField;
  * @date Created in 2019/3/14 11:37
  * @since JDK1.8
  **/
-public class ReturnStranger implements InfoReturn {
+public class ReturnStranger implements StrangerInfo {
 
     /** 返回编码，应该是25304 */
     @JSONField(name = "return")
@@ -45,7 +47,6 @@ public class ReturnStranger implements InfoReturn {
         this.returnCode = returnCode;
     }
 
-    @Override
     public Integer getError() {
         return error;
     }
@@ -70,8 +71,16 @@ public class ReturnStranger implements InfoReturn {
         this.nick = nick;
     }
 
-    public Integer getSex() {
-        return sex;
+    /**
+     * QQ号
+     */
+    @Override
+    public String getQQ() {
+        return QQID;
+    }
+
+    public SexType getSex() {
+        return sex == 0 ? SexType.MALE : sex == 1 ? SexType.FEMALE : SexType.UNKNOWN;
     }
 
     public void setSex(Integer sex) {
@@ -80,6 +89,22 @@ public class ReturnStranger implements InfoReturn {
 
     public Integer getAge() {
         return age;
+    }
+
+    /**
+     * 头像地址
+     */
+    @Override
+    public String headUrl() {
+        return null;
+    }
+
+    /**
+     * 等级
+     */
+    @Override
+    public Integer getLevel() {
+        return null;
     }
 
     public void setAge(Integer age) {

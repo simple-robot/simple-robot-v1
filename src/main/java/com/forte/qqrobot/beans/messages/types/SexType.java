@@ -36,4 +36,21 @@ public enum SexType {
     @Override
     public String toString() {
         return TO_STRING;
-    }}
+    }
+
+    /**
+     * 工厂获取
+     */
+    public static SexType of(int sex) {
+        for (SexType value : values()) {
+            if (value.SEX == sex) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+
+
+
+}
