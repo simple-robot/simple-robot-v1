@@ -1,11 +1,11 @@
 package com.forte.qqrobot.listener.invoker;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.SocketResourceDispatchCenter;
 import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.msgget.MsgGet;
-import com.forte.qqrobot.utils.CQCodeUtil;
+import com.forte.qqrobot.beans.lemoc.msgget.MsgGet;
 
 import java.lang.reflect.Method;
 
@@ -47,7 +47,7 @@ public class ListenerFilter {
                     String singleValue = value[0];
                     //如果需要被at，判断的时候移除at的CQ码
                     if(shouldAt){
-                        String qqCode = ResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
+                        String qqCode = SocketResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
                         String regex = "\\[CQ:at,qq="+ qqCode +"\\]";
                         return filter.keywordMatchType().test(msgGet.getMsg().replaceAll(regex, ""), singleValue);
                     }else{
@@ -97,7 +97,7 @@ public class ListenerFilter {
                 String singleValue = value[0];
                 //如果需要被at，判断的时候移除at的CQ码
                 if(shouldAt){
-                    String qqCode = ResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
+                    String qqCode = SocketResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
                     String regex = "\\[CQ:at,qq="+ qqCode +"\\]";
                     return filter.keywordMatchType().test(msgGet.getMsg().replaceAll(regex, ""), singleValue);
                 }else{
@@ -190,7 +190,7 @@ public class ListenerFilter {
                 String singleValue = value[0];
                 //如果需要被at，判断的时候移除at的CQ码
                 if(shouldAt){
-                    String qqCode = ResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
+                    String qqCode = SocketResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
                     String regex = "\\[CQ:at,qq="+ qqCode +"\\]";
                     return filter.keywordMatchType().test(msgGet.getMsg().replaceAll(regex, ""), singleValue);
                 }else{

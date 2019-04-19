@@ -1,10 +1,8 @@
 package com.forte.qqrobot.listener;
 
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.msgget.MsgDisGroup;
-import com.forte.qqrobot.beans.msgget.MsgGroup;
+import com.forte.qqrobot.beans.lemoc.msgget.MsgGroup;
 import com.forte.qqrobot.socket.MsgSender;
-import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 /**

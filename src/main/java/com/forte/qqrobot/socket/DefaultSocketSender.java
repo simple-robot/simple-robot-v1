@@ -1,7 +1,7 @@
 package com.forte.qqrobot.socket;
 
-import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.beans.inforeturn.InfoReturn;
+import com.forte.qqrobot.SocketResourceDispatchCenter;
+import com.forte.qqrobot.beans.lemoc.inforeturn.InfoReturn;
 
 import java.util.function.Supplier;
 
@@ -24,7 +24,7 @@ public class DefaultSocketSender extends QQWebSocketMsgSender {
      * 构造
      */
     public DefaultSocketSender(QQWebSocketClient client){
-       super(client, ResourceDispatchCenter.getQQWebSocketMsgCreator());
+       super(client, SocketResourceDispatchCenter.getQQJSONMsgCreator());
     }
 
     /**

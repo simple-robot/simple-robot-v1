@@ -2,11 +2,11 @@ package com.forte.qqrobot.socket;
 
 import com.alibaba.fastjson.JSONObject;
 import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.SocketResourceDispatchCenter;
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.inforeturn.InfoReturn;
-import com.forte.qqrobot.beans.msgget.MsgGet;
-import com.forte.qqrobot.beans.types.InfoReturnTypes;
-import com.forte.qqrobot.beans.types.MsgGetTypes;
+import com.forte.qqrobot.beans.lemoc.inforeturn.InfoReturn;
+import com.forte.qqrobot.beans.lemoc.msgget.MsgGet;
+import com.forte.qqrobot.http.QQHttpMsgSender;
 import com.forte.qqrobot.listener.DefaultInitListener;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
@@ -115,7 +115,7 @@ public class QQWebSocketClient extends WebSocketClient {
             //封装为对象
             InfoReturn infoReturnBean = returnInfoJson.toJavaObject(typeClass);
             //更新对象
-            ResourceDispatchCenter.getQQWebSocketInfoReturnManager().update(returnCode, infoReturnBean);
+            SocketResourceDispatchCenter.getQQWebSocketInfoReturnManager().update(returnCode, infoReturnBean);
 
         }
     }
@@ -173,7 +173,7 @@ public class QQWebSocketClient extends WebSocketClient {
         CQCode[] cqCodes = cqCodeUtil.getCQCodeFromMsg(msg).toArray(new CQCode[0]);
         //判断是否at自己
         //获取本机QQ号
-        String localQQCode = ResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
+        String localQQCode = SocketResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
         boolean at = cqCodeUtil.isAt(msg, localQQCode);
         //组装参数
         //* 组装参数不再携带QQWebSocketSender对象和QQHttpSender对象，而是交给Manager创建         *

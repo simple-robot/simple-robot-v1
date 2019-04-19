@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date Created in 2019/3/8 10:26
  * @since JDK1.8
  **/
+@Deprecated
 public class QQWebSocketManager {
 
     /** 用于保存全部的socketClient客户端 */

@@ -3,7 +3,7 @@ package com.forte.qqrobot.listener.invoker;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.anno.Spare;
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.msgget.MsgGet;
+import com.forte.qqrobot.beans.lemoc.msgget.MsgGet;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.FieldUtils;

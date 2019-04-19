@@ -1,10 +1,8 @@
 package com.forte.qqrobot.utils;
 
-import com.forte.qqrobot.beans.types.MsgGetTypes;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**

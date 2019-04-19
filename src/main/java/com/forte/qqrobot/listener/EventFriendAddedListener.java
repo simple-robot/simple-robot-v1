@@ -1,7 +1,7 @@
 package com.forte.qqrobot.listener;
 
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.msgget.EventFriendAdded;
+import com.forte.qqrobot.beans.lemoc.msgget.EventFriendAdded;
 import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 

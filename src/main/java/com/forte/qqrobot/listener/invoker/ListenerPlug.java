@@ -1,15 +1,11 @@
 package com.forte.qqrobot.listener.invoker;
 
 import com.forte.qqrobot.anno.Block;
-import com.forte.qqrobot.anno.Listen;
-import com.forte.qqrobot.beans.types.MsgGetTypes;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
 import com.forte.qqrobot.utils.Maputer;
-import org.apache.commons.collections.set.SynchronizedSet;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -137,9 +133,11 @@ public class ListenerPlug {
         if (!append) {
             unBlock();
         }
+
         for (String name : getBlockNames(listenerMethod)) {
             onBlock(name, true);
         }
+
     }
 
     /**

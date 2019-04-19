@@ -1,11 +1,10 @@
 package com.forte.qqrobot.listener.invoker;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.beans.msgget.MsgGet;
-import com.forte.qqrobot.beans.types.MsgGetTypes;
+import com.forte.qqrobot.beans.lemoc.msgget.MsgGet;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.socket.MsgSender;
-import com.forte.qqrobot.socket.QQHttpMsgSender;
+import com.forte.qqrobot.http.QQHttpMsgSender;
 import com.forte.qqrobot.socket.QQWebSocketClient;
 import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 

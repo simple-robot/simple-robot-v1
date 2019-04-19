@@ -1,13 +1,8 @@
 package com.forte.qqrobot.socket;
 
-import com.alibaba.fastjson.JSON;
-import com.forte.qqrobot.beans.HttpApi.request.get.*;
-import com.forte.qqrobot.beans.HttpApi.response.*;
-import com.forte.qqrobot.LinkConfiguration;
 import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.beans.inforeturn.*;
-import com.forte.qqrobot.listener.invoker.ListenerMethod;
-import com.forte.qqrobot.utils.HttpClientUtil;
+import com.forte.qqrobot.SocketResourceDispatchCenter;
+import com.forte.qqrobot.beans.lemoc.inforeturn.*;
 
 import java.util.function.Supplier;
 
@@ -44,7 +39,7 @@ public class QQWebSocketMsgSender {
      * @return QQWebSocketMsgSender实例对象
      */
     public static QQWebSocketMsgSender build(QQWebSocketClient client) {
-        return new QQWebSocketMsgSender(client, ResourceDispatchCenter.getQQWebSocketMsgCreator());
+        return new QQWebSocketMsgSender(client, SocketResourceDispatchCenter.getQQJSONMsgCreator());
     }
 
     /* ———————————————— 信息发送方法 ———————————————— */
@@ -306,14 +301,13 @@ public class QQWebSocketMsgSender {
     //**************************************
 
 
-
     /**
      * 获取socket信息获取管理器
      *
      * @return socket信息获取管理器
      */
     private QQWebSocketInfoReturnManager getSocketInfoReturnManager() {
-        return ResourceDispatchCenter.getQQWebSocketInfoReturnManager();
+        return SocketResourceDispatchCenter.getQQWebSocketInfoReturnManager();
     }
 
 }

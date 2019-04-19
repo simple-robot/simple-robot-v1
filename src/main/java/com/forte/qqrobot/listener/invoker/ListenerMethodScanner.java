@@ -1,8 +1,7 @@
 package com.forte.qqrobot.listener.invoker;
 
 import com.forte.qqrobot.anno.*;
-import com.forte.qqrobot.beans.msgget.MsgGet;
-import com.forte.qqrobot.beans.types.MsgGetTypes;
+import com.forte.qqrobot.beans.lemoc.msgget.MsgGet;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.MethodUtil;

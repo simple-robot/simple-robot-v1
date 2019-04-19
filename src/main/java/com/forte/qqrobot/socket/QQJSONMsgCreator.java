@@ -1,9 +1,9 @@
 package com.forte.qqrobot.socket;
 
 import com.alibaba.fastjson.JSON;
-import com.forte.qqrobot.beans.HttpApi.request.get.*;
-import com.forte.qqrobot.beans.infoget.*;
-import com.forte.qqrobot.beans.msgsend.*;
+import com.forte.forhttpapi.beans.request.get.*;
+import com.forte.qqrobot.beans.lemoc.infoget.*;
+import com.forte.qqrobot.beans.lemoc.msgsend.*;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;

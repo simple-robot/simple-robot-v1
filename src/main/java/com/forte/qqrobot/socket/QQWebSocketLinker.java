@@ -1,7 +1,8 @@
 package com.forte.qqrobot.socket;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.LinkConfiguration;
+import com.forte.qqrobot.SocketResourceDispatchCenter;
+import com.forte.qqrobot.configuration.LinkConfiguration;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.ListenerPlug;
@@ -33,7 +34,7 @@ public class QQWebSocketLinker {
     public static QQWebSocketClient link(Class<? extends QQWebSocketClient> client, String url, int retryTime) {
         QQWebSocketClient cc = null;
         //获取连接配置
-        LinkConfiguration linkConfiguration = ResourceDispatchCenter.getLinkConfiguration();
+        LinkConfiguration linkConfiguration = SocketResourceDispatchCenter.getLinkConfiguration();
         int times = 0;
         boolean localB = true;
 
@@ -140,7 +141,7 @@ public class QQWebSocketLinker {
      */
     private static void linkSuccess() {
         //获取连接配置
-        LinkConfiguration linkConfiguration = ResourceDispatchCenter.getLinkConfiguration();
+//        LinkConfiguration linkConfiguration = SocketResourceDispatchCenter.getLinkConfiguration();
 //        加载普通监听器
 //        linkConfiguration.getListeners().forEach(ResourceDispatchCenter.getListenerInvoker()::loadListener);
         //构建监听函数管理器

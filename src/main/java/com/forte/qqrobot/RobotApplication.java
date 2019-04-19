@@ -1,6 +1,7 @@
 package com.forte.qqrobot;
 
 import com.alibaba.fastjson.util.TypeUtils;
+import com.forte.qqrobot.configuration.LinkConfiguration;
 import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -17,13 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date Created in 2019/3/6 18:10
  * @since JDK1.8
  **/
-public abstract class RobotApplication extends BaseApplication {
-
-//    /** socket对象 */
-//    public static QQWebSocketManager manager;
-
-    /** 主客户端 */
-    public static QQWebSocketClient mainClient;
+public abstract class RobotApplication extends BaseApplication<LinkConfiguration> {
 
     /**
      * 初始化
@@ -62,39 +57,33 @@ public abstract class RobotApplication extends BaseApplication {
      */
     private static void resourceInit(){
         //将连接管理器加入资源调度中心
-        ResourceDispatchCenter.saveQQWebSocketManager(new QQWebSocketManager());
+        SocketResourceDispatchCenter.saveQQWebSocketManager(new QQWebSocketManager());
         //将连接时的配置对象加入资源调度中心
-        ResourceDispatchCenter.saveLinkConfiguration(new LinkConfiguration());
+        SocketResourceDispatchCenter.saveLinkConfiguration(new LinkConfiguration());
         //将CQCodeUtil放入资源调度中心
-        ResourceDispatchCenter.saveCQCodeUtil(CQCodeUtil.build());
+        SocketResourceDispatchCenter.saveCQCodeUtil(CQCodeUtil.build());
         //将QQWebSocketMsgCreator放入资源调度中心
-        ResourceDispatchCenter.saveQQWebSocketMsgCreator(new QQJSONMsgCreator());
+        SocketResourceDispatchCenter.saveQQWebSocketMsgCreator(new QQJSONMsgCreator());
         //将DefaultWholeListener放入资源调度中心
-        ResourceDispatchCenter.saveDefaultWholeListener(new DefaultWholeListener());
+        SocketResourceDispatchCenter.saveDefaultWholeListener(new DefaultWholeListener());
         //将ListenerMethodScanner放入资源调度中心
-        ListenerMethodScanner listenerMethodScanner = new ListenerMethodScanner();
-        ResourceDispatchCenter.saveListenerMethodScanner(listenerMethodScanner);
+        SocketResourceDispatchCenter.saveListenerMethodScanner(new ListenerMethodScanner());
 
         //将ListenerFilter放入资源调度中心
-        ResourceDispatchCenter.saveListenerFilter(new ListenerFilter());
+        SocketResourceDispatchCenter.saveListenerFilter(new ListenerFilter());
         //将QQWebSocketInfoReturnManager放入资源调度中心
-        ResourceDispatchCenter.saveQQWebSocketInfoReturnManager(new QQWebSocketInfoReturnManager());
+        SocketResourceDispatchCenter.saveQQWebSocketInfoReturnManager(new QQWebSocketInfoReturnManager());
     }
 
     /**
      * 连接socket
      */
-    private static QQWebSocketManager lineSocket(){
-        //连接管理器
-        QQWebSocketManager manager = ResourceDispatchCenter.getQQWebSocketManager();
+    private static QQWebSocketClient lineSocket(){
         //连接配置对象
-        LinkConfiguration configuration = ResourceDispatchCenter.getLinkConfiguration();
+        LinkConfiguration configuration = SocketResourceDispatchCenter.getLinkConfiguration();
         //主要的socket连接，如果无法结果精准获取请求后的返回值的话，后期会同时连接多个socket
         //由于这里用到了config对象，需要
-        mainClient = QQWebSocketLinker.link(configuration.getSocketClient(), configuration.getLinkUrl());
-        manager.saveMainSocket(mainClient);
-
-        return manager;
+        return QQWebSocketLinker.link(configuration.getSocketClient(), configuration.getLinkUrl());
     }
 
 
@@ -105,7 +94,7 @@ public abstract class RobotApplication extends BaseApplication {
         //初始化方法
         init();
         //连接之前
-        LinkConfiguration linkConfiguration = ResourceDispatchCenter.getLinkConfiguration();
+        LinkConfiguration linkConfiguration = SocketResourceDispatchCenter.getLinkConfiguration();
         application.before(linkConfiguration);
         //连接之后，如果没有进行扫描，则默认扫描启动类同级包且排除此启动类
         String packageName = application.getClass().getPackage().getName();
@@ -115,16 +104,15 @@ public abstract class RobotApplication extends BaseApplication {
 
 
         //连接socket
-        QQWebSocketManager manager = lineSocket();
-        //获取client
-        QQWebSocketClient mainSocket = manager.getMainSocket();
+        QQWebSocketClient client = lineSocket();
+//        //获取client
+//        QQWebSocketClient mainSocket = manager.getMainSocket();
 
         //获取CQCodeUtil实例
-        CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
+        CQCodeUtil cqCodeUtil = SocketResourceDispatchCenter.getCQCodeUtil();
 
         //连接之后
-        application.after(cqCodeUtil, QQWebSocketMsgSender.build(mainSocket));
-
+        application.after(cqCodeUtil, QQWebSocketMsgSender.build(client));
     }
 
 

@@ -1,0 +1,26 @@
+package com.forte.qqrobot.beans.messages.result;
+
+/**
+ * 匿名信息
+ * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
+ * @since JDK1.8
+ **/
+public interface AnonInfo extends InfoResult {
+
+    /**
+     * 获取ID
+     */
+    String getId();
+
+    /**
+     * 获取匿名名称
+     */
+    String getAnonName();
+
+    /**
+     * Token, 原数据似乎是数据流形式
+     */
+    String token();
+
+
+}

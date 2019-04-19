@@ -1,7 +1,5 @@
 package com.forte.qqrobot.anno;
 
-import com.forte.qqrobot.beans.types.MsgGetTypes;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

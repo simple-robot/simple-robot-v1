@@ -1,6 +1,5 @@
 package com.forte.qqrobot.anno;
 
-import com.forte.qqrobot.beans.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.KeywordMatchType;
 import com.forte.qqrobot.beans.types.MostType;
 
@@ -8,7 +7,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.function.Consumer;
 
 /**
  * 监听消息过滤器

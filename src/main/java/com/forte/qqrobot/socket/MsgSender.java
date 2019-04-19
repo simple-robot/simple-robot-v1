@@ -2,6 +2,8 @@ package com.forte.qqrobot.socket;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
+import com.forte.qqrobot.http.DefaultHttpSender;
+import com.forte.qqrobot.http.QQHttpMsgSender;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerPlug;
 
@@ -22,7 +24,6 @@ public class MsgSender {
     public final QQHttpMsgSender HTTP_MSG_SENDER;
     /** 当不使用HTTP API时，使用此对象 */
     private static final QQHttpMsgSender EMPTY_HTTP_MSG_SENDER = new DefaultHttpSender();
-
     /** 使用此连接管理器的是哪个监听方法 */
     private final ListenerMethod LISTENER_METHOD;
 

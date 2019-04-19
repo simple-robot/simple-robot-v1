@@ -1,13 +1,12 @@
 package com.forte.qqrobot.listener;
 
-import com.forte.qqrobot.beans.HttpApi.response.Resp_getLoginQQInfo;
-import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.LinkConfiguration;
-import com.forte.qqrobot.beans.inforeturn.ReturnLoginNick;
-import com.forte.qqrobot.beans.inforeturn.ReturnLoginQQ;
+import com.forte.qqrobot.SocketResourceDispatchCenter;
+import com.forte.forhttpapi.beans.response.Resp_getLoginQQInfo;
+import com.forte.qqrobot.configuration.LinkConfiguration;
+import com.forte.qqrobot.beans.lemoc.inforeturn.ReturnLoginNick;
+import com.forte.qqrobot.beans.lemoc.inforeturn.ReturnLoginQQ;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.socket.MsgSender;
-import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 /**
@@ -23,7 +22,7 @@ public class DefaultInitListener implements InitListener {
      */
     @Override
     public void init(CQCodeUtil cqCodeUtil, MsgSender sender) {
-        LinkConfiguration linkConfiguration = ResourceDispatchCenter.getLinkConfiguration();
+        LinkConfiguration linkConfiguration = SocketResourceDispatchCenter.getLinkConfiguration();
 
         Resp_getLoginQQInfo.LoginQQInfo loginQQInfo = sender.HTTP_MSG_SENDER.getLoginQQInfo().map(Resp_getLoginQQInfo::getResult).orElse(null);
         //如果HTTP请求到了，保存

@@ -1,15 +1,12 @@
 package com.forte.qqrobot.socket;
 
-import com.forte.qqrobot.beans.inforeturn.InfoReturn;
+import com.forte.qqrobot.beans.lemoc.inforeturn.InfoReturn;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 返回信息管理器
