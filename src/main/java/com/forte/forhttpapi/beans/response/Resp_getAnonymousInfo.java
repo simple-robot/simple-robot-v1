@@ -1,12 +1,14 @@
 package com.forte.forhttpapi.beans.response;
 
+import com.forte.qqrobot.beans.messages.result.AnonInfo;
+
 /**
  * 「取匿名成员信息」
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/22 15:37
  * @since JDK1.8
  **/
-public class Resp_getAnonymousInfo implements RespBean<Resp_getAnonymousInfo.AnonymousInfo> {
+public class Resp_getAnonymousInfo implements AnonInfo {
     /*
     {
     "status":0,
@@ -21,7 +23,6 @@ public class Resp_getAnonymousInfo implements RespBean<Resp_getAnonymousInfo.Ano
     private AnonymousInfo result;
     private String errMsg;
 
-    @Override
     public String getErrMsg() {
         return errMsg;
     }
@@ -30,7 +31,6 @@ public class Resp_getAnonymousInfo implements RespBean<Resp_getAnonymousInfo.Ano
         this.errMsg = errMsg;
     }
 
-    @Override
     public Integer getStatus() {
         return status;
     }
@@ -39,7 +39,6 @@ public class Resp_getAnonymousInfo implements RespBean<Resp_getAnonymousInfo.Ano
         this.status = status;
     }
 
-    @Override
     public AnonymousInfo getResult() {
         return result;
     }
@@ -48,10 +47,25 @@ public class Resp_getAnonymousInfo implements RespBean<Resp_getAnonymousInfo.Ano
         this.result = result;
     }
 
+    @Override
+    public String getId() {
+        return result.aid+"";
+    }
+
+    @Override
+    public String getAnonName() {
+        return result.code;
+    }
+
+    @Override
+    public String token() {
+        return result.token;
+    }
+
     /**
      * ——————————————内部类，封装信息
      */
-    public static class AnonymousInfo{
+    public static class AnonymousInfo  {
         /*
          aid	int	匿名成员ID
          code	string	匿名成员代号，如大力鬼王
@@ -84,6 +98,7 @@ public class Resp_getAnonymousInfo implements RespBean<Resp_getAnonymousInfo.Ano
         public void setToken(String token) {
             this.token = token;
         }
+
     }
 }
 

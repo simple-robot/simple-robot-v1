@@ -1,5 +1,7 @@
 package com.forte.forhttpapi.beans.response;
 
+import com.forte.qqrobot.beans.messages.result.GroupHomeworkList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,12 +11,11 @@ import java.util.Map;
  * @create 2019-03-22 16:44
  **/
 
-public class Resp_getGroupHomeworkList implements RespBean<Resp_getGroupHomeworkList.GroupHomeworkList[]> {
+public class Resp_getGroupHomeworkList implements GroupHomeworkList {
     private Integer status;
-    private GroupHomeworkList[] result;
+    private GroupHomeworkListName[] result;
     private String errMsg;
 
-    @Override
     public String getErrMsg() {
         return errMsg;
     }
@@ -23,7 +24,6 @@ public class Resp_getGroupHomeworkList implements RespBean<Resp_getGroupHomework
         this.errMsg = errMsg;
     }
 
-    @Override
     public Integer getStatus() {
         return status;
     }
@@ -32,12 +32,16 @@ public class Resp_getGroupHomeworkList implements RespBean<Resp_getGroupHomework
         this.status = status;
     }
 
-    public void setResult(GroupHomeworkList[] result) {
+    public void setResult(GroupHomeworkListName[] result) {
         this.result = result;
     }
 
+    public GroupHomeworkListName[] getResult() {
+        return result;
+    }
+
     @Override
-    public GroupHomeworkList[] getResult() {
+    public GroupHomeworkListName[] getList() {
         return result;
     }
 
@@ -90,7 +94,7 @@ public class Resp_getGroupHomeworkList implements RespBean<Resp_getGroupHomework
         result[i].team_id	int	该作业属于哪个团队的(根据官方政策，无用)
         result[i].ts_create	int	该作业的创建时间，时间戳形式
                   */
-    public static class GroupHomeworkList {
+    public static class GroupHomeworkListName implements GroupHomework {
         //TODO 该作业的内容信息数组 该作业的内容/该作业的内容类型
         private List<Map<String, Object>> content = new ArrayList<>();
 
@@ -107,7 +111,7 @@ public class Resp_getGroupHomeworkList implements RespBean<Resp_getGroupHomework
         private String puin;
         private Integer status;
         private Integer team_id;
-        private Integer ts_create;
+        private Long ts_create;
 
         public List<Map<String, Object>> getContent() {
             return content;
@@ -173,8 +177,59 @@ public class Resp_getGroupHomeworkList implements RespBean<Resp_getGroupHomework
             this.hw_type = hw_type;
         }
 
+        @Override
+        public Content[] getContents(String key) {
+            return new Content[0];
+        }
+
+        @Override
+        public String getCourseId() {
+            return course_id + "";
+        }
+
+        @Override
+        public String getCourseName() {
+            return course_name;
+        }
+
+        @Override
+        public String getCoursePic() {
+            return course_pic;
+        }
+
+        @Override
+        public String getId() {
+            return hw_id + "";
+        }
+
+        @Override
+        public String getTitle() {
+            return hw_title;
+        }
+
+        @Override
+        public String getType() {
+            return hw_type + "";
+        }
+
+        @Override
         public String getIcon() {
             return icon;
+        }
+
+        @Override
+        public Boolean isNeedFeedBack() {
+            return need_feedback;
+        }
+
+        @Override
+        public String getAnnoNick() {
+            return pnick_name;
+        }
+
+        @Override
+        public String getAnnoQQ() {
+            return puin;
         }
 
         public void setIcon(String icon) {
@@ -205,8 +260,14 @@ public class Resp_getGroupHomeworkList implements RespBean<Resp_getGroupHomework
             this.puin = puin;
         }
 
-        public Integer getStatus() {
-            return status;
+        @Override
+        public String getStatus() {
+            return status + "";
+        }
+
+        @Override
+        public Long getTime() {
+            return ts_create;
         }
 
         public void setStatus(Integer status) {
@@ -221,11 +282,11 @@ public class Resp_getGroupHomeworkList implements RespBean<Resp_getGroupHomework
             this.team_id = team_id;
         }
 
-        public Integer getTs_create() {
+        public Long getTs_create() {
             return ts_create;
         }
 
-        public void setTs_create(Integer ts_create) {
+        public void setTs_create(Long ts_create) {
             this.ts_create = ts_create;
         }
     }

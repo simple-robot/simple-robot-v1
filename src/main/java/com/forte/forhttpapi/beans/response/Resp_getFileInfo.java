@@ -1,17 +1,18 @@
 package com.forte.forhttpapi.beans.response;
 
+import com.forte.qqrobot.beans.messages.result.FileInfo;
+
 /**
  * @author Ricardo
  * @create 2019-03-22 16:44
  **/
 
-public class Resp_getFileInfo implements RespBean<Resp_getFileInfo.FileInfo> {
+public class Resp_getFileInfo implements FileInfo {
 
     private Integer status;
     private FileInfo result;
     private String errMsg;
 
-    @Override
     public String getErrMsg() {
         return errMsg;
     }
@@ -20,7 +21,6 @@ public class Resp_getFileInfo implements RespBean<Resp_getFileInfo.FileInfo> {
         this.errMsg = errMsg;
     }
 
-    @Override
     public Integer getStatus() {
         return status;
     }
@@ -33,9 +33,29 @@ public class Resp_getFileInfo implements RespBean<Resp_getFileInfo.FileInfo> {
         this.result = result;
     }
 
-    @Override
     public FileInfo getResult() {
         return result;
+    }
+
+    @Override
+    public String getFileName() {
+        return result.name;
+    }
+
+    @Override
+    public String getId() {
+        return result.id;
+
+    }
+
+    @Override
+    public String getBusid() {
+        return result.busid+"";
+    }
+
+    @Override
+    public Long getFileSize() {
+        return result.size;
     }
 
 

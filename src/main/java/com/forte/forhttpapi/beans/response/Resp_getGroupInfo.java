@@ -1,6 +1,9 @@
 package com.forte.forhttpapi.beans.response;
 
+import com.forte.qqrobot.beans.messages.result.GroupInfo;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,12 +12,11 @@ import java.util.Map;
  * @create 2019-03-22 16:44
  **/
 
-public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> {
+public class Resp_getGroupInfo implements GroupInfo {
     private Integer status;
-    private GroupInfo result;
+    private GroupInfoName result;
     private String errMsg;
 
-    @Override
     public String getErrMsg() {
         return errMsg;
     }
@@ -23,7 +25,6 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
         this.errMsg = errMsg;
     }
 
-    @Override
     public Integer getStatus() {
         return status;
     }
@@ -32,13 +33,107 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
         this.status = status;
     }
 
-    public void setResult(GroupInfo result) {
+    public void setResult(GroupInfoName result) {
         this.result = result;
     }
 
-    @Override
-    public GroupInfo getResult() {
+    public GroupInfoName getResult() {
         return result;
+    }
+
+    @Override
+    public Integer getLevel() {
+        return result.gLevel;
+    }
+
+    @Override
+    public Integer getOpenType() {
+        return result.ac_open;
+    }
+
+    @Override
+    public String getType() {
+        return result.gtype + "";
+    }
+
+    @Override
+    public Integer getTypeId() {
+        return result.classID;
+    }
+
+    @Override
+    public String[] getAdminList() {
+        return result.gAdmins;
+    }
+
+    @Override
+    public String getBoard() {
+        return result.gBoard;
+    }
+
+    @Override
+    public Long getCreateTime() {
+        return result.gCrtTime;
+    }
+
+    @Override
+    public String getSimpleIntro() {
+        return result.gIntro;
+    }
+
+    @Override
+    public String getCompleteIntro() {
+        return result.gRIntro;
+    }
+
+    @Override
+    public Integer getMaxMember() {
+        return result.gMaxMem;
+    }
+
+    @Override
+    public Integer getMemberNum() {
+        return result.gMemNum;
+    }
+
+    @Override
+    public String getName() {
+        return result.gName;
+    }
+
+    @Override
+    public String getOwnerQQ() {
+        return result.gOwner;
+    }
+
+    @Override
+    public String getCode() {
+        return result.gc;
+    }
+
+    @Override
+    public Map<String, String> getLevelNames() {
+        return result.levelname;
+    }
+
+    @Override
+    public Map<String, String> getAdminNickList() {
+        return result.ns;
+    }
+
+    @Override
+    public String getPos() {
+        return result.pos;
+    }
+
+    @Override
+    public Integer getSearchType() {
+        return result.search;
+    }
+
+    @Override
+    public String[] getTags() {
+        return result.tags;
     }
 
     /*
@@ -72,7 +167,7 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
         "gc":4639,
         "gtype":0,
         "level_def":0,
-        "levelname":{
+        "levelname"
             "lvln1":"潜水",
             "lvln10":"一见倾心",
             "lvln11":"超凡脱俗",
@@ -142,7 +237,7 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
         result.tags[i].tag	string	该标签的名称
         result.tags[i].u	number	该标签的创建者QQ
                   */
-    public static class GroupInfo {
+    public static class GroupInfoName {
         private Integer ac_grade;
         private String ac_num;
         private Integer ac_open;
@@ -155,7 +250,7 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
         private String flag;
         private String[] gAdmins;
         private String gBoard;
-        private String gCrtTime;
+        private Long gCrtTime;
         private String gIntro;
         private Integer gLevel;
         private Integer gMaxMem;
@@ -168,9 +263,9 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
         private Integer gtype;
         private String level_def;
         // TODO 群成员等级信息
-        private List<Map<String, Object>> levelname = new ArrayList<>();
+        private Map<String, String> levelname = new HashMap<>();
         // TODO 群管理和群主的昵称列表
-        private List<Map<String, Object>> ns = new ArrayList<>();
+        private Map<String, String> ns = new HashMap<>();
         private String open;
         private String photo;
         private String pos;
@@ -178,7 +273,7 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
         private List<Map<String, Object>> share = new ArrayList<>();
         private String sys_show;
         // TODO  群标签信息列表
-        private List<Map<String, Object>> tags = new ArrayList<>();
+        private String[] tags;
         private String user_show;
 
         public Integer getAc_grade() {
@@ -269,11 +364,11 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
             this.gBoard = gBoard;
         }
 
-        public String getgCrtTime() {
+        public Long getgCrtTime() {
             return gCrtTime;
         }
 
-        public void setgCrtTime(String gCrtTime) {
+        public void setgCrtTime(Long gCrtTime) {
             this.gCrtTime = gCrtTime;
         }
 
@@ -365,19 +460,19 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
             this.level_def = level_def;
         }
 
-        public List<Map<String, Object>> getLevelname() {
+        public Map<String, String> getLevelname() {
             return levelname;
         }
 
-        public void setLevelname(List<Map<String, Object>> levelname) {
+        public void setLevelname(Map<String, String> levelname) {
             this.levelname = levelname;
         }
 
-        public List<Map<String, Object>> getNs() {
+        public Map<String, String> getNs() {
             return ns;
         }
 
-        public void setNs(List<Map<String, Object>> ns) {
+        public void setNs(Map<String, String> ns) {
             this.ns = ns;
         }
 
@@ -429,11 +524,11 @@ public class Resp_getGroupInfo implements RespBean<Resp_getGroupInfo.GroupInfo> 
             this.sys_show = sys_show;
         }
 
-        public List<Map<String, Object>> getTags() {
+        public String[] getTags() {
             return tags;
         }
 
-        public void setTags(List<Map<String, Object>> tags) {
+        public void setTags(String[] tags) {
             this.tags = tags;
         }
 

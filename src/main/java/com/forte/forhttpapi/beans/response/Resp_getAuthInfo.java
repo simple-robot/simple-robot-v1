@@ -1,18 +1,19 @@
 package com.forte.forhttpapi.beans.response;
 
+import com.forte.qqrobot.beans.messages.result.AuthInfo;
+
 /**
  * 「取权限信息」
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/22 15:41
  * @since JDK1.8
  **/
-public class Resp_getAuthInfo implements RespBean<Resp_getAuthInfo.AuthInfo> {
+public class Resp_getAuthInfo implements AuthInfo {
 
     private Integer status;
     private AuthInfo result;
     private String errMsg;
 
-    @Override
     public String getErrMsg() {
         return errMsg;
     }
@@ -21,7 +22,6 @@ public class Resp_getAuthInfo implements RespBean<Resp_getAuthInfo.AuthInfo> {
         this.errMsg = errMsg;
     }
 
-    @Override
     public Integer getStatus() {
         return status;
     }
@@ -30,13 +30,27 @@ public class Resp_getAuthInfo implements RespBean<Resp_getAuthInfo.AuthInfo> {
         this.status = status;
     }
 
-    @Override
     public AuthInfo getResult() {
         return result;
     }
 
     public void setResult(AuthInfo result) {
         this.result = result;
+    }
+
+    @Override
+    public String getCode() {
+        return result.authCode;
+    }
+
+    @Override
+    public String getCookies() {
+        return result.cookies;
+    }
+
+    @Override
+    public String getCsrfToken() {
+        return result.csrfToken+"";
     }
 
     /**
@@ -48,16 +62,16 @@ public class Resp_getAuthInfo implements RespBean<Resp_getAuthInfo.AuthInfo> {
        cookies	    string	Cookies
        csrfToken	number	CsrfToken，即QQ网页用到的 bkn/g_tk等
          */
-        private Integer authCode;
+        private String authCode;
         private String cookies;
         private Integer csrfToken;
 
 
-        public Integer getAuthCode() {
+        public String getAuthCode() {
             return authCode;
         }
 
-        public void setAuthCode(Integer authCode) {
+        public void setAuthCode(String authCode) {
             this.authCode = authCode;
         }
 
