@@ -1,6 +1,7 @@
 package com.forte.qqrobot.listener.invoker;
 
 import com.forte.qqrobot.anno.Block;
+import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
 import com.forte.qqrobot.utils.Maputer;
 

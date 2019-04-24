@@ -1,12 +1,14 @@
 package com.forte.qqrobot.listener.invoker;
 
+
+import com.forte.forhttpapi.http.QQHttpMsgSender;
+import com.forte.forlemoc.socket.QQWebSocketClient;
+import com.forte.forlemoc.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.beans.lemoc.msgget.MsgGet;
+import com.forte.qqrobot.beans.messages.msgget.MsgGet;
+import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.socket.MsgSender;
-import com.forte.qqrobot.http.QQHttpMsgSender;
-import com.forte.qqrobot.socket.QQWebSocketClient;
-import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -47,6 +49,7 @@ public class ListenerManager {
 
     /**
      * 接收到了消息响应
+     * TODO 移除/分离QQWebSocketClient
      * @param msgGet    接收的消息
      * @param args      参数列表
      * @param at        是否被at

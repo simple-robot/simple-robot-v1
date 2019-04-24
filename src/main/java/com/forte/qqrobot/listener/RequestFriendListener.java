@@ -1,7 +1,7 @@
 package com.forte.qqrobot.listener;
 
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.lemoc.msgget.RequestFriend;
+import com.forte.qqrobot.beans.messages.msgget.FriendAddRequest;
 import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
@@ -11,5 +11,5 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  * @since JDK1.8
  **/
 public interface RequestFriendListener extends SocketListener{
-    boolean onMessage(RequestFriend msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
+    boolean onMessage(FriendAddRequest request, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
 }

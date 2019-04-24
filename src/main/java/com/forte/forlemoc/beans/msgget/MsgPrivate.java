@@ -9,7 +9,7 @@ import com.forte.qqrobot.beans.messages.types.PrivateMsgType;
  * @date Created in 2019/3/7 10:52
  * @since JDK1.8
  **/
-public class MsgPrivate implements PrivateMsg {
+public class MsgPrivate implements PrivateMsg, MsgGet {
     /*
      {
             "nick":     "法欧特桑",

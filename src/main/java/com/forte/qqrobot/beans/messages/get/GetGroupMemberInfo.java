@@ -18,4 +18,7 @@ public interface GetGroupMemberInfo extends InfoGet<GroupMemberInfo> {
         return GroupMemberInfo.class;
     }
 
+    String getGroup();
+    String getQQ();
+
 }

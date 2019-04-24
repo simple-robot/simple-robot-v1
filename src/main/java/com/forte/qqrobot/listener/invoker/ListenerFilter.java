@@ -1,11 +1,10 @@
 package com.forte.qqrobot.listener.invoker;
 
-import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.SocketResourceDispatchCenter;
+import com.forte.forlemoc.SocketResourceDispatchCenter;
 import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.lemoc.msgget.MsgGet;
+import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 
 import java.lang.reflect.Method;
 

@@ -1,7 +1,8 @@
 package com.forte.qqrobot.listener;
 
+
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.lemoc.msgget.EventGroupMemberReduce;
+import com.forte.qqrobot.beans.messages.msgget.GroupMemberReduce;
 import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
@@ -11,7 +12,7 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  * @since JDK1.8
  **/
 public interface EventGroupMemberReduceListener extends SocketListener {
-    boolean onMessage(EventGroupMemberReduce msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
+    boolean onMessage(GroupMemberReduce event, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
 
 }
 

@@ -57,7 +57,7 @@ result.name	string	昵称
 result.headimg	string	头像链接
 result.level	int	QQ等级
      */
-    public static class StrangerInfo implements RespGenderBean {
+    public static class StrangerInfo {
         private String qq;
         private Integer gender;
         private Integer old;

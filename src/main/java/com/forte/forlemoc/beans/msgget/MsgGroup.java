@@ -8,7 +8,7 @@ import com.forte.qqrobot.beans.messages.types.GroupMsgType;
  * @date Created in 2019/3/7 11:09
  * @since JDK1.8
  **/
-public class MsgGroup implements GroupMsg {
+public class MsgGroup implements GroupMsg, MsgGet {
     /*
     {
          "username":        "泰兰德",

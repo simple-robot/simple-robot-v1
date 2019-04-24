@@ -1,7 +1,8 @@
 package com.forte.qqrobot.listener;
 
+
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.lemoc.msgget.RequestGroup;
+import com.forte.qqrobot.beans.messages.msgget.GroupAddRequest;
 import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
@@ -12,5 +13,5 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  **/
 public interface RequestGroupListener extends SocketListener{
 
-    boolean onMessage(RequestGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
+    boolean onMessage(GroupAddRequest request, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
 }

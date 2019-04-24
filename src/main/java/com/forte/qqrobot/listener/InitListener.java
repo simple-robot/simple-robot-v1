@@ -2,7 +2,6 @@ package com.forte.qqrobot.listener;
 
 
 import com.forte.qqrobot.socket.MsgSender;
-import com.forte.qqrobot.socket.QQWebSocketMsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 /**

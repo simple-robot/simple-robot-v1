@@ -10,7 +10,7 @@ import com.forte.qqrobot.beans.messages.types.SexType;
  * @date Created in 2019/3/14 11:37
  * @since JDK1.8
  **/
-public class ReturnStranger implements StrangerInfo {
+public class ReturnStranger implements StrangerInfo, InfoReturn {
 
     /** 返回编码，应该是25304 */
     @JSONField(name = "return")

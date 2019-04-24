@@ -15,7 +15,7 @@ import java.util.Optional;
  * @date Created in 2019/3/14 10:49
  * @since JDK1.8
  **/
-public class ReturnLoginInGroups implements com.forte.qqrobot.beans.messages.result.GroupList {
+public class ReturnLoginInGroups implements com.forte.qqrobot.beans.messages.result.GroupList, InfoReturn {
 
     /** 返回标记编码, 应该为 25305 */
     @JSONField(name = "return")

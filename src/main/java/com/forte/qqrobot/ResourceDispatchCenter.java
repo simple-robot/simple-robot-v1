@@ -1,14 +1,10 @@
 package com.forte.qqrobot;
 
-import com.forte.qqrobot.configuration.LinkConfiguration;
 import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.ListenerPlug;
-import com.forte.qqrobot.socket.QQWebSocketInfoReturnManager;
-import com.forte.qqrobot.socket.QQWebSocketManager;
-import com.forte.qqrobot.socket.QQJSONMsgCreator;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.SingleFactory;
@@ -16,9 +12,9 @@ import com.forte.qqrobot.utils.SingleFactory;
 import java.util.concurrent.Executor;
 
 /**
- *  资源调度中心
+ *  资源调度中心抽象类，基本是静态方法，开发者可以实现此类并增加方法
  * <br>主要用于框架内部，用于获取一些功能性类的单例对象
- * <br>获取前需要保证在初始化方法{@link RobotApplication#init()}中已经储存过
+ * <br>获取前需要保证在初始化方法 Application 中已经储存过
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/9 14:42
  * @since JDK1.8

@@ -17,4 +17,6 @@ public interface GetImageInfo extends InfoGet<ImageInfo> {
         return ImageInfo.class;
     }
 
+    String getFlag();
+
 }

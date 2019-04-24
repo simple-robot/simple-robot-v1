@@ -1,7 +1,8 @@
 package com.forte.qqrobot.listener.invoker;
 
 import com.forte.qqrobot.anno.*;
-import com.forte.qqrobot.beans.lemoc.msgget.MsgGet;
+import com.forte.qqrobot.beans.messages.msgget.MsgGet;
+import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.MethodUtil;
@@ -75,7 +76,7 @@ public class ListenerMethodScanner {
                     //监听器实现来的函数仅会有一个监听类型
                     MsgGetTypes singleType = MsgGetTypes.getByType(msgGetClass);
                     MsgGetTypes[] byType = new MsgGetTypes[]{singleType};
-                    if(!singleType.equals(MsgGetTypes.unknownMsg)){
+                    if(singleType != null){
                         //如果不是未知的, 则认定其是正确的onMessage对象，开始封装
                         //获取其他注解
                         Filter filter = m.getAnnotation(Filter.class);
@@ -109,6 +110,7 @@ public class ListenerMethodScanner {
         //判断类上可以存在的注解
         Listen classListen = clazz.getAnnotation(Listen.class);
         Block classBlock = clazz.getAnnotation(Block.class);
+
 
 
         //提前准备方法获取过滤器

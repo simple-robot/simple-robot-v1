@@ -17,4 +17,5 @@ public interface GetGroupInfo extends InfoGet<GroupInfo> {
         return GroupInfo.class;
     }
 
+    String getGroup();
 }

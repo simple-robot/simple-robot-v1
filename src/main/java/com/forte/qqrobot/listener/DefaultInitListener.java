@@ -1,10 +1,11 @@
 package com.forte.qqrobot.listener;
 
-import com.forte.qqrobot.SocketResourceDispatchCenter;
+
 import com.forte.forhttpapi.beans.response.Resp_getLoginQQInfo;
-import com.forte.qqrobot.configuration.LinkConfiguration;
-import com.forte.qqrobot.beans.lemoc.inforeturn.ReturnLoginNick;
-import com.forte.qqrobot.beans.lemoc.inforeturn.ReturnLoginQQ;
+import com.forte.forlemoc.SocketResourceDispatchCenter;
+import com.forte.forlemoc.beans.inforeturn.ReturnLoginNick;
+import com.forte.forlemoc.beans.inforeturn.ReturnLoginQQ;
+import com.forte.forlemoc.LinkConfiguration;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;

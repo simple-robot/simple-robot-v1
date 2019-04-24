@@ -18,4 +18,5 @@ public interface GetStrangerInfo extends InfoGet<StrangerInfo> {
         return StrangerInfo.class;
     }
 
+    String getQQ();
 }

@@ -17,4 +17,5 @@ public interface GetGroupTopNote extends InfoGet<GroupTopNote> {
         return GroupTopNote.class;
     }
 
+    String getGroup();
 }

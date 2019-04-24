@@ -15,4 +15,7 @@ public interface GetGroupMemberList extends InfoGet<GroupMemberList> {
     default Class<GroupMemberList> resultType(){
         return GroupMemberList.class;
     }
+
+    String getGroup();
+
 }

@@ -18,4 +18,5 @@ public interface GetShareList extends InfoGet<ShareList> {
         return ShareList.class;
     }
 
+    String getGroup();
 }

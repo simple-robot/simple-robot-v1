@@ -78,7 +78,7 @@ result.allowChangeCard	int	允许修改名片，0/不允许，1/允许
 result.tipExpireTime	int	头衔有效期，时间戳形式，-1为永不到期
 result.headimg	string	QQ头像
      */
-    public static class GroupMemberInfo implements RespGenderBean, RespPowerBean {
+    public static class GroupMemberInfo  {
         private String group;
         private String qq;
         private String name;

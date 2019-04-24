@@ -3,6 +3,7 @@ package com.forte.qqrobot.log;
 import java.time.LocalDateTime;
 
 /**
+ * 临时使用的log类
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/15 15:34
  * @since JDK1.8

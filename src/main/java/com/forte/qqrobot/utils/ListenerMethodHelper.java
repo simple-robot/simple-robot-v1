@@ -1,5 +1,6 @@
 package com.forte.qqrobot.utils;
 
+import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 
 import java.util.*;
@@ -13,7 +14,9 @@ import java.util.stream.Collectors;
  **/
 public class ListenerMethodHelper {
 
-    //将监听函数根据类型分类
+    /**
+     * 将监听函数根据类型分类
+     */
     public static Map<MsgGetTypes, Set<ListenerMethod>> groupByMsgGetTypes(Collection<ListenerMethod> listenerMethods){
         //第一层分组
         Map<MsgGetTypes[], Set<ListenerMethod>> collect = listenerMethods.stream().collect(Collectors.groupingBy(ListenerMethod::getTypes, Collectors.toSet()));

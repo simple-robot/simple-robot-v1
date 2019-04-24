@@ -9,7 +9,7 @@ import com.forte.qqrobot.beans.messages.types.IncreaseType;
  * @date Created in 2019/3/8 11:06
  * @since JDK1.8
  **/
-public class EventGroupMemberJoin implements GroupMemberIncrease {
+public class EventGroupMemberJoin implements GroupMemberIncrease, EventGet {
     /*
     103 群事件-群成员增加
 subType（子类型，1/管理员已同意 2/管理员邀请）

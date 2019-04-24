@@ -9,7 +9,7 @@ import com.forte.qqrobot.beans.messages.types.ReduceType;
  * @date Created in 2019/3/8 11:01
  * @since JDK1.8
  **/
-public class EventGroupMemberReduce implements GroupMemberReduce {
+public class EventGroupMemberReduce implements GroupMemberReduce, EventGet {
 
     /*
     102 群事件-群成员减少

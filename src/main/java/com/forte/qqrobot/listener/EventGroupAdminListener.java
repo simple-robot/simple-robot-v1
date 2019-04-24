@@ -1,7 +1,7 @@
 package com.forte.qqrobot.listener;
 
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.lemoc.msgget.EventGroupAdmin;
+import com.forte.qqrobot.beans.messages.msgget.GroupAdminChange;
 import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
@@ -12,5 +12,5 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  **/
 public interface EventGroupAdminListener extends SocketListener{
 
-    boolean onMessage(EventGroupAdmin msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
+    boolean onMessage(GroupAdminChange event, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
 }

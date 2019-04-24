@@ -1,7 +1,5 @@
 package com.forte.forlemoc.beans.inforeturn;
 
-import com.forte.qqrobot.beans.MsgBean;
-
 /**
  * 请求JSON数据的返回值
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>

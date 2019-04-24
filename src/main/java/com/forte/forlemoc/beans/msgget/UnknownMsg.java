@@ -1,6 +1,5 @@
 package com.forte.forlemoc.beans.msgget;
 
-import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 
 /**
  * 未知的消息，用于解决可能出现的空指针异常

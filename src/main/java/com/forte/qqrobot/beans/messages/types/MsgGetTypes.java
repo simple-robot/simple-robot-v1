@@ -2,10 +2,7 @@ package com.forte.qqrobot.beans.messages.types;
 
 
 import com.alibaba.fastjson.JSON;
-import com.forte.forlemoc.beans.msgget.*;
 import com.forte.qqrobot.beans.messages.msgget.*;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 枚举类型，定义全部的消息接收类型
@@ -45,8 +42,6 @@ public enum MsgGetTypes {
 
 
     private Class<? extends MsgGet> beanClass;
-    //本类全部常量
-    private static final AtomicReference<com.forte.forlemoc.types.MsgGetTypes[]> allTypes = new AtomicReference<>();
 
     /**
      * 获取此类型对应的class对象

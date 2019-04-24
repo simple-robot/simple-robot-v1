@@ -8,7 +8,7 @@ import com.forte.qqrobot.beans.messages.msgget.GroupAddRequest;
  * @date Created in 2019/3/8 11:21
  * @since JDK1.8
  **/
-public class RequestGroup implements GroupAddRequest {
+public class RequestGroup implements GroupAddRequest, MsgGet {
 
     /*
     302 请求-群添加

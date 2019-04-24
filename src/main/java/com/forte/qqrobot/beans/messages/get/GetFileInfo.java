@@ -16,4 +16,7 @@ public interface GetFileInfo extends InfoGet<FileInfo> {
     default Class<FileInfo> resultType(){
         return FileInfo.class;
     }
+
+    String getFlag();
+
 }

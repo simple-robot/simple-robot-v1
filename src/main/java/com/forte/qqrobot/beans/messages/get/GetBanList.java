@@ -15,4 +15,10 @@ public interface GetBanList extends InfoGet<BanList> {
     default Class<BanList> resultType(){
         return BanList.class;
     }
+
+    /**
+     * 获取群号
+     */
+    String getGroup();
+
 }

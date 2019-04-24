@@ -1,7 +1,8 @@
 package com.forte.qqrobot.listener;
 
+
 import com.forte.qqrobot.beans.CQCode;
-import com.forte.qqrobot.beans.lemoc.msgget.*;
+import com.forte.qqrobot.beans.messages.msgget.*;
 import com.forte.qqrobot.socket.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
@@ -22,47 +23,47 @@ public class DefaultWholeListener implements EventFriendAddedListener,
                                                 RequestGroupListener {
 
     @Override
-    public boolean onMessage(EventFriendAdded msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
+    public boolean onMessage(FriendAdd event, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(EventGroupAdmin msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
+    public boolean onMessage(GroupAdminChange event, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(EventGroupMemberJoin msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
+    public boolean onMessage(GroupMemberIncrease event, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(EventGroupMemberReduce msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
+    public boolean onMessage(GroupMemberReduce event, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(MsgDisGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
+    public boolean onMessage(DiscussMsg msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(MsgGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
+    public boolean onMessage(GroupMsg msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(MsgPrivate msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
+    public boolean onMessage(PrivateMsg msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(RequestFriend msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
+    public boolean onMessage(FriendAddRequest request, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 
     @Override
-    public boolean onMessage(RequestGroup msg, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
+    public boolean onMessage(GroupAddRequest request, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender) {
         return false;
     }
 }

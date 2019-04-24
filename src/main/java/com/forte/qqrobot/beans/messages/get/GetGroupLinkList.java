@@ -16,4 +16,6 @@ public interface GetGroupLinkList extends InfoGet<GroupLinkList> {
         return GroupLinkList.class;
     }
 
+    String getGroup();
+
 }

@@ -32,7 +32,7 @@ qq群号：782930037
 
 - ##### 新建一个项目，导入jar包（maven暂时没有上传，所以暂时没有依赖）
 
-- ##### 创建一个类，继承  `com.forte.qqrobot.RobotApplication` 类
+- ##### 创建一个类，继承  `com.forte.qqrobot.xxxApplication` 类
 
 > ※ 后期此类将会分离为两个类以兼容两种插件
 >

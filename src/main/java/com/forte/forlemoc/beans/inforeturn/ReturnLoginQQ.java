@@ -9,7 +9,7 @@ import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
  * @date Created in 2019/3/14 11:30
  * @since JDK1.8
  **/
-public class ReturnLoginQQ implements LoginQQInfo {
+public class ReturnLoginQQ implements LoginQQInfo, InfoReturn {
 
     /** 返回编码,应该是25301 */
     @JSONField(name = "return")

@@ -11,7 +11,7 @@ import com.forte.qqrobot.beans.messages.types.SexType;
  * @date Created in 2019/3/14 11:08
  * @since JDK1.8
  **/
-public class ReturnGroupMember implements GroupMemberInfo {
+public class ReturnGroupMember implements GroupMemberInfo, InfoReturn {
 
 
     /** 返回编码，应该为 25303 */

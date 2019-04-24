@@ -8,7 +8,7 @@ import com.forte.qqrobot.beans.messages.msgget.DiscussMsg;
  * @date Created in 2019/3/8 10:46
  * @since JDK1.8
  **/
-public class MsgDisGroup implements DiscussMsg {
+public class MsgDisGroup implements DiscussMsg, MsgGet {
     /*
     4 讨论组消息
     subType，sendTime，fromDiscuss，fromQQ，msg，font, nick, sex, age

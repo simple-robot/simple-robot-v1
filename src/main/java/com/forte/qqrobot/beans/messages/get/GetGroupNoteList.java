@@ -17,4 +17,6 @@ public interface GetGroupNoteList extends InfoGet<GroupNoteList> {
         return GroupNoteList.class;
     }
 
+    String getGroup();
+
 }

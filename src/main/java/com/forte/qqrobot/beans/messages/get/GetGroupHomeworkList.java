@@ -17,4 +17,6 @@ public interface GetGroupHomeworkList extends InfoGet<GroupHomeworkList> {
         return GroupHomeworkList.class;
     }
 
+    String getGroup();
+
 }

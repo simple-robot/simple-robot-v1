@@ -8,7 +8,7 @@ import com.forte.qqrobot.beans.messages.msgget.FriendAddRequest;
  * @date Created in 2019/3/8 11:17
  * @since JDK1.8
  **/
-public class RequestFriend implements FriendAddRequest {
+public class RequestFriend implements FriendAddRequest, MsgGet {
     /*
     301 请求-好友添加
     subType，sendTime，fromQQ，msg（附言），responseFlag（反馈标识-处理请求用）

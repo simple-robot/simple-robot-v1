@@ -13,7 +13,6 @@ public interface EventGet extends MsgGet {
     default String getMsg(){
         return "";
     }
-    @Override
     default void setMsg(String msg){}
 
     /**
@@ -23,7 +22,6 @@ public interface EventGet extends MsgGet {
     default String getFont(){
         return "";
     }
-    @Override
     default void setFont(String font){}
 
 
