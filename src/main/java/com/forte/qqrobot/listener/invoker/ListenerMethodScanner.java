@@ -4,6 +4,8 @@ import com.forte.qqrobot.anno.*;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.listener.SocketListener;
+import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
+import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.MethodUtil;
 
@@ -199,7 +201,7 @@ public class ListenerMethodScanner {
      * 构建监听函数阻断器
      * @return 监听函数阻断器
      */
-    public ListenerPlug buildPlug(){
+    public Plug buildPlug(){
         return new ListenerPlug(listenerMethodSet);
     }
 

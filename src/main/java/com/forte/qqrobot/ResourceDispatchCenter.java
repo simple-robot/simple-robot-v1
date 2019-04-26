@@ -4,7 +4,8 @@ import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
-import com.forte.qqrobot.listener.invoker.ListenerPlug;
+import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
+import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.SingleFactory;
@@ -76,7 +77,7 @@ public abstract class ResourceDispatchCenter {
      * 储存一个监听函数阻断器
      * @param listenerPlug 监听函数阻断器
      */
-    public static void saveListenerPlug(ListenerPlug listenerPlug){
+    public static void savePlug(Plug listenerPlug){
         SingleFactory.set(listenerPlug);
     }
 
@@ -127,7 +128,7 @@ public abstract class ResourceDispatchCenter {
      * 获取一个ListenerPlug单例对象
      * @return ListenerPlug单例对象
      */
-    public static ListenerPlug getListenerPlug(){
+    public static Plug getPlug(){
         return SingleFactory.get(ListenerPlug.class);
     }
 
@@ -142,6 +143,14 @@ public abstract class ResourceDispatchCenter {
      */
     public static Executor getThreadPool(){
         return BaseLocalThreadPool.getThreadPool(THREAD_POOL_NAME);
+    }
+
+    /**
+     * 获取指定名称的线程池
+     * @return  线程池单例
+     */
+    public static Executor getThreadPool(String threadPoolName){
+        return BaseLocalThreadPool.getThreadPool(threadPoolName);
     }
 
 

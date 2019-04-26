@@ -1,4 +1,4 @@
-package com.forte.qqrobot.sender;
+package com.forte.qqrobot.sender.senderlist;
 
 import com.forte.qqrobot.beans.messages.get.*;
 import com.forte.qqrobot.beans.messages.result.*;

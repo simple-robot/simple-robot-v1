@@ -1,8 +1,9 @@
-package com.forte.qqrobot.listener.invoker;
+package com.forte.qqrobot.listener.invoker.plug;
 
 import com.forte.qqrobot.anno.Block;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
+import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.utils.Maputer;
 
 import java.util.*;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
  * @date Created in 2019/3/15 15:45
  * @since JDK1.8
  **/
-public class ListenerPlug {
+public class ListenerPlug implements Plug {
 
     /**
      * 全局阻塞容器, 仅只能根据名称阻塞，不可追加
@@ -189,7 +190,7 @@ public class ListenerPlug {
     }
 
     /**
-     * 取消当前阻断
+     * 取消当前阻断, 需要线程同步
      */
     public void unBlock() {
         NORMAL_BLOCK.getAndSet(null);

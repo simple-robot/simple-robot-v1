@@ -1,6 +1,7 @@
 package com.forte.qqrobot;
 
-import com.forte.forlemoc.socket.QQWebSocketMsgSender;
+
+import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 /**
@@ -16,7 +17,7 @@ public interface Application<CONFIG extends BaseConfiguration> {
 
     void before(CONFIG configuration);
 
-    void after(CQCodeUtil cqCodeUtil, QQWebSocketMsgSender sender);
+    void after(CQCodeUtil cqCodeUtil, MsgSender sender);
 
     default String author(){
         return "@ForteScarlet";

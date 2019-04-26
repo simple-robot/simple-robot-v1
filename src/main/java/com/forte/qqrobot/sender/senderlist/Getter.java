@@ -1,4 +1,4 @@
-package com.forte.qqrobot.sender;
+package com.forte.qqrobot.sender.senderlist;
 
 /**
  * Get方法相关方法总汇总

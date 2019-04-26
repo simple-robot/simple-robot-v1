@@ -1,14 +1,16 @@
 package com.forte.qqrobot.listener.invoker;
 
 
-import com.forte.forhttpapi.http.QQHttpMsgSender;
-import com.forte.forlemoc.socket.QQWebSocketClient;
-import com.forte.forlemoc.socket.QQWebSocketMsgSender;
+import com.forte.forlemoc.SocketResourceDispatchCenter;
 import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.log.QQLog;
-import com.forte.qqrobot.socket.MsgSender;
+import com.forte.qqrobot.sender.MsgSender;
+import com.forte.qqrobot.sender.senderlist.SenderList;
+import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -33,37 +35,57 @@ public class ListenerManager {
     /**
      * 空的map, 用于应对从监听函数获取的时候出现空的情况
      */
-    private static final Map<Boolean, List<ListenerMethod>> EMPTY_MAP;
+    private static final Map<Boolean, List<ListenerMethod>> EMPTY_MAP = new HashMap<Boolean, List<ListenerMethod>>(){{
+        put(true , EMPTY_LIST);
+        put(false, EMPTY_LIST);
+    }};
 
     /**
      * 空的list，用于应对空指针异常
      */
     private static final List<ListenerMethod> EMPTY_LIST = Collections.EMPTY_LIST;
 
-    static{
-        Map<Boolean, List<ListenerMethod>> emptyMap = new HashMap<>(2);
-        emptyMap.put(true , EMPTY_LIST);
-        emptyMap.put(false, EMPTY_LIST);
-        EMPTY_MAP = emptyMap;
+//    static{
+//        Map<Boolean, List<ListenerMethod>> emptyMap = new HashMap<>(2);
+//        emptyMap.put(true , EMPTY_LIST);
+//        emptyMap.put(false, EMPTY_LIST);
+//        EMPTY_MAP = emptyMap;
+//    }
+
+    /**
+     * 接收到了消息
+     */
+    public void onMsg(MsgGet msgget){
+
+        //组装参数，此参数保证全部类型全部唯一, 且参数索引2的位置为是否被at
+        Object[] params = getParams(msgget);
+        boolean at = (boolean) params[2];
+
+        //TODO 唯一对外接口，表示接收到了消息
+
+
+
+
+
+
     }
 
     /**
      * 接收到了消息响应
-     * TODO 移除/分离QQWebSocketClient
      * @param msgGet    接收的消息
      * @param args      参数列表
      * @param at        是否被at
      */
-    public void invoke(MsgGet msgGet, Set<Object> args, boolean at, QQWebSocketClient client){
+    private void invoke(MsgGet msgGet, Set<Object> args, boolean at, SenderList senders){
         //构建MsgSender对象
 
+        //参数获取getter
         Function<ListenerMethod, Set<Object>> paramGetter = lm -> {
             Set<Object> params = new HashSet<>(args);
-            QQWebSocketMsgSender socketSender = QQWebSocketMsgSender.build(client);
-            QQHttpMsgSender httpSender = QQHttpMsgSender.build();
-            params.add(socketSender);
-            params.add(httpSender);
-            params.add(MsgSender.build(socketSender, httpSender, lm));
+            MsgSender msgSender = MsgSender.build(senders);
+            //将整合的送信器与原声sender都传入
+            params.add(msgSender);
+            params.add(senders);
             return params;
         };
 
@@ -72,11 +94,11 @@ public class ListenerManager {
 
         //先查看是否存在阻断函数，如果存在阻断函数则执行仅执行阻断函数
         //获取阻断器
-        ListenerPlug listenerPlug = ResourceDispatchCenter.getListenerPlug();
-        Set<ListenerMethod> blockMethod = listenerPlug.getBlockMethod(type);
+        Plug Plug = ResourceDispatchCenter.getPlug();
+        Set<ListenerMethod> blockMethod = Plug.getBlockMethod(type);
         if(blockMethod != null){
             //如果存在阻断，执行阻断
-            invokeBlock(blockMethod, type, paramGetter, msgGet, at);
+            invokeBlock(blockMethod, paramGetter, msgGet, at);
 
         }else{
             //如果不存在阻断，正常执行
@@ -94,12 +116,11 @@ public class ListenerManager {
     /**
      * 执行阻断函数
      * @param blockMethod   阻断函数列表
-     * @param msgGetTypes   消息类型
      * @param paramGetter   参数获取函数
      * @param msgGet        接收到的消息
      * @param at            是否被at
      */
-    private void invokeBlock(Set<ListenerMethod> blockMethod, MsgGetTypes msgGetTypes, Function<ListenerMethod, Set<Object>> paramGetter, MsgGet msgGet, boolean at){
+    private void invokeBlock(Set<ListenerMethod> blockMethod, Function<ListenerMethod, Set<Object>> paramGetter, MsgGet msgGet, boolean at){
         //过滤
         //获取过滤器
         ListenerFilter filter = ResourceDispatchCenter.getListenerFilter();
@@ -123,8 +144,26 @@ public class ListenerManager {
      * @param args      参数列表
      * @param at        是否被at
      */
-    public void invoke(MsgGet msgGet, Object[] args, boolean at, QQWebSocketClient socketClient){
-        invoke(msgGet, Arrays.stream(args).collect(Collectors.toSet()), at, socketClient);
+    private void invoke(MsgGet msgGet, Object[] args, boolean at, SenderList senders){
+        invoke(msgGet, Arrays.stream(args).collect(Collectors.toSet()), at, senders);
+    }
+
+
+    private Object[] getParams(MsgGet msgGet){
+        String msg = msgGet.getMsg();
+
+        //配置参数
+        //获取cqCodeUtil
+        CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
+        //获取全部CQ码
+        CQCode[] cqCodes = cqCodeUtil.getCQCodeFromMsg(msg).toArray(new CQCode[0]);
+        //判断是否at自己
+        //获取本机QQ号
+        String localQQCode = SocketResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
+        boolean at = cqCodeUtil.isAt(msg, localQQCode);
+        //组装参数
+        //* 组装参数不再携带QQWebSocketSender对象和QQHttpSender对象，而是交给Manager动态创建         *
+        return new Object[]{msgGet, cqCodes, at, cqCodeUtil};
     }
 
     /**

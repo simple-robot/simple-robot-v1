@@ -1,8 +1,9 @@
 package com.forte.qqrobot.listener;
 
+
 import com.forte.qqrobot.beans.CQCode;
 import com.forte.qqrobot.beans.messages.msgget.GroupAdminChange;
-import com.forte.qqrobot.socket.MsgSender;
+import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 /**

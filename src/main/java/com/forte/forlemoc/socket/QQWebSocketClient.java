@@ -48,8 +48,6 @@ public class QQWebSocketClient extends WebSocketClient {
      */
     public QQWebSocketClient(URI serverURI, ListenerManager manager, Set<InitListener> initListeners) {
         super(serverURI);
-        //创建socket送信器
-//        this.socketSender = QQWebSocketMsgSender.build(this);
         this.manager = manager;
         this.initListeners = initListeners;
     }
@@ -106,7 +104,7 @@ public class QQWebSocketClient extends WebSocketClient {
             /*
                 获取封装类后，一，分发给监听器
             */
-            manager.invoke(msgGet, params, at, this);
+            manager.onMsg(msgGet);
         }else{
             //如果act为0则说明这个消息是响应消息
             JSONObject returnInfoJson = JSONObject.parseObject(s);

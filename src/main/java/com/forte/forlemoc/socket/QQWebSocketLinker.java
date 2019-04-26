@@ -1,11 +1,8 @@
 package com.forte.forlemoc.socket;
 
-import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.forlemoc.SocketResourceDispatchCenter;
 import com.forte.forlemoc.LinkConfiguration;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
-import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
-import com.forte.qqrobot.listener.invoker.ListenerPlug;
 import com.forte.qqrobot.log.QQLog;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,7 +28,7 @@ public class QQWebSocketLinker {
      * @param retryTime 重试次数，如果小于0则视为无限循环
      * @return
      */
-    public static QQWebSocketClient link(Class<? extends QQWebSocketClient> client, String url, int retryTime) {
+    public static QQWebSocketClient link(Class<? extends QQWebSocketClient> client, ListenerManager manager, String url, int retryTime) {
         QQWebSocketClient cc = null;
         //获取连接配置
         LinkConfiguration linkConfiguration = SocketResourceDispatchCenter.getLinkConfiguration();
@@ -39,12 +36,12 @@ public class QQWebSocketLinker {
         boolean localB = true;
 
         //构建监听函数管理器等扫描器所构建的
-        ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
-        ListenerManager manager = scanner.buildManager();
-        ListenerPlug plug = scanner.buildPlug();
-        //保存
-        ResourceDispatchCenter.saveListenerManager(manager);
-        ResourceDispatchCenter.saveListenerPlug(plug);
+//        ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
+//        ListenerManager manager = scanner.buildManager();
+//        ListenerPlug plug = scanner.buildPlug();
+//        //保存
+//        ResourceDispatchCenter.saveListenerManager(manager);
+//        ResourceDispatchCenter.saveListenerPlug(plug);
 
         //连接的时候先尝试一次本地连接
         try {
@@ -94,13 +91,12 @@ public class QQWebSocketLinker {
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 //这里是利用反射创建实例的错误，当出现这个错误的时候不能再循环了，直接抛出异常
                 throw new RuntimeException(e);
-            } finally {
+            }
                 times++;
                 //如果重试次数超过设定次数，跳出循环
                 if (retryTime > 0 && times >= retryTime) {
                     break;
                 }
-            }
         }
 
         //循环结束即认定为连接成功
@@ -114,8 +110,8 @@ public class QQWebSocketLinker {
      * @param url 连接地址
      * @return
      */
-    public static QQWebSocketClient link(Class<? extends QQWebSocketClient> client, String url) {
-        return link(client, url, -1);
+    public static QQWebSocketClient link(Class<? extends QQWebSocketClient> client, ListenerManager manager, String url) {
+        return link(client, manager, url, -1);
     }
 
     /**
@@ -124,8 +120,8 @@ public class QQWebSocketLinker {
      * @param url 连接地址
      * @return
      */
-    public static QQWebSocketClient link(String url) {
-        return link(QQWebSocketClient.class, url, -1);
+    public static QQWebSocketClient link(ListenerManager manager, String url) {
+        return link(QQWebSocketClient.class, manager, url, -1);
     }
 
 
@@ -140,19 +136,6 @@ public class QQWebSocketLinker {
      * ****************************************
      */
     private static void linkSuccess() {
-        //获取连接配置
-//        LinkConfiguration linkConfiguration = SocketResourceDispatchCenter.getLinkConfiguration();
-//        加载普通监听器
-//        linkConfiguration.getListeners().forEach(ResourceDispatchCenter.getListenerInvoker()::loadListener);
-        //构建监听函数管理器
-//        ListenerManager listenerManager = ResourceDispatchCenter.getListenerMethodScanner().buildManager();
-//        ListenerPlug listenerPlug = ResourceDispatchCenter.getListenerMethodScanner().buildPlug();
-        //保存监听函数
-        //将ListenerInvoker放入资源调度中心
-//        ResourceDispatchCenter.saveListenerManager(listenerManager);
-        //将监听函数阻断器放入资源调度中心
-//        ResourceDispatchCenter.saveListenerPlug(listenerPlug);
-
 
 
     }

@@ -1,7 +1,5 @@
-package com.forte.qqrobot.sender;
+package com.forte.qqrobot.sender.senderlist;
 
-import com.forte.qqrobot.beans.messages.get.GetAnonInfo;
-import com.forte.qqrobot.beans.messages.get.GetAuthInfo;
 import com.forte.qqrobot.beans.messages.result.*;
 
 /**
@@ -9,7 +7,7 @@ import com.forte.qqrobot.beans.messages.result.*;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface SenderGetList {
+public interface SenderGetList extends SenderList {
 
     //**************************************
     //*             get相关接口

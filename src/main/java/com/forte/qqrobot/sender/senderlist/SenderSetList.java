@@ -1,4 +1,4 @@
-package com.forte.qqrobot.sender;
+package com.forte.qqrobot.sender.senderlist;
 
 import com.forte.qqrobot.beans.messages.types.GroupAddRequestType;
 
@@ -7,7 +7,7 @@ import com.forte.qqrobot.beans.messages.types.GroupAddRequestType;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface SenderSetList {
+public interface SenderSetList extends SenderList {
 
     /**
      * 退出讨论组

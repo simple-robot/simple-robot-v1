@@ -1,4 +1,4 @@
-package com.forte.qqrobot.sender;
+package com.forte.qqrobot.sender.senderlist;
 
 /**
  * 消息发送汇总接口, 综合了所有的set,send,get相关方法接口<br>
