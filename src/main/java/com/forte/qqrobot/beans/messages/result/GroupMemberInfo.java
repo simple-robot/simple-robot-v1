@@ -20,12 +20,12 @@ public interface GroupMemberInfo extends InfoResult {
     String getNickName();
     /** 群名片 */
     String getCard();
-    /** -1:男，1:女，0:未知  */
+    /** 获取性别 -1:男，1:女，0:未知  */
     SexType getSex();
 
     /** 所在城市 */
     String getCity();
-    /**加群时间 */
+    /** 加群时间 */
     Long getJoinTime();
     /** 最后一次发言时间 */
     Long getLastTime();

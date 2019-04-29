@@ -1,6 +1,7 @@
 package com.forte.qqrobot.beans.messages.result;
 
 /**
+ * 登录的QQ的信息
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/

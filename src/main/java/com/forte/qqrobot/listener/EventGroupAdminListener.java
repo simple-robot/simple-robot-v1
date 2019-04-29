@@ -1,7 +1,7 @@
 package com.forte.qqrobot.listener;
 
 
-import com.forte.qqrobot.beans.CQCode;
+import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.messages.msgget.GroupAdminChange;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
@@ -11,6 +11,7 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  * @date Created in 2019/3/9 17:25
  * @since JDK1.8
  **/
+@Deprecated
 public interface EventGroupAdminListener extends SocketListener{
 
     boolean onMessage(GroupAdminChange event, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);

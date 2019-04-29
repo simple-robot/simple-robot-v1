@@ -6,6 +6,10 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
+import com.forte.qqrobot.sender.senderlist.SenderGetList;
+import com.forte.qqrobot.sender.senderlist.SenderList;
+import com.forte.qqrobot.sender.senderlist.SenderSendList;
+import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.MethodUtil;
 
@@ -63,7 +67,9 @@ public class ListenerMethodScanner {
     }
 
 
-    // TODO 方法分离
+    /**
+     * 通过接口实现的方式来构建监听函数列表
+     */
     private Set<ListenerMethod> buildBySocketListener(Class<?> clazz, Object bean, Spare spare) throws InstantiationException, IllegalAccessException {
         //尝试获取实例对象
         Object obj = getBean(clazz, bean);
@@ -105,14 +111,22 @@ public class ListenerMethodScanner {
     }
 
 
-    private Set<ListenerMethod> buildByNormal(Class<?> clazz, Object bean, Spare spare) throws IllegalAccessException {
+    /**
+     * 通过普通的注解的形式加载监听函数
+     * @param clazz
+     * @param bean
+     * @param spare
+     * @return
+     * @throws IllegalAccessException
+     */
+    private Set<ListenerMethod> buildByNormal(Class<?> clazz, Object bean, Spare spare) {
         boolean isSpare = (spare != null);
         //不使用else，两者不冲突
         //开始判断当前类, 判断类上是否有@Listen注解
         //判断类上可以存在的注解
         Listen classListen = clazz.getAnnotation(Listen.class);
-        Block classBlock = clazz.getAnnotation(Block.class);
 
+        Block classBlock = clazz.getAnnotation(Block.class);
 
 
         //提前准备方法获取过滤器
@@ -129,7 +143,7 @@ public class ListenerMethodScanner {
 
         //参数获取类型
         MsgGetTypes[] msgGetTypes = Optional.ofNullable(classListen).map(Listen::value).orElse(null);
-        //方法集合, 排除静态方法，
+        //方法集合, 排除静态方法
         Method[] publicMethods = Arrays.stream(MethodUtil.getPublicMethods(clazz, getFilter)).toArray(Method[]::new);
 
         //遍历并构建ListenerMethod对象
@@ -155,7 +169,11 @@ public class ListenerMethodScanner {
             //获取需要的注解
             Filter filter = method.getAnnotation(Filter.class);
             BlockFilter blockFilter = method.getAnnotation(BlockFilter.class);
+            //获取类上的阻断注解
             Block block = method.getAnnotation(Block.class);
+            //如果方法上没有阻断注解，则使用类上注解，如果方法上存在则使用方法上的注解,此时当不存在的时候直接使用null即可
+            block = (block == null) ? classBlock : block;
+
             //如果是全局备用，则直接备用，如果没有全局备用，获取此方法的Spare注解
             Spare thisSpare = isSpare ? spare : method.getAnnotation(Spare.class);
             //监听类型
@@ -188,6 +206,7 @@ public class ListenerMethodScanner {
     public Set<ListenerMethod> scanner(Object bean) throws Exception {
         return scanner(bean.getClass(), bean);
     }
+
 
     /**
      * 构建监听函数管理器实例

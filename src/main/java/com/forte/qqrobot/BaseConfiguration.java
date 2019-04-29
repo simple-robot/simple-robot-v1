@@ -1,6 +1,6 @@
 package com.forte.qqrobot;
 
-import com.forte.forhttpapi.beans.response.Resp_getLoginQQInfo;
+import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -25,42 +25,23 @@ public abstract class BaseConfiguration {
     /** 是否扫描了初始化监听器 */
     private boolean scannedInitListener = false;
 
-    /** 本机QQ信息, 先创建一个默认的类 */
-    private Resp_getLoginQQInfo.LoginQQInfo loginQQInfo = new Resp_getLoginQQInfo.LoginQQInfo();
+    /** 本机QQ信息, 一般唯一，使用静态 */
+    private static LoginQQInfo loginQQInfo = null;
 
     /** 全部初始化监听器 */
     private Set<InitListener> initListeners = new HashSet<>();
 
-    /** 本机QQ号 */
-    private String localQQCode = "";
+    /** 本机QQ号, 一般唯一，使用静态 */
+    private static String localQQCode = "";
 
-    /** 本机QQ的昵称 */
-    private String localQQNick = "";
+    /** 本机QQ的昵称, 一般唯一，使用静态 */
+    private static String localQQNick = "";
 
     /** 使用的编码格式，默认为UTF-8 */
     private String encode = "UTF-8";
 
-    /** 酷Q根路径的配置，默认为null */
-    private String cqPath;
-
-    /* ———————— 动态交互的参数为静态参数，保证参数存在 */
-
-    /** 动态交互 HTTP API插件的监听端口 */
-    private static Integer HTTP_API_port = 8877;
-
-    /** 向http api请求数据的访问地址，默认为'/' */
-    private static String HTTP_API_path = "/";
-
-    /** HTTP API 插件的ip地址 */
-    private static String HTTP_API_ip = "localhost";
-
-    /** 获取HTTP API请求地址 */
-    public static String getHttpRequestUrl(){
-        String ip = HTTP_API_ip;
-        Integer port = HTTP_API_port;
-        String path = HTTP_API_path.startsWith("/") ? HTTP_API_path.length() > 1 ? HTTP_API_path : "" : "/" + HTTP_API_path;
-        return "http://" + ip + ":" + port + path;
-    }
+    /** 酷Q根路径的配置，默认为null, 路径一般不会有多个，使用静态即可 */
+    private static String cqPath;
 
     /**
      * 注册监听器
@@ -195,18 +176,18 @@ public abstract class BaseConfiguration {
     }
 
     public void setLocalQQNick(String localQQNick) {
-        this.localQQNick = localQQNick;
+        BaseConfiguration.localQQNick = localQQNick;
     }
 
-    public String getLocalQQCode() {
-        return localQQCode;
+    public static String getLocalQQCode() {
+        return BaseConfiguration.localQQCode;
     }
 
     public void setLocalQQCode(String localQQCode) {
-        this.localQQCode = localQQCode;
+        BaseConfiguration.localQQCode = localQQCode;
     }
 
-    public Resp_getLoginQQInfo.LoginQQInfo getLoginQQInfo() {
+    public LoginQQInfo getLoginQQInfo() {
         return loginQQInfo;
     }
 
@@ -218,42 +199,18 @@ public abstract class BaseConfiguration {
         this.encode = encode;
     }
 
-    public String getCqPath() {
+    public static String getCqPath() {
         return cqPath;
     }
 
     public void setCqPath(String cqPath) {
-        this.cqPath = cqPath;
+        BaseConfiguration.cqPath = cqPath;
     }
 
-    public static Integer getHTTP_API_port() {
-        return HTTP_API_port;
-    }
-
-    public void setHTTP_API_port(Integer HTTP_API_port) {
-        this.HTTP_API_port = HTTP_API_port;
-    }
-
-    public static String getHTTP_API_ip() {
-        return HTTP_API_ip;
-    }
-
-    public void setHTTP_API_ip(String HTTP_API_ip) {
-        this.HTTP_API_ip = HTTP_API_ip;
-    }
-
-    public static String getHTTP_API_path() {
-        return HTTP_API_path;
-    }
-
-    public void setHTTP_API_path(String HTTP_API_path) {
-        this.HTTP_API_path = HTTP_API_path;
-    }
-
-    public void setLoginQQInfo(Resp_getLoginQQInfo.LoginQQInfo loginQQInfo) {
-        this.loginQQInfo = loginQQInfo;
-        this.localQQCode = loginQQInfo.getQq();
-        this.localQQNick = loginQQInfo.getNick();
+    public void setLoginQQInfo(LoginQQInfo loginQQInfo) {
+        BaseConfiguration.loginQQInfo = loginQQInfo;
+        BaseConfiguration.localQQCode = loginQQInfo.getQQ();
+        BaseConfiguration.localQQNick = loginQQInfo.getName();
     }
 
 

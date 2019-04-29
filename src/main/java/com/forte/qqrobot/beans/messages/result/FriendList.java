@@ -13,7 +13,7 @@ public interface FriendList extends InfoResult {
         有分组比较特殊，暂不使用InfoResultList接口
      */
 
-    /** 由于有好友分组信息，于是使用Map来区分 */
+    /** 各个分组下的好友列表 */
     Map<String, Friend[]> getFriendList();
 
     /** 通过某个分组获取其中的好友列表 */

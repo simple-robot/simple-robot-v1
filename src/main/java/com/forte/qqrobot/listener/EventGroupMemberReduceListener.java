@@ -1,7 +1,7 @@
 package com.forte.qqrobot.listener;
 
 
-import com.forte.qqrobot.beans.CQCode;
+import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.messages.msgget.GroupMemberReduce;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
@@ -11,6 +11,7 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  * @date Created in 2019/3/9 17:27
  * @since JDK1.8
  **/
+@Deprecated
 public interface EventGroupMemberReduceListener extends SocketListener {
     boolean onMessage(GroupMemberReduce event, CQCode[] cqCode, boolean at, CQCodeUtil cqCodeUtil, MsgSender sender);
 

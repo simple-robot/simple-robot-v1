@@ -3,6 +3,7 @@ package com.forte.qqrobot.beans.messages.msgget;
 import com.forte.qqrobot.beans.messages.types.GroupAdminChangeType;
 
 /**
+ * 群管理员变动事件
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/4/18 11:35
  * @since JDK1.8

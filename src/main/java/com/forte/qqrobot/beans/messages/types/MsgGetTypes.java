@@ -3,6 +3,8 @@ package com.forte.qqrobot.beans.messages.types;
 
 import com.alibaba.fastjson.JSON;
 import com.forte.qqrobot.beans.messages.msgget.*;
+import com.forte.qqrobot.utils.FieldUtils;
+import org.apache.ibatis.logging.stdout.StdOutImpl;
 
 /**
  * 枚举类型，定义全部的消息接收类型
@@ -44,6 +46,14 @@ public enum MsgGetTypes {
     private Class<? extends MsgGet> beanClass;
 
     /**
+     * 构造
+     * @param beanClass bean的class对象
+     */
+    MsgGetTypes(Class<? extends MsgGet> beanClass){
+        this.beanClass = beanClass;
+    }
+
+    /**
      * 获取此类型对应的class对象
      * @return 此类型对应的class对象
      */
@@ -60,14 +70,6 @@ public enum MsgGetTypes {
         return JSON.parseObject(json, beanClass);
     }
 
-    /**
-     * 构造
-     * @param beanClass bean的class对象
-     */
-    MsgGetTypes(Class<? extends MsgGet> beanClass){
-        this.beanClass = beanClass;
-    }
-
 
     /**
      * 通过class对象获取枚举对象
@@ -75,7 +77,7 @@ public enum MsgGetTypes {
      */
     public static MsgGetTypes getByType(Class<? extends MsgGet> clazz){
         for (MsgGetTypes type : values()) {
-            if(type.beanClass.equals(clazz)){
+            if(FieldUtils.isChild(clazz, type.beanClass)){
                 return type;
             }
         }
@@ -83,6 +85,14 @@ public enum MsgGetTypes {
         //没有找到，返回unknownMsg
 //        return unknownMsg;
         return null;
+    }
+
+    /**
+     * 通过MsgGet对象获取枚举对象
+     * @param msgGet 对象
+     */
+    public static MsgGetTypes getByType(MsgGet msgGet){
+       return getByType(msgGet.getClass());
     }
 
 

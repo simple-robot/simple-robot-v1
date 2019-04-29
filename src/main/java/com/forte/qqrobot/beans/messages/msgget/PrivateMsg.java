@@ -3,7 +3,7 @@ package com.forte.qqrobot.beans.messages.msgget;
 import com.forte.qqrobot.beans.messages.types.PrivateMsgType;
 
 /**
- * 私信类型
+ * 私信消息
  **/
 public interface PrivateMsg extends MsgGet {
 

@@ -17,12 +17,12 @@ public interface BanList extends InfoResultList<BanList.BanInfo> {
      */
     interface BanInfo extends ResultInner{
         /**
-         * 禁言者的QQ
+         * 被禁言者的QQ
          */
         String getQQ();
 
         /**
-         * 禁言成员昵称
+         * 被禁言成员昵称
          */
         String getNickName();
 

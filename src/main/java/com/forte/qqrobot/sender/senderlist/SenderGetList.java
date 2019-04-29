@@ -62,11 +62,11 @@ public interface SenderGetList extends SenderList {
     GroupInfo getGroupInfo(String group);
 
     /**
-     * 取群连接列表
-     * @param groupList 群号
+     * 取群链接列表
+     * @param group 群号
      * @return  群链接
      */
-    GroupLinkList getGroupLinkList(String groupList);
+    GroupLinkList getGroupLinkList(String group);
 
     /**
      * 取群列表

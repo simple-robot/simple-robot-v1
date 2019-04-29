@@ -1,15 +1,15 @@
 package com.forte.qqrobot.listener.invoker;
 
 
-import com.forte.forlemoc.SocketResourceDispatchCenter;
+import com.forte.qqrobot.BaseConfiguration;
 import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.beans.CQCode;
+import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.MsgSender;
-import com.forte.qqrobot.sender.senderlist.SenderList;
+import com.forte.qqrobot.sender.senderlist.*;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -45,29 +45,41 @@ public class ListenerManager {
      */
     private static final List<ListenerMethod> EMPTY_LIST = Collections.EMPTY_LIST;
 
-//    static{
-//        Map<Boolean, List<ListenerMethod>> emptyMap = new HashMap<>(2);
-//        emptyMap.put(true , EMPTY_LIST);
-//        emptyMap.put(false, EMPTY_LIST);
-//        EMPTY_MAP = emptyMap;
-//    }
+
+//    /** 消息发送器-send */
+//    private final SenderSendList SENDER;
+//
+//    /** 消息发送器-set */
+//    private final SenderSetList SETTER;
+//
+//    /** 消息发送器-get */
+//    private final SenderGetList GETTER;
+
+
+
 
     /**
      * 接收到了消息
      */
-    public void onMsg(MsgGet msgget){
+    public void onMsg(MsgGet msgget, SenderSendList sender, SenderSetList setter, SenderGetList getter){
 
+        //对外接口，表示接收到了消息, 对消息进行监听分配
         //组装参数，此参数保证全部类型全部唯一, 且参数索引2的位置为是否被at
         Object[] params = getParams(msgget);
         boolean at = (boolean) params[2];
 
-        //TODO 唯一对外接口，表示接收到了消息
+        //为消息分配监听函数
+        invoke(msgget, params, at, sender, setter, getter);
+    }
 
-
-
-
-
-
+    /**
+     * 接收到了消息
+     */
+    public void onMsg(MsgGet msgget, SenderList sender){
+        onMsg(msgget,
+                sender.isSenderList() ? (SenderSendList) sender : null,
+                sender.isSenderList() ? (SenderSetList) sender : null,
+                sender.isSenderList() ? (SenderGetList) sender : null);
     }
 
     /**
@@ -76,19 +88,13 @@ public class ListenerManager {
      * @param args      参数列表
      * @param at        是否被at
      */
-    private void invoke(MsgGet msgGet, Set<Object> args, boolean at, SenderList senders){
+    private void invoke(MsgGet msgGet, Set<Object> args, boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
         //构建MsgSender对象
 
-        //参数获取getter
-        Function<ListenerMethod, Set<Object>> paramGetter = lm -> {
-            Set<Object> params = new HashSet<>(args);
-            MsgSender msgSender = MsgSender.build(senders);
-            //将整合的送信器与原声sender都传入
-            params.add(msgSender);
-            params.add(senders);
-            return params;
-        };
+        //增加参数
 
+        //参数获取getter
+        Function<ListenerMethod, Set<Object>> paramGetter = buildParamGetter(msgGet, args, at, sendList, setList, getList);
         //获取消息类型
         MsgGetTypes type = MsgGetTypes.getByType(msgGet.getClass());
 
@@ -110,7 +116,16 @@ public class ListenerManager {
                 invokeSpare(type, paramGetter, msgGet, at);
             }
         }
+    }
 
+    /**
+     * 接收到了消息响应
+     * @param msgGet    接收的消息
+     * @param args      参数列表
+     * @param at        是否被at
+     */
+    private void invoke(MsgGet msgGet, Object[] args, boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+        invoke(msgGet, Arrays.stream(args).collect(Collectors.toSet()), at, sendList, setList, getList);
     }
 
     /**
@@ -139,19 +154,14 @@ public class ListenerManager {
 
 
     /**
-     * 接收到了消息响应
-     * @param msgGet    接收的消息
-     * @param args      参数列表
-     * @param at        是否被at
+     * 组装可以提供给监听函数的基础参数，其中需要保证：
+     * 所有参数的数据类型不相同
+     * 参数索引为2的位置上为是否被 at 的信息
+     * @param msgGet 消息接口
+     * @return 参数集合
      */
-    private void invoke(MsgGet msgGet, Object[] args, boolean at, SenderList senders){
-        invoke(msgGet, Arrays.stream(args).collect(Collectors.toSet()), at, senders);
-    }
-
-
     private Object[] getParams(MsgGet msgGet){
         String msg = msgGet.getMsg();
-
         //配置参数
         //获取cqCodeUtil
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
@@ -159,11 +169,38 @@ public class ListenerManager {
         CQCode[] cqCodes = cqCodeUtil.getCQCodeFromMsg(msg).toArray(new CQCode[0]);
         //判断是否at自己
         //获取本机QQ号
-        String localQQCode = SocketResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
+        String localQQCode = BaseConfiguration.getLocalQQCode();
         boolean at = cqCodeUtil.isAt(msg, localQQCode);
         //组装参数
         //* 组装参数不再携带QQWebSocketSender对象和QQHttpSender对象，而是交给Manager动态创建         *
         return new Object[]{msgGet, cqCodes, at, cqCodeUtil};
+    }
+
+    /**
+     * 构建参数获取getter
+     * @return
+     */
+    private Function<ListenerMethod, Set<Object>> buildParamGetter(MsgGet msgGet, Set<Object> args, boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+        //增加参数:MsgGetTypes
+        args.add(MsgGetTypes.getByType(msgGet.getClass()));
+
+        //参数获取getter
+        return lm -> {
+            Set<Object> params = new HashSet<>(args);
+            MsgSender msgSender = MsgSender.build(sendList, setList, getList, lm);
+            //将整合的送信器与原声sender都传入
+            params.add(msgSender);
+            if(sendList != null){
+                params.add(sendList);
+            }
+            if(setList != null){
+                params.add(setList);
+            }
+            if(getList != null){
+                params.add(getList);
+            }
+            return params;
+        };
     }
 
     /**
@@ -256,40 +293,43 @@ public class ListenerManager {
      * @param methods 函数集合
      */
     public ListenerManager(Collection<ListenerMethod> methods){
-        //分组后赋值
-        //第一层分组后
-        Map<MsgGetTypes[], Set<ListenerMethod>> collect = methods.stream()
-                //第一层分组
-                .collect(Collectors.groupingBy(ListenerMethod::getTypes, Collectors.toSet()));
+        //如果没有东西
+        if(methods == null || methods.isEmpty()){
+            this.LISTENER_METHOD_SET = Collections.EMPTY_MAP;
+        }else{
+            //分组后赋值
+            //第一层分组后
+            Map<MsgGetTypes[], Set<ListenerMethod>> collect = methods.stream()
+                    //第一层分组
+                    .collect(Collectors.groupingBy(ListenerMethod::getTypes, Collectors.toSet()));
 
-        //按照分类进行转化
-        HashMap<MsgGetTypes, Set<ListenerMethod>> firstMap = new HashMap<>(collect.size());
+            //按照分类进行转化
+            HashMap<MsgGetTypes, Set<ListenerMethod>> firstMap = new HashMap<>(collect.size());
 
-        //遍历
-        collect.forEach((k, v) -> {
-            //遍历类型
-            for (MsgGetTypes types : k) {
-                Set<ListenerMethod> listenerMethods = firstMap.get(types);
-                if(listenerMethods != null){
-                    //如果存在，追加
-                    listenerMethods.addAll(v);
-                }else{
-                    //如果不存在，创建并保存
-                    listenerMethods = new HashSet<>(v);
-                    firstMap.put(types, listenerMethods);
+            //遍历
+            collect.forEach((k, v) -> {
+                //遍历类型
+                for (MsgGetTypes types : k) {
+                    Set<ListenerMethod> listenerMethods = firstMap.get(types);
+                    if(listenerMethods != null){
+                        //如果存在，追加
+                        listenerMethods.addAll(v);
+                    }else{
+                        //如果不存在，创建并保存
+                        listenerMethods = new HashSet<>(v);
+                        firstMap.put(types, listenerMethods);
+                    }
                 }
-            }
-        });
+            });
 
-        //第二层，将参数按照是否为普通函数转化，转化完成后保存
-        this.LISTENER_METHOD_SET = firstMap.entrySet().stream().flatMap(e -> {
-            //准备数据
-            Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> result = new HashMap<>(firstMap.size());
-            result.put(e.getKey(), e.getValue().stream().collect(Collectors.groupingBy(lm -> !lm.isSpare())));
-            return result.entrySet().stream();
-        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-
-
+            //第二层，将参数按照是否为普通函数转化，转化完成后保存
+            this.LISTENER_METHOD_SET = firstMap.entrySet().stream().flatMap(e -> {
+                //准备数据
+                Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> result = new HashMap<>(firstMap.size());
+                result.put(e.getKey(), e.getValue().stream().collect(Collectors.groupingBy(lm -> !lm.isSpare())));
+                return result.entrySet().stream();
+            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
     }
+
 }

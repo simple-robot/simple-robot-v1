@@ -22,6 +22,14 @@ import java.util.concurrent.Executor;
  **/
 public abstract class ResourceDispatchCenter {
 
+    /**
+     * 记录一个单例对象
+     * @param bean  单例对象
+     * @param <T>   单例对象的类型
+     */
+    protected static <T> void save(T bean){
+        SingleFactory.set(bean);
+    }
 
     /**
      * 储存一个CQCodeUtil对象到单例工厂
@@ -29,7 +37,7 @@ public abstract class ResourceDispatchCenter {
      */
     static void saveCQCodeUtil(CQCodeUtil cqCodeUtil){
         //将CQCodeUtil放入单例工厂
-        SingleFactory.set(cqCodeUtil);
+        save(cqCodeUtil);
     }
 
     /**
@@ -37,15 +45,15 @@ public abstract class ResourceDispatchCenter {
      * @param defaultWholeListener 单例对象
      */
     static void saveDefaultWholeListener(DefaultWholeListener defaultWholeListener){
-        SingleFactory.set(defaultWholeListener);
+        save(defaultWholeListener);
     }
 
     /**
-     * 储存一个监听器管理器
+     * 储存一个监听函数管理器
      * @param listenerManager 单例对象
      */
     public static void saveListenerManager(ListenerManager listenerManager){
-        SingleFactory.set(listenerManager);
+        save(listenerManager);
     }
 
     /**
@@ -53,7 +61,7 @@ public abstract class ResourceDispatchCenter {
      * @param listenerFilter 单例对象
      */
     static void saveListenerFilter(ListenerFilter listenerFilter){
-        SingleFactory.set(listenerFilter);
+        save(listenerFilter);
     }
 
     /**
@@ -61,7 +69,7 @@ public abstract class ResourceDispatchCenter {
      * @param listenerMethodScanner 监听函数扫描器
      */
     static void saveListenerMethodScanner(ListenerMethodScanner listenerMethodScanner){
-        SingleFactory.set(listenerMethodScanner);
+        save(listenerMethodScanner);
     }
 
     /**
@@ -70,25 +78,35 @@ public abstract class ResourceDispatchCenter {
      * @param configuration 配置类对象
      */
     protected static <T extends BaseConfiguration> void saveConfiguration(T configuration){
-        SingleFactory.set(configuration);
+        save(configuration);
     }
 
     /**
      * 储存一个监听函数阻断器
      * @param listenerPlug 监听函数阻断器
      */
-    public static void savePlug(Plug listenerPlug){
-        SingleFactory.set(listenerPlug);
+    static void savePlug(Plug listenerPlug){
+        save(listenerPlug);
     }
 
-        /* ———————————————— 获取方法 ———————————————— */
+    //**************** get ****************//
+
+    /**
+     * 获取一个指定类型的单例对象-如果储存过的话
+     * @param beanClass 指定类型
+     * @param <T>       类型
+     * @return          单例对象
+     */
+    protected static <T> T get(Class<T> beanClass){
+        return SingleFactory.get(beanClass);
+    }
 
     /**
      * 获得一个CQCodeUtil单例对象
      * @return  CQCodeUtil单例对象
      */
     public static CQCodeUtil getCQCodeUtil(){
-        return SingleFactory.get(CQCodeUtil.class);
+        return get(CQCodeUtil.class);
     }
 
     /**
@@ -96,7 +114,7 @@ public abstract class ResourceDispatchCenter {
      * @return DefaultWholeListener单例对象
      */
     public static DefaultWholeListener getDefaultWholeListener(){
-        return SingleFactory.get(DefaultWholeListener.class);
+        return get(DefaultWholeListener.class);
     }
 
     /**
@@ -104,7 +122,7 @@ public abstract class ResourceDispatchCenter {
      * @return ListenerInvoker单例对象
      */
     public static ListenerManager getListenerManager(){
-        return SingleFactory.get(ListenerManager.class);
+        return get(ListenerManager.class);
     }
 
     /**
@@ -112,7 +130,7 @@ public abstract class ResourceDispatchCenter {
      * @return ListenerFilter单例对象
      */
     public static ListenerFilter getListenerFilter(){
-        return SingleFactory.get(ListenerFilter.class);
+        return get(ListenerFilter.class);
     }
 
 
@@ -121,7 +139,7 @@ public abstract class ResourceDispatchCenter {
      * @return ListenerMethodScanner单例对象
      */
     public static ListenerMethodScanner getListenerMethodScanner(){
-        return SingleFactory.get(ListenerMethodScanner.class);
+        return get(ListenerMethodScanner.class);
     }
 
     /**
@@ -129,7 +147,7 @@ public abstract class ResourceDispatchCenter {
      * @return ListenerPlug单例对象
      */
     public static Plug getPlug(){
-        return SingleFactory.get(ListenerPlug.class);
+        return get(ListenerPlug.class);
     }
 
     /**

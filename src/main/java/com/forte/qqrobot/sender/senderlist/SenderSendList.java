@@ -18,13 +18,6 @@ public interface SenderSendList extends SenderList {
     boolean sendDiscussMsg(String group, String msg);
 
     /**
-     * 送花
-     * @param group 群号
-     * @param QQ    QQ号
-     */
-    boolean sendFlower(String group, String QQ);
-
-    /**
      * 发送群消息
      * @param group 群号
      * @param msg   消息内容
@@ -37,6 +30,13 @@ public interface SenderSendList extends SenderList {
      * @param msg   消息内容
      */
     boolean sendPrivateMsg(String QQ, String msg);
+
+    /**
+     * 送花
+     * @param group 群号
+     * @param QQ    QQ号
+     */
+    boolean sendFlower(String group, String QQ);
 
     /**
      * 发送名片赞

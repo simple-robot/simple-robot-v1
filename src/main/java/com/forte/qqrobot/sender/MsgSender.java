@@ -340,13 +340,13 @@ public class MsgSender implements Sender{
 
     //**************** 单个 ****************//
 
-    public static MsgSender build(SenderSendList sender){
+    public static MsgSender buildOnlySender(SenderSendList sender){
         return build(sender, null, null, null);
     }
-    public static MsgSender build(SenderSetList setter){
+    public static MsgSender buildOnlySetter(SenderSetList setter){
         return build(null, setter, null, null);
     }
-    public static MsgSender build(SenderGetList getter){
+    public static MsgSender buildOnlyGetter(SenderGetList getter){
         return build(null, null, getter, null);
     }
 
@@ -372,23 +372,9 @@ public class MsgSender implements Sender{
             this.GETTER = null;
         }else{
             //构建SENDER
-            if(senderList instanceof SenderSendList){
-                this.SENDER = (SenderSendList) senderList;
-            }else{
-                this.SENDER = null;
-            }
-            //构建SETTER
-            if(senderList instanceof SenderSetList){
-                this.SETTER = (SenderSetList) senderList;
-            }else{
-                this.SETTER = null;
-            }
-            //构建GETTER
-            if(senderList instanceof SenderGetList){
-                this.GETTER = (SenderGetList) senderList;
-            }else{
-                this.GETTER = null;
-            }
+            this.SENDER = senderList.isSenderList() ? (SenderSendList)senderList : null;
+            this.SETTER = senderList.isSetterList() ? (SenderSetList) senderList : null;
+            this.GETTER = senderList.isGetterList() ? (SenderGetList) senderList : null;
         }
 
         //为listenerMethod赋值

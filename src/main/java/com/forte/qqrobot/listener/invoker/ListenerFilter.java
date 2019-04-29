@@ -1,10 +1,11 @@
 package com.forte.qqrobot.listener.invoker;
 
-import com.forte.forlemoc.SocketResourceDispatchCenter;
+import com.forte.qqrobot.BaseConfiguration;
 import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
-import com.forte.qqrobot.beans.CQCode;
+import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
+import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.lang.reflect.Method;
 
@@ -46,8 +47,8 @@ public class ListenerFilter {
                     String singleValue = value[0];
                     //如果需要被at，判断的时候移除at的CQ码
                     if(shouldAt){
-                        String qqCode = SocketResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
-                        String regex = "\\[CQ:at,qq="+ qqCode +"\\]";
+                        String qqCode = BaseConfiguration.getLocalQQCode();
+                        String regex = CQCodeUtil.build().getCQCode_at(qqCode); // "\\[CQ:at,qq="+ qqCode +"\\]"
                         return filter.keywordMatchType().test(msgGet.getMsg().replaceAll(regex, ""), singleValue);
                     }else{
                         return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
@@ -96,8 +97,8 @@ public class ListenerFilter {
                 String singleValue = value[0];
                 //如果需要被at，判断的时候移除at的CQ码
                 if(shouldAt){
-                    String qqCode = SocketResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
-                    String regex = "\\[CQ:at,qq="+ qqCode +"\\]";
+                    String qqCode = BaseConfiguration.getLocalQQCode();
+                    String regex = CQCodeUtil.build().getCQCode_at(qqCode);// "\\[CQ:at,qq="+ qqCode +"\\]";
                     return filter.keywordMatchType().test(msgGet.getMsg().replaceAll(regex, ""), singleValue);
                 }else{
                     return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
@@ -117,7 +118,7 @@ public class ListenerFilter {
 
     /**
      * 根据BlockFilter注解过滤
-     *
+     * 过时的方法
      * @param method 方法
      * @param msgGet msgGet参数
      * @param cqCode cqCode参数
@@ -189,8 +190,8 @@ public class ListenerFilter {
                 String singleValue = value[0];
                 //如果需要被at，判断的时候移除at的CQ码
                 if(shouldAt){
-                    String qqCode = SocketResourceDispatchCenter.getLinkConfiguration().getLocalQQCode();
-                    String regex = "\\[CQ:at,qq="+ qqCode +"\\]";
+                    String qqCode = BaseConfiguration.getLocalQQCode();
+                    String regex = CQCodeUtil.build().getCQCode_at(qqCode); //"\\[CQ:at,qq="+ qqCode +"\\]";
                     return filter.keywordMatchType().test(msgGet.getMsg().replaceAll(regex, ""), singleValue);
                 }else{
                     return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);

@@ -1,9 +1,7 @@
 package com.forte.qqrobot.utils;
 
-import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.beans.CQCode;
+import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.types.CQCodeTypes;
-import sun.java2d.pipe.SpanIterator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -354,5 +352,8 @@ public class CQCodeUtil {
     public static CQCodeUtil build(){
         return CQ_CODE_UTIL;
     }
+
+    /** 构造私有化 */
+    private CQCodeUtil(){}
 
 }

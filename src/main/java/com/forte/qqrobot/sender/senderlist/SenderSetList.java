@@ -10,12 +10,6 @@ import com.forte.qqrobot.beans.messages.types.GroupAddRequestType;
 public interface SenderSetList extends SenderList {
 
     /**
-     * 退出讨论组
-     * @param group 讨论组号
-     */
-    boolean setDiscussLeave(String group);
-
-    /**
      * 好友请求申请
      * @param flag  一般会有个标识
      * @param friendName    如果通过，则此参数为好友备注
@@ -80,6 +74,12 @@ public interface SenderSetList extends SenderList {
     boolean setGroupFileDelete(String group, String flag);
 
     /**
+     * 退出讨论组
+     * @param group 讨论组号
+     */
+    boolean setDiscussLeave(String group);
+
+    /**
      * 退出群
      * @param group 群号
      */
@@ -91,7 +91,7 @@ public interface SenderSetList extends SenderList {
      * @param QQ    QQ号
      * @param dontBack  是否拒绝再次申请
      */
-    boolean setGroupMemberKcik(String group, String QQ, boolean dontBack);
+    boolean setGroupMemberKick(String group, String QQ, boolean dontBack);
 
     /**
      * 群签到
@@ -116,7 +116,7 @@ public interface SenderSetList extends SenderList {
     boolean setGroupWholeBan(String group, boolean in);
 
     /**
-     * 似乎只需要一个消息ID即可
+     * 消息撤回 似乎只需要一个消息ID即可
      * 需要pro
      * @param flag  消息标识
      */

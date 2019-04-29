@@ -1,8 +1,6 @@
 package com.forte.qqrobot.sender;
 
-import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
-import com.forte.qqrobot.listener.invoker.plug.Plug;
 
 /**
  * 为送信器提供检测监听函数是否存在的方法

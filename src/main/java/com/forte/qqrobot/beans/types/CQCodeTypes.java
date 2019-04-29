@@ -53,6 +53,7 @@ public enum CQCodeTypes {
             new String[0],
             new String[]{"[\\w\\.]+"}),
 
+
     /**
      * [CQ:record,file={1},magic={2}] - 发送语音
      * {1}为音频文件名称，音频存放在酷Q目录的data\record\下
@@ -177,7 +178,7 @@ public enum CQCodeTypes {
      * @return CQCodeTypes实例对象
      */
     public static CQCodeTypes getTypeByFunction(String function){
-        for (CQCodeTypes type : getAllTypes()) {
+        for (CQCodeTypes type : values()) {
             if(type.function.equals(function)){
                 return type;
             }
@@ -289,12 +290,12 @@ public enum CQCodeTypes {
 
     }
 
-    /**
-     * 获取本类全部常量对象
-     */
-    private static CQCodeTypes[] getAllTypes(){
-        return values();
-    }
+//    /**
+////     * 获取本类全部常量对象
+////     */
+//    private static CQCodeTypes[] getAllTypes(){
+//        return values();
+//    }
 
 
 }

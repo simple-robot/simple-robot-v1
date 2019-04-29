@@ -1,6 +1,7 @@
 package com.forte.qqrobot.beans.messages.msgget;
 
 import com.forte.qqrobot.beans.messages.RootBean;
+import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 
 /**
  * 消息接收类型接口，定义一个获取接收到的消息的方法
