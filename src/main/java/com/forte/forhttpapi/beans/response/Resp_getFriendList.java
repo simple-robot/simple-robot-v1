@@ -1,5 +1,7 @@
 package com.forte.forhttpapi.beans.response;
 
+import com.forte.qqrobot.beans.messages.result.FriendList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,12 +11,11 @@ import java.util.Map;
  * @create 2019-03-22 16:44
  **/
 
-public class Resp_getFriendList implements RespBean<Resp_getFriendList.FriendList[]> {
+public class Resp_getFriendList implements FriendList {
     private Integer status;
     private FriendList[] result;
     private String errMsg;
 
-    @Override
     public String getErrMsg() {
         return errMsg;
     }
@@ -23,7 +24,6 @@ public class Resp_getFriendList implements RespBean<Resp_getFriendList.FriendLis
         this.errMsg = errMsg;
     }
 
-    @Override
     public Integer getStatus() {
         return status;
     }
@@ -36,8 +36,17 @@ public class Resp_getFriendList implements RespBean<Resp_getFriendList.FriendLis
         this.result = result;
     }
 
-    @Override
     public FriendList[] getResult() {
+        return result;
+    }
+
+    @Override
+    public Map<String, Friend[]> getFriendList() {
+        return null;
+    }
+
+    @Override
+    public FriendList[] getFirendList(String group) {
         return result;
     }
 
@@ -73,25 +82,30 @@ public class Resp_getFriendList implements RespBean<Resp_getFriendList.FriendLis
          result[i].mems[n].name	string	该用户的备注
          result[i].mems[n].uin	number	该用户的QQ号
                   */
-    public static class FriendList {
-        private String gname;
-        //TODO 这里是一个分组下的所有好友
-        private List<Map<String, String>> mems = new ArrayList<>();
+    public static class FriendList implements Friend {
+        private String name;
+        private String uin;
 
-        public String getGname() {
-            return gname;
+        public void setName(String name) {
+            this.name = name;
         }
 
-        public void setGname(String gname) {
-            this.gname = gname;
+        public String getUin() {
+            return uin;
         }
 
-        public List<Map<String, String>> getMems() {
-            return mems;
+        public void setUin(String uin) {
+            this.uin = uin;
         }
 
-        public void setMems(List<Map<String, String>> mems) {
-            this.mems = mems;
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getQQ() {
+            return uin;
         }
     }
 

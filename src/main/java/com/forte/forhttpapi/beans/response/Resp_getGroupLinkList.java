@@ -1,16 +1,17 @@
 package com.forte.forhttpapi.beans.response;
 
+import com.forte.qqrobot.beans.messages.result.GroupLinkList;
+
 /**
  * @author Ricardo
  * @create 2019-03-22 16:44
  **/
 
-public class Resp_getGroupLinkList implements RespBean<Resp_getGroupLinkList.GroupLinkList[]> {
+public class Resp_getGroupLinkList implements GroupLinkList {
     private Integer status;
-    private GroupLinkList[] result;
+    private GroupLinkListName[] result;
     private String errMsg;
 
-    @Override
     public String getErrMsg() {
         return errMsg;
     }
@@ -19,7 +20,6 @@ public class Resp_getGroupLinkList implements RespBean<Resp_getGroupLinkList.Gro
         this.errMsg = errMsg;
     }
 
-    @Override
     public Integer getStatus() {
         return status;
     }
@@ -28,12 +28,16 @@ public class Resp_getGroupLinkList implements RespBean<Resp_getGroupLinkList.Gro
         this.status = status;
     }
 
-    public void setResult(GroupLinkList[] result) {
+    public void setResult(GroupLinkListName[] result) {
         this.result = result;
     }
 
+    public GroupLinkListName[] getResult() {
+        return result;
+    }
+
     @Override
-    public GroupLinkList[] getResult() {
+    public GroupLinkListName[] getList() {
         return result;
     }
 
@@ -60,11 +64,11 @@ public class Resp_getGroupLinkList implements RespBean<Resp_getGroupLinkList.Gro
             result[i].uin	number	发布该链接的QQ
 
      */
-    public static class GroupLinkList {
+    public static class GroupLinkListName implements GroupLink {
         private String raw_url;
         private String seq;
         private String thumbnail;
-        private String time;
+        private Long time;
         private String title;
         private String uin;
 
@@ -92,16 +96,33 @@ public class Resp_getGroupLinkList implements RespBean<Resp_getGroupLinkList.Gro
             this.thumbnail = thumbnail;
         }
 
-        public String getTime() {
+        @Override
+        public String getUrl() {
+            return raw_url;
+        }
+
+        @Override
+        public String getPicUrl() {
+            return thumbnail;
+        }
+
+        @Override
+        public Long getTime() {
             return time;
         }
 
-        public void setTime(String time) {
+        public void setTime(Long time) {
             this.time = time;
         }
 
+        @Override
         public String getTitle() {
             return title;
+        }
+
+        @Override
+        public String getQQ() {
+            return null;
         }
 
         public void setTitle(String title) {
