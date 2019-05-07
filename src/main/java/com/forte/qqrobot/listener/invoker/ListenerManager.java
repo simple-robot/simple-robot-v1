@@ -30,20 +30,20 @@ public class ListenerManager {
      * 第一层，按照接收的消息类型分类
      * 第二层，按照是否为普通函数分类
      */
-    private final Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> LISTENER_METHOD_SET;
+    private final Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> LISTENER_METHOD_MAP;
+
+    /**
+     * 空的list，用于应对空指针异常
+     */
+    private static final List<ListenerMethod> EMPTY_LIST = Collections.emptyList();
 
     /**
      * 空的map, 用于应对从监听函数获取的时候出现空的情况
      */
     private static final Map<Boolean, List<ListenerMethod>> EMPTY_MAP = new HashMap<Boolean, List<ListenerMethod>>(){{
-        put(true , EMPTY_LIST);
-        put(false, EMPTY_LIST);
+        put(true , Collections.emptyList());
+        put(false, Collections.emptyList());
     }};
-
-    /**
-     * 空的list，用于应对空指针异常
-     */
-    private static final List<ListenerMethod> EMPTY_LIST = Collections.EMPTY_LIST;
 
 
 //    /** 消息发送器-send */
@@ -272,7 +272,7 @@ public class ListenerManager {
      * @return 监听函数列表
      */
     private List<ListenerMethod> getNormalMethods(MsgGetTypes msgGetTypes){
-        return LISTENER_METHOD_SET.getOrDefault(msgGetTypes, EMPTY_MAP).getOrDefault(true, EMPTY_LIST);
+        return LISTENER_METHOD_MAP.getOrDefault(msgGetTypes, EMPTY_MAP).getOrDefault(true, EMPTY_LIST);
     }
 
 
@@ -282,7 +282,7 @@ public class ListenerManager {
      * @return 监听函数列表
      */
     private List<ListenerMethod> getSpareMethods(MsgGetTypes msgGetTypes){
-        return LISTENER_METHOD_SET.getOrDefault(msgGetTypes, EMPTY_MAP).getOrDefault(false, EMPTY_LIST);
+        return LISTENER_METHOD_MAP.getOrDefault(msgGetTypes, EMPTY_MAP).getOrDefault(false, EMPTY_LIST);
     }
 
 
@@ -295,7 +295,7 @@ public class ListenerManager {
     public ListenerManager(Collection<ListenerMethod> methods){
         //如果没有东西
         if(methods == null || methods.isEmpty()){
-            this.LISTENER_METHOD_SET = Collections.EMPTY_MAP;
+            this.LISTENER_METHOD_MAP = Collections.EMPTY_MAP;
         }else{
             //分组后赋值
             //第一层分组后
@@ -323,7 +323,7 @@ public class ListenerManager {
             });
 
             //第二层，将参数按照是否为普通函数转化，转化完成后保存
-            this.LISTENER_METHOD_SET = firstMap.entrySet().stream().flatMap(e -> {
+            this.LISTENER_METHOD_MAP = firstMap.entrySet().stream().flatMap(e -> {
                 //准备数据
                 Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> result = new HashMap<>(firstMap.size());
                 result.put(e.getKey(), e.getValue().stream().collect(Collectors.groupingBy(lm -> !lm.isSpare())));

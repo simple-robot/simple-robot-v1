@@ -280,6 +280,16 @@ public class CQCodeUtil {
         return RegexUtil.getMatcher(msg, CQCODE_EXTRACT_REGEX);
     }
 
+    /**
+     * 从信息字符串中提取出指定类型的CQCode码的字符串
+     * @param msg   消息字符串
+     * @param types CQ码类型
+     * @return
+     */
+    public List<String>  getCQCodeStrFromMsgByType(String msg, CQCodeTypes types){
+        return RegexUtil.getMatcher(msg, types.getMatchRegex());
+    }
+
 
     /**
      * 从信息字符串中移除CQCode字符串
@@ -343,6 +353,7 @@ public class CQCodeUtil {
     public boolean isContains(CQCodeTypes types, String text){
         return types.contains(text);
     }
+
 
     /**
      * 公共静态方法，创建一个实例对象
