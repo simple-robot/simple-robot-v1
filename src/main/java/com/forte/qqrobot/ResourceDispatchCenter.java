@@ -6,9 +6,11 @@ import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
+import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.SingleFactory;
+import org.quartz.impl.StdSchedulerFactory;
 
 import java.util.concurrent.Executor;
 
@@ -22,13 +24,16 @@ import java.util.concurrent.Executor;
  **/
 public abstract class ResourceDispatchCenter {
 
+    /** 资源调度中心使用的单例工厂 */
+    private static final SingleFactory resourceSingleFactory = SingleFactory.build(ResourceDispatchCenter.class);
+
     /**
      * 记录一个单例对象
      * @param bean  单例对象
      * @param <T>   单例对象的类型
      */
     protected static <T> void save(T bean){
-        SingleFactory.set(bean);
+        resourceSingleFactory.set(bean);
     }
 
     /**
@@ -89,6 +94,22 @@ public abstract class ResourceDispatchCenter {
         save(listenerPlug);
     }
 
+    /**
+     * 储存一个定时任务管理器
+     * @param timeTaskManager 定时任务管理器
+     */
+    static void saveTimeTaskManager(TimeTaskManager timeTaskManager){
+        save(timeTaskManager);
+    }
+
+    /**
+     * 保存一个StdSchedulerFactory定时任务工厂
+     * @param stdSchedulerFactory 定时任务工厂
+     */
+    static void saveStdSchedulerFactory(StdSchedulerFactory stdSchedulerFactory){
+        save(stdSchedulerFactory);
+    }
+
     //**************** get ****************//
 
     /**
@@ -98,7 +119,7 @@ public abstract class ResourceDispatchCenter {
      * @return          单例对象
      */
     protected static <T> T get(Class<T> beanClass){
-        return SingleFactory.get(beanClass);
+        return resourceSingleFactory.get(beanClass);
     }
 
     /**
@@ -151,6 +172,26 @@ public abstract class ResourceDispatchCenter {
     }
 
     /**
+     * 获取一个TimeTaskManager单例对象
+     * @return TimeTaskManager单例对象
+     */
+    public static TimeTaskManager getTimeTaskManager(){
+        return get(TimeTaskManager.class);
+    }
+
+    /**
+     * 获取一个StdSchedulerFactory单例对象
+     * @return  StdSchedulerFactory单例对象
+     */
+    public static StdSchedulerFactory getStdSchedulerFactory(){
+        return get(StdSchedulerFactory.class);
+    }
+
+
+    //**************** 线程池相关 ****************//
+
+
+    /**
      * 获取线程池的名称
      */
     private final static String THREAD_POOL_NAME = "QQ_ROBOT_ONMESSAGE_THREAD_POOL";
@@ -171,7 +212,14 @@ public abstract class ResourceDispatchCenter {
         return BaseLocalThreadPool.getThreadPool(threadPoolName);
     }
 
+    //**************** 其他API ****************//
 
+    /**
+     * 重置资源-即清空所有资源
+     */
+    public static void reset(){
+        resourceSingleFactory.clear();
+    }
 
 
 }

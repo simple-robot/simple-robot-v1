@@ -6,10 +6,6 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
-import com.forte.qqrobot.sender.senderlist.SenderGetList;
-import com.forte.qqrobot.sender.senderlist.SenderList;
-import com.forte.qqrobot.sender.senderlist.SenderSendList;
-import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.MethodUtil;
 
@@ -27,7 +23,7 @@ import java.util.stream.Collectors;
 public class ListenerMethodScanner {
 
     /**
-     * SocketListener接口的
+     * SocketListener接口的唯一方法名
      */
     private static final String SOCKET_LISTENER_METHOD_NAME = "onMessage";
 
@@ -38,7 +34,6 @@ public class ListenerMethodScanner {
 
     /**
      * 传入一个可能是监听器对象的Class对象
-     * @return
      */
     public Set<ListenerMethod> scanner(Class<?> clazz, Object bean) throws Exception {
         Set<ListenerMethod> result = new HashSet<>();
@@ -78,7 +73,8 @@ public class ListenerMethodScanner {
         Method[] methods = MethodUtil.getPublicMethods(clazz, m -> m.getName().equals(SOCKET_LISTENER_METHOD_NAME) && FieldUtils.isChild(m.getParameterTypes()[0], MsgGet.class));
 
         //遍历，根据第一个参数判断函数的监听类型并封装
-        Set<ListenerMethod> socketListenerCollection = Arrays.stream(methods)
+        //添加所有
+        return Arrays.stream(methods)
                 .map(m -> {
                     Class<MsgGet> msgGetClass = (Class<MsgGet>) m.getParameterTypes()[0];
                     //监听器实现来的函数仅会有一个监听类型
@@ -105,9 +101,6 @@ public class ListenerMethodScanner {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-
-        //添加所有
-        return socketListenerCollection;
     }
 
 
@@ -258,7 +251,7 @@ public class ListenerMethodScanner {
             //尝试实例化,先查询是存在@Constr注解的静态方法，返回值应与Clazz相同
             Method[] constrs = MethodUtil.getMethods(clazz, m -> MethodUtil.isStatic(m) && (m.getReturnType().equals(clazz)) && (m.getAnnotation(Constr.class) != null));
 
-            //如果存在，遍历执行，直到执行成功
+            //如果存在，遍历执行，直到执行成功，否则抛出异常
             if(constrs.length > 0){
                 for (int i = 0; i < constrs.length; i++) {
                     try{

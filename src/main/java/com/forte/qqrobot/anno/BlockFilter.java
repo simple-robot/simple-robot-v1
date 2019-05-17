@@ -32,4 +32,10 @@ public @interface BlockFilter {
      * ※ 请注意！如果为私聊的话将会永远接收不到消息 */
     boolean at() default false;
 
+    /** 对qq号进行过滤
+     *  不同的监听类型会有不同的效果。例如群消息则会过滤群号、私聊会过滤qq号
+     *  如果是不存在code的消息类型，则此参数将会失效。
+     * */
+    String[] code() default {};
+
 }

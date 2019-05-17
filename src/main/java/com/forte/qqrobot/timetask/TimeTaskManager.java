@@ -1,0 +1,173 @@
+package com.forte.qqrobot.timetask;
+
+import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.anno.timetask.CronTask;
+import com.forte.qqrobot.anno.timetask.FixedRateTask;
+import com.forte.qqrobot.anno.timetask.TypeTask;
+import com.forte.qqrobot.beans.types.TimeTaskTemplate;
+import com.forte.qqrobot.beans.types.TimeType;
+import com.forte.qqrobot.exception.TimeTaskException;
+import com.forte.qqrobot.log.QQLog;
+import com.forte.qqrobot.utils.FieldUtils;
+import org.quartz.*;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * 定时任务控制中心
+ * 当一个类存在多个定时任务的注解的时候，将会按照类型全部加载
+ * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
+ * @since JDK1.8
+ **/
+public class TimeTaskManager {
+
+    /** 与定时任务有关的注解列表 */
+    private static final Class<Annotation>[] timeTaskAnnos = new Class[]{
+            CronTask.class, FixedRateTask.class, TypeTask.class
+    };
+
+    /**触发器名称前缀 */
+    private static final String TRIGGER_NAME  = "trigger_";
+
+    private static final String JOBDETAIL_NAME = "job_";
+
+    /** 尝试加载一个疑似是定时任务的类 */
+    public void register(Class<? extends Job> timeTaskClass){
+        List<Annotation> timeTaskAnnos = isTimeTask(timeTaskClass);
+        if(timeTaskAnnos.size() > 0){
+            //遍历
+            timeTaskAnnos.forEach(a -> register(timeTaskClass, a));
+        }
+    }
+
+    /**
+     * 判断一个Class对象是否为需要加载的定时任务
+     */
+    private static List<Annotation> isTimeTask(Class<?> clazz){
+        //存在的定时任务注解
+        List<Annotation> annoList = new ArrayList<>();
+        //首先判断是否存在注解
+        for(Class<Annotation> tc : timeTaskAnnos){
+            Annotation an = clazz.getAnnotation(tc);
+            if(an != null){
+                annoList.add(an);
+            }
+        }
+
+        //如果定时任务类存在注解但不是Job类型的接口，抛出异常
+        if(annoList.size() > 0 && FieldUtils.isChild(clazz, Job.class)){
+            throw new TimeTaskException("您的定时任务类没有继承["+ Job.class +"]接口！");
+        }
+
+        return annoList;
+    }
+
+
+    /**
+     * 注册至定时任务调度器
+     */
+    private static void register(Class<? extends Job> clazz, Annotation annotation){
+        //判断注解类型
+        Scheduler scheduler;
+        try {
+            scheduler = ResourceDispatchCenter.getStdSchedulerFactory().getScheduler();
+        } catch (SchedulerException e) {
+            throw new TimeTaskException("定时任务调度器实例获取失败！", e);
+        }
+
+        //创建一个jobDetail的实例，将该实例与HelloJob Class绑定
+        JobDetail jobDetail = null;
+        Trigger trigger = null;
+        String name = null;
+
+
+        if(annotation instanceof CronTask){
+            //如果是cron定时任务
+            CronTask cronTask = (CronTask)annotation;
+            name = cronTask.id();
+            name = name.trim().length() <= 0 ? clazz.getSimpleName() : name;
+            //创建定时任务触发器与Job实例
+            jobDetail = getJobDetail(clazz, name);
+            //创建定时触发器
+            trigger = getTrigger(cronTask, name);
+        }else if(annotation instanceof FixedRateTask){
+            //如果是时间周期定时任务
+            FixedRateTask fixedRateTask = (FixedRateTask)annotation;
+            name = fixedRateTask.id();
+            name = name.trim().length() <= 0 ? clazz.getSimpleName() : name;
+            //创建定时任务触发器与Job实例
+            jobDetail = getJobDetail(clazz, name);
+            //创建定时触发器
+            trigger = getTrigger(fixedRateTask, name);
+
+        }else if(annotation instanceof TypeTask){
+            //如果是模板定时任务
+            TypeTask typeTask = (TypeTask)annotation;
+            name = typeTask.id();
+            name = name.trim().length() <= 0 ? clazz.getSimpleName() : name;
+            //创建定时任务触发器与Job实例
+            jobDetail = getJobDetail(clazz, name);
+            //创建定时触发器
+            trigger = getTrigger(typeTask, name);
+        }
+
+        if(jobDetail != null && trigger != null){
+            //注册定时任务
+            try {
+                scheduler.scheduleJob(jobDetail, trigger);
+                QQLog.debug("加载定时任务[ "+ name +" ]成功！");
+            } catch (SchedulerException e) {
+                throw new TimeTaskException("定时任务["+ name +"]注册失败！", e);
+            }
+        }else{
+            String why = jobDetail == null ? (JobDetail.class + "实例创建失败！") : (Trigger.class + "实例创建失败！");
+            throw new TimeTaskException("定时任务["+ name +"]注册失败: " + why);
+        }
+
+    }
+
+    //**************** - ****************//
+
+
+    /** 获取定时任务实例 */
+    private static JobDetail getJobDetail(Class<? extends Job> clazz, String name){
+        return JobBuilder.newJob(clazz).withIdentity(getJobName(name)).build();
+    }
+
+    /** 获取触发器 */
+    private static Trigger getTrigger(CronTask cronTask, String name){
+        String cron = cronTask.value();
+        String identity = getTriggerName(name);
+        return TriggerBuilder.newTrigger().withIdentity(identity).withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
+    }
+    /** 获取触发器 */
+    private static Trigger getTrigger(FixedRateTask fixedRateTask, String name){
+        long time = fixedRateTask.value();
+        TimeType timeType = fixedRateTask.timeType();
+        int repeatCount = fixedRateTask.RepeatCount();
+        repeatCount = repeatCount < -1 ? -1 : repeatCount;
+        String identity = getTriggerName(name);
+
+        //获取Builder
+        SimpleScheduleBuilder simpleScheduleBuilder = timeType.getSimpleScheduleBuilder(time).withRepeatCount(repeatCount);
+        //返回结果
+        return TriggerBuilder.newTrigger().withIdentity(identity).withSchedule(simpleScheduleBuilder).build();
+    }
+    /** 获取触发器 */
+    private static Trigger getTrigger(TypeTask typeTask, String name){
+        TimeTaskTemplate value = typeTask.value();
+        return value.getTrigger(getTriggerName(name));
+    }
+
+    private static String getTriggerName(String name){
+        return TRIGGER_NAME + name;
+    }
+
+    private static String getJobName(String name){
+        return JOBDETAIL_NAME + name;
+    }
+
+}

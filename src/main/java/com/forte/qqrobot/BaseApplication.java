@@ -6,13 +6,19 @@ import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
+import com.forte.qqrobot.scanner.ScannerManager;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
+import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
+import org.quartz.impl.StdSchedulerFactory;
 
+import java.io.Closeable;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,7 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date Created in 2019/3/29 10:18
  * @since JDK1.8
  **/
-public abstract class BaseApplication<CONFIG extends BaseConfiguration> {
+public abstract class BaseApplication<CONFIG extends BaseConfiguration> implements Closeable {
 
     /**
      * 线程工厂初始化
@@ -56,6 +62,16 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> {
 
         //将ListenerFilter放入资源调度中心
         ResourceDispatchCenter.saveListenerFilter(new ListenerFilter());
+    }
+
+    /**
+     * 定时任务初始化
+     */
+    private void timeTaskInit(){
+        //将定时任务类添加到资源调度中心
+        ResourceDispatchCenter.saveTimeTaskManager(new TimeTaskManager());
+        //将定时任务工厂添加到资源调度中心
+        ResourceDispatchCenter.saveStdSchedulerFactory(new StdSchedulerFactory());
     }
 
     /**
@@ -111,6 +127,16 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> {
         resourceInit();
         //线程工厂初始化
         threadPoolInit();
+        //定时任务初始化
+        timeTaskInit();
+    }
+
+    /**
+     * 进行扫描
+     */
+    private void scanner(Set<String> packages, CONFIG config){
+        //使用扫描管理器进行扫描
+        ScannerManager.scanner(packages, config);
     }
 
     /**
@@ -118,9 +144,17 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> {
      */
     private void afterConfig(CONFIG config, Application<CONFIG> app){
         //配置完成后，如果没有进行扫描，则默认扫描启动类同级包且排除此启动类
-        String packageName = app.getClass().getPackage().getName();
-        //如果没有扫描过，扫描本包全部
-        config.scannerIfNotScanned(packageName, c -> !c.equals(app.getClass()));
+        //需要扫描的包路径，如果是null则扫描启动器的根路径，否则按照要求进行扫描
+        Set<String> scannerPackage = config.getScannerPackage();
+        if(scannerPackage == null){
+            scannerPackage = new HashSet<String>(){{
+                add(app.getClass().getPackage().getName());
+            }};
+        }
+
+        //进行扫描
+        scanner(scannerPackage, config);
+
 
 
         //构建监听函数管理器等扫描器所构建的

@@ -10,6 +10,7 @@ import com.forte.qqrobot.utils.FieldUtils;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * 配置类的根类，定义包扫描方法
@@ -18,9 +19,6 @@ import java.util.function.Predicate;
  * @since JDK1.8
  **/
 public abstract class BaseConfiguration {
-
-    /** 是否扫描了普通监听器 */
-    private boolean scannedListener = false;
 
     /** 是否扫描了初始化监听器 */
     private boolean scannedInitListener = false;
@@ -37,18 +35,25 @@ public abstract class BaseConfiguration {
     /** 本机QQ的昵称, 一般唯一，使用静态 */
     private static String localQQNick = "";
 
-    /** 使用的编码格式，默认为UTF-8 */
-    private String encode = "UTF-8";
+    /** 使用的编码格式，默认为UTF-8，静态，全局唯一 */
+    private static String encode = "UTF-8";
 
     /** 酷Q根路径的配置，默认为null, 路径一般不会有多个，使用静态即可 */
     private static String cqPath;
+
+    /** 需要进行的包扫描路径，默认为null */
+    private Set<String> scannerPackage = new HashSet<>();
+
+    /** 自定义监听函数实例化规则，假如同时使用了spring之类的框架，需要对此进行配置 */
+    private static Supplier<?> listenerCreater;
+
 
     /**
      * 注册监听器
      * @param listeners 监听器列表
      */
+    @Deprecated
     public void registerListeners(Object... listeners){
-        isScannedListener();
         //获取扫描器
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
         //遍历
@@ -72,8 +77,8 @@ public abstract class BaseConfiguration {
      * 注册监听器
      * @param listeners 监听器列表
      */
+    @Deprecated
     public void registerListeners(Class<?>... listeners){
-        isScannedListener();
         //获取扫描器
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
 
@@ -82,7 +87,6 @@ public abstract class BaseConfiguration {
             try {
                 //扫描
                 Set<ListenerMethod> scanSet = scanner.scanner(listener);
-
                 QQLog.info("加载["+ listener +"]的监听函数成功：");
                 scanSet.forEach(lm -> QQLog.info(">>>" + lm.getMethodToString()));
             } catch (Exception e) {
@@ -112,32 +116,17 @@ public abstract class BaseConfiguration {
      * 包扫描普通监听器
      * @param packageName   包名
      */
+    @Deprecated
     public void scannerListener(String packageName){
-        isScannedListener();
-        Set<Class<?>> list = new FileScanner().find(packageName).get();
-        registerListeners(list.toArray(new Class<?>[0]));
+        sacnner(packageName);
     }
 
     /**
-     * 如果没有扫描过普通包，则扫描
+     * 包扫描，现在的扫描已经不再仅限于监听器了
      */
-    public void scannerIfNotScanned(String packageName){
-        if(this.scannedListener){
-            return;
-        }
-        Set<Class<?>> list = new FileScanner().find(packageName).get();
-        registerListeners(list.toArray(new Class<?>[0]));
-    }
-
-    /**
-     * 如果没有扫描过普通包，则扫描
-     */
-    public void scannerIfNotScanned(String packageName, Predicate<Class<?>> classFilter){
-        if(this.scannedListener){
-            return;
-        }
-        Set<Class<?>> list = new FileScanner().find(packageName, classFilter).get();
-        registerListeners(list.toArray(new Class<?>[0]));
+    public void sacnner(String packageName){
+        //添加包路径
+        scannerPackage.add(packageName);
     }
 
     /**
@@ -162,9 +151,18 @@ public abstract class BaseConfiguration {
 
 
     //**************** getter & setter ****************//
+    /**
+     * 配置需要进行扫描的路径
+     */
+    public void setScannerPackage(String... packages){
+        if(packages != null){
+            this.scannerPackage.addAll(Arrays.asList(packages));
+        }
+    }
 
-    private void isScannedListener(){
-        this.scannedListener = true;
+    /** 获取需要进行扫描的包路径集合 */
+    public Set<String> getScannerPackage(){
+        return this.scannerPackage;
     }
 
     private void isScannedInitListener(){
@@ -191,7 +189,7 @@ public abstract class BaseConfiguration {
         return loginQQInfo;
     }
 
-    public String getEncode() {
+    public static String getEncode() {
         return encode;
     }
 

@@ -27,7 +27,7 @@ public class ListenerMethod {
     /** 为监听函数创建一个UUID */
     private final String UUID;
 
-    /** 监听器对象实例，用于执行方法 */
+    /** 监听器对象实例获取函数，用于执行方法 */
     private final Object listener;
 
     /** 过滤器注解，如果没有则为null */
@@ -98,7 +98,8 @@ public class ListenerMethod {
         Class<?>[] parameterTypes = method.getParameterTypes();
         Object[] args = new Object[parameterTypes.length];
 
-        //遍历参数类型数组
+        //遍历参数类型数组, 进行参数注入
+        //TODO 将参数注入单独提出
         for (int i = 0; i < parameterTypes.length; i++) {
             //当前类型
             Class<?> type = parameterTypes[i];

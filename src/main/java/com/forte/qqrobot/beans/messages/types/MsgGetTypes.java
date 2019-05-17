@@ -4,7 +4,6 @@ package com.forte.qqrobot.beans.messages.types;
 import com.alibaba.fastjson.JSON;
 import com.forte.qqrobot.beans.messages.msgget.*;
 import com.forte.qqrobot.utils.FieldUtils;
-import org.apache.ibatis.logging.stdout.StdOutImpl;
 
 /**
  * 枚举类型，定义全部的消息接收类型

@@ -81,7 +81,7 @@ public class FileScanner {
             // 引用jar包的代码
             return findClassJar(packageName, classFilter);
         }
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     /**

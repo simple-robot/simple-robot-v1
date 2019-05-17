@@ -1,5 +1,6 @@
 package com.forte.qqrobot.log;
 
+import java.io.PrintStream;
 import java.time.LocalDateTime;
 
 /**
@@ -9,6 +10,10 @@ import java.time.LocalDateTime;
  * @since JDK1.8
  **/
 public class QQLog {
+
+//    public static final PrintStream INFO;
+//    public static final PrintStream DEBUG;
+//    public static final PrintStream ERROR;
 
     private static final String INFO_HEAD = "INFO";
 

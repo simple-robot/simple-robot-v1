@@ -2,29 +2,82 @@ package com.forte.qqrobot.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 /**
  * 基于CAS原理的单例工厂<br>
- * 单例原理为基于CAS的乐观锁懒汉式单例<br>
- * 方法内全部为final类型的静态方法，所以本类为抽象类且没有继承的必要<br>
+ * 单例原理为基于CAS的乐观锁懒汉式单例   <br>
+ * 使用工厂方法创建一个不会重名的实例对象 <br>
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date 2018/12/19 15:59
  * @version 2.0
  * @since JDK1.8
  **/
-public abstract class SingleFactory {
+public class SingleFactory {
+
+    /** 单例工厂的ID，如果不指定则会使用一个随机的UUID */
+    private final String ID;
+
+    /** 线程同步set，如果出现了相同ID的单例工厂将会报错 */
+    private static final Set<String> ID_SET = new ConcurrentSkipListSet<>();
+
+    /** 构造 */
+    private SingleFactory(String id){
+        if(ID_SET.add(id)){
+            this.ID = id;
+        }else{
+            throw new SecurityException("不可以重复创建已经存在的ID实例。");
+        }
+    }
+
+    /** 构造 */
+    private SingleFactory(Number id){
+       this(String.valueOf(id));
+    }
+
+    /** 工厂 */
+    public static SingleFactory build(Object obj){
+        if(obj.getClass().equals(String.class)){
+            //字符串
+            return new SingleFactory((String)obj);
+        }else if(obj instanceof Number){
+            //是数字类的
+            return new SingleFactory(String.valueOf(obj));
+        }else if(obj.getClass().equals(char.class) || obj.getClass().equals(Character.class)){
+            //是数字类的
+            return new SingleFactory(Integer.valueOf((Character)obj));
+        }else{
+            return new SingleFactory(obj.getClass().toString());
+        }
+    }
+
+    /** 工厂 */
+    public static SingleFactory build(){
+        return new SingleFactory(UUID.randomUUID().toString().replaceAll("-", ""));
+    }
+
+
+    /**
+     * 清空所有保存的数据
+     */
+    public void clear(){
+        SINGLE_MAP.clear();
+    }
+
+    //**************** 以下为单例工厂内容 ****************//
+
 
     /**
      * 单例仓库-线程安全Map
      */
-    private static final Map<Class , SingleBean> SINGLE_MAP = Collections.synchronizedMap(new HashMap<>());
+    private final Map<Class , SingleBean> SINGLE_MAP = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * 获取单例，如果没有此类的记录则返回空
      */
-    public static final <T> T get(Class<? extends T> clz){
+    public final <T> T get(Class<? extends T> clz){
         return Optional.ofNullable(SINGLE_MAP.get(clz)).map(s -> (T)s.get()).orElse(null);
     }
 
@@ -34,11 +87,11 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T getOrNew(Class<T> clz){
+    public final <T> T getOrNew(Class<T> clz){
         return getOrNew(clz, (Object[]) null);
     }
 
-    public static final <T> T getOrNew(Class<? extends T> clz , Object... params){
+    public final <T> T getOrNew(Class<? extends T> clz , Object... params){
         return Optional.ofNullable(SINGLE_MAP.get(clz)).map(s -> (T)s.get()).orElseGet(() -> {
             //如果没有，记录
             return set(clz, () -> {
@@ -69,7 +122,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T getOrSet(Class<? extends T> clz, T t){
+    public final <T> T getOrSet(Class<? extends T> clz, T t){
         return Optional.ofNullable((T)get(clz)).orElseGet(() -> setAndGet(clz, t));
     }
 
@@ -79,7 +132,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T getOrSet(T t){
+    public final <T> T getOrSet(T t){
         return Optional.ofNullable((T)get(t.getClass())).orElseGet(() -> setAndGet(t));
     }
 
@@ -91,7 +144,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T getOrSet(Class<? extends T> clz, Supplier<? extends T> supplier){
+    public final <T> T getOrSet(Class<? extends T> clz, Supplier<? extends T> supplier){
         return Optional.ofNullable((T)get(clz)).orElseGet(() -> setAndGet(clz, supplier));
     }
 
@@ -101,7 +154,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T getOrSet(Supplier<? extends T> supplier){
+    public final <T> T getOrSet(Supplier<? extends T> supplier){
         return Optional.ofNullable((T)get(supplier.get().getClass())).orElseGet(() -> setAndGet(supplier));
     }
 
@@ -111,7 +164,7 @@ public abstract class SingleFactory {
      * @param t
      * @param <T>
      */
-    public static final <T> void reset(Class<? extends T> clz , T t){
+    public final <T> void reset(Class<? extends T> clz , T t){
         set(clz, t, true);
     }
 
@@ -121,7 +174,7 @@ public abstract class SingleFactory {
      * @param t
      * @param <T>
      */
-    public static final <T> void reset(T t){
+    public final <T> void reset(T t){
         reset(t.getClass(), t);
     }
 
@@ -132,7 +185,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T resetAndGet(Class<? extends T> clz , T t){
+    public final <T> T resetAndGet(Class<? extends T> clz , T t){
         return set(clz, t, true).get();
     }
 
@@ -143,7 +196,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T resetAndGet(T t){
+    public final <T> T resetAndGet(T t){
         return resetAndGet((Class<T>)t.getClass(), t);
     }
 
@@ -153,7 +206,7 @@ public abstract class SingleFactory {
      * @param supplier
      * @param <T>
      */
-    public static final <T> void reset(Class<? extends T> clz , Supplier<? extends T> supplier){
+    public final <T> void reset(Class<? extends T> clz , Supplier<? extends T> supplier){
         set(clz, supplier, true);
     }
 
@@ -163,7 +216,7 @@ public abstract class SingleFactory {
      * @param supplier
      * @param <T>
      */
-    public static final <T> void reset(Supplier<? extends T> supplier){
+    public final <T> void reset(Supplier<? extends T> supplier){
         reset(supplier.get().getClass(), supplier);
     }
 
@@ -174,7 +227,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T resetAndGet(Class<? extends T> clz , Supplier<? extends T> supplier){
+    public final <T> T resetAndGet(Class<? extends T> clz , Supplier<? extends T> supplier){
         return set(clz, supplier, true).get();
     }
 
@@ -184,7 +237,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T resetAndGet(Supplier<? extends T> supplier){
+    public final <T> T resetAndGet(Supplier<? extends T> supplier){
         return resetAndGet((Class<? extends T>)supplier.get().getClass(), supplier);
     }
 
@@ -195,7 +248,7 @@ public abstract class SingleFactory {
      * @param t
      * @param <T>
      */
-    public static final <T> void set(Class<? extends T> clz , T t){
+    public final <T> void set(Class<? extends T> clz , T t){
         set(clz, t, false);
     }
 
@@ -204,7 +257,7 @@ public abstract class SingleFactory {
      * @param t
      * @param <T>
      */
-    public static final <T> void set(T t){
+    public final <T> void set(T t){
         set(t.getClass(), t);
     }
 
@@ -215,7 +268,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T setAndGet(Class<? extends T> clz , T t){
+    public final <T> T setAndGet(Class<? extends T> clz , T t){
         return set(clz, t, false).get();
     }
 
@@ -226,7 +279,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T setAndGet(T t){
+    public final <T> T setAndGet(T t){
         return setAndGet((Class<T>)t.getClass(), t);
     }
 
@@ -236,7 +289,7 @@ public abstract class SingleFactory {
      * @param supplier
      * @param <T>
      */
-    public static final <T> void set(Class<? extends T> clz , Supplier<? extends T> supplier){
+    public final <T> void set(Class<? extends T> clz , Supplier<? extends T> supplier){
         set(clz, supplier, false);
     }
 
@@ -245,7 +298,7 @@ public abstract class SingleFactory {
      * @param supplier
      * @param <T>
      */
-    public static final <T> void set(Supplier<? extends T> supplier){
+    public final <T> void set(Supplier<? extends T> supplier){
         set(supplier.get().getClass(), supplier);
     }
 
@@ -256,7 +309,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T setAndGet(Class<? extends T> clz , Supplier<? extends T> supplier){
+    public final <T> T setAndGet(Class<? extends T> clz , Supplier<? extends T> supplier){
         return set(clz, supplier, false).get();
     }
 
@@ -266,7 +319,7 @@ public abstract class SingleFactory {
      * @param <T>
      * @return
      */
-    public static final <T> T setAndGet(Supplier<? extends T> supplier){
+    public final <T> T setAndGet(Supplier<? extends T> supplier){
         return setAndGet((Class<? extends T>)supplier.get().getClass(), supplier);
     }
 
@@ -277,7 +330,7 @@ public abstract class SingleFactory {
      * @param t
      * @param <T>
      */
-    private static final <T> SingleBean<? extends T> set(Class<? extends T> clz , T t , boolean reset){
+    private final <T> SingleBean<? extends T> set(Class<? extends T> clz , T t , boolean reset){
         return set(clz , () -> t , reset);
     }
 
@@ -289,7 +342,7 @@ public abstract class SingleFactory {
      * @param supplier
      * @param <T>
      */
-    private static synchronized final <T> SingleBean<? extends T> set(Class<? extends T> clz , Supplier<? extends T> supplier , boolean reset){
+    private synchronized final <T> SingleBean<? extends T> set(Class<? extends T> clz , Supplier<? extends T> supplier , boolean reset){
         SingleBean<? extends T> singleBean = SINGLE_MAP.get(clz);
         if(!reset && singleBean != null){
             //如果已经存在，直接返回此对象
@@ -307,7 +360,7 @@ public abstract class SingleFactory {
      * 内部单例类，应当是基于CAS原理的懒汉式单例类
      * @param <T>
      */
-    private static final class SingleBean<T> {
+    private final class SingleBean<T> {
         /**
          * 获取实例的方法
          */
