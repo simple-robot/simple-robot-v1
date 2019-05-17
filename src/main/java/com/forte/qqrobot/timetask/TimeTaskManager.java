@@ -8,13 +8,14 @@ import com.forte.qqrobot.beans.types.TimeTaskTemplate;
 import com.forte.qqrobot.beans.types.TimeType;
 import com.forte.qqrobot.exception.TimeTaskException;
 import com.forte.qqrobot.log.QQLog;
+import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.FieldUtils;
 import org.quartz.*;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * 定时任务控制中心
@@ -35,13 +36,30 @@ public class TimeTaskManager {
     private static final String JOBDETAIL_NAME = "job_";
 
     /** 尝试加载一个疑似是定时任务的类 */
-    public void register(Class<? extends Job> timeTaskClass){
+    public void register(Class<? extends Job> timeTaskClass, MsgSender sender){
         List<Annotation> timeTaskAnnos = isTimeTask(timeTaskClass);
         if(timeTaskAnnos.size() > 0){
             //遍历
-            timeTaskAnnos.forEach(a -> register(timeTaskClass, a));
+            timeTaskAnnos.forEach(a -> register(timeTaskClass, a, sender));
         }
     }
+
+    /** 尝试加载一个疑似是定时任务的类 */
+    public void register(Class<? extends Job> timeTaskClass, Supplier<MsgSender> senderSupplier){
+        List<Annotation> timeTaskAnnos = isTimeTask(timeTaskClass);
+        if(timeTaskAnnos.size() > 0){
+            //遍历
+            timeTaskAnnos.forEach(a -> register(timeTaskClass, a, senderSupplier.get()));
+        }
+    }
+
+    /**
+     * 启动定时任务
+     */
+    public void start() throws SchedulerException {
+        ResourceDispatchCenter.getStdSchedulerFactory().getScheduler().start();
+    }
+
 
     /**
      * 判断一个Class对象是否为需要加载的定时任务
@@ -69,7 +87,7 @@ public class TimeTaskManager {
     /**
      * 注册至定时任务调度器
      */
-    private static void register(Class<? extends Job> clazz, Annotation annotation){
+    private static void register(Class<? extends Job> clazz, Annotation annotation, MsgSender sender){
         //判断注解类型
         Scheduler scheduler;
         try {
@@ -82,6 +100,8 @@ public class TimeTaskManager {
         JobDetail jobDetail = null;
         Trigger trigger = null;
         String name = null;
+
+        //创建可以提供的参数集合
 
 
         if(annotation instanceof CronTask){
@@ -117,6 +137,14 @@ public class TimeTaskManager {
         if(jobDetail != null && trigger != null){
             //注册定时任务
             try {
+                //向Job中注入参数
+                JobDataMap jobDataMap = jobDetail.getJobDataMap();
+                //保存一个送信器实例
+                TimeTaskContext.giveMsgSender(jobDataMap, sender);
+                //保存一个cq工具类实例
+                TimeTaskContext.giveCQCodeUtil(jobDataMap, ResourceDispatchCenter.getCQCodeUtil());
+
+
                 scheduler.scheduleJob(jobDetail, trigger);
                 QQLog.debug("加载定时任务[ "+ name +" ]成功！");
             } catch (SchedulerException e) {

@@ -6,6 +6,7 @@ import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
+import com.forte.qqrobot.scanner.Register;
 import com.forte.qqrobot.scanner.ScannerManager;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
@@ -30,6 +31,12 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since JDK1.8
  **/
 public abstract class BaseApplication<CONFIG extends BaseConfiguration> implements Closeable {
+
+    /** 没有监听函数的送信器 */
+    private MsgSender NO_METHOD_SENDER;
+
+    /** 注册器，赋值在扫描方法结束后 */
+    private Register register;
 
     /**
      * 线程工厂初始化
@@ -134,9 +141,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     /**
      * 进行扫描
      */
-    private void scanner(Set<String> packages, CONFIG config){
+    private Register scanner(Set<String> packages, CONFIG config){
         //使用扫描管理器进行扫描
-        ScannerManager.scanner(packages, config);
+        return ScannerManager.scanner(packages, config);
     }
 
     /**
@@ -152,9 +159,11 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
             }};
         }
 
-        //进行扫描
-        scanner(scannerPackage, config);
+        //进行扫描并保存注册器
+        this.register = scanner(scannerPackage, config);
 
+        //直接注册监听函数
+        this.register.registerListener();
 
 
         //构建监听函数管理器等扫描器所构建的
@@ -167,6 +176,15 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         //保存
         ResourceDispatchCenter.saveListenerManager(manager);
         ResourceDispatchCenter.savePlug(plug);
+    }
+
+    /**
+     * 有些事情需要连接之后才能做，例如加载定时任务，需要空函数送信器
+     */
+    private void after(){
+        //注册监听函数
+        this.register.registerTimeTask(this.NO_METHOD_SENDER);
+
     }
 
     /**
@@ -184,9 +202,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         //配置结束
         afterConfig(configuration, app);
 
-//        ListenerManager manager = ResourceDispatchCenter.getListenerMethodScanner().buildManager();
-//        ListenerPlug plug = ResourceDispatchCenter.getListenerPlug();
-
         //获取管理器
         ListenerManager manager = ResourceDispatchCenter.getListenerManager();
 
@@ -195,13 +210,15 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
 
         //获取CQCodeUtil实例
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
-
-        //构建没有监听函数的送信器
+        //构建没有监听函数的送信器并保存
         MsgSender sender = MsgSender.build(getSender(), getSetter(), getGetter());
+        this.NO_METHOD_SENDER = sender;
+
+        //连接之后的收尾工作
+        after();
 
         //连接之后
         app.after(cqCodeUtil, sender);
-
     }
 
 
