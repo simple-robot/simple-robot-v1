@@ -1,5 +1,6 @@
 package com.forte.qqrobot.timetask;
 
+import com.forte.qqrobot.exception.TimeTaskException;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import org.quartz.Job;
@@ -17,9 +18,13 @@ public interface TimeJob extends Job {
 
     /** 仅用于获取定时任务参数 */
     default void execute(JobExecutionContext context) throws JobExecutionException{
-        CQCodeUtil cqCodeUtil = TimeTaskContext.getCQCodeUtil(context);
-        MsgSender msgSender = TimeTaskContext.getMsgSender(context);
-        execute(msgSender, cqCodeUtil);
+       try{
+           CQCodeUtil cqCodeUtil = TimeTaskContext.getCQCodeUtil(context);
+           MsgSender msgSender = TimeTaskContext.getMsgSender(context);
+           execute(msgSender, cqCodeUtil);
+       }catch (Exception e){
+           throw new TimeTaskException(e);
+       }
     }
 
 }

@@ -64,7 +64,7 @@ public class TimeTaskManager {
     /**
      * 判断一个Class对象是否为需要加载的定时任务
      */
-    private static List<Annotation> isTimeTask(Class<?> clazz){
+    private static List<Annotation> isTimeTask(Class<? extends Job> clazz){
         //存在的定时任务注解
         List<Annotation> annoList = new ArrayList<>();
         //首先判断是否存在注解
@@ -73,11 +73,6 @@ public class TimeTaskManager {
             if(an != null){
                 annoList.add(an);
             }
-        }
-
-        //如果定时任务类存在注解但不是Job类型的接口，抛出异常
-        if(annoList.size() > 0 && FieldUtils.isChild(clazz, Job.class)){
-            throw new TimeTaskException("您的定时任务类没有继承["+ Job.class +"]接口！");
         }
 
         return annoList;
@@ -92,6 +87,7 @@ public class TimeTaskManager {
         Scheduler scheduler;
         try {
             scheduler = ResourceDispatchCenter.getStdSchedulerFactory().getScheduler();
+            scheduler.start();
         } catch (SchedulerException e) {
             throw new TimeTaskException("定时任务调度器实例获取失败！", e);
         }
@@ -144,9 +140,8 @@ public class TimeTaskManager {
                 //保存一个cq工具类实例
                 TimeTaskContext.giveCQCodeUtil(jobDataMap, ResourceDispatchCenter.getCQCodeUtil());
 
-
                 scheduler.scheduleJob(jobDetail, trigger);
-                QQLog.debug("加载定时任务[ "+ name +" ]成功！");
+                QQLog.info("加载定时任务[ "+ name +" ]成功！");
             } catch (SchedulerException e) {
                 throw new TimeTaskException("定时任务["+ name +"]注册失败！", e);
             }

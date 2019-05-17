@@ -15,6 +15,9 @@ import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
+import org.quartz.SchedulerFactory;
+import org.quartz.core.QuartzScheduler;
+import org.quartz.core.QuartzSchedulerThread;
 import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.Closeable;
@@ -77,6 +80,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     private void timeTaskInit(){
         //将定时任务类添加到资源调度中心
         ResourceDispatchCenter.saveTimeTaskManager(new TimeTaskManager());
+
         //将定时任务工厂添加到资源调度中心
         ResourceDispatchCenter.saveStdSchedulerFactory(new StdSchedulerFactory());
     }
@@ -153,7 +157,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         //配置完成后，如果没有进行扫描，则默认扫描启动类同级包且排除此启动类
         //需要扫描的包路径，如果是null则扫描启动器的根路径，否则按照要求进行扫描
         Set<String> scannerPackage = config.getScannerPackage();
-        if(scannerPackage == null){
+        if(scannerPackage == null || scannerPackage.isEmpty()){
             scannerPackage = new HashSet<String>(){{
                 add(app.getClass().getPackage().getName());
             }};
@@ -184,7 +188,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     private void after(){
         //注册监听函数
         this.register.registerTimeTask(this.NO_METHOD_SENDER);
-
     }
 
     /**

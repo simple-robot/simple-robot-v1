@@ -23,7 +23,7 @@ public @interface FixedRateTask {
     long value();
 
     /** 时间类型，默认为秒 */
-    TimeType timeType();
+    TimeType timeType() default TimeType.second;
 
     /** 开始后的重复次数，默认为-1，-1为无限重复 */
     int RepeatCount() default -1;

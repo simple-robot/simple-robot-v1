@@ -24,7 +24,7 @@ public class TimeTaskContext {
 
     /** 为一个JobDataMap赋值 */
     public static void giveMsgSender(JobDataMap jobDataMap, MsgSender sender){
-        give(jobDataMap, CQ_CODE_UTIL_KEY, sender);
+        give(jobDataMap, MSG_SENDER_KEY, sender);
     }
 
     /** 获取一个CQCodeUtil */
