@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * 方法执行工具
+ * 方法相关工具
  *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  */
@@ -177,6 +177,28 @@ public class MethodUtil {
     public static boolean isStatic(Method method){
         return Modifier.isStatic(method.getModifiers());
     }
+
+    /**
+     * 获取方法
+     * @param type  类型
+     * @param methodName 方法名
+     * @return
+     */
+    public static <T> Method getMethod(Class<T> type, String methodName) throws NoSuchMethodException {
+        return type.getDeclaredMethod(methodName, type);
+    }
+
+
+    /**
+     * 获取方法
+     * @param type  类型
+     * @param methodName 方法名
+     * @return
+     */
+    public static <T> Method getMethod(T type, String methodName) throws NoSuchMethodException {
+        return getMethod(type.getClass(), methodName);
+    }
+
 
 
 }

@@ -14,7 +14,7 @@
     <artifactId>simple-robot-core</artifactId>
 
     <!-- 版本号 -->
-    <version>0.9-BETA</version>
+    <version>1.0-BETA</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>
@@ -296,18 +296,17 @@
 
         <!--log4j-->
         <!-- https://mvnrepository.com/artifact/log4j/log4j -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-        <!-- slf4j -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
-            <version>1.7.2</version>
-        </dependency>
-
+        <!--<dependency>-->
+            <!--<groupId>log4j</groupId>-->
+            <!--<artifactId>log4j</artifactId>-->
+            <!--<version>1.2.17</version>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; slf4j &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.slf4j</groupId>-->
+            <!--<artifactId>slf4j-nop</artifactId>-->
+            <!--<version>1.7.2</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -333,6 +332,15 @@
             <artifactId>httpmime</artifactId>
             <version>4.5</version>
         </dependency>
+
+        <!-- 彩色控制台 -->
+        <!-- https://mvnrepository.com/artifact/io.gitee.ForteScarlet.plusutils/console-plus -->
+        <dependency>
+            <groupId>io.gitee.ForteScarlet.plusutils</groupId>
+            <artifactId>console-plus</artifactId>
+            <version>1.2</version>
+        </dependency>
+
 
         <!-- 导入jsoup 解析HTML -->
         <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->

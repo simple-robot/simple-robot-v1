@@ -1,9 +1,6 @@
 package com.forte.qqrobot.beans.types;
 
 import org.quartz.SimpleScheduleBuilder;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
 
 import java.util.function.Function;
 

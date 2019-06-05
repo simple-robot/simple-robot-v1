@@ -6,7 +6,6 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * 定时任务类型

@@ -1,6 +1,8 @@
 package com.forte.qqrobot;
 
 import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
+import com.forte.qqrobot.depend.DependGetter;
+import com.forte.qqrobot.depend.DependInjector;
 import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -9,8 +11,6 @@ import com.forte.qqrobot.scanner.FileScanner;
 import com.forte.qqrobot.utils.FieldUtils;
 
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * 配置类的根类，定义包扫描方法
@@ -20,8 +20,13 @@ import java.util.function.Supplier;
  **/
 public abstract class BaseConfiguration {
 
+    //**************************************
+    //*          config params
+    //**************************************
+
+
     /** 是否扫描了初始化监听器 */
-    private boolean scannedInitListener = false;
+//    private boolean scannedInitListener = false;
 
     /** 本机QQ信息, 一般唯一，使用静态 */
     private static LoginQQInfo loginQQInfo = null;
@@ -44,8 +49,23 @@ public abstract class BaseConfiguration {
     /** 需要进行的包扫描路径，默认为null */
     private Set<String> scannerPackage = new HashSet<>();
 
-    /** 自定义监听函数实例化规则，假如同时使用了spring之类的框架，需要对此进行配置 */
-    private static Supplier<?> listenerCreater;
+    //**************** 依赖相关 ****************//
+
+    /** 自定义依赖对象实例化规则，假如同时使用了spring之类的框架，需要对此进行配置
+     *  基本全局唯一，使用静态
+     * */
+    private static DependGetter dependGetter = null;
+
+    /** 依赖实例注入器，自定义依赖实例中的依赖注入规则，假如使用了Spring这类的框架需要进行配置
+     *  基本全局唯一，使用静态
+     *  TODO 此参数暂不可用，是否可用再商议
+     * */
+    private static DependInjector dependInjector;
+
+
+    //**************************************
+    //*             以下为方法
+    //**************************************
 
 
     /**
@@ -64,17 +84,19 @@ public abstract class BaseConfiguration {
                 if(scanSet.size() > 0){
                     QQLog.info("加载["+ listener.getClass() +"]的监听函数成功：");
                     StringJoiner joiner = new StringJoiner("]\r\n\t>>>", "\t>>>", "");
-                    scanSet.stream().peek(lm -> joiner.add(lm.getMethodToString()));
+                    scanSet.forEach(lm -> joiner.add(lm.getMethodToString()));
                     QQLog.info(joiner.toString());
                 }
             } catch (Exception e) {
-                QQLog.error("加载[\"+ listener.getClass() +\"]的监听函数出现异常！", e);
+                QQLog.error("加载["+ listener.getClass() +"]的监听函数出现异常！", e);
             }
         }
     }
 
     /**
      * 注册监听器
+     * 2019-06-05
+     *
      * @param listeners 监听器列表
      */
     @Deprecated
@@ -87,8 +109,12 @@ public abstract class BaseConfiguration {
             try {
                 //扫描
                 Set<ListenerMethod> scanSet = scanner.scanner(listener);
-                QQLog.info("加载["+ listener +"]的监听函数成功：");
-                scanSet.forEach(lm -> QQLog.info(">>>" + lm.getMethodToString()));
+                if(scanSet.size() > 0){
+                    QQLog.info("加载["+ listener +"]的监听函数成功：");
+                    StringJoiner joiner = new StringJoiner("]\r\n\t>>>", "\t>>>", "");
+                    scanSet.forEach(lm -> joiner.add(lm.getMethodToString()));
+                    QQLog.info(joiner.toString());
+                }
             } catch (Exception e) {
                 QQLog.error("加载["+ listener +"]的监听函数出现异常！", e);
             }
@@ -100,7 +126,6 @@ public abstract class BaseConfiguration {
      * @param listeners 初始化监听器
      */
     public void registerInitListeners(InitListener... listeners){
-        isScannedInitListener();
         initListeners.addAll(Arrays.asList(listeners));
     }
 
@@ -134,7 +159,6 @@ public abstract class BaseConfiguration {
      * @param packageName 包名
      */
     public void scannerInitListener(String packageName){
-        isScannedInitListener();
         Set<Class<?>> list = new FileScanner().find(packageName, c -> FieldUtils.isChild(c, InitListener.class)).get();
 
         registerInitListeners(list.stream().map(lc -> {
@@ -160,13 +184,12 @@ public abstract class BaseConfiguration {
         }
     }
 
+    //**************** simple getter & setter ****************//
+
+
     /** 获取需要进行扫描的包路径集合 */
     public Set<String> getScannerPackage(){
         return this.scannerPackage;
-    }
-
-    private void isScannedInitListener(){
-        this.scannedInitListener = true;
     }
 
     public String getLocalQQNick() {
@@ -205,12 +228,44 @@ public abstract class BaseConfiguration {
         BaseConfiguration.cqPath = cqPath;
     }
 
+    /**
+     * 配置loginQQInfo信息
+     */
     public void setLoginQQInfo(LoginQQInfo loginQQInfo) {
         BaseConfiguration.loginQQInfo = loginQQInfo;
         BaseConfiguration.localQQCode = loginQQInfo.getQQ();
         BaseConfiguration.localQQNick = loginQQInfo.getName();
     }
 
+    /**
+     * 获取依赖获取器
+     */
+    public static DependGetter getDependGetter() {
+        return dependGetter;
+    }
+
+    /**
+     * 配置依赖获取器
+     */
+    public void setDependGetter(DependGetter dependGetter) {
+        BaseConfiguration.dependGetter = dependGetter;
+    }
+
+    /**
+     * 通过类的全包路径进行指定，通过反射创建实例
+     */
+    public void setDependGetter(String packPath) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        BaseConfiguration.dependGetter = (DependGetter) Class.forName(packPath).newInstance();
+    }
+
+
+    public static DependInjector getDependInjector() {
+        return dependInjector;
+    }
+
+    public void setDependInjector(DependInjector dependInjector) {
+        BaseConfiguration.dependInjector = dependInjector;
+    }
 
 
 

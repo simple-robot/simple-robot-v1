@@ -1,6 +1,8 @@
 package com.forte.qqrobot;
 
 import com.alibaba.fastjson.util.TypeUtils;
+import com.forte.qqrobot.depend.DependCenter;
+import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
@@ -15,9 +17,6 @@ import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 import com.forte.qqrobot.utils.CQCodeUtil;
-import org.quartz.SchedulerFactory;
-import org.quartz.core.QuartzScheduler;
-import org.quartz.core.QuartzSchedulerThread;
 import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.Closeable;
@@ -25,10 +24,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 启动类总抽象类，在此实现部分通用功能
+ * 实现closeable接口
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/29 10:18
  * @since JDK1.8
@@ -41,6 +40,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     /** 注册器，赋值在扫描方法结束后 */
     private Register register;
 
+    /** 依赖获取器，赋值在配置后 */
+    private DependGetter dependGetter;
+
     /**
      * 线程工厂初始化
      */
@@ -48,9 +50,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         BaseLocalThreadPool.setTimeUnit(TimeUnit.SECONDS);
         //空线程存活时间
         BaseLocalThreadPool.setKeepAliveTime(60);
-        //线程池工厂
-        AtomicLong nums = new AtomicLong(0);
-        BaseLocalThreadPool.setDefaultThreadFactory(r -> new Thread(r, "ROBOT-" + nums.addAndGet(1) + "-Thread"));
+        //线程池的线程工厂
+        BaseLocalThreadPool.setDefaultThreadFactory(Thread::new);
         //核心池数量，可同时执行的线程数量
         BaseLocalThreadPool.setCorePoolSize(500);
         //线程池最大数量
@@ -80,7 +81,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     private void timeTaskInit(){
         //将定时任务类添加到资源调度中心
         ResourceDispatchCenter.saveTimeTaskManager(new TimeTaskManager());
-
         //将定时任务工厂添加到资源调度中心
         ResourceDispatchCenter.saveStdSchedulerFactory(new StdSchedulerFactory());
     }
@@ -145,16 +145,25 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     /**
      * 进行扫描
      */
-    private Register scanner(Set<String> packages, CONFIG config){
+    private Register scanner(Set<String> packages){
         //使用扫描管理器进行扫描
-        return ScannerManager.scanner(packages, config);
+        return ScannerManager.scanner(packages);
     }
 
     /**
      * 配置结束后的方法
      */
     private void afterConfig(CONFIG config, Application<CONFIG> app){
-        //配置完成后，如果没有进行扫描，则默认扫描启动类同级包且排除此启动类
+        //先配置依赖管理器
+        //将依赖管理对象放入资源管理中心
+        DependGetter dependGetter = CONFIG.getDependGetter();
+        DependCenter dependCenter = dependGetter == null ? new DependCenter() : new DependCenter(dependGetter);
+        ResourceDispatchCenter.saveDependCenter(dependCenter);
+
+        //赋值
+        this.dependGetter = dependCenter;
+
+        //配置完成后，如果没有进行扫描，则默认扫描启动类同级包
         //需要扫描的包路径，如果是null则扫描启动器的根路径，否则按照要求进行扫描
         Set<String> scannerPackage = config.getScannerPackage();
         if(scannerPackage == null || scannerPackage.isEmpty()){
@@ -164,7 +173,12 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         }
 
         //进行扫描并保存注册器
-        this.register = scanner(scannerPackage, config);
+        this.register = scanner(scannerPackage);
+
+        //TODO 先注入依赖
+
+
+
 
         //直接注册监听函数
         this.register.registerListener();
@@ -223,6 +237,26 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         //连接之后
         app.after(cqCodeUtil, sender);
     }
+
+
+    //**************** 部分资源获取API ****************//
+
+    /**
+     * 获取依赖获取器
+     */
+    public DependGetter getDependGetter(){
+        return this.dependGetter;
+    }
+
+    /**
+     * 获取空函数送信器<br>
+     * ※ 此送信器无法进行阻断
+     */
+    public MsgSender getMsgSender(){
+        return this.NO_METHOD_SENDER;
+    }
+
+
 
 
 }

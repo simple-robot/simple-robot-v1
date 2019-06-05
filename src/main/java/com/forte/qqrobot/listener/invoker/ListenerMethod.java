@@ -1,5 +1,6 @@
 package com.forte.qqrobot.listener.invoker;
 
+import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.anno.Block;
 import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
@@ -12,6 +13,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -20,15 +22,17 @@ import java.util.stream.Collectors;
  * @date Created in 2019/3/25 18:28
  * @since JDK1.8
  **/
-public class ListenerMethod {
+public class ListenerMethod<T> {
 
     //**************** 所有字段均不可改变 ****************//
 
     /** 为监听函数创建一个UUID */
     private final String UUID;
 
-    /** 监听器对象实例获取函数，用于执行方法 */
-    private final Object listener;
+    /**
+     * 监听函数获取函数
+     * */
+    private final Supplier<T> listenerGetter;
 
     /** 过滤器注解，如果没有则为null */
     private final Filter filter;
@@ -52,15 +56,15 @@ public class ListenerMethod {
 
     /**
      * 全参数构造
-     * @param bean          方法所在实例对象
+     * @param listenerGetter 监听器对象实例获取函数
      * @param filter        过滤注解
      * @param blockFilter   阻塞过滤注解
      * @param spare         备用方法注解
      * @param method        方法本体
      * @param type          监听类型
      */
-    private ListenerMethod(Object bean, Filter filter, BlockFilter blockFilter, Spare spare, Block block, Method method, MsgGetTypes[] type) {
-        this.listener = bean;
+    private ListenerMethod(Supplier<T> listenerGetter, Filter filter, BlockFilter blockFilter, Spare spare, Block block, Method method, MsgGetTypes[] type) {
+        this.listenerGetter = listenerGetter;
         this.filter = filter;
         this.blockFilter = blockFilter;
         this.spare = spare;
@@ -95,19 +99,21 @@ public class ListenerMethod {
      */
     boolean invoke(Set<Object> giveArgs) throws InvocationTargetException, IllegalAccessException {
         //获取方法的参数数组，根据数组顺序准备参数，如果没有的参数使用null
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        Object[] args = new Object[parameterTypes.length];
-
+//        Class<?>[] parameterTypes = method.getParameterTypes();
+//        Object[] args = new Object[parameterTypes.length];
         //遍历参数类型数组, 进行参数注入
-        //TODO 将参数注入单独提出
-        for (int i = 0; i < parameterTypes.length; i++) {
-            //当前类型
-            Class<?> type = parameterTypes[i];
-            //从提供的数组中查找相同类型，理论上讲不会有相同类型，如果没有则使用null
-            args[i] = giveArgs.stream().filter(p -> FieldUtils.isChild(p.getClass(), type)).findAny().orElse(null);
-        }
+        //将参数注入单独提出
+        //获取方法执行的参数
+        Object[] args = ResourceDispatchCenter.getDependCenter().getMethodPrarmeters(method, giveArgs.toArray());
+//        for (int i = 0; i < parameterTypes.length; i++) {
+//            //当前类型
+//            Class<?> type = parameterTypes[i];
+//            //从提供的数组中查找相同类型，理论上讲不会有重复类型，如果没有则使用null
+//            args[i] = giveArgs.stream().filter(p -> FieldUtils.isChild(p.getClass(), type)).findAny().orElse(null);
+//        }
 
         //执行方法
+        T listener = listenerGetter.get();
         Object invoke = method.invoke(listener, args);
         if(invoke == null){
             return false;
@@ -124,8 +130,8 @@ public class ListenerMethod {
     /**
      * 使用ListenerMethod对象构建
      */
-    static ListenerMethodBuilder build(Object bean, Method method, MsgGetTypes[] type){
-        return new ListenerMethodBuilder(bean, method, type);
+    static <T> ListenerMethodBuilder<T> build(Supplier<T> listenerGetter, Method method, MsgGetTypes[] type){
+        return new ListenerMethodBuilder(listenerGetter, method, type);
     }
 
 
@@ -175,10 +181,9 @@ public class ListenerMethod {
 
     /**
      * 获取实例对象的toString字符串
-     * @return
      */
     public String getBeanToString(){
-        return listener.toString();
+        return listenerGetter.get().toString();
     }
 
     /**
@@ -201,8 +206,12 @@ public class ListenerMethod {
     //*         getter & setter
     //**************************************
 
-    public Object getListener() {
-        return listener;
+    public T getListener() {
+        return listenerGetter.get();
+    }
+
+    public Supplier<T> getListenerGetter() {
+        return listenerGetter;
     }
 
     public Method getMethod() {
@@ -228,9 +237,9 @@ public class ListenerMethod {
     /**
      * 内部类，对象构建类
      */
-    static class ListenerMethodBuilder{
+    static class ListenerMethodBuilder<T> {
         /** 监听器对象实例，用于执行方法 */
-        private final Object listener;
+        private final Supplier<T> listenerGetter;
         /** 方法本体 */
         private final Method method;
         /** 此方法所属的监听类型 */
@@ -246,8 +255,8 @@ public class ListenerMethod {
         /**
          * 构造
          */
-        public ListenerMethodBuilder(Object listener, Method method, MsgGetTypes[] type) {
-            this.listener = listener;
+        public ListenerMethodBuilder(Supplier<T> listenerGetter, Method method, MsgGetTypes[] type) {
+            this.listenerGetter = listenerGetter;
             this.method = method;
             this.type = type;
         }
@@ -277,7 +286,7 @@ public class ListenerMethod {
          * 构建对象
          */
         public ListenerMethod build(){
-            return new ListenerMethod(listener, filter, blockFilter, spare, block, method, type);
+            return new ListenerMethod(listenerGetter, filter, blockFilter, spare, block, method, type);
         }
 
 

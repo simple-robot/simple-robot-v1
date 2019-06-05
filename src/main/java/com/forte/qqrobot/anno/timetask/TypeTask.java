@@ -19,5 +19,4 @@ public @interface TypeTask {
     TimeTaskTemplate value();
 
     String id() default "";
-
 }

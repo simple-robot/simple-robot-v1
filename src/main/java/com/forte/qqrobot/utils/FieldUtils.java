@@ -668,6 +668,7 @@ public class FieldUtils {
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
+    @Deprecated
     public static void objectSetter2(Object t, String fieldName, Object param) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         // TODO 发现bug，此方法会导致缓存无法储存
         objectSetter(t , t , fieldName , fieldName , 1 , param);
@@ -895,10 +896,9 @@ public class FieldUtils {
      * 获取一个list字段的泛型类型<br>
      * 这个字段必须是一个list类型的字段！
      * @param listField 字段
-     * @return
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException 如果泛型类型未找到或多于1个
      */
-    public static Class getListFieldGeneric(Field listField) {
+    public static Class getListFieldGeneric(Field listField) throws ClassNotFoundException {
 
         ParameterizedType listGenericType = (ParameterizedType) listField.getGenericType();
         Type[] listActualTypeArguments = listGenericType.getActualTypeArguments();
@@ -910,15 +910,12 @@ public class FieldUtils {
             String typeName = listActualTypeArguments[0].getTypeName();
             //如果此类型存在泛型，移除泛型
             typeName = typeName.replaceAll("<[\\w\\.\\, ]+>" , "");
-            try {
-                return Class.forName(typeName);
-            } catch (ClassNotFoundException e) {
-                //将异常转化为运行时
-                throw new RuntimeException(e);
-            }
+            return Class.forName(typeName);
         } else {
             //如果多个类型，直接返回Object类型
-            return Object.class;
+            //不返回了，抛出异常
+//            return Object.class;
+            throw new ClassNotFoundException("more than one types.");
         }
     }
 
@@ -951,7 +948,7 @@ public class FieldUtils {
      * @return
      * @throws ClassNotFoundException
      */
-    public static Class getListFieldGeneric(Class c , String fieldName) {
+    public static Class getListFieldGeneric(Class c , String fieldName) throws ClassNotFoundException {
         return getListFieldGeneric(fieldGetter(c , fieldName));
     }
 
@@ -963,7 +960,7 @@ public class FieldUtils {
      * @return
      * @throws ClassNotFoundException
      */
-    public static Class getListFieldGeneric(Object obj , String fieldName) {
+    public static Class getListFieldGeneric(Object obj , String fieldName) throws ClassNotFoundException {
         return getListFieldGeneric(obj.getClass() , fieldName);
     }
 
@@ -977,8 +974,8 @@ public class FieldUtils {
      * @return
      */
     public static boolean isChild(Class child, Class findFather) {
-        Objects.requireNonNull(child, "Parameter [child] can not be null");
-        Objects.requireNonNull(findFather, "Parameter [findFather] can not be null");
+        Objects.requireNonNull(child, "the first parameter [child] can not be null");
+        Objects.requireNonNull(findFather, "the second parameter [findFather] can not be null");
         //如果自身就是这个类，直接返回true
         if (child.equals(findFather)) {
             return true;
@@ -1101,12 +1098,27 @@ public class FieldUtils {
     }
 
     /**
-     * 获取类名
+     * 单词开头小写
      *
-     * @param c
-     * @return
      * @author ForteScarlet
      */
+    public static String headLower(String str) {
+        //拿到第一个字母
+        String head = (str.charAt(0) + "").toLowerCase();
+        //拿到其他
+        String body = str.substring(1);
+        return head + body;
+    }
+
+
+    /**
+     * 获取类名
+     * @param c 类
+     * @deprecated 有方法直接获取的: {@link Class#getSimpleName()}
+     * @return 类名
+     * @author ForteScarlet
+     */
+    @Deprecated
     public static String getClassName(Class<?> c) {
         String name = c.getName();
         String[] split = name.split("\\.");
@@ -1115,7 +1127,6 @@ public class FieldUtils {
 
     /**
      * 通过对象获取类名
-     *
      * @param o
      * @return
      * @author ForteScarlet
@@ -1136,6 +1147,64 @@ public class FieldUtils {
             }
         }
     }
+
+
+    /**
+     * 获取方法名，如果是个getter规则方法名则移除get并开头小写, 与{@link #getMethodNameWithoutSetter(Method)}类似
+     * @param method 方法
+     * @return 方法名
+     */
+    public static String getMethodNameWithoutGetter(Method method){
+        //获取方法名
+        String name = method.getName();
+        //判断是否为get开头且去掉get之后首字母大写
+        if(name.startsWith("get") && Character.isUpperCase(name.substring(3).charAt(0))){
+            //如果是，去掉get并开头小写
+            return headLower(name.substring(3));
+        }else{
+            //否则原样返回
+            return name;
+        }
+    }
+
+    /**
+     * 获取方法名，如果是个getter规则方法名则移除get并开头小写, 与{@link #getMethodNameWithoutGetter(Method)}类似
+     * @param method 方法
+     * @return 方法名
+     */
+    public static String getMethodNameWithoutSetter(Method method){
+        //获取方法名
+        String name = method.getName();
+        //判断是否为get开头且去掉set之后首字母大写
+        if(name.startsWith("set") && Character.isUpperCase(name.substring(3).charAt(0))){
+            //如果是，去掉get并开头小写
+            return headLower(name.substring(3));
+        }else{
+            //否则原样返回
+            return name;
+        }
+    }
+
+    /**
+     * 获取方法名，如果是个getter或setter规则方法名则移除get或set并开头小写
+     * @param method 方法
+     * @see #getMethodNameWithoutGetter(Method)
+     * @see #getMethodNameWithoutSetter(Method)
+     * @return 方法名
+     */
+    public static String getMethodNameWithoutGetterAndSetter(Method method){
+        //获取方法名
+        String name = method.getName();
+        //判断是否为get开头且去掉get之后首字母大写
+        if((name.startsWith("get") || name.startsWith("set")) && Character.isUpperCase(name.substring(3).charAt(0))){
+            //如果是，去掉get并开头小写
+            return headLower(name.substring(3));
+        }else{
+            //否则原样返回
+            return name;
+        }
+    }
+
 
 
 

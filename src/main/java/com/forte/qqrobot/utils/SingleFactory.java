@@ -2,6 +2,7 @@ package com.forte.qqrobot.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -20,42 +21,50 @@ public class SingleFactory {
     /** 单例工厂的ID，如果不指定则会使用一个随机的UUID */
     private final String ID;
 
-    /** 线程同步set，如果出现了相同ID的单例工厂将会报错 */
-    private static final Set<String> ID_SET = new ConcurrentSkipListSet<>();
+    /** 线程同步Map，保存全部ID的单例工厂 */
+    private static final Map<String, SingleFactory> FACTORY_MAP = new ConcurrentHashMap<>();
 
     /** 构造 */
     private SingleFactory(String id){
-        if(ID_SET.add(id)){
+        if(FACTORY_MAP.get(id) == null){
             this.ID = id;
         }else{
             throw new SecurityException("不可以重复创建已经存在的ID实例。");
         }
     }
 
-    /** 构造 */
-    private SingleFactory(Number id){
-       this(String.valueOf(id));
+    /**
+     * 获取或创建
+     */
+    private synchronized static SingleFactory getInstance(String id){
+        SingleFactory get = FACTORY_MAP.get(id);
+        if(get == null){
+            get = new SingleFactory(id);
+            FACTORY_MAP.put(get.ID, get);
+        }
+        return get;
     }
 
+
     /** 工厂 */
-    public static SingleFactory build(Object obj){
+    public synchronized static SingleFactory build(Object obj){
         if(obj.getClass().equals(String.class)){
             //字符串
-            return new SingleFactory((String)obj);
+            return getInstance((String)obj);
         }else if(obj instanceof Number){
             //是数字类的
-            return new SingleFactory(String.valueOf(obj));
+            return getInstance("NO."+ obj);
         }else if(obj.getClass().equals(char.class) || obj.getClass().equals(Character.class)){
             //是数字类的
-            return new SingleFactory(Integer.valueOf((Character)obj));
+            return getInstance(String.valueOf(Integer.valueOf((Character)obj)));
         }else{
-            return new SingleFactory(obj.getClass().toString());
+            return getInstance(obj.getClass().toString());
         }
     }
 
     /** 工厂 */
-    public static SingleFactory build(){
-        return new SingleFactory(UUID.randomUUID().toString().replaceAll("-", ""));
+    public synchronized static SingleFactory build(){
+        return getInstance(UUID.randomUUID().toString().replaceAll("-", ""));
     }
 
 
@@ -365,32 +374,24 @@ public class SingleFactory {
          * 获取实例的方法
          */
         private final Supplier<T> supplier;
-        private AtomicReference<T> single = new AtomicReference<>();
+        private final AtomicReference<T> single = new AtomicReference<>();
 
         /**
          * 获取单例
          */
         private T get() {
-            for (; ; ) {
-                //获取
-                T currect = single.get();
-                //如果存在直接返回
-                if (currect != null) {
-                    return currect;
-                }
-                //创建
-                currect = supplier.get();
-                //原子赋值
-                if (single.compareAndSet(null, currect)) {
-                    return currect;
-                }
+            //获取
+            T currect = single.get();
+            //如果存在直接返回
+            if (currect != null) {
+                return currect;
             }
+            //创建并赋值
+            return single.updateAndGet(old -> supplier.get());
         }
 
         /**
          * 构造
-         *
-         * @param supplier
          */
         private SingleBean(Supplier<T> supplier) {
             this.supplier = supplier;

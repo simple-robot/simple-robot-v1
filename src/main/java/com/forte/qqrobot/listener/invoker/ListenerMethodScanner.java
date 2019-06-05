@@ -1,8 +1,11 @@
 package com.forte.qqrobot.listener.invoker;
 
+import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.anno.*;
+import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
@@ -12,6 +15,7 @@ import com.forte.qqrobot.utils.MethodUtil;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -34,10 +38,29 @@ public class ListenerMethodScanner {
 
     /**
      * 传入一个可能是监听器对象的Class对象
+     * 只对标注了@Beans的函数进行获取
      */
     public Set<ListenerMethod> scanner(Class<?> clazz, Object bean) throws Exception {
         Set<ListenerMethod> result = new HashSet<>();
 
+        //v1.0 update
+        //如果此类不存在@Bean函数，略过
+        if(clazz.getAnnotation(Beans.class) == null){
+            return result;
+        }
+
+        //获取实例的函数
+        DependCenter dependCenter = ResourceDispatchCenter.getDependCenter();
+        Supplier listenerGetter;
+        //获取类上的Beans注解
+        Beans beansAnnotation = clazz.getAnnotation(Beans.class);
+        String name = beansAnnotation.value();
+        if(name.trim().length() == 0){
+            //如果没有指定名称，通过类型获取
+            listenerGetter = () -> dependCenter.get(clazz);
+        }else{
+            listenerGetter = () -> dependCenter.get(name);
+        }
 
         //先判断是不是实现了普通监听器接口
         boolean isSocketListener = FieldUtils.isChild(clazz, SocketListener.class);
@@ -49,11 +72,11 @@ public class ListenerMethodScanner {
         //如果是普通监听器，则认为此方法中全部公共的onMessage都有可能为监听器方法，获取全部onMessage方法
         //判断条件：方法名为onMessage且第一个参数的类型是MsgGet
         if(isSocketListener){
-            result.addAll(buildBySocketListener(clazz, bean, spare));
+            result.addAll(buildBySocketListener(clazz, spare, listenerGetter));
         }
 
         //**************** 以上为实现了接口的判断 ****************//
-        result.addAll(buildByNormal(clazz, bean, spare));
+        result.addAll(buildByNormal(clazz, spare, listenerGetter));
 
 
         //记录并返回结果
@@ -65,9 +88,9 @@ public class ListenerMethodScanner {
     /**
      * 通过接口实现的方式来构建监听函数列表
      */
-    private Set<ListenerMethod> buildBySocketListener(Class<?> clazz, Object bean, Spare spare) throws InstantiationException, IllegalAccessException {
+    private Set<ListenerMethod> buildBySocketListener(Class<?> clazz, Spare spare, Supplier listenerGetter) {
         //尝试获取实例对象
-        Object obj = getBean(clazz, bean);
+//        Object obj = getBean(clazz, bean);
         boolean isSpare = (spare != null);
 
         Method[] methods = MethodUtil.getPublicMethods(clazz, m -> m.getName().equals(SOCKET_LISTENER_METHOD_NAME) && FieldUtils.isChild(m.getParameterTypes()[0], MsgGet.class));
@@ -89,11 +112,11 @@ public class ListenerMethodScanner {
                         //尝试获取实例对象
                         if (isSpare) {
                             //添加
-                            return build(obj, m, byType, spare, filter, blockFilter, block);
+                            return build(listenerGetter, m, byType, spare, filter, blockFilter, block);
                         } else {
                             //如果没有类上的Spare注解，则方法单独获取
                             Spare thisSpare = m.getAnnotation(Spare.class);
-                            return build(obj, m, byType, thisSpare, filter, blockFilter, block);
+                            return build(listenerGetter, m, byType, thisSpare, filter, blockFilter, block);
                         }
                     }else{
                         return null;
@@ -106,13 +129,8 @@ public class ListenerMethodScanner {
 
     /**
      * 通过普通的注解的形式加载监听函数
-     * @param clazz
-     * @param bean
-     * @param spare
-     * @return
-     * @throws IllegalAccessException
      */
-    private Set<ListenerMethod> buildByNormal(Class<?> clazz, Object bean, Spare spare) {
+    private Set<ListenerMethod> buildByNormal(Class<?> clazz, Spare spare, Supplier listenerGetter) {
         boolean isSpare = (spare != null);
         //不使用else，两者不冲突
         //开始判断当前类, 判断类上是否有@Listen注解
@@ -152,12 +170,12 @@ public class ListenerMethodScanner {
 
             //如果没有被跳过，说明此方法可以被添加
             //尝试获取实例对象
-            Object obj;
-            try {
-                obj = getBean(clazz, bean);
-            } catch (Exception e) {
-                throw new RuntimeException(new IllegalAccessException("无法为[" + clazz + "]创建实例对象"));
-            }
+//            Object obj;
+//            try {
+//                obj = getBean(clazz, bean);
+//            } catch (Exception e) {
+//                throw new RuntimeException(new IllegalAccessException("无法为[" + clazz + "]创建实例对象"));
+//            }
 
             //获取需要的注解
             Filter filter = method.getAnnotation(Filter.class);
@@ -171,8 +189,10 @@ public class ListenerMethodScanner {
             Spare thisSpare = isSpare ? spare : method.getAnnotation(Spare.class);
             //监听类型
             MsgGetTypes[] msgGetType = Optional.ofNullable(methodListen).map(Listen::value).orElse(msgGetTypes);
+
+
             //构建对象并添加
-            return build(obj, method, msgGetType, thisSpare, filter, blockFilter, block);
+            return build(listenerGetter, method, msgGetType, thisSpare, filter, blockFilter, block);
         }).filter(Objects::nonNull).collect(Collectors.toSet());
 
     }
@@ -219,7 +239,7 @@ public class ListenerMethodScanner {
 
     /**
      * 构建ListenerMethod对象
-     * @param obj       方法执行用的实例对象
+     * @param listenerGetter 监听器实例获取函数
      * @param method    方法本体
      * @param types     监听类型
      * @param spare         Spare注解
@@ -227,8 +247,8 @@ public class ListenerMethodScanner {
      * @param blockFilter   blockFilter注解
      * @return  ListenerMethod实例对象
      */
-    private ListenerMethod build(Object obj, Method method, MsgGetTypes[] types, Spare spare, Filter filter, BlockFilter blockFilter, Block block){
-        return ListenerMethod.build(obj, method, types)
+    private <T> ListenerMethod<T> build(Supplier<T> listenerGetter, Method method, MsgGetTypes[] types, Spare spare, Filter filter, BlockFilter blockFilter, Block block){
+        return ListenerMethod.build(listenerGetter, method, types)
                              .spare(spare)
                              .filter(filter)
                              .blockFilter(blockFilter)
@@ -238,10 +258,15 @@ public class ListenerMethodScanner {
 
     /**
      * 尝试获取实例对象
+     *
+     * v1.0 update
+     * 使用依赖获取方式获取实例对象
+     *
      * @param clazz clazz对象
      * @param bean  可能存在的实例对象
      * @return
      */
+    @Deprecated
     private Object getBean(Class clazz, Object bean) throws IllegalAccessException, InstantiationException {
         //如果参数的bean不为null，直接赋值
         if(bean != null){

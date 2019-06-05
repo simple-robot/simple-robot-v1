@@ -1,5 +1,6 @@
 package com.forte.qqrobot;
 
+import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
@@ -15,9 +16,11 @@ import org.quartz.impl.StdSchedulerFactory;
 import java.util.concurrent.Executor;
 
 /**
- *  资源调度中心抽象类，基本是静态方法，开发者可以实现此类并增加方法
+ * 资源调度中心抽象类，基本是静态方法，开发者可以实现此类并增加方法
  * <br>主要用于框架内部，用于获取一些功能性类的单例对象
  * <br>获取前需要保证在初始化方法 Application 中已经储存过
+ * <br>用户一般使用的是依赖资源: {@link com.forte.qqrobot.depend.DependCenter}
+ * 所有的资源几乎都在这里，甚至包括
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/9 14:42
  * @since JDK1.8
@@ -110,7 +113,17 @@ public abstract class ResourceDispatchCenter {
         save(stdSchedulerFactory);
     }
 
+    /**
+     * 保存一个依赖管理中心
+     * @param dependCenter 依赖管理中心
+     */
+    static void saveDependCenter(DependCenter dependCenter){
+        save(dependCenter);
+    }
+
+
     //**************** get ****************//
+
 
     /**
      * 获取一个指定类型的单例对象-如果储存过的话
@@ -187,6 +200,13 @@ public abstract class ResourceDispatchCenter {
         return get(StdSchedulerFactory.class);
     }
 
+    /**
+     * 获取一个DependCenter单例对象
+     * @return  DependCenter单例对象
+     */
+    public static DependCenter getDependCenter(){
+        return get(DependCenter.class);
+    }
 
     //**************** 线程池相关 ****************//
 
@@ -220,6 +240,7 @@ public abstract class ResourceDispatchCenter {
     public static void reset(){
         resourceSingleFactory.clear();
     }
+
 
 
 }

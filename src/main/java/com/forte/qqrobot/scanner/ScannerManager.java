@@ -36,7 +36,7 @@ public class ScannerManager implements Register {
     /**
      * 进行扫描
      */
-    public static <CONFIG extends BaseConfiguration> ScannerManager scanner(Collection<String> packages, CONFIG configuration){
+    public static ScannerManager scanner(Collection<String> packages){
         //获取扫描器
         FileScanner fileScanner = new FileScanner();
 

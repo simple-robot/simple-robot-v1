@@ -19,4 +19,6 @@ public interface Register {
 
     /** 注册定时任务 */
     void registerTimeTask(Supplier<MsgSender> senderSupplier);
+
+
 }
