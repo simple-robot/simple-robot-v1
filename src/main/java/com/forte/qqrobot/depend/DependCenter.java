@@ -143,7 +143,7 @@ public class DependCenter implements DependGetter {
         String name = depend.getName();
         if(contains(name)){
             //如果存在，直接抛出异常
-            throw new ResourceRequestDeniedException("已经存在名称为["+ depend +"]的依赖");
+            throw new DependResourceException("已经存在名称为["+ depend +"]的依赖");
         }
 
         //判断类型，如果是基础数据类型，保存到基础，否则保存至其他
