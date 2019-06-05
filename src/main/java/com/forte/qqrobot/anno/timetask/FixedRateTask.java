@@ -1,7 +1,6 @@
 package com.forte.qqrobot.anno.timetask;
 
 import com.forte.qqrobot.beans.types.TimeType;
-import sun.misc.Timeable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

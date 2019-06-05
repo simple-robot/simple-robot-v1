@@ -247,7 +247,7 @@ public class ListenerMethodScanner {
      * @param blockFilter   blockFilter注解
      * @return  ListenerMethod实例对象
      */
-    private <T> ListenerMethod<T> build(Supplier<T> listenerGetter, Method method, MsgGetTypes[] types, Spare spare, Filter filter, BlockFilter blockFilter, Block block){
+    private ListenerMethod build(Supplier listenerGetter, Method method, MsgGetTypes[] types, Spare spare, Filter filter, BlockFilter blockFilter, Block block){
         return ListenerMethod.build(listenerGetter, method, types)
                              .spare(spare)
                              .filter(filter)

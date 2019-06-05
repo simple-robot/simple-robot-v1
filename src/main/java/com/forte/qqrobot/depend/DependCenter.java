@@ -5,7 +5,6 @@ import com.forte.qqrobot.depend.parameter.ParamNameGetter;
 import com.forte.qqrobot.depend.util.DependUtil;
 import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.utils.SingleFactory;
-import jdk.management.resource.ResourceRequestDeniedException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
