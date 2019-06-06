@@ -50,16 +50,15 @@ public class ListenerMethodScanner {
         }
 
         //获取实例的函数
-        DependCenter dependCenter = ResourceDispatchCenter.getDependCenter();
         Supplier listenerGetter;
         //获取类上的Beans注解
         Beans beansAnnotation = clazz.getAnnotation(Beans.class);
         String name = beansAnnotation.value();
         if(name.trim().length() == 0){
             //如果没有指定名称，通过类型获取
-            listenerGetter = () -> dependCenter.get(clazz);
+            listenerGetter = () -> ResourceDispatchCenter.getDependCenter().get(clazz);
         }else{
-            listenerGetter = () -> dependCenter.get(name);
+            listenerGetter = () -> ResourceDispatchCenter.getDependCenter().get(name);
         }
 
         //先判断是不是实现了普通监听器接口

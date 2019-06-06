@@ -26,15 +26,15 @@ public class QQLog extends ColorSystem {
         setErrTextFunction(str -> Colors.builder().add(str, Colors.FONT.RED).build().toString());
     }
 
-    public static void info(String msg){
+    public static void info(Object msg){
         info.println(msg);
     }
 
-    public static void debug(String msg){
+    public static void debug(Object msg){
         debug.println(msg);
     }
 
-    public static void error(String msg, Throwable e){
+    public static void error(Object msg, Throwable e){
         err.println(msg);
         e.printStackTrace();
     }

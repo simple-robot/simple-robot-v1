@@ -4,6 +4,7 @@ import com.forte.qqrobot.depend.parameter.ParamGetterManager;
 import com.forte.qqrobot.depend.parameter.ParamNameGetter;
 import com.forte.qqrobot.depend.util.DependUtil;
 import com.forte.qqrobot.exception.DependResourceException;
+import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.SingleFactory;
 
 import java.lang.reflect.Method;
@@ -278,7 +279,7 @@ public class DependCenter implements DependGetter {
      * @param addParams 额外参数
      *                  当存在额外参数的时候，优先使用额外参数进行注入
      */
-    public Object[] getMethodPrarmeters(Method method, Object[] addParams){
+    public Object[] getMethodParameters(Method method, Object[] addParams){
         Parameter[] parameters = method.getParameters();
         //优先从额外参数中获取，额外参数只能根据类型来区分
         //将额外类型转化为map集合
@@ -291,8 +292,8 @@ public class DependCenter implements DependGetter {
      * 通过方法获取可以注入的参数
      * @param method 方法对象
      */
-    public Object[] getMethodPrarmeters(Method method){
-        return getMethodPrarmeters(method, null);
+    public Object[] getMethodParameters(Method method){
+        return getMethodParameters(method, null);
     }
 
 
@@ -312,7 +313,10 @@ public class DependCenter implements DependGetter {
                 String name = dependAnnotation.value();
                 if(name.trim().length() == 0){
                     //没有名称，优先使用额外参数获取，其次使用类型查询
-                    Object addParamGet = addParamsMap.get(parameter.getType());
+                    Class<?> pt = parameter.getType();
+                    //特殊判断：如果类型为Boolean或者boolean
+                    pt = (pt.equals(Boolean.class) || pt.equals(boolean.class)) ? Boolean.class : pt;
+                    Object addParamGet = addParamsMap.get(pt);
                     if(addParamGet != null){
                         param = addParamGet;
                     }else{
@@ -326,7 +330,10 @@ public class DependCenter implements DependGetter {
             }else{
                 //没有注解, 通过使用参数名称获取
                 //先尝试通过额外参数获取
-                Object addParamGet = addParamsMap.get(parameter.getType());
+                Class<?> pt = parameter.getType();
+                //特殊判断：如果类型为Boolean或者boolean
+                pt = (pt.equals(Boolean.class) || pt.equals(boolean.class)) ? Boolean.class : pt;
+                Object addParamGet = addParamsMap.get(pt);
                 if(addParamGet != null){
                     param = addParamGet;
                 }else{
@@ -334,7 +341,13 @@ public class DependCenter implements DependGetter {
                     //如果获取不到则使用类型查询
                     String name = paramNameGetter.getParameterName(parameter);
                     if(name != null){
-                        param = get(name);
+                        Object o = get(name);
+                        //如果通过名称获取的对象为null或者类型并非参数的子类，通过类型获取
+                        if(o == null || !FieldUtils.isChild(o, parameter.getType())){
+                            param = get(parameter.getType());
+                        }else{
+                            param = o;
+                        }
                     }else{
                         param = get(parameter.getType());
                     }

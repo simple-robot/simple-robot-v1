@@ -6,11 +6,11 @@ import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
 import com.forte.qqrobot.anno.Spare;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
-import com.forte.qqrobot.utils.FieldUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -104,7 +104,7 @@ public class ListenerMethod<T> {
         //遍历参数类型数组, 进行参数注入
         //将参数注入单独提出
         //获取方法执行的参数
-        Object[] args = ResourceDispatchCenter.getDependCenter().getMethodPrarmeters(method, giveArgs.toArray());
+        Object[] args = ResourceDispatchCenter.getDependCenter().getMethodParameters(method, giveArgs.toArray());
 //        for (int i = 0; i < parameterTypes.length; i++) {
 //            //当前类型
 //            Class<?> type = parameterTypes[i];

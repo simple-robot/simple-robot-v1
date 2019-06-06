@@ -1,6 +1,7 @@
 package com.forte.qqrobot;
 
 import com.alibaba.fastjson.util.TypeUtils;
+import com.forte.plusutils.consoleplus.console.Colors;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.listener.DefaultWholeListener;
@@ -8,6 +9,7 @@ import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
+import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.scanner.Register;
 import com.forte.qqrobot.scanner.ScannerManager;
 import com.forte.qqrobot.sender.MsgSender;
@@ -33,6 +35,32 @@ import java.util.concurrent.TimeUnit;
  * @since JDK1.8
  **/
 public abstract class BaseApplication<CONFIG extends BaseConfiguration> implements Closeable {
+
+    //java版本检测
+    static{
+        try{
+            //获取java版本
+            String javaVersion = System.getProperties().getProperty("java.version");
+            final int needVersion = 8;
+            boolean largerThan8 = Integer.parseInt(javaVersion.split("_")[0].split("\\.")[1]) >= needVersion;
+            if(!largerThan8){
+                Colors colors = Colors.builder()
+                        .addNoColor("检测到您的版本号为 ")
+                        .add(javaVersion, Colors.FONT.RED)
+                        .addNoColor(", 小于")
+                        .add(" 1.8 ", Colors.FONT.BLUE)
+                        .add("版本。")
+                        .add("本框架基于1.8实现，推荐您切换为1.8或以上版本。")
+                        .build();
+                QQLog.info(colors);
+                QQLog.info("假如您的版本在1.8或以上，请忽略这两条信息。");
+            }
+        }catch (Exception e){
+            QQLog.info("java版本号检测失败, 请尽可能确保您的java版本在1.8以上");
+        }
+
+
+    }
 
     /** 没有监听函数的送信器 */
     private MsgSender NO_METHOD_SENDER;
@@ -159,7 +187,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         DependGetter dependGetter = CONFIG.getDependGetter();
         DependCenter dependCenter = dependGetter == null ? new DependCenter() : new DependCenter(dependGetter);
         ResourceDispatchCenter.saveDependCenter(dependCenter);
-
         //赋值
         this.dependGetter = dependCenter;
 
@@ -175,9 +202,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         //进行扫描并保存注册器
         this.register = scanner(scannerPackage);
 
-        //TODO 先注入依赖
-
-
+        //先注入依赖
+        this.register.registerDependCenter();
 
 
         //直接注册监听函数

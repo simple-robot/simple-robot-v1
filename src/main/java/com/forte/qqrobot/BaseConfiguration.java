@@ -18,7 +18,7 @@ import java.util.*;
  * @date Created in 2019/4/4 18:02
  * @since JDK1.8
  **/
-public abstract class BaseConfiguration {
+public class BaseConfiguration {
 
     //**************************************
     //*          config params

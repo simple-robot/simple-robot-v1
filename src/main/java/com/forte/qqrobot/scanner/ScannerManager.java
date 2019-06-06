@@ -3,6 +3,7 @@ package com.forte.qqrobot.scanner;
 
 import com.forte.qqrobot.BaseConfiguration;
 import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.exception.RobotRuntionException;
 import com.forte.qqrobot.exception.TimeTaskException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
@@ -130,6 +131,15 @@ public class ScannerManager implements Register {
     @Override
     public void registerTimeTask(Supplier<MsgSender> senderSupplier){
         registerTimeTask(classes, senderSupplier);
+    }
+
+    /**
+     * 进行依赖注入
+     */
+    @Override
+    public void registerDependCenter() {
+        DependCenter dependCenter = ResourceDispatchCenter.getDependCenter();
+        dependCenter.load(classes);
     }
 
 
