@@ -8,17 +8,18 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
+ * {@link TimeJob} 有时候去实现会出现问题，无法正确覆盖{@link Job}中的方法，故此提供一个新的抽象类以代替原本的TimeJob接口。
+ * @author ForteScarlet <ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface TimeJob extends Job {
+public abstract class BaseTimeJob implements Job {
 
     /** 同名方法，获取并注入两个定时任务参数 */
-    void execute(MsgSender msgSender, CQCodeUtil cqCodeUtil);
+    public abstract void execute(MsgSender msgSender, CQCodeUtil cqCodeUtil);
 
     /** 仅用于获取定时任务参数 */
     @Override
-    default void execute(JobExecutionContext context) throws JobExecutionException{
+    public void execute(JobExecutionContext context) throws JobExecutionException{
        try{
            CQCodeUtil cqCodeUtil = TimeTaskContext.getCQCodeUtil(context);
            MsgSender msgSender = TimeTaskContext.getMsgSender(context);

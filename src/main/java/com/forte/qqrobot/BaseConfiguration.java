@@ -143,13 +143,13 @@ public class BaseConfiguration {
      */
     @Deprecated
     public void scannerListener(String packageName){
-        sacnner(packageName);
+        scanner(packageName);
     }
 
     /**
      * 包扫描，现在的扫描已经不再仅限于监听器了
      */
-    public void sacnner(String packageName){
+    public void scanner(String packageName){
         //添加包路径
         scannerPackage.add(packageName);
     }
