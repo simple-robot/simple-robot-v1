@@ -1,6 +1,5 @@
 package com.forte.qqrobot.beans.messages.get;
 
-import com.forte.qqrobot.beans.messages.result.AnonInfo;
 import com.forte.qqrobot.beans.messages.result.AuthInfo;
 
 /**
