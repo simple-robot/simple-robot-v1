@@ -28,6 +28,9 @@ public class BaseConfiguration {
     /** 是否扫描了初始化监听器 */
 //    private boolean scannedInitListener = false;
 
+    /** 服务器ip，默认为127.0.0.1 */
+    private String ip = "127.0.0.1";
+
     /** 本机QQ信息, 一般唯一，使用静态 */
     private static LoginQQInfo loginQQInfo = null;
 
@@ -226,6 +229,14 @@ public class BaseConfiguration {
 
     public void setCqPath(String cqPath) {
         BaseConfiguration.cqPath = cqPath;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     /**
