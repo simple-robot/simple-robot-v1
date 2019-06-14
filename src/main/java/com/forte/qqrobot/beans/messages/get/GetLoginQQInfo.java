@@ -15,7 +15,7 @@ public interface GetLoginQQInfo extends InfoGet<LoginQQInfo> {
      * 获取通过此类型请求而获取到的参数的返回值的类型
      */
     @Override
-    default Class<LoginQQInfo> resultType(){
+    default Class<? extends LoginQQInfo> resultType(){
         return LoginQQInfo.class;
     }
 

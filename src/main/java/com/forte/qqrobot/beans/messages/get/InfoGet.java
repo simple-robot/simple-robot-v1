@@ -14,7 +14,7 @@ public interface InfoGet<RESULT extends InfoResult> extends RootBean {
     /**
      * 获取通过此类型请求而获取到的参数的返回值的类型
      */
-    Class<RESULT> resultType();
+    Class<? extends RESULT> resultType();
 
     /**
      * 请求的时候都应该有一个参数标识

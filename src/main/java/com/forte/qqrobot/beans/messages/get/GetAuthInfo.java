@@ -13,7 +13,7 @@ public interface GetAuthInfo extends InfoGet<AuthInfo> {
      * 获取通过此类型请求而获取到的参数的返回值的类型
      */
     @Override
-    default Class<AuthInfo> resultType(){
+    default Class<? extends AuthInfo> resultType(){
         return AuthInfo.class;
     }
 

@@ -13,7 +13,7 @@ public interface GetFileInfo extends InfoGet<FileInfo> {
      * 获取通过此类型请求而获取到的参数的返回值的类型
      */
     @Override
-    default Class<FileInfo> resultType(){
+    default Class<? extends FileInfo> resultType(){
         return FileInfo.class;
     }
 

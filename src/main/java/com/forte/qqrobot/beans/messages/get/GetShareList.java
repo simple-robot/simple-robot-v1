@@ -14,7 +14,7 @@ public interface GetShareList extends InfoGet<ShareList> {
      * 获取通过此类型请求而获取到的参数的返回值的类型
      */
     @Override
-    default Class<ShareList> resultType(){
+    default Class<? extends ShareList> resultType(){
         return ShareList.class;
     }
 

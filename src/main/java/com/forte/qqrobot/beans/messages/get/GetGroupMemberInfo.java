@@ -14,7 +14,7 @@ public interface GetGroupMemberInfo extends InfoGet<GroupMemberInfo> {
      * 获取通过此类型请求而获取到的参数的返回值的类型
      */
     @Override
-    default Class<GroupMemberInfo> resultType(){
+    default Class<? extends GroupMemberInfo> resultType(){
         return GroupMemberInfo.class;
     }
 

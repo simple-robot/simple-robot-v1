@@ -13,7 +13,7 @@ public interface GetGroupTopNote extends InfoGet<GroupTopNote> {
      * 获取通过此类型请求而获取到的参数的返回值的类型
      */
     @Override
-    default Class<GroupTopNote> resultType(){
+    default Class<? extends GroupTopNote> resultType(){
         return GroupTopNote.class;
     }
 

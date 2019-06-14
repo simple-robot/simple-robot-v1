@@ -12,7 +12,7 @@ public interface GetBanList extends InfoGet<BanList> {
      * 获取通过此类型请求而获取到的参数的返回值的类型
      */
     @Override
-    default Class<BanList> resultType(){
+    default Class<? extends BanList> resultType(){
         return BanList.class;
     }
 
