@@ -16,8 +16,14 @@ https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1049734
 qq群号：782930037
 
 LEMOC支持组件GIT地址：https://github.com/ForteScarlet/simple-robot-component-lemoc
-HTTP API支持组件GIT地址：(暂未上传)
 
+
+HTTP API支持组件GIT地址：https://github.com/ForteScarlet/simple-robot-component-httpapi 
+
+
+------
+# 以下为已弃用文档
+------
 
 
 ## 简单说明

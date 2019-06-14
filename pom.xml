@@ -342,39 +342,6 @@
         </dependency>
 
 
-        <!-- 导入jsoup 解析HTML -->
-        <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
-        <!--<dependency>-->
-            <!--<groupId>org.jsoup</groupId>-->
-            <!--<artifactId>jsoup</artifactId>-->
-            <!--<version>1.11.3</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>junit</groupId>-->
-            <!--<artifactId>junit</artifactId>-->
-            <!--<version>4.12</version>-->
-            <!--<scope>compile</scope>-->
-        <!--</dependency>-->
-
-        <!-- 准备整合数据库连接池 -->
-        <!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
-        <!--<dependency>-->
-            <!--<groupId>com.alibaba</groupId>-->
-            <!--<artifactId>druid</artifactId>-->
-            <!--<version>1.1.15</version>-->
-        <!--</dependency>-->
-        <!--&lt;!&ndash; mybatis &ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>org.mybatis</groupId>-->
-            <!--<artifactId>mybatis</artifactId>-->
-            <!--<version>3.4.6</version>-->
-        <!--</dependency>-->
-        <!--&lt;!&ndash; mysql 驱动 &ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>mysql</groupId>-->
-            <!--<artifactId>mysql-connector-java</artifactId>-->
-            <!--<version>8.0.13</version>-->
-        <!--</dependency>-->
     </dependencies>
 
 

@@ -18,7 +18,7 @@ public interface TimeJob extends Job {
 
     /** 仅用于获取定时任务参数 */
     @Override
-    default void execute(JobExecutionContext context) throws JobExecutionException{
+    default void execute(JobExecutionContext context) {
        try{
            CQCodeUtil cqCodeUtil = TimeTaskContext.getCQCodeUtil(context);
            MsgSender msgSender = TimeTaskContext.getMsgSender(context);

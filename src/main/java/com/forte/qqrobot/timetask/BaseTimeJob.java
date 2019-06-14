@@ -19,7 +19,7 @@ public abstract class BaseTimeJob implements Job {
 
     /** 仅用于获取定时任务参数 */
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException{
+    public void execute(JobExecutionContext context) {
        try{
            CQCodeUtil cqCodeUtil = TimeTaskContext.getCQCodeUtil(context);
            MsgSender msgSender = TimeTaskContext.getMsgSender(context);

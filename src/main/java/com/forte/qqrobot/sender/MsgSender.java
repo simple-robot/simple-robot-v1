@@ -138,6 +138,7 @@ public class MsgSender implements Sender{
 
     /**
      * 根据组名来使某个分组进入阻断状态
+     * 此方法当前执行的监听函数没有关联
      */
     public void onBlockByName(String name, boolean append) {
         getPlugByMethod().onBlock(name, append);
