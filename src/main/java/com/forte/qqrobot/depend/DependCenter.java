@@ -316,7 +316,7 @@ public class DependCenter implements DependGetter {
                     Class<?> pt = parameter.getType();
                     //特殊判断：如果类型为Boolean或者boolean
                     pt = (pt.equals(Boolean.class) || pt.equals(boolean.class)) ? Boolean.class : pt;
-                    Object addParamGet = addParamsMap.get(pt);
+                    Object addParamGet = getAddParameter(pt, addParamsMap);
                     if(addParamGet != null){
                         param = addParamGet;
                     }else{
@@ -333,7 +333,7 @@ public class DependCenter implements DependGetter {
                 Class<?> pt = parameter.getType();
                 //特殊判断：如果类型为Boolean或者boolean
                 pt = (pt.equals(Boolean.class) || pt.equals(boolean.class)) ? Boolean.class : pt;
-                Object addParamGet = addParamsMap.get(pt);
+                Object addParamGet = getAddParameter(pt, addParamsMap);
                 if(addParamGet != null){
                     param = addParamGet;
                 }else{
@@ -357,6 +357,24 @@ public class DependCenter implements DependGetter {
         return param;
     }
 
+    /**
+     * 获取额外参数
+     */
+    private <T> T getAddParameter(Class<T> type, Map<Class, Object> addParameters){
+        //先尝试直接获取，如果没有则尝试获取子类
+        T t = (T) addParameters.get(type);
+        if(t == null){
+            for (Class key : addParameters.keySet()) {
+                if(FieldUtils.isChild(key, type)){
+                    return (T) addParameters.get(key);
+                }
+            }
+            return null;
+        }else{
+            return t;
+        }
+    }
+
 
 
 
@@ -374,10 +392,27 @@ public class DependCenter implements DependGetter {
     public <T> Depend<T> getDepend(Class<T> type){
         List<Depend> depends = classResourceWareHouse.get(type);
         if (depends == null || depends.size() == 0) {
+            //没有获取到，尝试通过子类型获取
+            Set<Class> keys = classResourceWareHouse.keySet();
+            Class[] classes = keys.stream().filter(k -> FieldUtils.isChild(k, type)).toArray(Class[]::new);
+            if(classes.length == 0){
+                //还是没有，返回null
+                depends = null;
+            }else if(classes.length > 1){
+                //不止1个，抛出异常
+                throw new DependResourceException("存在不止一个[" + type + "]类型的子类型："+ Arrays.toString(classes) +",请尝试使用名称获取。");
+            }else{
+                depends = classResourceWareHouse.get(classes[0]);
+            }
+        }
+
+        //判断
+        if(depends == null || depends.size() == 0){
+            //如果还是没有，返回null
             return null;
-        } else if (depends.size() > 1) {
+        }else if (depends.size() > 1) {
             //多于一个
-            throw new DependResourceException("存在不止一个[" + type + "]类型的依赖，请使用名称获取。");
+            throw new DependResourceException("存在不止一个[" + type + "]类型的依赖，请尝试使用名称获取。");
         } else {
             return depends.get(0);
         }

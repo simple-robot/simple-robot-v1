@@ -64,8 +64,10 @@ public class ScannerManager implements Register {
             try {
                 //扫描
                 Set<ListenerMethod> scanSet = scanner.scanner(c);
-                QQLog.info("加载["+ c +"]的监听函数成功：");
-                scanSet.forEach(lm -> QQLog.info(">>>" + lm.getMethodToString()));
+                if(!scanSet.isEmpty()){
+                    QQLog.info("加载["+ c +"]的监听函数成功：");
+                    scanSet.forEach(lm -> QQLog.info(">>>" + lm.getMethodToString()));
+                }
             } catch (Exception e) {
                 throw new RobotRuntionException(e);
             }

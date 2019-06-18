@@ -105,12 +105,6 @@ public class ListenerMethod<T> {
         //将参数注入单独提出
         //获取方法执行的参数
         Object[] args = ResourceDispatchCenter.getDependCenter().getMethodParameters(method, giveArgs.toArray());
-//        for (int i = 0; i < parameterTypes.length; i++) {
-//            //当前类型
-//            Class<?> type = parameterTypes[i];
-//            //从提供的数组中查找相同类型，理论上讲不会有重复类型，如果没有则使用null
-//            args[i] = giveArgs.stream().filter(p -> FieldUtils.isChild(p.getClass(), type)).findAny().orElse(null);
-//        }
 
         //执行方法
         T listener = listenerGetter.get();

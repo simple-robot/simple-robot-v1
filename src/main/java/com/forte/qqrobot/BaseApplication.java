@@ -10,6 +10,7 @@ import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.log.QQLog;
+import com.forte.qqrobot.safe.PoliceStation;
 import com.forte.qqrobot.scanner.Register;
 import com.forte.qqrobot.scanner.ScannerManager;
 import com.forte.qqrobot.sender.MsgSender;
@@ -38,6 +39,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
 
     //java版本检测
     static{
+        //初始化警察局
+        PoliceStation.getInstance();
+
         try{
             //获取java版本
             String javaVersion = System.getProperties().getProperty("java.version");

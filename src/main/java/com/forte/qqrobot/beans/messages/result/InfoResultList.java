@@ -23,7 +23,8 @@ public interface InfoResultList<T extends ResultInner> extends InfoResult, Itera
      * 判断列表是否为空
      */
     default boolean isEmpty(){
-        return getList().length <= 0;
+        T[] list = getList();
+        return list != null && list.length <= 0;
     }
 
     /**
