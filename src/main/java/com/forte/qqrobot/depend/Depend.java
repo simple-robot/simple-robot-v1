@@ -1,7 +1,7 @@
 package com.forte.qqrobot.depend;
 
-import java.lang.reflect.Field;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -27,6 +27,8 @@ public class Depend<V> {
     /** 传入一个实例对象并对其中的参数进行注入 */
     private final Consumer<V> injectDepend;
 
+    /** 使用额外参数对实例对象进行注入，需要保证额外参数内不存在更深一级的额参数 */
+    private final BiConsumer<V, DependGetter> injectAdditionalDepend;
 
     /**
      * 构造
@@ -36,17 +38,19 @@ public class Depend<V> {
      * @param supplier      依赖空实例获取函数
      * @param injectDepend  依赖注入函数
      */
-    public Depend(String name, Class<V> type, boolean single, Supplier<V> supplier, Consumer<V> injectDepend) {
+    public Depend(String name, Class<V> type, boolean single, Supplier<V> supplier, Consumer<V> injectDepend, BiConsumer<V, DependGetter> injectAdditionalDepend) {
         Objects.requireNonNull(name);
         Objects.requireNonNull(type);
         Objects.requireNonNull(supplier);
         Objects.requireNonNull(injectDepend);
+        Objects.requireNonNull(injectAdditionalDepend);
 
         this.NAME = name;
         this.TYPE = type;
         this.single = single;
         this.supplier = supplier;
         this.injectDepend = injectDepend;
+        this.injectAdditionalDepend = injectAdditionalDepend;
     }
 
     /**
@@ -86,6 +90,11 @@ public class Depend<V> {
      */
     public void inject(V v){
         injectDepend.accept(v);
+    }
+
+    /** 通过额外参数对象进行注入 */
+    public void injectAdditional(V v, DependGetter additionalDepends){
+        injectAdditionalDepend.accept(v, additionalDepends);
     }
 
     /**

@@ -6,6 +6,7 @@ import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.depend.DependCenter;
+import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
@@ -14,6 +15,7 @@ import com.forte.qqrobot.utils.MethodUtil;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -45,20 +47,26 @@ public class ListenerMethodScanner {
 
         //v1.0 update
         //如果此类不存在@Bean函数，略过
-        if(clazz.getAnnotation(Beans.class) == null){
-            return result;
-        }
+        //v1.0.3 update
+        //可以通过批量加载注入beans，所以现在@Beans应该不再是必须的了
+//        if(clazz.getAnnotation(Beans.class) == null){
+////            return result;
+////        }
 
         //获取实例的函数
         Supplier listenerGetter;
+        Function<DependGetter, ?> listenerGetterWithAddition;
         //获取类上的Beans注解
         Beans beansAnnotation = clazz.getAnnotation(Beans.class);
-        String name = beansAnnotation.value();
+        String name = beansAnnotation == null ? "" : beansAnnotation.value();
         if(name.trim().length() == 0){
             //如果没有指定名称，通过类型获取
             listenerGetter = () -> ResourceDispatchCenter.getDependCenter().get(clazz);
+            listenerGetterWithAddition = add -> ResourceDispatchCenter.getDependCenter().get(clazz, add);
+
         }else{
             listenerGetter = () -> ResourceDispatchCenter.getDependCenter().get(name);
+            listenerGetterWithAddition = add -> ResourceDispatchCenter.getDependCenter().get(name, add);
         }
 
         //先判断是不是实现了普通监听器接口
@@ -71,11 +79,11 @@ public class ListenerMethodScanner {
         //如果是普通监听器，则认为此方法中全部公共的onMessage都有可能为监听器方法，获取全部onMessage方法
         //判断条件：方法名为onMessage且第一个参数的类型是MsgGet
         if(isSocketListener){
-            result.addAll(buildBySocketListener(clazz, spare, listenerGetter));
+            result.addAll(buildBySocketListener(clazz, spare, listenerGetter, listenerGetterWithAddition));
         }
 
         //**************** 以上为实现了接口的判断 ****************//
-        result.addAll(buildByNormal(clazz, spare, listenerGetter));
+        result.addAll(buildByNormal(clazz, spare, listenerGetter, listenerGetterWithAddition));
 
 
         //记录并返回结果
@@ -87,7 +95,7 @@ public class ListenerMethodScanner {
     /**
      * 通过接口实现的方式来构建监听函数列表
      */
-    private Set<ListenerMethod> buildBySocketListener(Class<?> clazz, Spare spare, Supplier listenerGetter) {
+    private Set<ListenerMethod> buildBySocketListener(Class<?> clazz, Spare spare, Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition) {
         //尝试获取实例对象
 //        Object obj = getBean(clazz, bean);
         boolean isSpare = (spare != null);
@@ -111,11 +119,11 @@ public class ListenerMethodScanner {
                         //尝试获取实例对象
                         if (isSpare) {
                             //添加
-                            return build(listenerGetter, m, byType, spare, filter, blockFilter, block);
+                            return build(listenerGetter, listenerGetterWithAddition, m, byType, spare, filter, blockFilter, block);
                         } else {
                             //如果没有类上的Spare注解，则方法单独获取
                             Spare thisSpare = m.getAnnotation(Spare.class);
-                            return build(listenerGetter, m, byType, thisSpare, filter, blockFilter, block);
+                            return build(listenerGetter, listenerGetterWithAddition, m, byType, thisSpare, filter, blockFilter, block);
                         }
                     }else{
                         return null;
@@ -129,7 +137,7 @@ public class ListenerMethodScanner {
     /**
      * 通过普通的注解的形式加载监听函数
      */
-    private Set<ListenerMethod> buildByNormal(Class<?> clazz, Spare spare, Supplier listenerGetter) {
+    private Set<ListenerMethod> buildByNormal(Class<?> clazz, Spare spare, Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition) {
         boolean isSpare = (spare != null);
         //不使用else，两者不冲突
         //开始判断当前类, 判断类上是否有@Listen注解
@@ -191,7 +199,7 @@ public class ListenerMethodScanner {
 
 
             //构建对象并添加
-            return build(listenerGetter, method, msgGetType, thisSpare, filter, blockFilter, block);
+            return build(listenerGetter, listenerGetterWithAddition, method, msgGetType, thisSpare, filter, blockFilter, block);
         }).filter(Objects::nonNull).collect(Collectors.toSet());
 
     }
@@ -246,8 +254,8 @@ public class ListenerMethodScanner {
      * @param blockFilter   blockFilter注解
      * @return  ListenerMethod实例对象
      */
-    private ListenerMethod build(Supplier listenerGetter, Method method, MsgGetTypes[] types, Spare spare, Filter filter, BlockFilter blockFilter, Block block){
-        return ListenerMethod.build(listenerGetter, method, types)
+    private ListenerMethod build(Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition, Method method, MsgGetTypes[] types, Spare spare, Filter filter, BlockFilter blockFilter, Block block){
+        return ListenerMethod.build(listenerGetter, listenerGetterWithAddition, method, types)
                              .spare(spare)
                              .filter(filter)
                              .blockFilter(blockFilter)

@@ -19,8 +19,8 @@ public class AnnotationUtils {
      * 获取类中标注了@Constr注解的方法。
      * 如果有多个，获取其中某一个；
      * 如果出现了：
-     * 注解不存在静态方法上、
-     * 方法返回值不是这个类本身或者子类
+     * - 注解不存在静态方法上、
+     * - 方法返回值不是这个类本身或者子类
      * 则会抛出异常
      * @param clz class对象
      * @throws AnnotationException 如果不是静态方法、没有返回值、返回值不是这个类型或者这个类型的字类类型却使用了@Constr注解

@@ -13,7 +13,6 @@ import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -25,6 +24,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 
 import java.io.File;
@@ -56,9 +56,6 @@ public class HttpClientUtil {
     // HTTP内容类型。相当于form表单的形式，提交数据
     public static final String CONTENT_TYPE_JSON_URL = "application/json;charset=utf-8";
 
-    /** 赛风vpn代理端口 */
-    private static final int SAIFENG_PORT = 8899;
-
     static {
         cookieStore = new BasicCookieStore();
     }
@@ -79,6 +76,7 @@ public class HttpClientUtil {
         try {
             //System.out.println("初始化HttpClientTest~~~开始");
             SSLContextBuilder builder = new SSLContextBuilder();
+
             builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
             SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
                     builder.build());
@@ -94,9 +92,9 @@ public class HttpClientUtil {
             // 设置最大路由
             pool.setDefaultMaxPerRoute(2);
             // 根据默认超时限制初始化requestConfig
-            int socketTimeout = 1000000;
-            int connectTimeout = 1000000;
-            int connectionRequestTimeout = 1000000;
+            int socketTimeout = 10000;
+            int connectTimeout = 10000;
+            int connectionRequestTimeout = 10000;
             requestConfig = RequestConfig.custom().setConnectionRequestTimeout(
                     connectionRequestTimeout).setSocketTimeout(socketTimeout).setConnectTimeout(
                     connectTimeout).build();
@@ -236,7 +234,7 @@ public class HttpClientUtil {
      *
      * @param httpUrl 地址
      */
-    public static String sendHttpPost(String httpUrl) {
+    public static String post(String httpUrl) {
         // 创建httpPost
         HttpPost httpPost = new HttpPost(httpUrl);
         return sendHttpRequest(httpPost);
@@ -247,158 +245,158 @@ public class HttpClientUtil {
      *
      * @param httpUrl
      */
-    public static String sendHttpGet(String httpUrl) {
+    public static String get(String httpUrl) {
         // 创建get请求
         HttpGet httpGet = new HttpGet(httpUrl);
         return sendHttpRequest(httpGet);
     }
 
-    /**
-     * 赛风代理 - get
-     * @return
-     */
-    public static String sendHttpGetProxy(String httpUrl){
-        //设置代理
-        HttpHost proxy = new HttpHost("localhost", SAIFENG_PORT, "HTTP");
-
-        // 响应内容
-        String responseContent = null;
-
-        // 设置请求超时时间
-        int timeout = 10000;
-
-        RequestConfig config = RequestConfig.custom()
-                .setProxy(proxy)
-                .setSocketTimeout(timeout)
-                .setConnectTimeout(timeout)
-                .setConnectionRequestTimeout(timeout)
-                .build();
-
-        //实例化CloseableHttpClient对象
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCookieStore(cookieStore)
-                .setDefaultRequestConfig(config)
-                .build();
-
-        //访问地址
-        HttpGet get = new HttpGet(httpUrl);
-
-        //响应
-        CloseableHttpResponse response = null;
-        //请求返回
-        try {
-            response = httpclient.execute(get);
-
-            // 得到响应实例
-            HttpEntity entity = response.getEntity();
-
-            // 判断响应状态
-            if (response.getStatusLine().getStatusCode() >= 300) {
-                System.err.println("[ WARNING ]HTTP Request is not success, Response code is " + response.getStatusLine().getStatusCode());
-            }
-
-            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
-                responseContent = EntityUtils.toString(entity, CHARSET_UTF_8);
-                EntityUtils.consume(entity);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                // 释放资源
-                if (response != null) {
-                    response.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return responseContent;
-
-    }
-
-
-    /**
-     * 赛风代理 - post
-     * @return
-     */
-    public static String sendHttpPostProxy(String httpUrl, Map<String, String> maps){
-        //处理参数
-        String params = convertStringParamter(maps);
-
-        //设置代理
-        HttpHost proxy = new HttpHost("localhost", SAIFENG_PORT, "HTTP");
-
-        // 响应内容
-        String responseContent = null;
-
-        // 设置请求超时时间
-        int timeout = 10000;
-
-        RequestConfig config = RequestConfig.custom()
-                .setProxy(proxy)
-                .setSocketTimeout(timeout)
-                .setConnectTimeout(timeout)
-                .setConnectionRequestTimeout(timeout)
-                .build();
-
-        //实例化CloseableHttpClient对象
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCookieStore(cookieStore)
-                .setDefaultRequestConfig(config)
-                .build();
-
-        //访问地址
-        HttpPost post = new HttpPost(httpUrl);
-
-        // 设置参数
-        if (params != null && params.trim().length() > 0) {
-            StringEntity stringEntity = new StringEntity(params, "UTF-8");
-            stringEntity.setContentType(CONTENT_TYPE_FORM_URL);
-            post.setEntity(stringEntity);
-        }
-
-        //响应
-        CloseableHttpResponse response = null;
-        //请求返回
-        try {
-            response = httpclient.execute(post);
+//    /**
+//     * 赛风代理 - get
+//     * @return
+//     */
+//    public static String getProxy(String httpUrl){
+//        //设置代理
+//        HttpHost proxy = new HttpHost("localhost", SAIFENG_PORT, "HTTP");
+//
+//        // 响应内容
+//        String responseContent = null;
+//
+//        // 设置请求超时时间
+//        int timeout = 10000;
+//
+//        RequestConfig config = RequestConfig.custom()
+//                .setProxy(proxy)
+//                .setSocketTimeout(timeout)
+//                .setConnectTimeout(timeout)
+//                .setConnectionRequestTimeout(timeout)
+//                .build();
+//
+//        //实例化CloseableHttpClient对象
+//        CloseableHttpClient httpclient = HttpClients.custom()
+//                .setDefaultCookieStore(cookieStore)
+//                .setDefaultRequestConfig(config)
+//                .build();
+//
+//        //访问地址
+//        HttpGet get = new HttpGet(httpUrl);
+//
+//        //响应
+//        CloseableHttpResponse response = null;
+//        //请求返回
+//        try {
+//            response = httpclient.execute(get);
+//
+//            // 得到响应实例
+//            HttpEntity entity = response.getEntity();
+//
+//            // 判断响应状态
+//            if (response.getStatusLine().getStatusCode() >= 300) {
+//                System.err.println("[ WARNING ]HTTP Request is not success, Response code is " + response.getStatusLine().getStatusCode());
+//            }
+//
+//            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+//                responseContent = EntityUtils.toString(entity, CHARSET_UTF_8);
+//                EntityUtils.consume(entity);
+//            }
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                // 释放资源
+//                if (response != null) {
+//                    response.close();
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        return responseContent;
+//
+//    }
 
 
-            // 得到响应实例
-            HttpEntity entity = response.getEntity();
-
-
-            // 判断响应状态
-            if (response.getStatusLine().getStatusCode() >= 300) {
-                System.err.println("[ WARNING ]HTTP Request is not success, Response code is " + response.getStatusLine().getStatusCode());
-            }
-
-
-
-            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
-                responseContent = EntityUtils.toString(entity, CHARSET_UTF_8);
-                EntityUtils.consume(entity);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                // 释放资源
-                if (response != null) {
-                    response.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return responseContent;
-
-    }
+//    /**
+//     * 赛风代理 - post
+//     * @return
+//     */
+//    public static String sendHttpPostProxy(String httpUrl, Map<String, String> maps){
+//        //处理参数
+//        String params = convertStringParamter(maps);
+//
+//        //设置代理
+//        HttpHost proxy = new HttpHost("localhost", SAIFENG_PORT, "HTTP");
+//
+//        // 响应内容
+//        String responseContent = null;
+//
+//        // 设置请求超时时间
+//        int timeout = 10000;
+//
+//        RequestConfig config = RequestConfig.custom()
+//                .setProxy(proxy)
+//                .setSocketTimeout(timeout)
+//                .setConnectTimeout(timeout)
+//                .setConnectionRequestTimeout(timeout)
+//                .build();
+//
+//        //实例化CloseableHttpClient对象
+//        CloseableHttpClient httpclient = HttpClients.custom()
+//                .setDefaultCookieStore(cookieStore)
+//                .setDefaultRequestConfig(config)
+//                .build();
+//
+//        //访问地址
+//        HttpPost post = new HttpPost(httpUrl);
+//
+//        // 设置参数
+//        if (params != null && params.trim().length() > 0) {
+//            StringEntity stringEntity = new StringEntity(params, "UTF-8");
+//            stringEntity.setContentType(CONTENT_TYPE_FORM_URL);
+//            post.setEntity(stringEntity);
+//        }
+//
+//        //响应
+//        CloseableHttpResponse response = null;
+//        //请求返回
+//        try {
+//            response = httpclient.execute(post);
+//
+//
+//            // 得到响应实例
+//            HttpEntity entity = response.getEntity();
+//
+//
+//            // 判断响应状态
+//            if (response.getStatusLine().getStatusCode() >= 300) {
+//                System.err.println("[ WARNING ]HTTP Request is not success, Response code is " + response.getStatusLine().getStatusCode());
+//            }
+//
+//
+//
+//            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+//                responseContent = EntityUtils.toString(entity, CHARSET_UTF_8);
+//                EntityUtils.consume(entity);
+//            }
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                // 释放资源
+//                if (response != null) {
+//                    response.close();
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        return responseContent;
+//
+//    }
 
 
     /**
@@ -407,7 +405,7 @@ public class HttpClientUtil {
      * @param httpUrl
      * @return
      */
-    public static String sendHttpOptions(String httpUrl) {
+    public static String option(String httpUrl) {
         // 创建get请求
         HttpOptions httpOptions = new HttpOptions(httpUrl);
         return sendHttpRequest(httpOptions);
@@ -421,7 +419,7 @@ public class HttpClientUtil {
      * @param maps      参数
      * @param fileLists 附件
      */
-    public static String sendHttpPost(String httpUrl, Map<String, String> maps, List<File> fileLists) {
+    public static String post(String httpUrl, Map<String, String> maps, List<File> fileLists) {
         HttpPost httpPost = new HttpPost(httpUrl);// 创建httpPost
         MultipartEntityBuilder meBuilder = MultipartEntityBuilder.create();
         if (maps != null) {
@@ -446,7 +444,7 @@ public class HttpClientUtil {
      * @param httpUrl 地址
      * @param params  参数(格式:key1=value1&key2=value2)
      */
-    public static String sendHttpPost(String httpUrl, String params) {
+    public static String post(String httpUrl, String params) {
         HttpPost httpPost = new HttpPost(httpUrl);// 创建httpPost
         try {
             // 设置参数
@@ -466,9 +464,9 @@ public class HttpClientUtil {
      *
      * @param maps 参数
      */
-    public static String sendHttpPost(String httpUrl, Map<String, String> maps) {
+    public static String post(String httpUrl, Map<String, String> maps) {
         String param = convertStringParamter(maps);
-        return sendHttpPost(httpUrl, param);
+        return post(httpUrl, param);
     }
 
 
@@ -478,7 +476,7 @@ public class HttpClientUtil {
      * @param httpUrl    地址
      * @param paramsJson 参数(格式 json)
      */
-    public static String sendHttpPostJson(String httpUrl, String paramsJson) {
+    public static String postJson(String httpUrl, String paramsJson) {
         HttpPost httpPost = new HttpPost(httpUrl);// 创建httpPost
         try {
             // 设置参数
@@ -499,7 +497,7 @@ public class HttpClientUtil {
      * @param httpUrl   地址
      * @param paramsXml 参数(格式 Xml)
      */
-    public static String sendHttpPostXml(String httpUrl, String paramsXml) {
+    public static String postXml(String httpUrl, String paramsXml) {
         HttpPost httpPost = new HttpPost(httpUrl);// 创建httpPost
         try {
             // 设置参数

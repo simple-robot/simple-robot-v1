@@ -1,6 +1,7 @@
 package com.forte.qqrobot.depend.util;
 
 import com.forte.qqrobot.anno.depend.Depend;
+import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.MethodUtil;
@@ -8,10 +9,7 @@ import com.forte.qqrobot.utils.MethodUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * 依赖注入的工具类
@@ -130,7 +128,73 @@ public class DependUtil {
                 } catch (IllegalAccessException e) {
                     throw new DependResourceException("类["+ type +"]的字段["+ field +"]值赋值异常！", e);
                 }
+                field.setAccessible(false);
+            };
+        }
+    }
+
+    /**
+     * 对字段进行注入
+     * 函数形式
+     * 仅使用额外参数
+     * @param type  需要注入的对象的类型
+     * @param field 字段
+     * @param dependAnnotation  depend注解
+     * @param getter 获取字段依赖的函数
+     * @return  是否注入成功
+     */
+    public static <T> BiConsumer<T, DependGetter> doInj(Class<T> type, Field field, Depend dependAnnotation, Function<DependGetter, com.forte.qqrobot.depend.Depend> getter) throws NoSuchMethodException {
+        //是否使用set注入
+        if(dependAnnotation.bySetter()){
+            //通过setter注入
+            Method setter;
+            if(dependAnnotation.setterName().trim().length() == 0){
+                //没有指定setter的方法名，则获取setter
+                setter = FieldUtils.getFieldSetter(type, field);
+                if(setter == null){
+                    throw new DependResourceException("无法获取类["+ type +"]的字段["+ field +"]的setter方法");
+                }
+            }else{
+                //否则，按照给定的方法名获取
+                setter = MethodUtil.getMethod(type, dependAnnotation.setterName());
+            }
+
+            //赋值函数
+            return (bean, add) -> {
+                try {
+                    com.forte.qqrobot.depend.Depend<T> beanDepend = getter.apply(add);
+                    //先获取空值实例
+                    T emptyInstance = beanDepend == null ? null : beanDepend.getEmptyInstance();
+                    setter.invoke(bean, emptyInstance);
+                    //为实例注入参数
+                    if(beanDepend != null){
+                        //注入时提供额外参数
+                        beanDepend.injectAdditional(emptyInstance, add);
+                    }
+
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new DependResourceException("无法通过setter["+ setter +"]为类["+ type +"]的字段["+ field +"]赋值！", e);
+                }
+            };
+        }else{
+            return (bean, add) -> {
+                //直接使用字段反射注入
                 field.setAccessible(true);
+                try {
+                    //先获取空值实例
+                    com.forte.qqrobot.depend.Depend<T> beanDepend = getter.apply(add);
+                    T emptyInstance = beanDepend == null ? null : beanDepend.getEmptyInstance();
+                    field.set(bean, emptyInstance);
+                    //为实例注入参数
+                    if(beanDepend != null){
+                        //注入时提供额外参数
+                        beanDepend.injectAdditional(emptyInstance, add);
+                    }
+
+                } catch (IllegalAccessException e) {
+                    throw new DependResourceException("类["+ type +"]的字段["+ field +"]值赋值异常！", e);
+                }
+                field.setAccessible(false);
             };
         }
     }

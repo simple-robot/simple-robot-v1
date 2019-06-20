@@ -15,6 +15,6 @@ public class BasicDepend<V> extends Depend<V> {
      * @param value 值
      */
     public BasicDepend(String name, Class<V> type, V value) {
-        super(name, type, true, () -> value, v -> {});
+        super(name, type, true, () -> value, v -> {}, (v, add) -> {});
     }
 }

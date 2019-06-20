@@ -6,13 +6,13 @@ import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
 import com.forte.qqrobot.anno.Spare;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.depend.AdditionalDepends;
+import com.forte.qqrobot.depend.DependGetter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -33,6 +33,11 @@ public class ListenerMethod<T> {
      * 监听函数获取函数
      * */
     private final Supplier<T> listenerGetter;
+
+    /**
+     * 监听函数获取函数：提供额外参数
+     */
+    private final Function<DependGetter, T> listenerGetterWithAddition;
 
     /** 过滤器注解，如果没有则为null */
     private final Filter filter;
@@ -63,8 +68,9 @@ public class ListenerMethod<T> {
      * @param method        方法本体
      * @param type          监听类型
      */
-    private ListenerMethod(Supplier<T> listenerGetter, Filter filter, BlockFilter blockFilter, Spare spare, Block block, Method method, MsgGetTypes[] type) {
+    private ListenerMethod(Supplier<T> listenerGetter, Function<DependGetter, T> listenerGetterWithAddition, Filter filter, BlockFilter blockFilter, Spare spare, Block block, Method method, MsgGetTypes[] type) {
         this.listenerGetter = listenerGetter;
+        this.listenerGetterWithAddition  = listenerGetterWithAddition;
         this.filter = filter;
         this.blockFilter = blockFilter;
         this.spare = spare;
@@ -95,19 +101,21 @@ public class ListenerMethod<T> {
      *  - 如果返回值是Boolean或boolean类型，原样返回
      *  - 如果返回值为null，则认为执行失败
      *  - 如果为其他任意返回值，认为执行成功
-     * @param giveArgs 可以提供的参数
+     * @param additionalDepends 可以提供的额外参数(动态参数)
      */
-    boolean invoke(Set<Object> giveArgs) throws InvocationTargetException, IllegalAccessException {
+    boolean invoke(AdditionalDepends additionalDepends) throws InvocationTargetException, IllegalAccessException {
         //获取方法的参数数组，根据数组顺序准备参数，如果没有的参数使用null
 //        Class<?>[] parameterTypes = method.getParameterTypes();
 //        Object[] args = new Object[parameterTypes.length];
         //遍历参数类型数组, 进行参数注入
         //将参数注入单独提出
         //获取方法执行的参数
-        Object[] args = ResourceDispatchCenter.getDependCenter().getMethodParameters(method, giveArgs.toArray());
+        Object[] args = ResourceDispatchCenter.getDependCenter().getMethodParameters(method, additionalDepends);
+
+        //获取实例
+        T listener = listenerGetterWithAddition.apply(additionalDepends);
 
         //执行方法
-        T listener = listenerGetter.get();
         Object invoke = method.invoke(listener, args);
         if(invoke == null){
             return false;
@@ -124,8 +132,8 @@ public class ListenerMethod<T> {
     /**
      * 使用ListenerMethod对象构建
      */
-    static <T> ListenerMethodBuilder<T> build(Supplier<T> listenerGetter, Method method, MsgGetTypes[] type){
-        return new ListenerMethodBuilder(listenerGetter, method, type);
+    static <T> ListenerMethodBuilder<T> build(Supplier<T> listenerGetter, Function<DependGetter, T> listenerGetterWithAddition, Method method, MsgGetTypes[] type){
+        return new ListenerMethodBuilder(listenerGetter, listenerGetterWithAddition, method, type);
     }
 
 
@@ -234,6 +242,8 @@ public class ListenerMethod<T> {
     static class ListenerMethodBuilder<T> {
         /** 监听器对象实例，用于执行方法 */
         private final Supplier<T> listenerGetter;
+        /** 提供额外参数来获取监听器实例 */
+        private final Function<DependGetter, T> listenerGetterWithAddition;
         /** 方法本体 */
         private final Method method;
         /** 此方法所属的监听类型 */
@@ -249,8 +259,9 @@ public class ListenerMethod<T> {
         /**
          * 构造
          */
-        public ListenerMethodBuilder(Supplier<T> listenerGetter, Method method, MsgGetTypes[] type) {
+        public ListenerMethodBuilder(Supplier<T> listenerGetter, Function<DependGetter, T> listenerGetterWithAddition, Method method, MsgGetTypes[] type) {
             this.listenerGetter = listenerGetter;
+            this.listenerGetterWithAddition = listenerGetterWithAddition;
             this.method = method;
             this.type = type;
         }
@@ -280,7 +291,7 @@ public class ListenerMethod<T> {
          * 构建对象
          */
         public ListenerMethod build(){
-            return new ListenerMethod(listenerGetter, filter, blockFilter, spare, block, method, type);
+            return new ListenerMethod(listenerGetter, listenerGetterWithAddition, filter, blockFilter, spare, block, method, type);
         }
 
 

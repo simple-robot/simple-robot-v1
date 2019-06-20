@@ -141,6 +141,7 @@ public class ScannerManager implements Register {
     @Override
     public void registerDependCenter() {
         DependCenter dependCenter = ResourceDispatchCenter.getDependCenter();
+        //通过注解加载依赖
         dependCenter.load(classes);
     }
 

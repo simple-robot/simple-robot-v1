@@ -17,8 +17,11 @@ public class ParamGetterManager {
     static {
         ParamNameGetter paramNameGetter;
         try {
-            if(ParamGetterManager.class.getDeclaredMethod("method", String.class)
-                    .getParameters()[0].getName().equals(PARAM_NAME)){
+
+            String method = ParamGetterManager.class.getDeclaredMethod("method", String.class)
+                    .getParameters()[0].getName();
+
+            if(method.equals(PARAM_NAME)){
                 //如果能获取参数
                 paramNameGetter = new NormalParamNameGetter();
             }else{

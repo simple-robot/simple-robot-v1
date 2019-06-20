@@ -34,6 +34,15 @@ public @interface Beans {
     /** 是否为单例，默认为单例 */
     boolean single() default true;
 
+    /** 是否将类中全部字段标记为Depend，默认为false
+     *  如果标记为false，则默认为无参数的false
+     * */
+    boolean allDepend() default false;
+
+    /** 当全部标记为@Depend的时候，此参数为所有字段标记的@Depend注解对象，默认为无参注解 */
+    Depend depend() default @Depend;
+
+
     /** 根据参数类型列表来指定构造函数，默认为无参构造 */
     Class[] constructor() default {};
 

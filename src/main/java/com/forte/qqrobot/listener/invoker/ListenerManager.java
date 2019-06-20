@@ -6,6 +6,7 @@ import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.MsgSender;
@@ -94,7 +95,7 @@ public class ListenerManager {
         //增加参数
 
         //参数获取getter
-        Function<ListenerMethod, Set<Object>> paramGetter = buildParamGetter(msgGet, args, at, sendList, setList, getList);
+        Function<ListenerMethod, AdditionalDepends> paramGetter = buildParamGetter(msgGet, args, at, sendList, setList, getList);
         //获取消息类型
         MsgGetTypes type = MsgGetTypes.getByType(msgGet.getClass());
 
@@ -135,7 +136,7 @@ public class ListenerManager {
      * @param msgGet        接收到的消息
      * @param at            是否被at
      */
-    private void invokeBlock(Set<ListenerMethod> blockMethod, Function<ListenerMethod, Set<Object>> paramGetter, MsgGet msgGet, boolean at){
+    private void invokeBlock(Set<ListenerMethod> blockMethod, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, boolean at){
         //过滤
         //获取过滤器
         ListenerFilter filter = ResourceDispatchCenter.getListenerFilter();
@@ -178,28 +179,43 @@ public class ListenerManager {
 
     /**
      * 构建参数获取getter
-     * @return
+     * 额外参数作为 {@link AdditionalDepends} 类进行封装
      */
-    private Function<ListenerMethod, Set<Object>> buildParamGetter(MsgGet msgGet, Set<Object> args, boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+    private Function<ListenerMethod, AdditionalDepends> buildParamGetter(MsgGet msgGet, Set<Object> args, Boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
         //增加参数:MsgGetTypes
-        args.add(MsgGetTypes.getByType(msgGet.getClass()));
+        MsgGetTypes msgType = MsgGetTypes.getByType(msgGet.getClass());
 
         //参数获取getter
         return lm -> {
-            Set<Object> params = new HashSet<>(args);
+            Map<String, Object> map = new HashMap<>();
+            map.put("msgGet", msgGet);
+            map.put(msgGet.getClass().getSimpleName(), msgGet);
+            map.put("at", at);
+            map.put("msgType", msgType);
             MsgSender msgSender = MsgSender.build(sendList, setList, getList, lm);
+            map.put("msgSender", msgSender);
             //将整合的送信器与原生sender都传入
-            params.add(msgSender);
             if(sendList != null){
-                params.add(sendList);
+                map.put("sendList", sendList);
+                map.put("sender", sendList);
+                map.put("SENDER", sendList);
             }
             if(setList != null){
-                params.add(setList);
+                map.put("setList", setList);
+                map.put("setter", setList);
+                map.put("SETTER", setList);
             }
             if(getList != null){
-                params.add(getList);
+                map.put("getList", getList);
+                map.put("getter", getList);
+                map.put("GETTER", getList);
             }
-            return params;
+
+            for (Object arg : args) {
+                map.put(arg.getClass().getSimpleName(), arg);
+            }
+
+            return AdditionalDepends.getInstance(map);
         };
     }
 
@@ -211,7 +227,7 @@ public class ListenerManager {
      * @param at            是否被at
      * @return              执行成功函数数量
      */
-    private int invokeNormal(MsgGetTypes msgGetTypes, Function<ListenerMethod, Set<Object>> paramGetter, MsgGet msgGet, boolean at){
+    private int invokeNormal(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, boolean at){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
         //获取监听函数过滤器
@@ -242,7 +258,7 @@ public class ListenerManager {
      * @param msgGet        接收的消息
      * @param at            是否被at
      */
-    private int invokeSpare(MsgGetTypes msgGetTypes, Function<ListenerMethod, Set<Object>> paramGetter, MsgGet msgGet, boolean at){
+    private int invokeSpare(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, boolean at){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
         //获取监听函数过滤器

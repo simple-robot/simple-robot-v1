@@ -8,13 +8,12 @@ import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.SingleFactory;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 /**
@@ -93,16 +92,41 @@ public class DependCenter implements DependGetter {
     /**
      * 加载一批依赖对象
      */
+    public DependCenter load(Predicate<Class> classTest, Collection<Class<?>> list){
+        return load(classTest, list.toArray(new Class[0]));
+    }
+
+    /**
+     * 判断规则默认为非接口、抽象类且存在@Beans注解的class对象
+     * @param list classes对象列表
+     */
     public DependCenter load(Collection<Class<?>> list){
         return load(list.toArray(new Class[0]));
     }
 
     /**
-     * 加载一批依赖对象
+     * 判断规则默认为非接口、抽象类且存在@Beans注解的class对象
+     * @param loadsClasses  classes对象列表
      */
-    public DependCenter load(Class<?>... loadsClasses) {
-        //转化为Beans对象, class对象去重
-        List<Beans> beans = BeansFactory.getBeans(Arrays.stream(loadsClasses).distinct().toArray(Class[]::new));
+    public DependCenter load(Class<?>... loadsClasses){
+        return load(c ->
+                //不是接口、不是抽象类
+                (!c.isInterface()) && (!Modifier.isAbstract(c.getModifiers()))
+                        &&
+                        //存在注解
+                        //注解：Beans、Listen
+                (c.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class) != null)
+        , loadsClasses);
+    }
+
+
+    /**
+     * 加载一批依赖对象
+     * @param classTest class判断类，如果有特殊规则则填写，例如全部包扫描的时候，没有注解的类也可以通过
+     */
+    public DependCenter load(Predicate<Class> classTest, Class<?>... loadsClasses) {
+        //转化为Beans对象, class对象去重并根据规则过滤
+        List<Beans> beans = BeansFactory.getBeans(Arrays.stream(loadsClasses).distinct().filter(classTest).toArray(Class[]::new));
 
         //后遍历
         beans.forEach(b -> {
@@ -123,8 +147,11 @@ public class DependCenter implements DependGetter {
                     //参数注入函数
                     Consumer<?> injectDepend = getInjectDependConsumer(b);
 
+                    //额外参数注入函数
+                    BiConsumer<?, DependGetter> additional = getAddInjectDependConsumer(b);
+
                     //封装为Depend对象
-                    Depend<?> depend = new Depend(name, type, b.isSingle(), supplier, injectDepend);
+                    Depend<?> depend = new Depend(name, type, b.isSingle(), supplier, injectDepend, additional);
 
                     //保存
                     saveDepend(depend);
@@ -211,15 +238,21 @@ public class DependCenter implements DependGetter {
     private <T> Consumer<T> getInjectDependConsumer(Beans<T> beans){
         //查找所有的字段，取到所有存在@Depend注解的字段或方法
         Class<T> type = beans.getType();
-        //获取全部字段, 根据注解获取, 转化为字段值注入函数
-        Consumer<T>[] consumerArray = Arrays.stream(type.getDeclaredFields()).filter(f -> f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class) != null)
+        //获取全部字段, 根据注解获取(或全部注入), 转化为字段值注入函数
+        Consumer<T>[] consumerArray = Arrays.stream(FieldUtils.getFields(type, true))
+                .filter(f -> beans.getBeans().allDepend() || f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
                     com.forte.qqrobot.anno.depend.Depend dependAnnotation = f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
+                    if((beans.getBeans().allDepend()) && (dependAnnotation == null)){
+                        dependAnnotation = beans.getBeans().depend();
+                    }
+
                     //字段名称
                     String name = dependAnnotation.value();
                     //字段类型
                     Class<?> fieldType = dependAnnotation.type().length == 0 ? f.getType() : dependAnnotation.type()[0];
+
                     //字段值的获取函数，获取的是Depend对象
                     Supplier<Depend> fieldGetter;
                     if (name.trim().length() == 0) {
@@ -272,6 +305,84 @@ public class DependCenter implements DependGetter {
         };
     }
 
+    /**
+     * 获取依赖注入函数
+     * 提供额外的参数注入函数并且仅使用额外参数进行注入
+     */
+    private <T> BiConsumer<T, ? extends DependGetter> getAddInjectDependConsumer(Beans<T> beans){
+        //查找所有的字段，取到所有存在@Depend注解的字段或方法
+        Class<T> type = beans.getType();
+        //获取全部字段, 根据注解获取(或全部注入), 转化为字段值注入函数
+        BiConsumer<T, DependGetter>[] consumerArray = Arrays.stream(FieldUtils.getFields(type, true))
+                .filter(f -> beans.getBeans().allDepend() || f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class) != null)
+                //将字段转化为Supplier函数，以获取字段值
+                .map(f -> {
+                    //获取字段注解
+                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
+                    //如果没有注解且allDepend为true，获取默认注解
+                    if((beans.getBeans().allDepend()) && (dependAnnotation == null)){
+                        dependAnnotation = beans.getBeans().depend();
+                    }
+
+                    //字段名称
+                    String name = dependAnnotation.value();
+                    //字段类型
+                    Class<?> fieldType = dependAnnotation.type().length == 0 ? f.getType() : dependAnnotation.type()[0];
+
+                    //字段值的获取函数，获取的是Depend对象
+                    Function<DependGetter, Depend> fieldGetterFunction;
+                    if (name.trim().length() == 0) {
+                        //如果未指定字段名称，判断是否为常量类型，如果是，尝试获取字段名，否则使用类型注入
+                        if (BasicResourceWarehouse.isBasicType(f.getType())) {
+                            //是常量类型，通过变量名获取
+                            String fieldName = f.getName();
+                            Object thisConstant = this.constant(fieldName);
+                            fieldGetterFunction = (add) -> (add.equals(this)) ? new BasicDepend(fieldName, thisConstant.getClass(), thisConstant) : add.constant(fieldName) == null ? new BasicDepend(fieldName, thisConstant.getClass(), thisConstant) : (new BasicDepend(f.getName(), add.constant(fieldName).getClass() ,add.constant(fieldName)));
+                        } else {
+                            //否则，是普通的类型，通过类型获取
+                            fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(fieldType) : (add.get(fieldType) == null) ? this.getDepend(fieldType) : new Depend(fieldType.getSimpleName(), fieldType, false, () -> add.get(fieldType), v ->  {}, (v, a) -> {});
+                        }
+                    } else {
+                        //指定了名称，直接获取
+                        fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(name, fieldType) : (add.get(name, fieldType) == null) ? this.getDepend(name, fieldType) : new Depend(name, fieldType, false, () -> add.get(name, fieldType), v ->  {}, (v, a) ->  {});
+                    }
+
+                    //判断字段是否可以注入的函数
+                    Function<T, Boolean> canInjFunction;
+                    try {
+                        canInjFunction = DependUtil.canInj(type, f, dependAnnotation);
+                    } catch (NoSuchMethodException e) {
+                        throw new DependResourceException("字段值获取函数构建异常！", e);
+                    }
+
+                    //赋值函数
+                    BiConsumer<T, DependGetter> setterConsumer;
+                    try {
+                        setterConsumer = DependUtil.doInj(type, f, dependAnnotation, fieldGetterFunction);
+                    } catch (NoSuchMethodException e) {
+                        throw new DependResourceException("字段值赋值函数构建异常！", e);
+                    }
+
+                    //赋值函数
+                    return (BiConsumer<T, DependGetter>) (T b, DependGetter add) -> {
+                        //值判断, 判断此字段是否可以进行注入
+                        if (canInjFunction.apply(b)) {
+                            //值赋值
+                            setterConsumer.accept(b, add);
+                        }
+                    };
+                }).toArray(BiConsumer[]::new);
+
+        //全部字段赋值
+        return (b, add) -> {
+            //遍历全部字段值赋值函数并赋值
+            for (BiConsumer<T, DependGetter> inj : consumerArray) {
+                inj.accept(b, add);
+            }
+        };
+    }
+
+
 
     /**
      * 通过方法获取可以注入的参数
@@ -279,13 +390,10 @@ public class DependCenter implements DependGetter {
      * @param addParams 额外参数
      *                  当存在额外参数的时候，优先使用额外参数进行注入
      */
-    public Object[] getMethodParameters(Method method, Object[] addParams){
+    public Object[] getMethodParameters(Method method, AdditionalDepends addParams){
         Parameter[] parameters = method.getParameters();
-        //优先从额外参数中获取，额外参数只能根据类型来区分
-        //将额外类型转化为map集合
-        Map<Class, Object> addParamsMaps = addParams == null ? Collections.emptyMap() : Arrays.stream(addParams).collect(Collectors.toMap(Object::getClass, o -> o));
-
-        return Arrays.stream(parameters).map(p -> getParameter(p, addParamsMaps)).toArray();
+        //优先从额外参数中获取
+        return Arrays.stream(parameters).map(p -> getParameter(p, addParams == null ? AdditionalDepends.getEmpty() : addParams)).toArray();
     }
 
     /**
@@ -300,7 +408,7 @@ public class DependCenter implements DependGetter {
     /**
      * 将parameter转化为对应的bean
      */
-    private Object getParameter(Parameter parameter, Map<Class, Object> addParamsMap){
+    private Object getParameter(Parameter parameter, AdditionalDepends additionalDepends){
         //获取注解
         com.forte.qqrobot.anno.depend.Depend dependAnnotation = parameter.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
 
@@ -313,27 +421,28 @@ public class DependCenter implements DependGetter {
                 String name = dependAnnotation.value();
                 if(name.trim().length() == 0){
                     //没有名称，优先使用额外参数获取，其次使用类型查询
-                    Class<?> pt = parameter.getType();
-                    //特殊判断：如果类型为Boolean或者boolean
-                    pt = (pt.equals(Boolean.class) || pt.equals(boolean.class)) ? Boolean.class : pt;
-                    Object addParamGet = getAddParameter(pt, addParamsMap);
+                    Class type = dependAnnotation.type().length == 0 ? parameter.getType() : dependAnnotation.type()[0];
+                    type = FieldUtils.basicToBox(type);
+                    Object addParamGet = additionalDepends.get(type);
                     if(addParamGet != null){
                         param = addParamGet;
                     }else{
-                        Class type = dependAnnotation.type().length == 0 ? parameter.getType() : dependAnnotation.type()[0];
-                        param = get(type);
+                        param = this.get(type, additionalDepends);
                     }
                 }else{
                     //有名称，通过名称获取
-                    param = get(name);
+                    Object addParamGet = additionalDepends.get(name);
+                    if(addParamGet != null){
+                        param = addParamGet;
+                    }else{
+                        param = this.get(name, additionalDepends);
+                    }
                 }
             }else{
                 //没有注解, 通过使用参数名称获取
                 //先尝试通过额外参数获取
-                Class<?> pt = parameter.getType();
-                //特殊判断：如果类型为Boolean或者boolean
-                pt = (pt.equals(Boolean.class) || pt.equals(boolean.class)) ? Boolean.class : pt;
-                Object addParamGet = getAddParameter(pt, addParamsMap);
+                Class<?> pt = FieldUtils.basicToBox(parameter.getType());
+                Object addParamGet = additionalDepends.get(pt);
                 if(addParamGet != null){
                     param = addParamGet;
                 }else{
@@ -341,42 +450,26 @@ public class DependCenter implements DependGetter {
                     //如果获取不到则使用类型查询
                     String name = paramNameGetter.getParameterName(parameter);
                     if(name != null){
-                        Object o = get(name);
-                        //如果通过名称获取的对象为null或者类型并非参数的子类，通过类型获取
-                        if(o == null || !FieldUtils.isChild(o, parameter.getType())){
-                            param = get(parameter.getType());
+                        Object addGet = additionalDepends.get(name);
+                        if(addGet != null){
+                            param = addGet;
                         }else{
-                            param = o;
+                            Object o = this.get(name, additionalDepends);
+                            //如果通过名称获取的对象为null或者类型并非参数的子类，通过类型获取
+                            if(o == null || !FieldUtils.isChild(o, pt)){
+                                param = this.get(pt, additionalDepends);
+                            }else{
+                                param = o;
+                            }
                         }
                     }else{
-                        param = get(parameter.getType());
+                        param = this.get(pt, additionalDepends);
                     }
                 }
             }
 
         return param;
     }
-
-    /**
-     * 获取额外参数
-     */
-    private <T> T getAddParameter(Class<T> type, Map<Class, Object> addParameters){
-        //先尝试直接获取，如果没有则尝试获取子类
-        T t = (T) addParameters.get(type);
-        if(t == null){
-            for (Class key : addParameters.keySet()) {
-                if(FieldUtils.isChild(key, type)){
-                    return (T) addParameters.get(key);
-                }
-            }
-            return null;
-        }else{
-            return t;
-        }
-    }
-
-
-
 
 
     //**************************************
@@ -471,6 +564,75 @@ public class DependCenter implements DependGetter {
         Depend<T> get = getDepend(type);
         return get == null ? null : get.getInstance();
 
+    }
+
+
+    /**
+     * 通过额外参数对某个对象进行强制注入
+     */
+    public <T> T get(Class<T> type, DependGetter additionalDepends){
+        //先获取依赖
+        Depend<T> depend = getDepend(type);
+        if(depend != null){
+            //使用额外参数注入依赖对象，额外参数内部不存在其他参数依赖
+            //拆分步骤，先获取依赖实例
+            T instance = depend.getEmptyInstance();
+            //注入额外参数
+            depend.injectAdditional(instance, additionalDepends);
+            //注入普通参数
+//            depend.injectAdditional(instance, this);
+            return instance;
+
+        }else{
+            //没东西，直接返回null
+            return null;
+        }
+    }
+
+
+    /**
+     * 通过额外参数对某个对象进行强制注入
+     */
+    public Object get(String name, DependGetter additionalDepends){
+        //先获取依赖
+        Depend depend = getDepend(name);
+        if(depend != null){
+            //使用额外参数注入依赖对象，额外参数内部不存在其他参数依赖
+            //拆分步骤，先获取依赖实例
+            Object instance = depend.getEmptyInstance();
+            //注入普通参数
+//            depend.injectAdditional(instance, this);
+            //注入额外参数
+            depend.injectAdditional(instance, additionalDepends);
+            return instance;
+
+        }else{
+            //没东西，直接返回null
+            return null;
+        }
+    }
+
+
+    /**
+     * 通过额外参数对某个对象进行强制注入
+     */
+    public <T> T get(String name, Class<T> type, DependGetter additionalDepends){
+        //先获取依赖
+        Depend<T> depend = getDepend(name);
+        if(depend != null){
+            //使用额外参数注入依赖对象，额外参数内部不存在其他参数依赖
+            //拆分步骤，先获取依赖实例
+            T instance = depend.getEmptyInstance();
+            //注入普通参数
+            depend.injectAdditional(instance, this);
+            //注入额外参数
+            depend.injectAdditional(instance, additionalDepends);
+            return instance;
+
+        }else{
+            //没东西，直接返回null
+            return null;
+        }
     }
 
 

@@ -81,8 +81,6 @@ public enum MsgGetTypes {
             }
         }
 
-        //没有找到，返回unknownMsg
-//        return unknownMsg;
         return null;
     }
 
