@@ -571,6 +571,16 @@ public class DependCenter implements DependGetter {
      * 通过额外参数对某个对象进行强制注入
      */
     public <T> T get(Class<T> type, DependGetter additionalDepends){
+        if(additionalDepends == null){
+            return this.get(type);
+        }
+
+        if(additionalDepends instanceof AdditionalDepends){
+            if(((AdditionalDepends) additionalDepends).isEmpty()){
+                return this.get(type);
+            }
+        }
+
         //先获取依赖
         Depend<T> depend = getDepend(type);
         if(depend != null){
@@ -594,6 +604,16 @@ public class DependCenter implements DependGetter {
      * 通过额外参数对某个对象进行强制注入
      */
     public Object get(String name, DependGetter additionalDepends){
+        if(additionalDepends == null){
+            return this.get(name);
+        }
+
+        if(additionalDepends instanceof AdditionalDepends){
+            if(((AdditionalDepends) additionalDepends).isEmpty()){
+                return this.get(name);
+            }
+        }
+
         //先获取依赖
         Depend depend = getDepend(name);
         if(depend != null){
@@ -617,6 +637,16 @@ public class DependCenter implements DependGetter {
      * 通过额外参数对某个对象进行强制注入
      */
     public <T> T get(String name, Class<T> type, DependGetter additionalDepends){
+        if(additionalDepends == null){
+            return this.get(name, type);
+        }
+
+        if(additionalDepends instanceof AdditionalDepends){
+            if(((AdditionalDepends) additionalDepends).isEmpty()){
+                return this.get(name, type);
+            }
+        }
+
         //先获取依赖
         Depend<T> depend = getDepend(name);
         if(depend != null){

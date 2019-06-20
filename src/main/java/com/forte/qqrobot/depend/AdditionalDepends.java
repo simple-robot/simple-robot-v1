@@ -38,6 +38,13 @@ public class AdditionalDepends implements DependGetter {
     }
 
     /**
+     * 判断自己是否为空
+     */
+    public boolean isEmpty(){
+        return this.equals(EMPTY) || ((name.isEmpty()) && (type.isEmpty()));
+    }
+
+    /**
      * 获取空参数对象
      */
     public static AdditionalDepends getEmpty() {
