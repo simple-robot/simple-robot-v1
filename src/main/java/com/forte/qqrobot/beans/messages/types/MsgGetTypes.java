@@ -39,6 +39,9 @@ public enum MsgGetTypes {
     /** 请求-群添加 */
     groupAddRequest(GroupAddRequest.class),
 
+    /** 事件-群文件上传 */
+    groupFileUpload(GroupFileUpload.class),
+
     ;
 
 

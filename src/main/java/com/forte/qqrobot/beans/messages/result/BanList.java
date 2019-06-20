@@ -1,39 +1,18 @@
 package com.forte.qqrobot.beans.messages.result;
 
+import com.forte.qqrobot.beans.messages.result.inner.BanInfo;
+
 /**
  * 禁言列表
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface BanList extends InfoResultList<BanList.BanInfo> {
+public interface BanList extends InfoResultList<BanInfo> {
 
     /**
      * 获取禁言列表
      */
 //    BanInfo[] getBanList();
 
-    /**
-     * 禁言详细信息
-     */
-    interface BanInfo extends ResultInner{
-        /**
-         * 被禁言者的QQ
-         */
-        String getQQ();
 
-        /**
-         * 被禁言成员昵称
-         */
-        String getNickName();
-
-        /**
-         * 是否为管理员
-         */
-        Boolean isManager();
-
-        /**
-         * 禁言剩余时间
-         */
-        Long lastTime();
-    }
 }

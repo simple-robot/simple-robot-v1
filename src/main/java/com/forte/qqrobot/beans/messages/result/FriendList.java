@@ -1,5 +1,7 @@
 package com.forte.qqrobot.beans.messages.result;
 
+import com.forte.qqrobot.beans.messages.result.inner.Friend;
+
 import java.util.Map;
 
 /**
@@ -19,14 +21,4 @@ public interface FriendList extends InfoResult {
     /** 通过某个分组获取其中的好友列表 */
     Friend[] getFirendList(String group);
 
-    /**
-     * 好友信息
-     */
-    interface Friend extends ResultInner{
-        /** 获取好友昵称 */
-        String getName();
-
-        /** 获取好友QQ号 */
-        String getQQ();
-    }
 }

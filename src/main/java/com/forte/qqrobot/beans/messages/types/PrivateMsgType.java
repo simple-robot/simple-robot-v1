@@ -13,7 +13,9 @@ public enum PrivateMsgType {
     /** 来自群 */
     FROM_GROUP(2),
     /** 来自讨论组 */
-    FROM_DISCUSS(3)
+    FROM_DISCUSS(3),
+    /** 系统消息 */
+    FROM_SYSTEM(4)
     ;
 
     /** 类型对应数字 */
@@ -42,7 +44,10 @@ public enum PrivateMsgType {
     public boolean isFromDiscuss(){
         return TYPE == FROM_DISCUSS.TYPE;
     }
-
+    /** 是否为系统消息 */
+    public boolean isFromSystem(){
+        return TYPE == FROM_SYSTEM.TYPE;
+    }
     /**
      * 工厂获取
      */
