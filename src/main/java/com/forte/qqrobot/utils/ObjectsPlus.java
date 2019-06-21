@@ -3,6 +3,7 @@ package com.forte.qqrobot.utils;
 import java.util.Objects;
 
 /**
+ * 提供几个判断是否存在null值的方法
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/

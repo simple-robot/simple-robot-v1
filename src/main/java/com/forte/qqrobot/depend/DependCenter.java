@@ -4,6 +4,7 @@ import com.forte.qqrobot.depend.parameter.ParamGetterManager;
 import com.forte.qqrobot.depend.parameter.ParamNameGetter;
 import com.forte.qqrobot.depend.util.DependUtil;
 import com.forte.qqrobot.exception.DependResourceException;
+import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.SingleFactory;
 
@@ -109,7 +110,7 @@ public class DependCenter implements DependGetter {
      * @param loadsClasses  classes对象列表
      */
     public DependCenter load(Class<?>... loadsClasses){
-        return load(c ->
+        return load(null, c ->
                 //不是接口、不是抽象类
                 (!c.isInterface()) && (!Modifier.isAbstract(c.getModifiers()))
                         &&
@@ -119,14 +120,37 @@ public class DependCenter implements DependGetter {
         , loadsClasses);
     }
 
+    /**
+     * 判断规则默认为非接口、抽象类且存在@Beans注解的class对象
+     * @param loadsClasses  classes对象列表
+     */
+    public DependCenter load(com.forte.qqrobot.anno.depend.Beans beanAnno, Class<?>... loadsClasses){
+        return load(beanAnno, c ->
+                //不是接口、不是抽象类
+                (!c.isInterface()) && (!Modifier.isAbstract(c.getModifiers()))
+                        &&
+                        //存在注解
+                        //注解：Beans、Listen
+                (c.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class) != null)
+        , loadsClasses);
+    }
 
     /**
      * 加载一批依赖对象
      * @param classTest class判断类，如果有特殊规则则填写，例如全部包扫描的时候，没有注解的类也可以通过
      */
-    public DependCenter load(Predicate<Class> classTest, Class<?>... loadsClasses) {
+    public DependCenter load(Predicate<Class> classTest, Class<?>... loadsClasses){
+        return load(null, classTest, loadsClasses);
+    }
+
+
+    /**
+     * 加载一批依赖对象
+     * @param classTest class判断类，如果有特殊规则则填写，例如全部包扫描的时候，没有注解的类也可以通过
+     */
+    public DependCenter load(com.forte.qqrobot.anno.depend.Beans BeansAnno, Predicate<Class> classTest, Class<?>... loadsClasses) {
         //转化为Beans对象, class对象去重并根据规则过滤
-        List<Beans> beans = BeansFactory.getBeans(Arrays.stream(loadsClasses).distinct().filter(classTest).toArray(Class[]::new));
+        List<Beans> beans = BeansFactory.getBeans(BeansAnno, Arrays.stream(loadsClasses).distinct().filter(classTest).toArray(Class[]::new));
 
         //后遍历
         beans.forEach(b -> {
@@ -172,6 +196,8 @@ public class DependCenter implements DependGetter {
             //如果存在，直接抛出异常
             throw new DependResourceException("已经存在名称为["+ depend +"]的依赖");
         }
+
+        QQLog.debug("load Depend >> " + depend);
 
         //判断类型，如果是基础数据类型，保存到基础，否则保存至其他
         if (BasicResourceWarehouse.isBasicType(depend.getType())) {

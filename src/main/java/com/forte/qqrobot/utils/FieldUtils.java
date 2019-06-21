@@ -3,6 +3,9 @@ package com.forte.qqrobot.utils;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -697,6 +700,7 @@ public class FieldUtils {
      * @param level
      * @param param
      */
+    @Deprecated
     private static void objectSetter(Object t, Object root, String fieldName, String realFieldName, int level, Object param) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         // TODO 实现缓存的setter方法
         // TODO 存在严重bug，此方法会导致缓存无法储存和获取，导致getter效率大幅度下降
@@ -844,29 +848,89 @@ public class FieldUtils {
         return getFieldClass(object.getClass(), fieldName);
     }
 
+
     /**
      * 获取类中全部的字段
-     *
+     * @param type      Class对象
+     * @param withSuper 是否获取父类中的全部
+     * @return
+     */
+    public static Field[] getFields(Class type, boolean withSuper){
+        return getFieldsStream(type, withSuper).toArray(Field[]::new);
+    }
+
+    /**
+     * 获取类中全部的字段，转化为list
+     * @param type      Class对象
+     * @param withSuper 是否获取父类中的全部
+     */
+    public static List<Field> getFieldsList(Class type, boolean withSuper){
+        return getFields(type, withSuper, Collectors.toList());
+    };
+
+    /**
+     * 获取类中全部的字段，转化为set
+     * @param type      Class对象
+     * @param withSuper 是否获取父类中的全部
+     */
+    public static Set<Field> getFieldsSet(Class type, boolean withSuper){
+        return getFields(type, withSuper, Collectors.toSet());
+    }
+
+    /**
+     * 获取类中的全部字段，并根据字段名分组
+     */
+    public static Map<String, List<Field>> getFieldsGroupByName(Class type, boolean withSuper){
+        return getFields(type, withSuper, Collectors.groupingBy(Field::getName, Collectors.toList()));
+    }
+
+    /**
+     * 自定义流转化
+     * @param type      Class对象
+     * @param withSuper 是否获取父类中的全部
+     * @param collector Stream流转化函数
+     */
+    public static <A, R> R getFields(Class type, boolean withSuper, Collector<? super Field, A, R> collector){
+        return getFieldsStream(type, withSuper).collect(collector);
+    }
+
+    /**
+     * 自定义流转化
+     * @param type          Class对象
+     * @param withSuper     是否获取父类中的全部
+     * @param supplier      Stream流转化函数
+     * @param accumulator   Stream流转化函数
+     * @param combiner      Stream流转化函数
+     */
+    public static <A, R> R getFields(Class type, boolean withSuper,
+                                     Supplier<R> supplier,
+                                     BiConsumer<R, ? super Field> accumulator,
+                                     BiConsumer<R, R> combiner){
+        return getFieldsStream(type, withSuper).collect(supplier, accumulator, combiner);
+    }
+
+    /**
+     * 获取类中全部的字段
      * @param type      Class对象
      * @param withSuper 是否获取父类中的全部
      * @return 获取到的全部字段
      */
-    public static Field[] getFields(Class type, boolean withSuper) {
+    public static Stream<Field> getFieldsStream(Class type, boolean withSuper) {
         if (withSuper) {
             //如果还要获取父类的，获取父类
             Class superClass = type.getSuperclass();
             if (superClass == null) {
                 //没有父类，是Object类型
                 //Object 类型没有字段，直接返回
-                return new Field[0];
+                return Stream.empty();
             } else {
                 //有父类，获取父类
-                Field[] fields = getFields(superClass, true);
-                return Stream.concat(Arrays.stream(fields), Arrays.stream(type.getDeclaredFields())).toArray(Field[]::new);
+                Stream<Field> fields = getFieldsStream(superClass, true);
+                return Stream.concat(fields, Arrays.stream(type.getDeclaredFields()));
             }
         } else {
             //获取全部字段
-            return type.getDeclaredFields();
+            return Arrays.stream(type.getDeclaredFields());
         }
     }
 

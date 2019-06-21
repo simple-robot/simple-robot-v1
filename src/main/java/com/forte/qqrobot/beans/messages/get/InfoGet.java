@@ -1,11 +1,13 @@
 package com.forte.qqrobot.beans.messages.get;
 
+import com.forte.qqrobot.beans.messages.OriginalAble;
 import com.forte.qqrobot.beans.messages.RootBean;
 import com.forte.qqrobot.beans.messages.result.InfoResult;
 
 /**
  * 消息获取类型，用于获取参数的对象
- *
+ * v1.0.4之后（不包括）的版本，所有消息获取类型的消息
+ * 所有的消息获取类
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/

@@ -2,6 +2,8 @@ package com.forte.qqrobot;
 
 import com.alibaba.fastjson.util.TypeUtils;
 import com.forte.plusutils.consoleplus.console.Colors;
+import com.forte.qqrobot.anno.depend.AllBeans;
+import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.listener.DefaultWholeListener;
@@ -11,6 +13,7 @@ import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.safe.PoliceStation;
+import com.forte.qqrobot.scanner.FileScanner;
 import com.forte.qqrobot.scanner.Register;
 import com.forte.qqrobot.scanner.ScannerManager;
 import com.forte.qqrobot.sender.MsgSender;
@@ -23,10 +26,12 @@ import com.forte.qqrobot.utils.CQCodeUtil;
 import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.Closeable;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 启动类总抽象类，在此实现部分通用功能
@@ -194,19 +199,56 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         //赋值
         this.dependGetter = dependCenter;
 
+        String appPackage = app.getClass().getPackage().getName();
+
+        Set<String> scanAllPackage = new HashSet<>();
+
         //配置完成后，如果没有进行扫描，则默认扫描启动类同级包
         //需要扫描的包路径，如果是null则扫描启动器的根路径，否则按照要求进行扫描
         Set<String> scannerPackage = config.getScannerPackage();
-        if(scannerPackage == null || scannerPackage.isEmpty()){
+
+        //查看启动类上是否存在@AllBeans注解
+        AllBeans annotation = app.getClass().getAnnotation(AllBeans.class);
+        if(annotation != null){
+            //如果存在全局包扫描
+            String[] value = annotation.value();
+            if(value.length == 0){
+                scanAllPackage.add(appPackage);
+            }else{
+                scanAllPackage = Arrays.stream(value).collect(Collectors.toSet());
+            }
+
+        }
+
+        //包扫描路径，如果没有且类上没有全局搜索注解，则默认扫描启动类下包
+        if((scannerPackage == null || scannerPackage.isEmpty())){
             scannerPackage = new HashSet<String>(){{
-                add(app.getClass().getPackage().getName());
+                add(appPackage);
             }};
         }
 
+        //
+
         //进行扫描并保存注册器
+        //这个是普通的依赖注入
         this.register = scanner(scannerPackage);
 
-        //先注入依赖
+        //如果有全局注入，先扫描并注入全局注入
+        if(annotation != null){
+            //获取扫描器
+            FileScanner fileScanner = new FileScanner();
+            //扫描
+            for (String p : scanAllPackage) {
+                //全局扫描中，如果存在携带@beans的注解，则跳过.
+                //全局扫描只能将不存在@Beans注解的依赖进行添加
+                fileScanner.find(p, c -> c.getAnnotation(Beans.class) == null);
+            }
+            //获取扫描结果
+            Set<Class<?>> classes = fileScanner.get();
+            ScannerManager.getInstance(classes).registerDependCenterWithoutAnnotation();
+        }
+
+        //注入依赖-普通的扫描依赖
         this.register.registerDependCenter();
 
 

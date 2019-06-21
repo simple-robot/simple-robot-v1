@@ -21,20 +21,28 @@ public class Maputer {
      * 向map中存放一个值
      * 如果存在，将存在的值传入并返回一个要保存的值
      * 如果不存在，无参数，获取一个要保存的值
+     * @param map       操作的map
+     * @param key       操作的key
+     * @param ifExist   如果值存在的函数
+     * @param ifNull    如果值为null的函数
      */
-    public static <K, V> void put(Map<K, V> map, K key, Function<V, V> ifExist, Supplier<V> ifNull){
+    public static <K, V> V put(Map<K, V> map, K key, Function<V, V> ifExist, Supplier<V> ifNull){
         V value = map.get(key);
         if(value != null){
             //如果能获取到，参数传入并获取一个放入值
-            map.put(key, ifExist.apply(value));
+            return map.put(key, ifExist.apply(value));
         }else{
             //如果没有，获取参数
-            map.put(key, ifNull.get());
+            return map.put(key, ifNull.get());
         }
     }
 
     /**
      * 添加了 synchronized 关键字的{@link #put} 方法
+     * @param map       操作的map
+     * @param key       操作的key
+     * @param ifExist   如果值存在的函数
+     * @param ifNull    如果值为null的函数
      */
     public synchronized static <K, V> void putSynchronized(Map<K, V> map, K key, Function<V, V> ifExist, Supplier<V> ifNull){
         put(map, key, ifExist, ifNull);
@@ -44,6 +52,10 @@ public class Maputer {
      * 向map中存放一个值
      * 如果存在，将存在的值传入并返回一个要保存的值
      * 如果不存在，无参数，获取一个要保存的值
+     * @param map       操作的map
+     * @param key       操作的key
+     * @param ifExist   如果值存在的函数
+     * @param ifNull    如果值为null的函数
      */
     public static <K, V> void peek(Map<K, V> map, K key, Consumer<V> ifExist, Supplier<V> ifNull){
         V value = map.get(key);

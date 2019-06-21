@@ -15,13 +15,16 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD}) //类、方法
 public @interface AllBeans {
 
-    /** 全部加入的包路径 */
-    String[] value();
+    /** 全部加入的包路径, 默认为全包路径 */
+    String[] value() default {};
 
-    /** 如果为true则认为类中全部字段均为需要注入的类 */
-    boolean allDepend() default true;
+    /** 扫描的时候默认使用的Beans注解对象 */
+    Beans beans() default @Beans(allDepend = true);
 
-    /** 如果字段全部作为依赖注入，则此处为默认的注解 */
-    Depend depend() default @Depend;
+//    /** 如果为true则认为类中全部字段均为需要注入的类 */
+//    boolean allDepend() default true;
+//
+//    /** 如果字段全部作为依赖注入，则此处为默认的注解 */
+//    Depend depend() default @Depend;
 
 }

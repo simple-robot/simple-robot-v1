@@ -28,25 +28,25 @@ public class BeansFactory {
      * 传入的calss默认认为全部可以转化为Beans对象，过滤判断交给调用方
      */
     public static List<Beans> getBeans(Class<?>... classCollection){
+        return getBeans(null, classCollection);
+    }
+
+    /**
+     * 从Class列表中过滤并转化为Beans列表
+     * 传入的calss默认认为全部可以转化为Beans对象，过滤判断交给调用方
+     */
+    public static List<Beans> getBeans(com.forte.qqrobot.anno.depend.Beans beansAnno, Class<?>... classCollection) {
         //两个set，用于对于依赖的去重判断
-        //名称绝不可以相同，当名称不同的时候，类名是可以相同的
+        //名称绝不可以相同，当名称不同的时候，类是可以相同的
         Set<String> nameSet = new HashSet<>();
         //保存Beans集合
         List<Beans> beansList = new ArrayList<>();
 
-        //先过滤出@Beans注解下的类
+
         Arrays.stream(classCollection)
                 //不再进行过滤，将过滤交给调用方
-//                .filter(c ->
-//                //不是接口、不是抽象类
-//                (!c.isInterface()) && (!Modifier.isAbstract(c.getModifiers()))
-//                &&
-//                //存在注解 或者为整包扫描路径中的
-//                //注解：Beans、Listen
-//                (c.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class) != null)
-//            )
                 //转化为Bean对象
-                .map(BeansFactory::toBeans)
+                .map(c -> BeansFactory.toBeans(c, beansAnno))
                 //将children也添加进来
                 .flatMap(b -> Stream.concat(Stream.of(b), Stream.of(b.getChildren())))
                 .forEach(b -> {
@@ -70,13 +70,21 @@ public class BeansFactory {
         return beansList;
     }
 
-
     /**
-     * 将一个类转化为Beans对象，需要保证此类存在@Beans注解
+     * 将一个类转化为Beans对象
      */
     private static <T> Beans<T> toBeans(Class<T> clazz){
-        //获取此类上的@Beans注解
-        com.forte.qqrobot.anno.depend.Beans beansAnno = clazz.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class);
+        return toBeans(clazz, null);
+    }
+
+    /**
+     * 将一个类转化为Beans对象
+     */
+    private static <T> Beans<T> toBeans(Class<T> clazz, com.forte.qqrobot.anno.depend.Beans beansAnno){
+        //如果参数中不存在注解对象，则尝试获取类上的注解对象。获取此类上的@Beans注解
+        if(beansAnno == null){
+            beansAnno = clazz.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class);
+        }
         BeansData beansData;
         if(beansAnno == null){
             //不存在注解，使用默认值

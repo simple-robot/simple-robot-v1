@@ -1,5 +1,6 @@
 package com.forte.qqrobot.scanner;
 
+import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.sender.MsgSender;
 
 import java.util.function.Supplier;
@@ -23,5 +24,9 @@ public interface Register {
     /** 进行依赖注入 */
     void registerDependCenter();
 
+    /** 不需要@Beans注解的依赖注入
+     *  @param beans 需要提供通用Beans注解对象
+     * */
+    void registerDependCenterWithoutAnnotation(Beans beans);
 
 }

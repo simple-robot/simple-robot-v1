@@ -107,7 +107,7 @@ public class Depend<V> {
 
     @Override
     public String toString() {
-        return "Depend{" +
+        return "{" +
                 "TYPE=" + TYPE +
                 ", NAME='" + NAME + '\'' +
                 '}';

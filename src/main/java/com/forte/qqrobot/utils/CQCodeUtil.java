@@ -24,6 +24,17 @@ public class CQCodeUtil {
     /** 仅存在一个单例 */
     private static final CQCodeUtil CQ_CODE_UTIL = new CQCodeUtil();
 
+    /**
+     * 公共静态方法，创建一个实例对象
+     * 如果无法从资源调度中心获取，则创建一个新的实例
+     * 本类不需要过于拘谨于单例，使用单例只是为了缩减对象的创建频率
+     */
+    public static CQCodeUtil build(){
+        return CQ_CODE_UTIL;
+    }
+
+    /** 构造私有化 */
+    private CQCodeUtil(){}
 
     /**
      * 获取CQ码生成用StringJoiner
@@ -58,8 +69,8 @@ public class CQCodeUtil {
      * [ -> &#91;
      * ] -> &#93;
      * , -> &#44;
-     * @param value
-     * @return
+     * @param value 参数值的字符串
+     * @return  转义后的字符串
      */
     private String escapeValue(String value){
         return value
@@ -354,17 +365,10 @@ public class CQCodeUtil {
         return types.contains(text);
     }
 
+    //**************** ↑ v1.0.2 ↑ ****************//
 
-    /**
-     * 公共静态方法，创建一个实例对象
-     * 如果无法从资源调度中心获取，则创建一个新的实例
-     * 本类不需要过于拘谨于单例，使用单例只是为了缩减对象的创建频率
-     */
-    public static CQCodeUtil build(){
-        return CQ_CODE_UTIL;
-    }
+    //**************** ↓ v1.0.5 ↓ ****************//
 
-    /** 构造私有化 */
-    private CQCodeUtil(){}
+
 
 }

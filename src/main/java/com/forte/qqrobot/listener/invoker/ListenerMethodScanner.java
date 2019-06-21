@@ -42,7 +42,7 @@ public class ListenerMethodScanner {
      * 传入一个可能是监听器对象的Class对象
      * 只对标注了@Beans的函数进行获取
      */
-    public Set<ListenerMethod> scanner(Class<?> clazz, Object bean) throws Exception {
+    public Set<ListenerMethod> scanner(Class<?> clazz, Object bean) {
         Set<ListenerMethod> result = new HashSet<>();
 
         //v1.0 update

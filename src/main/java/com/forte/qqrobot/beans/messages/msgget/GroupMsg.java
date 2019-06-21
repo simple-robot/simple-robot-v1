@@ -19,6 +19,7 @@ public interface GroupMsg extends MsgGet {
     /** 获取消息类型 */
     GroupMsgType getType();
 
-
+    /** 获取群名称 */
+    String getName();
 
 }

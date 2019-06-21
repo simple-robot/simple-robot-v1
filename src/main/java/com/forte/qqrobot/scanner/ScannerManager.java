@@ -3,6 +3,7 @@ package com.forte.qqrobot.scanner;
 
 import com.forte.qqrobot.BaseConfiguration;
 import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.exception.RobotRuntionException;
 import com.forte.qqrobot.exception.TimeTaskException;
@@ -15,6 +16,7 @@ import com.forte.qqrobot.utils.FieldUtils;
 import org.quartz.Job;
 import org.quartz.SchedulerException;
 
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -51,6 +53,13 @@ public class ScannerManager implements Register {
 
         //返回实例对象
        return new ScannerManager(classes);
+    }
+
+    /**
+     * 直接获取实例
+     */
+    public static ScannerManager getInstance(Set<Class<?>> classes){
+        return new ScannerManager(classes);
     }
 
     /**
@@ -145,5 +154,14 @@ public class ScannerManager implements Register {
         dependCenter.load(classes);
     }
 
-
+    /**
+     * 不需要@Beans注解的依赖注入
+     */
+    @Override
+    public void registerDependCenterWithoutAnnotation(Beans beans) {
+        DependCenter dependCenter = ResourceDispatchCenter.getDependCenter();
+        //通过注解加载依赖
+        //注入依赖，不再需要携带@Beans
+        dependCenter.load(beans, c -> (!c.isInterface()) && (!Modifier.isAbstract(c.getModifiers())), classes.toArray(new Class[0]));
+    }
 }
