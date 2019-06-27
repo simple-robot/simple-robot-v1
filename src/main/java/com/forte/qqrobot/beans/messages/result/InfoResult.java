@@ -11,5 +11,4 @@ import com.forte.qqrobot.beans.messages.RootBean;
  **/
 public interface InfoResult extends RootBean, OriginalAble {
 
-
 }

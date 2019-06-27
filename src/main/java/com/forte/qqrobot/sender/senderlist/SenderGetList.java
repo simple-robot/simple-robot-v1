@@ -13,6 +13,11 @@ public interface SenderGetList extends SenderList {
     //*             get相关接口
     //**************************************
 
+    /** 如果存在一些可以自定义获取数量的接口，默认使用此数量 */
+    int NUMBER = 99;
+    /** 如果存在一些可以自定义是否使用缓存的接口，默认使用此选项 */
+    boolean CACHE = true;
+
     /**
      * 取匿名成员信息
      * 一般是使用匿名标识来获取
@@ -52,21 +57,51 @@ public interface SenderGetList extends SenderList {
      * @param group 群号
      * @return 群作业列表
      */
-    GroupHomeworkList getGroupHomeworkList(String group);
+    default GroupHomeworkList getGroupHomeworkList(String group){
+        return getGroupHomeworkList(group, NUMBER);
+    }
+
+    /**
+     * 取群作业列表
+     * @param group 群号
+     * @param number 获取数量
+     * @return 群作业列表
+     */
+    GroupHomeworkList getGroupHomeworkList(String group, int number);
+
+    /**
+     * 取群信息 使用缓存
+     * @param group 群号
+     * @return 群信息
+     */
+    default GroupInfo getGroupInfo(String group){
+        return getGroupInfo(group, CACHE);
+    }
 
     /**
      * 取群信息
      * @param group 群号
+     * @param cache 是否使用缓存
      * @return 群信息
      */
-    GroupInfo getGroupInfo(String group);
+    GroupInfo getGroupInfo(String group, boolean cache);
 
     /**
      * 取群链接列表
      * @param group 群号
      * @return  群链接
      */
-    GroupLinkList getGroupLinkList(String group);
+    default GroupLinkList getGroupLinkList(String group){
+        return getGroupLinkList(group, NUMBER);
+    }
+
+    /**
+     * 取群链接列表
+     * @param group 群号
+     * @param number 获取数量
+     * @return  群链接
+     */
+    GroupLinkList getGroupLinkList(String group, int number);
 
     /**
      * 取群列表
@@ -75,12 +110,23 @@ public interface SenderGetList extends SenderList {
     GroupList getGroupList();
 
     /**
-     * 取群成员信息
+     * 取群成员信息 使用缓存
      * @param group 群号
      * @param QQ    QQ号
      * @return 群成员信息
      */
-    GroupMemberInfo getGroupMemberInfo(String group, String QQ);
+    default GroupMemberInfo getGroupMemberInfo(String group, String QQ){
+        return getGroupMemberInfo(group, QQ, CACHE);
+    }
+
+    /**
+     * 取群成员信息
+     * @param group 群号
+     * @param QQ    QQ号
+     * @param cache 是否使用缓存
+     * @return 群成员信息
+     */
+    GroupMemberInfo getGroupMemberInfo(String group, String QQ, boolean cache);
 
     /**
      * 取群成员列表
@@ -94,7 +140,17 @@ public interface SenderGetList extends SenderList {
      * @param group 群号
      * @return  群公告列表
      */
-    GroupNoteList getGroupNoteList(String group);
+    default GroupNoteList getGroupNoteList(String group){
+        return getGroupNoteList(group, NUMBER);
+    }
+
+    /**
+     * 取群公告列表
+     * @param group 群号
+     * @param number 数量
+     * @return  群公告列表
+     */
+    GroupNoteList getGroupNoteList(String group, int number);
 
     /**
      * 取置顶群公告
@@ -123,10 +179,20 @@ public interface SenderGetList extends SenderList {
     ShareList getShareList(String group);
 
     /**
-     * 取陌生人信息
+     * 取陌生人信息 使用缓存
      * @param QQ 陌生人的QQ号
      * @return
      */
-    StrangerInfo getStrangerInfo(String QQ);
+    default StrangerInfo getStrangerInfo(String QQ){
+        return getStrangerInfo(QQ, CACHE);
+    }
+
+    /**
+     * 取陌生人信息
+     * @param QQ 陌生人的QQ号
+     * @param cache 是否使用缓存
+     * @return
+     */
+    StrangerInfo getStrangerInfo(String QQ, boolean cache);
 
 }

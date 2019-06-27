@@ -51,14 +51,14 @@ public class MsgSender implements Sender{
      * 是否存在send消息器
      */
     public boolean isSendAble(){
-        return SENDER == null;
+        return SENDER != null;
     }
 
     /**
      * 是否存在set消息器
      */
     public boolean isSetAble(){
-        return SETTER == null;
+        return SETTER != null;
     }
 
     /**
@@ -66,7 +66,7 @@ public class MsgSender implements Sender{
      * @return
      */
     public boolean isGetAble(){
-        return GETTER == null;
+        return GETTER != null;
     }
 
     //**************** 阻断相关 ****************//
