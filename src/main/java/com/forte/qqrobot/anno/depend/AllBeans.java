@@ -18,7 +18,7 @@ public @interface AllBeans {
     /** 全部加入的包路径, 默认为全包路径 */
     String[] value() default {};
 
-    /** 扫描的时候默认使用的Beans注解对象 */
+    /** 扫描的时候默认使用的Beans注解对象，默认尝试自动注入所有字段 */
     Beans beans() default @Beans(allDepend = true);
 
 //    /** 如果为true则认为类中全部字段均为需要注入的类 */

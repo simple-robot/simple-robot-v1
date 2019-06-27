@@ -61,11 +61,11 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
                         .add("版本。")
                         .add("本框架基于1.8实现，推荐您切换为1.8或以上版本。")
                         .build();
-                QQLog.info(colors);
-                QQLog.info("假如您的版本在1.8或以上，请忽略这两条信息。");
+                QQLog.warning(colors);
+                QQLog.warning("假如您的版本在1.8或以上，请忽略这两条信息。");
             }
         }catch (Exception e){
-            QQLog.info("java版本号检测失败, 请尽可能确保您的java版本在1.8以上");
+            QQLog.warning("java版本号检测失败, 请尽可能确保您的java版本在1.8以上");
         }
 
 
@@ -83,7 +83,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     /**
      * 线程工厂初始化
      */
-    private void threadPoolInit(){
+    protected void threadPoolInit(){
         BaseLocalThreadPool.setTimeUnit(TimeUnit.SECONDS);
         //空线程存活时间
         BaseLocalThreadPool.setKeepAliveTime(60);
@@ -154,9 +154,11 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
 
     /**
      * 开发者实现的启动方法
+     * v1.1.2-BETA后返回值修改为String，意义为启动结束后打印“启动成功”的时候使用的名字
+     * 例如，返回值为“server”，则会输出“server”启动成功
      * @param manager 监听管理器，用于分配获取到的消息
      */
-    protected abstract void start(ListenerManager manager);
+    protected abstract String start(ListenerManager manager);
 
     /**
      * 开发者实现的获取Config对象的方法,对象请保证每次获取的时候都是唯一的
@@ -245,7 +247,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
             }
             //获取扫描结果
             Set<Class<?>> classes = fileScanner.get();
-            ScannerManager.getInstance(classes).registerDependCenterWithoutAnnotation();
+            ScannerManager.getInstance(classes).registerDependCenterWithoutAnnotation(annotation.beans());
         }
 
         //注入依赖-普通的扫描依赖
@@ -295,7 +297,12 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         ListenerManager manager = ResourceDispatchCenter.getListenerManager();
 
         //开始连接
-        start(manager);
+        long s = System.currentTimeMillis();
+        String name = start(manager);
+        long e = System.currentTimeMillis();
+        String msg = name + "启动成功,耗时(" + (e - s) + "ms)";
+        QQLog.info(Colors.builder().add(msg, Colors.FONT.DARK_GREEN).build());
+
 
         //获取CQCodeUtil实例
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();

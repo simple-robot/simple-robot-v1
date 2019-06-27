@@ -17,4 +17,9 @@ public class BasicDepend<V> extends Depend<V> {
     public BasicDepend(String name, Class<V> type, V value) {
         super(name, type, true, () -> value, v -> {}, (v, add) -> {});
     }
+
+    public static <T> BasicDepend<T> getInstance(String name, T value){
+        return new BasicDepend<>(name, (Class<T>) value.getClass(), value);
+    }
+
 }

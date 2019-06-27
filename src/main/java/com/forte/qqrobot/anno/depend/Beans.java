@@ -34,8 +34,8 @@ public @interface Beans {
     /** 是否为单例，默认为单例 */
     boolean single() default true;
 
-    /** 是否将类中全部字段标记为Depend，默认为false
-     *  如果标记为false，则默认为无参数的false
+    /**
+     * 是否将类中全部字段标记为Depend，默认为false
      * */
     boolean allDepend() default false;
 

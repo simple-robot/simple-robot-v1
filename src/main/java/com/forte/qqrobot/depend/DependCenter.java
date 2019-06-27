@@ -363,7 +363,23 @@ public class DependCenter implements DependGetter {
                             //是常量类型，通过变量名获取
                             String fieldName = f.getName();
                             Object thisConstant = this.constant(fieldName);
-                            fieldGetterFunction = (add) -> (add.equals(this)) ? new BasicDepend(fieldName, thisConstant.getClass(), thisConstant) : add.constant(fieldName) == null ? new BasicDepend(fieldName, thisConstant.getClass(), thisConstant) : (new BasicDepend(f.getName(), add.constant(fieldName).getClass() ,add.constant(fieldName)));
+                            fieldGetterFunction = (add) -> {
+                                if(add.equals(this)){
+                                    //就是自身
+                                    return thisConstant == null ? null : BasicDepend.getInstance(fieldName, thisConstant);
+                                }else{
+                                    //不是自身，先额外获取
+                                    Object addConstant = add.constant(fieldName);
+                                    if(addConstant == null){
+                                        //如果获取不到，直接返回自己获取的值
+                                        return thisConstant == null ? null : BasicDepend.getInstance(fieldName, thisConstant);
+                                    }else{
+                                        //有值
+                                        return new BasicDepend(f.getName(), addConstant.getClass() ,addConstant);
+                                    }
+
+                                }
+                            };
                         } else {
                             //否则，是普通的类型，通过类型获取
                             fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(fieldType) : (add.get(fieldType) == null) ? this.getDepend(fieldType) : new Depend(fieldType.getSimpleName(), fieldType, false, () -> add.get(fieldType), v ->  {}, (v, a) -> {});
@@ -509,6 +525,14 @@ public class DependCenter implements DependGetter {
      * 通过类型获取依赖对象
      */
     public <T> Depend<T> getDepend(Class<T> type){
+        //优先尝试使用外部依赖获取
+        if(!dependGetter.equals(this)){
+            T t = dependGetter.get(type);
+            if(t != null){
+                return new Depend<T>(type.getSimpleName(), type, true, () -> t, ti -> {}, (ti, a) -> {});
+            }
+        }
+
         List<Depend> depends = classResourceWareHouse.get(type);
         if (depends == null || depends.size() == 0) {
             //没有获取到，尝试通过子类型获取
@@ -547,6 +571,14 @@ public class DependCenter implements DependGetter {
      * @param name 名称
      */
     public Depend getDepend(String name){
+        //优先尝试使用外部依赖获取
+        if(!dependGetter.equals(this)){
+            Object t = dependGetter.get(name);
+            if(t != null){
+                Class<?> type = t.getClass();
+                return new Depend(type.getSimpleName(), type, true, () -> t, ti -> {}, (ti, a) -> {});
+            }
+        }
         Depend<?> depend = nameResourceWarehouse.get(name);
         return depend == null ? null : depend;
     }
@@ -556,6 +588,14 @@ public class DependCenter implements DependGetter {
      * 常量只能通过名称获取
      */
     public Object getConstant(String name) {
+        //优先尝试使用外部依赖获取
+        if(!dependGetter.equals(this)){
+            Object constant = dependGetter.constant(name);
+            if(constant != null){
+                return constant;
+            }
+        }
+
         return basicResourceWarehouse.get(name);
     }
 
@@ -597,6 +637,13 @@ public class DependCenter implements DependGetter {
      * 通过额外参数对某个对象进行强制注入
      */
     public <T> T get(Class<T> type, DependGetter additionalDepends){
+        T instance = null;
+        //优先尝试使用外部依赖获取
+        if(!dependGetter.equals(this)){
+            instance = dependGetter.get(type);
+        }
+
+
         if(additionalDepends == null){
             return this.get(type);
         }
@@ -612,11 +659,11 @@ public class DependCenter implements DependGetter {
         if(depend != null){
             //使用额外参数注入依赖对象，额外参数内部不存在其他参数依赖
             //拆分步骤，先获取依赖实例
-            T instance = depend.getEmptyInstance();
+            if(instance == null){
+                instance = depend.getEmptyInstance();
+            }
             //注入额外参数
             depend.injectAdditional(instance, additionalDepends);
-            //注入普通参数
-//            depend.injectAdditional(instance, this);
             return instance;
 
         }else{
@@ -630,6 +677,12 @@ public class DependCenter implements DependGetter {
      * 通过额外参数对某个对象进行强制注入
      */
     public Object get(String name, DependGetter additionalDepends){
+        Object instance = null;
+        //优先尝试使用外部依赖获取
+        if(!dependGetter.equals(this)){
+            instance = dependGetter.get(name);
+        }
+
         if(additionalDepends == null){
             return this.get(name);
         }
@@ -645,16 +698,16 @@ public class DependCenter implements DependGetter {
         if(depend != null){
             //使用额外参数注入依赖对象，额外参数内部不存在其他参数依赖
             //拆分步骤，先获取依赖实例
-            Object instance = depend.getEmptyInstance();
-            //注入普通参数
-//            depend.injectAdditional(instance, this);
+            if(instance == null){
+                instance = depend.getEmptyInstance();
+            }
             //注入额外参数
             depend.injectAdditional(instance, additionalDepends);
             return instance;
 
         }else{
-            //没东西，直接返回null
-            return null;
+            //直接返回获取结果
+            return instance;
         }
     }
 
@@ -663,6 +716,12 @@ public class DependCenter implements DependGetter {
      * 通过额外参数对某个对象进行强制注入
      */
     public <T> T get(String name, Class<T> type, DependGetter additionalDepends){
+        T instance = null;
+        //优先尝试使用外部依赖获取
+        if(!dependGetter.equals(this)){
+            instance = dependGetter.get(name, type);
+        }
+
         if(additionalDepends == null){
             return this.get(name, type);
         }
@@ -678,16 +737,16 @@ public class DependCenter implements DependGetter {
         if(depend != null){
             //使用额外参数注入依赖对象，额外参数内部不存在其他参数依赖
             //拆分步骤，先获取依赖实例
-            T instance = depend.getEmptyInstance();
-            //注入普通参数
-            depend.injectAdditional(instance, this);
+            if(instance == null){
+                instance = depend.getEmptyInstance();
+            }
             //注入额外参数
             depend.injectAdditional(instance, additionalDepends);
             return instance;
 
         }else{
-            //没东西，直接返回null
-            return null;
+            //直接返回获取结果
+            return instance;
         }
     }
 

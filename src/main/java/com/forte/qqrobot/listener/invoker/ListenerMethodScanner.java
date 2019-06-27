@@ -13,6 +13,7 @@ import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.MethodUtil;
 
+import java.lang.Exception;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;

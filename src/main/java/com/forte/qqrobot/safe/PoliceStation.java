@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 /**
  * 用于确保安全的警察局，此类将会用于预防反射等可能会破坏框架结构的行为
+ * （未完成）
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/

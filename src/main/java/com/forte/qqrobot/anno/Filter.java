@@ -31,11 +31,34 @@ public @interface Filter {
      * ※ 请注意！如果为私聊且at参数为true的话的话将会永远接收不到消息 */
     boolean at() default false;
 
-    /** 对qq号进行过滤
-     *  不同的监听类型会有不同的效果。例如群消息则会过滤群号、私聊会过滤qq号
-     *  如果是不存在code的消息类型，则此参数将会失效。
+    /**
+     *  如果监听类型可以过滤QQ号，则对qq号进行过滤
+     *  如果是不存在QQ号的消息类型，则此参数将会失效。
+     *  如果为空数组则为全部匹配
      * */
     String[] code() default {};
+
+    /**
+     * 与{@link #mostType()} 功能类似，当{@link #code()}存在多个code的时候，判断其匹配规则。
+     * 默认为任意存在即可
+     */
+    MostType mostCodeType() default MostType.ANY_MATCH;
+
+    /**
+     * 如果监听类型可以过滤群号，则对群号进行过滤
+     * 如果是不存在群号的消息类型，则此参数将会失效
+     * 如果为空数组则为全部匹配
+     */
+    String[] group() default {};
+
+    /**
+     * 与{@link #mostType()} 功能类似，当{@link #group()}存在多个group的时候，判断其匹配规则。
+     * 默认为任意匹配即可。
+     */
+    MostType mostGroupType() default MostType.ANY_MATCH;
+
+
+
 
 
 }

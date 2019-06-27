@@ -1,6 +1,11 @@
 package com.forte.qqrobot.sender;
 
 import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.beans.messages.GroupCodeAble;
+import com.forte.qqrobot.beans.messages.QQCodeAble;
+import com.forte.qqrobot.beans.messages.result.GroupInfo;
+import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
+import com.forte.qqrobot.beans.messages.result.StrangerInfo;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
@@ -262,6 +267,56 @@ public class MsgSender implements Sender{
     public String[] getOnNormalBlockNameArray() {
         return getPlug().getNormalBlockNameArray();
     }
+
+
+    //**************************************
+    //*     额外参数的获取，也可以视为方法加强
+    //**************************************
+
+    /**
+     * 通过QQ号获取陌生人信息
+     * @param code  qq号
+     * @return      qq号的信息
+     */
+    public StrangerInfo getPersonInfoByCode(String code){
+        return GETTER.getStrangerInfo(code);
+    }
+
+    /**
+     * 通过携带QQ号信息的对象来获取信息
+     * @param codeAble  携带QQ号信息的对象
+     * @return
+     */
+    public StrangerInfo getPersonInfo(QQCodeAble codeAble){
+        return getPersonInfoByCode(codeAble.getQQCode());
+    }
+
+    /**
+     * 通过群号获取群详细信息
+     * @param groupCode 群号
+     * @return  群详细信息
+     */
+    public GroupInfo getGroupInfoByCode(String groupCode){
+        return GETTER.getGroupInfo(groupCode);
+    }
+
+    /**
+     *  通过携带群号的对象获取群详细信息
+     * @param groupCodeAble 携带群号的对象
+     * @return  群详细信息
+     */
+    public GroupInfo getGroupInfo(GroupCodeAble groupCodeAble){
+        return getGroupInfoByCode(groupCodeAble.getGroupCode());
+    }
+
+    /**
+     * 获取酷q上的qq信息
+     * @return qq信息
+     */
+    public LoginQQInfo getLoginInfo(){
+        return GETTER.getLoginQQInfo();
+    }
+
 
 
     //**************************************

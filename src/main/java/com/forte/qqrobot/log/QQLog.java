@@ -1,9 +1,11 @@
 package com.forte.qqrobot.log;
 
+import com.forte.plusutils.consoleplus.FortePlusPrintStream;
 import com.forte.plusutils.consoleplus.console.Colors;
 import com.forte.plusutils.consoleplus.system.ColorSystem;
 
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 
 /**
@@ -14,16 +16,28 @@ import java.time.LocalDateTime;
  **/
 public class QQLog extends ColorSystem {
 
-//    public static final PrintStream INFO;
-//    public static final PrintStream DEBUG;
-//    public static final PrintStream ERROR;
-//    private static final String INFO_HEAD = "INFO";
-//    private static final String DEBUG_HEAD = "DEBUG";
-//    private static final String ERROR_HEAD = "ERROR";
+
+    private static final PrintStream warning;
 
     static{
         //设置err为红色字体
         setErrTextFunction(str -> Colors.builder().add(str, Colors.FONT.RED).build().toString());
+        //设置警告类型输出
+        PrintStream warningPrintStream;
+        try {
+            warningPrintStream = FortePlusPrintStream.getInstance(System.out, obj -> {
+                Colors timeColors = Colors.builder().add("[" + LocalDateTime.now().toString() + "]", Colors.FONT.BLUE).build();
+                Colors typeColors = Colors.builder()
+                        .add("[", Colors.FONT.BLUE)
+                        .add("WARN", Colors.FONT.YELLOW)
+                        .add("]", Colors.FONT.BLUE)
+                        .build();
+                return timeColors + " " + typeColors + " " + obj;
+            });
+        } catch (IllegalAccessException | UnsupportedEncodingException e) {
+            warningPrintStream = null;
+        }
+        warning = warningPrintStream;
     }
 
     public static void info(Object msg){
@@ -39,8 +53,10 @@ public class QQLog extends ColorSystem {
         e.printStackTrace();
     }
 
-//    private static String getHead(String head){
-//        return "["+LocalDateTime.now().toString()+"] " + "["+ head+"]";
-//    }
+    public static void warning(Object msg){
+        warning.println(msg);
+    }
+
+
 
 }

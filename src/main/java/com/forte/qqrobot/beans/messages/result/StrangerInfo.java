@@ -21,6 +21,13 @@ public interface StrangerInfo extends InfoResult {
     /** 等级 */
     Integer getLevel();
 
+    /** 获取名称（昵称） */
+    String getName();
+
+
+
+
+
 
 
 

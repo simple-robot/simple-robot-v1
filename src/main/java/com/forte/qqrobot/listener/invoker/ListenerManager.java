@@ -79,8 +79,8 @@ public class ListenerManager {
     public void onMsg(MsgGet msgget, SenderList sender){
         onMsg(msgget,
                 sender.isSenderList() ? (SenderSendList) sender : null,
-                sender.isSenderList() ? (SenderSetList) sender : null,
-                sender.isSenderList() ? (SenderGetList) sender : null);
+                sender.isSetterList() ? (SenderSetList) sender : null,
+                sender.isGetterList() ? (SenderGetList) sender : null);
     }
 
     /**
