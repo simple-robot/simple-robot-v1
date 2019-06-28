@@ -3,6 +3,7 @@ package com.forte.qqrobot.utils;
 import com.alibaba.fastjson.JSONObject;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -13,7 +14,7 @@ import java.util.function.Function;
  **/
 public class JSONUtils {
 
-    private static final String originalName = "original";
+    private static final String originalName = "originalData";
 
     /**
      * 将json字符串转化为JSON对象
@@ -28,7 +29,8 @@ public class JSONUtils {
      * 根据JSONObject对象来将json对象转化为对应的消息获取对象
      */
     public static <T extends MsgGet> T toMsgGet(JSONObject jsonObject, Function<JSONObject, Class<T>> toType){
-        return jsonObject.toJavaObject(toType.apply(jsonObject));
+        Class<T> apply = toType.apply(jsonObject);
+        return apply == null ? null : jsonObject.toJavaObject(apply);
     }
 
     /**
@@ -36,7 +38,8 @@ public class JSONUtils {
      */
     public static <T extends MsgGet> T toMsgGet(String jsonStr, Function<JSONObject, Class<T>> toType){
         JSONObject jsonObject = toJsonObject(jsonStr);
-        return jsonObject.toJavaObject(toType.apply(jsonObject));
+        Class<T> apply = toType.apply(jsonObject);
+        return apply == null ? null : jsonObject.toJavaObject(apply);
     }
 
 }

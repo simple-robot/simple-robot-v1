@@ -1,7 +1,11 @@
 package com.forte.qqrobot.beans.messages.result;
 
+import com.forte.qqrobot.utils.EmptyIterator;
+
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -24,7 +28,7 @@ public interface InfoResultList<T extends ResultInner> extends InfoResult, Itera
      */
     default boolean isEmpty(){
         T[] list = getList();
-        return list != null && list.length <= 0;
+        return list == null || list.length <= 0;
     }
 
     /**
@@ -32,14 +36,14 @@ public interface InfoResultList<T extends ResultInner> extends InfoResult, Itera
      */
     @Override
     default Iterator<T> iterator(){
-        return Arrays.asList(getList()).iterator();
+        return isEmpty() ? EmptyIterator.getInstance() : Arrays.asList(getList()).iterator();
     }
 
     /**
      * 增加接口，使其可以转化为stream对象
      */
     default Stream<T> stream(){
-        return Arrays.stream(getList());
+        return isEmpty() ? Stream.empty() : Arrays.stream(getList());
     }
 
 

@@ -20,9 +20,6 @@ public interface PrivateMsg extends MsgGet, QQCodeAble {
     }
 
     /** 获取字体信息 */
-    String getFont();
-
-    /** 获取此人的昵称 */
-    String getName();
+//    String getFont();
 
 }

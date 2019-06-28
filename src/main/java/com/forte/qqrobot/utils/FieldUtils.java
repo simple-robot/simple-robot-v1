@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 /**
  * <p>
  * 字段操作工具，提供丰富的方法，以反射的方式从对象中获取值或赋值。<br>
+ *  说是字段操作工具，但是不止操作字段
  * 其中:<br>
  * - objectGetter方法可以允许使用多级字段，例如"user.child.name"<br>
  * - getExcelNum方法可以获取Excel中列的数字坐标，例如:"AA" => 27<br>

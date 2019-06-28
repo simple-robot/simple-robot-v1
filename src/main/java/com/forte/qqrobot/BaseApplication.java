@@ -67,9 +67,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         }catch (Exception e){
             QQLog.warning("java版本号检测失败, 请尽可能确保您的java版本在1.8以上");
         }
-
-
     }
+
+
 
     /** 没有监听函数的送信器 */
     private MsgSender NO_METHOD_SENDER;

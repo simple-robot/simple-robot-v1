@@ -2,14 +2,9 @@ package com.forte.qqrobot.utils;
 
 import com.forte.qqrobot.BaseConfiguration;
 import com.forte.qqrobot.exception.ConfigurationException;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 
 /**
  * CQ相关工具类 <br>

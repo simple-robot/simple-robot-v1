@@ -1,5 +1,7 @@
 package com.forte.qqrobot.beans.messages;
 
+import com.forte.qqrobot.utils.FieldUtils;
+
 /**
  * 所有的消息接口的根接口b<r>
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
@@ -17,12 +19,13 @@ public interface RootBean {
     /**
      * 尝试通过反射直接获取参数，通过获取get方法并执行来获取
      * 如果获取不到则返回null
+     * 支持多层级字段的获取了
+     * 例如：result.name
      */
     default Object getOtherParam(String key){
-        //开头大写
-        key = Character.toUpperCase(key.charAt(0)) + key.substring(1);
         try{
-            return this.getClass().getDeclaredMethod("get" + key).invoke(this);
+            return FieldUtils.objectGetter(this, key);
+//            return this.getClass().getDeclaredMethod("get" + key).invoke(this);
         }catch (Exception e){
             return null;
         }
@@ -31,15 +34,14 @@ public interface RootBean {
     /**
      * 尝试通过反射直接获取参数，通过获取get方法并执行来获取
      * 如果获取不到则返回null
+     * 支持多层级字段的获取了
+     * 例如：result.name
      */
     default <T> T getOtherParam(String key, Class<T> type){
-        //开头大写
-        key = Character.toUpperCase(key.charAt(0)) + key.substring(1);
         try{
-            return (T) this.getClass().getDeclaredMethod("get" + key).invoke(this);
+            return (T) FieldUtils.objectGetter(this, key);
+//            return (T) this.getClass().getDeclaredMethod("get" + key).invoke(this);
         }catch (Exception e){
-            System.err.println("通过反射获取额外参数出现异常");
-            e.printStackTrace();
             return null;
         }
     }
