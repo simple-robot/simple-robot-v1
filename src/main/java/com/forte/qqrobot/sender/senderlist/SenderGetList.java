@@ -1,9 +1,15 @@
 package com.forte.qqrobot.sender.senderlist;
 
+import com.forte.qqrobot.beans.messages.CodesAble;
+import com.forte.qqrobot.beans.messages.Flagable;
+import com.forte.qqrobot.beans.messages.GroupCodeAble;
+import com.forte.qqrobot.beans.messages.QQCodeAble;
+import com.forte.qqrobot.beans.messages.msgget.GroupFileUpload;
 import com.forte.qqrobot.beans.messages.result.*;
 
 /**
  * get相关方法列表，继承get总方法
+ * 1.2.1增加扩充方法
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
@@ -25,6 +31,7 @@ public interface SenderGetList extends SenderList {
      */
     AnonInfo getAnonInfo(String flag);
 
+
     /**
      * 获取权限信息
      * 一般不需要参数
@@ -40,11 +47,29 @@ public interface SenderGetList extends SenderList {
     BanList getBanList(String group);
 
     /**
+     * 获取封禁成员列表
+     * @param group 群号
+     * @return 封禁列表
+     */
+    default BanList getBanList(GroupCodeAble group){
+        return getBanList(group.getGroupCode());
+    }
+
+    /**
      * 获取群文件信息
      * @param flag 文件标识
      * @return 群文件信息
      */
     FileInfo getFileInfo(String flag);
+
+    /**
+     * 获取群文件信息
+     * @param file 文件
+     * @return 群文件信息
+     */
+    default FileInfo getFileInfo(GroupFileUpload file){
+        return getFileInfo(file.getId());
+    }
 
     /**
      * 获取好友列表
@@ -63,11 +88,29 @@ public interface SenderGetList extends SenderList {
 
     /**
      * 取群作业列表
+     * @param group 群号携带者
+     * @return 群作业列表
+     */
+    default GroupHomeworkList getGroupHomeworkList(GroupCodeAble group){
+        return getGroupHomeworkList(group.getGroupCode());
+    }
+
+    /**
+     * 取群作业列表
      * @param group 群号
      * @param number 获取数量
      * @return 群作业列表
      */
     GroupHomeworkList getGroupHomeworkList(String group, int number);
+
+    /**
+     * 取群作业列表
+     * @param group 群号携带者
+     * @return 群作业列表
+     */
+    default GroupHomeworkList getGroupHomeworkList(GroupCodeAble group, int number){
+        return getGroupHomeworkList(group.getGroupCode(), number);
+    }
 
     /**
      * 取群信息 使用缓存
@@ -79,12 +122,31 @@ public interface SenderGetList extends SenderList {
     }
 
     /**
+     * 取群信息 使用缓存
+     * @param group 群号携带者
+     * @return 群信息
+     */
+    default GroupInfo getGroupInfo(GroupCodeAble group){
+        return getGroupInfo(group.getGroupCode());
+    }
+
+    /**
      * 取群信息
      * @param group 群号
      * @param cache 是否使用缓存
      * @return 群信息
      */
     GroupInfo getGroupInfo(String group, boolean cache);
+
+    /**
+     * 取群信息
+     * @param group 群号携带者
+     * @param cache 是否使用缓存
+     * @return 群信息
+     */
+    default GroupInfo getGroupInfo(GroupCodeAble group, boolean cache){
+        return getGroupInfo(group.getGroupCode(), cache);
+    }
 
     /**
      * 取群链接列表
@@ -95,6 +157,16 @@ public interface SenderGetList extends SenderList {
         return getGroupLinkList(group, NUMBER);
     }
 
+
+    /**
+     * 取群链接列表
+     * @param group 群号
+     * @return  群链接
+     */
+    default GroupLinkList getGroupLinkList(GroupCodeAble group){
+        return getGroupLinkList(group.getGroupCode());
+    }
+
     /**
      * 取群链接列表
      * @param group 群号
@@ -102,6 +174,16 @@ public interface SenderGetList extends SenderList {
      * @return  群链接
      */
     GroupLinkList getGroupLinkList(String group, int number);
+
+    /**
+     * 取群链接列表
+     * @param group 群号
+     * @param number 获取数量
+     * @return  群链接
+     */
+    default GroupLinkList getGroupLinkList(GroupCodeAble group, int number){
+        return getGroupLinkList(group.getGroupCode(), number);
+    }
 
     /**
      * 取群列表
@@ -120,6 +202,25 @@ public interface SenderGetList extends SenderList {
     }
 
     /**
+     * 取群成员信息 使用缓存
+     * @param group 群号
+     * @param QQ    QQ号
+     * @return 群成员信息
+     */
+    default GroupMemberInfo getGroupMemberInfo(GroupCodeAble group, QQCodeAble QQ){
+        return getGroupMemberInfo(group.getGroupCode(), QQ.getQQCode());
+    }
+
+    /**
+     * 取群成员信息 使用缓存
+     * @param codes 群号和QQ号携带者
+     * @return 群成员信息
+     */
+    default GroupMemberInfo getGroupMemberInfo(CodesAble codes){
+        return getGroupMemberInfo(codes.getGroupCode(), codes.getQQCode());
+    }
+
+    /**
      * 取群成员信息
      * @param group 群号
      * @param QQ    QQ号
@@ -128,12 +229,41 @@ public interface SenderGetList extends SenderList {
      */
     GroupMemberInfo getGroupMemberInfo(String group, String QQ, boolean cache);
 
+
+    /**
+     * 取群成员信息 使用缓存
+     * @param group 群号
+     * @param QQ    QQ号
+     * @return 群成员信息
+     */
+    default GroupMemberInfo getGroupMemberInfo(GroupCodeAble group, QQCodeAble QQ, boolean cache){
+        return getGroupMemberInfo(group.getGroupCode(), QQ.getQQCode(), cache);
+    }
+
+    /**
+     * 取群成员信息 使用缓存
+     * @param codes 群号和QQ号携带者
+     * @return 群成员信息
+     */
+    default GroupMemberInfo getGroupMemberInfo(CodesAble codes, boolean cache){
+        return getGroupMemberInfo(codes.getGroupCode(), codes.getQQCode(), cache);
+    }
+
     /**
      * 取群成员列表
      * @param group 群号
      * @return  成员列表
      */
     GroupMemberList getGroupMemberList(String group);
+
+    /**
+     * 取群成员列表
+     * @param group 群号
+     * @return  成员列表
+     */
+    default GroupMemberList getGroupMemberList(GroupCodeAble group){
+        return getGroupMemberList(group.getGroupCode());
+    }
 
     /**
      * 取群公告列表
@@ -147,10 +277,30 @@ public interface SenderGetList extends SenderList {
     /**
      * 取群公告列表
      * @param group 群号
+     * @return  群公告列表
+     */
+    default GroupNoteList getGroupNoteList(GroupCodeAble group){
+        return getGroupNoteList(group.getGroupCode());
+    }
+
+    /**
+     * 取群公告列表
+     * @param group 群号
      * @param number 数量
      * @return  群公告列表
      */
     GroupNoteList getGroupNoteList(String group, int number);
+
+    /**
+     * 取群公告列表
+     * @param group 群号
+     * @param number 数量
+     * @return  群公告列表
+     */
+    default GroupNoteList getGroupNoteList(GroupCodeAble group, int number){
+        return getGroupNoteList(group.getGroupCode(), number);
+    }
+
 
     /**
      * 取置顶群公告
@@ -160,11 +310,29 @@ public interface SenderGetList extends SenderList {
     GroupTopNote getGroupTopNote(String group);
 
     /**
+     * 取置顶群公告
+     * @param group 群号
+     * @return  置顶群公告
+     */
+    default GroupTopNote getGroupTopNote(GroupCodeAble group){
+        return getGroupTopNote(group.getGroupCode());
+    }
+
+    /**
      * 获取图片信息
      * @param flag  图片文件名或标识
      * @return  图片信息
      */
     ImageInfo getImageInfo(String flag);
+
+    /**
+     * 获取图片信息
+     * @param flag  图片文件名或标识
+     * @return  图片信息
+     */
+    default ImageInfo getImageInfo(Flagable flag){
+        return getImageInfo(flag.getFlag());
+    }
 
     /**
      * 获取登录的QQ的信息
@@ -179,6 +347,15 @@ public interface SenderGetList extends SenderList {
     ShareList getShareList(String group);
 
     /**
+     * 获取群共享文件列表
+     * @param group 群号携带者
+     * @return 共享文件列表
+     */
+    default ShareList getShareList(GroupCodeAble group){
+        return getShareList(group.getGroupCode());
+    }
+
+    /**
      * 取陌生人信息 使用缓存
      * @param QQ 陌生人的QQ号
      * @return
@@ -188,11 +365,30 @@ public interface SenderGetList extends SenderList {
     }
 
     /**
+     * 取陌生人信息 使用缓存
+     * @param QQ 陌生人的QQ号
+     * @return
+     */
+    default StrangerInfo getStrangerInfo(QQCodeAble QQ){
+        return getStrangerInfo(QQ.getQQCode());
+    }
+
+    /**
      * 取陌生人信息
      * @param QQ 陌生人的QQ号
      * @param cache 是否使用缓存
      * @return
      */
     StrangerInfo getStrangerInfo(String QQ, boolean cache);
+
+    /**
+     * 取陌生人信息
+     * @param QQ 陌生人的QQ号
+     * @param cache 是否使用缓存
+     * @return
+     */
+    default StrangerInfo getStrangerInfo(QQCodeAble QQ, boolean cache){
+        return getStrangerInfo(QQ.getQQCode(), cache);
+    }
 
 }

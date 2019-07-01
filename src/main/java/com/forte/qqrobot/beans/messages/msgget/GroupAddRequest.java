@@ -1,13 +1,15 @@
 package com.forte.qqrobot.beans.messages.msgget;
 
 import com.forte.qqrobot.beans.messages.CodesAble;
+import com.forte.qqrobot.beans.messages.Flagable;
+import com.forte.qqrobot.beans.messages.types.GroupAddRequestType;
 
 /**
  * 群添加请求事件
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface GroupAddRequest extends EventGet, CodesAble {
+public interface GroupAddRequest extends EventGet, CodesAble, Flagable {
 
     /** 获取群号 */
     String getGroup();
@@ -29,7 +31,7 @@ public interface GroupAddRequest extends EventGet, CodesAble {
     @Override
     String getMsg();
 
-    /** 请求类消息的标识 */
-    String getFlag();
+    /** 加群类型 */
+    GroupAddRequestType getRequestType();
 
 }

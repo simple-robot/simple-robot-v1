@@ -14,5 +14,5 @@ public interface FriendAdd extends EventGet, QQCodeAble {
     @Override
     default String getQQCode(){
         return getQQ();
-    };
+    }
 }

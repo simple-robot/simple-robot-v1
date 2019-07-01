@@ -79,7 +79,7 @@ public abstract class BaseSetter implements Setter {
      * @param time  时长，一般是以分钟为单位
      */
     @Override
-    public boolean setGroupAnonymousBan(String group, String flag, Long time) {
+    public boolean setGroupAnonymousBan(String group, String flag, long time) {
         throw RobotApiException.byFrom();
     }
 
@@ -91,7 +91,7 @@ public abstract class BaseSetter implements Setter {
      * @param time  时长，一般是以分钟为单位
      */
     @Override
-    public boolean setGroupBan(String group, String QQ, Long time) {
+    public boolean setGroupBan(String group, String QQ, long time) {
         throw RobotApiException.byFrom();
     }
 
@@ -170,7 +170,7 @@ public abstract class BaseSetter implements Setter {
      * @param time  有效时长，一般为分钟吧
      */
     @Override
-    public boolean setGroupExclusiveTitle(String group, String QQ, String title, Long time) {
+    public boolean setGroupExclusiveTitle(String group, String QQ, String title, long time) {
         throw RobotApiException.byFrom();
     }
 
