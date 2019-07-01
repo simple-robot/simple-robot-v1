@@ -25,6 +25,7 @@ public class BaseConfiguration {
     //**************************************
 
 
+
     /** 是否扫描了初始化监听器 */
 //    private boolean scannedInitListener = false;
 

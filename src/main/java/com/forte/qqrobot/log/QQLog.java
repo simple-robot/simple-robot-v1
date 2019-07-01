@@ -19,6 +19,9 @@ public class QQLog extends ColorSystem {
 
     private static final PrintStream warning;
 
+    /** 日志的连接信息 */
+    private static QQLogBack qqLogBack = (m, l, e) -> true;
+
     static{
         //设置err为红色字体
         setErrTextFunction(str -> Colors.builder().add(str, Colors.FONT.RED).build().toString());
@@ -40,20 +43,32 @@ public class QQLog extends ColorSystem {
         warning = warningPrintStream;
     }
 
+    /**
+     * 更换日志阻断
+     */
+    public static void changeQQLogBack(QQLogBack logBack){
+        QQLog.qqLogBack = logBack;
+    }
+
     public static void info(Object msg){
+        if (qqLogBack.onLog(msg, LogLevel.INFO))
         info.println(msg);
     }
 
     public static void debug(Object msg){
+        if (qqLogBack.onLog(msg, LogLevel.DEBUG))
         debug.println(msg);
     }
 
     public static void error(Object msg, Throwable e){
-        err.println(msg);
-        e.printStackTrace();
+        if (qqLogBack.onLog(msg, LogLevel.ERROR, e)){
+            err.println(msg);
+            e.printStackTrace();
+        }
     }
 
     public static void warning(Object msg){
+        if (qqLogBack.onLog(msg, LogLevel.WARNING))
         warning.println(msg);
     }
 

@@ -12,6 +12,7 @@ import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.log.QQLog;
+import com.forte.qqrobot.log.QQLogBack;
 import com.forte.qqrobot.safe.PoliceStation;
 import com.forte.qqrobot.scanner.FileScanner;
 import com.forte.qqrobot.scanner.Register;
@@ -336,6 +337,14 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     }
 
 
+    //**************** 构造 ****************//
+    /** 无参构造 */
+    public BaseApplication(){}
+
+    /** 日志拦截构造 */
+    public BaseApplication(QQLogBack qqLogBack){
+        QQLog.changeQQLogBack(qqLogBack);
+    }
 
 
 }
