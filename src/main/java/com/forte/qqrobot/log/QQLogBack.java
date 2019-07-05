@@ -5,11 +5,10 @@ package com.forte.qqrobot.log;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-@FunctionalInterface
 public interface QQLogBack {
 
     /**
-     * 连接QQLog日志的输出，当返回值为true的时候才会输出到控制台。
+     * 拦截QQLog日志的输出，当返回值为true的时候才会输出到控制台。
      * @param msg   信息msg，可以直接String.valueOf()
      * @param level 日志级别
      * @param e     如果存在异常，此为异常

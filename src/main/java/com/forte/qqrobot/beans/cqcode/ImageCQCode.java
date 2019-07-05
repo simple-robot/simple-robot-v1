@@ -1,6 +1,7 @@
 package com.forte.qqrobot.beans.cqcode;
 
 import com.forte.qqrobot.beans.types.CQCodeTypes;
+import com.forte.qqrobot.exception.CQParseException;
 import com.forte.qqrobot.utils.CQUtils;
 import com.forte.qqrobot.utils.StringListReader;
 import org.apache.commons.io.FileUtils;
@@ -44,10 +45,10 @@ public class ImageCQCode extends CQCode {
     private final long ADD_TIME;
 
     /**
-     * 私有构造 TODO 为了测试暂时的公共构造
+     * 私有构造 为了测试暂时的公共构造
      * @param params 参数列表
      */
-    public ImageCQCode(Map<String, String> params) throws IOException {
+    private ImageCQCode(Map<String, String> params) throws IOException {
         super(CQ_CODE_TYPE, params);
         //获取文件md5参数
         String fileId = params.get("file");
@@ -81,6 +82,29 @@ public class ImageCQCode extends CQCode {
         URL = properties.getProperty("url");
         ADD_TIME = Long.parseLong(properties.getProperty("addtime"));
     }
+
+    /**
+     * 将CQCode对象转化为ImageCQCode对象
+     * @param cqCode    cqCode对象
+     * @return          ImageCqCode对象
+     */
+    public static ImageCQCode of(CQCode cqCode) throws IOException {
+        if(!cqCode.getCQCodeTypes().equals(CQ_CODE_TYPE)){
+            throw new CQParseException("无法将["+ cqCode.getCQCodeTypes() +"]类型的CQ码对象转化为ImageCQCode类型");
+        }
+        //如果本身就是ImageCQCode对象，直接转化
+        if(cqCode instanceof ImageCQCode){
+            return (ImageCQCode) cqCode;
+        }
+
+        return of(cqCode.getParams());
+    }
+
+    public static ImageCQCode of(Map<String, String> params) throws IOException {
+        return new ImageCQCode(params);
+    }
+
+
 
     public File getImageFile() {
         return IMAGE_FILE;

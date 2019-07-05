@@ -54,12 +54,28 @@ public class CQCodeUtil {
      * @return 转义后的字符串
      */
     public String escapeOutCQCode(String msgOutCQCode){
-        return msgOutCQCode
+        return msgOutCQCode == null ? null : msgOutCQCode
                 .replaceAll("\\&" , "&amp;")
                 .replaceAll("\\[" , "&#91;")
                 .replaceAll("\\]" , "&#93;")
                 ;
     }
+
+
+    /**
+     * 将一个没有CQ码的字符串进行解码
+     * nullable
+     * @param noCQCodeMsg
+     * @return
+     */
+    public String escapeOutCQCodeDecode(String noCQCodeMsg){
+        return noCQCodeMsg == null ? null : noCQCodeMsg
+                .replaceAll("\\&mp\\;" , "&")
+                .replaceAll("\\&91\\;" , "[")
+                .replaceAll("\\&93\\;" , "]")
+                ;
+    }
+
 
     /**
      * 对于CQ码中的value（参数值），为了防止解析混淆，需要进行转义。
@@ -72,12 +88,26 @@ public class CQCodeUtil {
      * @param value 参数值的字符串
      * @return  转义后的字符串
      */
-    private String escapeValue(String value){
-        return value
+    public String escapeValue(String value){
+        return value == null ? null : value
                 .replaceAll("\\&" , "&amp;")
                 .replaceAll("\\[" , "&#91;")
                 .replaceAll("\\]" , "&#93;")
                 .replaceAll("\\," , "&#44;")
+                ;
+    }
+
+    /**
+     * 对参数进行解码
+     * @param value 参数值的字符串
+     * @return  节码后的字符串
+     */
+    public String escapeValueDecode(String value){
+        return value == null ? null : value
+                .replaceAll("\\&amp;" , "&")
+                .replaceAll("\\&#91;" , "[")
+                .replaceAll("\\&#93;" , "]")
+                .replaceAll("\\&#44;" , ",")
                 ;
     }
 
@@ -181,6 +211,11 @@ public class CQCodeUtil {
         return getCQCodeString(CQCodeTypes.at, qq);
     }
 
+    public String getCQCode_atAll(){
+        return getCQCodeString(CQCodeTypes.at, "all");
+    }
+
+
     /**
      * 发送猜拳魔法表情
      * @param type  为猜拳结果的类型，暂不支持发送时自定义。该参数可被忽略。
@@ -275,7 +310,10 @@ public class CQCodeUtil {
         return getCQCodeString(CQCodeTypes.emoji, id);
     }
 
+
+
     //**************** CQ码辅助方法 ****************//
+
 
 
     /** 用于从字符串中提取CQCode码字符串的正则表达式 */
@@ -297,7 +335,7 @@ public class CQCodeUtil {
      * @param types CQ码类型
      * @return
      */
-    public List<String>  getCQCodeStrFromMsgByType(String msg, CQCodeTypes types){
+    public List<String> getCQCodeStrFromMsgByType(String msg, CQCodeTypes types){
         return RegexUtil.getMatcher(msg, types.getMatchRegex());
     }
 
@@ -344,6 +382,29 @@ public class CQCodeUtil {
     }
 
     /**
+     * 从信息字符串中提取出指定类型的CQCode码对象
+     * @param msg   字符串
+     * @param types 类型
+     * @return      指定类型的CQ码类型
+     */
+    public List<CQCode> getCQCodeFromMsgByType(String msg, CQCodeTypes types){
+        if(msg == null || msg.trim().length() <= 0){
+            return Collections.emptyList();
+        }
+        //CQ码list集合
+        List<String> cqStrList = getCQCodeStrFromMsgByType(msg, types);
+        return cqStrList.stream()
+                //移除[CQ:和],在以逗号分隔
+                .map(s -> s.substring(4, s.length() - 1).split("\\,"))
+                .map(arr -> {
+                    //参数数组
+                    String[] paramArr = new String[arr.length - 1];
+                    System.arraycopy(arr, 1, paramArr, 0, paramArr.length);
+                    return CQCode.of(arr[0], paramArr);
+                }).collect(Collectors.toList());
+    }
+
+    /**
      * 判断是否存在at某个qq
      * @return 是否at了某个qq
      */
@@ -365,9 +426,17 @@ public class CQCodeUtil {
         return types.contains(text);
     }
 
-    //**************** ↑ v1.0.2 ↑ ****************//
+    /**
+     * 将CQ码字符串转化为CQCode类型
+     * @param cq    cq字符串
+     * @return  CQCode对象
+     * @throws com.forte.qqrobot.exception.CQParseException
+     *  当字符串无法转化为cq码对象的时候将会抛出此异常
+     */
+    public CQCode toCQCode(String cq){
+        return CQCode.of(cq);
+    }
 
-    //**************** ↓ v1.0.5 ↓ ****************//
 
 
 

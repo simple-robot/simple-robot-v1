@@ -205,10 +205,11 @@ public enum CQCodeTypes {
 
     /** CQ码匹配的开头，从function开始拼接 */
     private static final String CQ_REGEX_HEAD = "\\[CQ:((?!(\\[CQ:))";
-    /** CQ码匹配的结尾，在最后yi个参数后 */
+    /** CQ码匹配的结尾，在最后一个参数后 */
     private static final String CQ_REGEX_END = ")\\]";
     /** 用于从字符串中提取CQCode码字符串的正则表达式 */
-    private static final String CQCODE_EXTRACT_REGEX = "\\[CQ:((?!(\\[CQ:)).)+\\]";
+//    private static final String CQCODE_EXTRACT_REGEX = "\\[CQ:((?!(\\[CQ:)).)+\\]";
+    private static final String CQCODE_EXTRACT_REGEX = "\\[CQ:((?!(\\[CQ:))\\w)+\\,((?!(\\[CQ:)).)+\\]";
 
     /** 获取方法类型名称 */
     public String getFunction(){

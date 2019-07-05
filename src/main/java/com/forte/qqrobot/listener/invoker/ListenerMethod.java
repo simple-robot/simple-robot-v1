@@ -59,6 +59,7 @@ public class ListenerMethod<T> {
 
 
 
+
     /**
      * 全参数构造
      * @param listenerGetter 监听器对象实例获取函数
