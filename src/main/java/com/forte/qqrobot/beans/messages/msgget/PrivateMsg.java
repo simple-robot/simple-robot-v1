@@ -1,13 +1,13 @@
 package com.forte.qqrobot.beans.messages.msgget;
 
-import com.forte.qqrobot.beans.messages.Flagable;
+import com.forte.qqrobot.beans.messages.FlagAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.types.PrivateMsgType;
 
 /**
  * 私信消息
  **/
-public interface PrivateMsg extends MsgGet, QQCodeAble, Flagable {
+public interface PrivateMsg extends MsgGet, QQCodeAble, FlagAble {
 
     /** 获取私聊消息类型 */
     PrivateMsgType getType();

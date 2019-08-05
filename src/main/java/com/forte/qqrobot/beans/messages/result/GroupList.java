@@ -8,10 +8,4 @@ import com.forte.qqrobot.beans.messages.result.inner.Group;
  * @since JDK1.8
  **/
 public interface GroupList extends InfoResultList<Group> {
-
-    /**
-     * 群列表
-     */
-//    Group[] getGroupList();
-
 }

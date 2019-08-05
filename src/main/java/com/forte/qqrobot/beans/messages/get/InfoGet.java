@@ -1,6 +1,5 @@
 package com.forte.qqrobot.beans.messages.get;
 
-import com.forte.qqrobot.beans.messages.OriginalAble;
 import com.forte.qqrobot.beans.messages.RootBean;
 import com.forte.qqrobot.beans.messages.result.InfoResult;
 

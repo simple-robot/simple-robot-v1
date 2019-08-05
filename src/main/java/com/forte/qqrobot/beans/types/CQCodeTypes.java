@@ -263,7 +263,11 @@ public enum CQCodeTypes {
     }
 
     /**
-     * 构造
+     * 构造方法
+     * @param function          cq码类型
+     * @param keys              参数列表
+     * @param ignoreAbleKeys    可以忽略的参数列表
+     * @param valuesRegex       对应参数的参数值匹配正则
      */
     CQCodeTypes(String function, String[] keys, String[] ignoreAbleKeys , String[] valuesRegex){
         this.function = function;

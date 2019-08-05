@@ -10,6 +10,7 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  * @date Created in 2019/3/11 15:13
  * @since JDK1.8
  **/
+@Deprecated
 public interface InitListener {
 
     /**

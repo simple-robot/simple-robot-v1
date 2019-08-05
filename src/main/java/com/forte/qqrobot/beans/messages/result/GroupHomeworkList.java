@@ -9,10 +9,4 @@ import com.forte.qqrobot.beans.messages.result.inner.GroupHomework;
  **/
 public interface GroupHomeworkList extends InfoResultList<GroupHomework> {
 
-    /** 获取群作业列表 */
-//    GroupHomework[] GetGroupHomeworkList();
-
-
-
-
 }

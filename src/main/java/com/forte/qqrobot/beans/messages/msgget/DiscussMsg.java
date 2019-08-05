@@ -1,13 +1,13 @@
 package com.forte.qqrobot.beans.messages.msgget;
 
 import com.forte.qqrobot.beans.messages.CodesAble;
-import com.forte.qqrobot.beans.messages.Flagable;
+import com.forte.qqrobot.beans.messages.FlagAble;
 
 /**
  * 讨论组消息
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  **/
-public interface DiscussMsg extends MsgGet, CodesAble, Flagable {
+public interface DiscussMsg extends MsgGet, CodesAble, FlagAble {
 
     /** 获取讨论组号 */
     String getGroup();

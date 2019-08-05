@@ -1,11 +1,15 @@
 package com.forte.qqrobot.sender.senderlist;
 
 import com.forte.qqrobot.beans.messages.CodesAble;
-import com.forte.qqrobot.beans.messages.Flagable;
+import com.forte.qqrobot.beans.messages.FlagAble;
 import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.msgget.GroupFileUpload;
 import com.forte.qqrobot.beans.messages.result.*;
+import com.forte.qqrobot.beans.types.CacheTypes;
+import com.forte.qqrobot.sender.CacheGetterFactory;
+
+import java.time.LocalDateTime;
 
 /**
  * get相关方法列表，继承get总方法
@@ -330,7 +334,7 @@ public interface SenderGetList extends SenderList {
      * @param flag  图片文件名或标识
      * @return  图片信息
      */
-    default ImageInfo getImageInfo(Flagable flag){
+    default ImageInfo getImageInfo(FlagAble flag){
         return getImageInfo(flag.getFlag());
     }
 
@@ -390,5 +394,43 @@ public interface SenderGetList extends SenderList {
     default StrangerInfo getStrangerInfo(QQCodeAble QQ, boolean cache){
         return getStrangerInfo(QQ.getQQCode(), cache);
     }
+
+
+    //**************** 以下为转化为缓存代理对象的方法 ****************//
+
+
+    /**
+     * 获取默认的缓存器，默认缓存器数据缓存1小时
+     */
+    default SenderGetList cache(){
+        return CacheGetterFactory.toCacheableGetter(this);
+    }
+
+    /**
+     * 转化为缓存getter
+     * @param time 缓存保存的秒时长
+     */
+    default SenderGetList cache(long time){
+        return CacheGetterFactory.toCacheableGetter(this, time);
+    }
+
+    /**
+     * 转化为缓存getter
+     * @param time          时长
+     * @param cacheTypes    时间对应的增量类型
+     */
+    default SenderGetList cache(long time, CacheTypes cacheTypes){
+        return CacheGetterFactory.toCacheableGetter(this, time, cacheTypes);
+    }
+
+    /**
+     * 指定过期时间
+     * @param to    到某个指定的时间过期
+     */
+    default SenderGetList cache(LocalDateTime to){
+        return CacheGetterFactory.toCacheableGetter(this, to);
+    }
+
+
 
 }

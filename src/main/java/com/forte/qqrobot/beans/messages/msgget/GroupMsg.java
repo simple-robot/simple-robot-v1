@@ -1,14 +1,13 @@
 package com.forte.qqrobot.beans.messages.msgget;
 
 import com.forte.qqrobot.beans.messages.CodesAble;
-import com.forte.qqrobot.beans.messages.Flagable;
-import com.forte.qqrobot.beans.messages.GroupCodeAble;
+import com.forte.qqrobot.beans.messages.FlagAble;
 import com.forte.qqrobot.beans.messages.types.GroupMsgType;
 
 /**
  * 群消息
  **/
-public interface GroupMsg extends MsgGet, CodesAble, Flagable {
+public interface GroupMsg extends MsgGet, CodesAble, FlagAble {
 
     /** 获取群消息发送人的qq号 */
     String getQQ();

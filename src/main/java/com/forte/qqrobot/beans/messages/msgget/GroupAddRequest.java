@@ -1,7 +1,7 @@
 package com.forte.qqrobot.beans.messages.msgget;
 
 import com.forte.qqrobot.beans.messages.CodesAble;
-import com.forte.qqrobot.beans.messages.Flagable;
+import com.forte.qqrobot.beans.messages.FlagAble;
 import com.forte.qqrobot.beans.messages.types.GroupAddRequestType;
 
 /**
@@ -9,7 +9,7 @@ import com.forte.qqrobot.beans.messages.types.GroupAddRequestType;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface GroupAddRequest extends EventGet, CodesAble, Flagable {
+public interface GroupAddRequest extends EventGet, CodesAble, FlagAble {
 
     /** 获取群号 */
     String getGroup();

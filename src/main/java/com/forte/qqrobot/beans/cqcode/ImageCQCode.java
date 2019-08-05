@@ -1,6 +1,7 @@
 package com.forte.qqrobot.beans.cqcode;
 
 import com.forte.qqrobot.beans.types.CQCodeTypes;
+import com.forte.qqrobot.exception.CQParamsException;
 import com.forte.qqrobot.exception.CQParseException;
 import com.forte.qqrobot.utils.CQUtils;
 import com.forte.qqrobot.utils.StringListReader;
@@ -52,12 +53,16 @@ public class ImageCQCode extends CQCode {
         super(CQ_CODE_TYPE, params);
         //获取文件md5参数
         String fileId = params.get("file");
+        if(fileId == null){
+            throw new CQParamsException("无法获取参数[file]");
+        }
         //解析参数以获取图片地址
         this.IMAGE_FILE = CQUtils.getImageFile(fileId);
 
         //获取文件中的参数并赋值
         List<String> datas = FileUtils.readLines(this.IMAGE_FILE, this.ENCODING);
         //使用properties接收参数，则将字符串集合转化为Reader流对象
+
                                                 //跳过第一行的数据
         Reader listReader = new StringListReader(datas.stream().skip(1).collect(Collectors.toList()));
 

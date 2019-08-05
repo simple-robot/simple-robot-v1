@@ -12,7 +12,7 @@ import java.util.Map;
 public interface FriendList extends InfoResult {
 
     /*
-        有分组比较特殊，暂不使用InfoResultList接口
+        好友列表有分组比较特殊，暂不使用InfoResultList接口
      */
 
     /** 各个分组下的好友列表 */

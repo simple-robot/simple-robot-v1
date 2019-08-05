@@ -6,9 +6,9 @@ import com.forte.qqrobot.exception.CQParseException;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * CQCode参数
@@ -38,7 +38,10 @@ public class CQCode implements Map<String, String> {
      */
     public static CQCode of(CQCodeTypes type, String[] params){
         //使用LinkedHashMap
-        Map<String, String> paramsMap = Arrays.stream(params).map(s -> s.split("=")).collect(Collectors.toMap(a -> a[0], a -> a[1], throwingMerger(), LinkedHashMap::new));
+        Map<String, String> paramsMap = Arrays.stream(params).map(s -> {
+            String[] split = s.split("=");
+            return split.length > 1 ? split : null;
+        }).filter(Objects::nonNull).collect(Collectors.toMap(a -> a[0], a -> a[1], throwingMerger(), LinkedHashMap::new));
         return of(type, paramsMap);
     }
 
@@ -100,7 +103,7 @@ public class CQCode implements Map<String, String> {
 
 
     /**
-     * 重写toString
+     * 获取CQ码字符串
      * @return toString
      */
     @Override
@@ -135,6 +138,7 @@ public class CQCode implements Map<String, String> {
 
     /**
      * 获取某个参数
+     * 同{@link #get(Object)} 方法
      * @param key key
      * @return  参数
      */
@@ -142,14 +146,32 @@ public class CQCode implements Map<String, String> {
         return get(key);
     }
 
-
+    /**
+     * 添加一个参数与值，同{@link #put(String, Object)} 方法
+     */
     public String addParam(String key, Object value){
         return put(key, value);
     }
 
+    /**
+     * 添加一个参数与值，同{@link #put(String, String)} 方法
+     */
     public String addParam(String key, String value){
         return put(key, value);
     }
+
+    /**
+     * 获取Stream<Entry>对象
+     * 在v1.2.4-BETA之后的版本增加。（不包括v1.2.4-BETA）
+     */
+    public Stream<Entry<String, String>> stream(){
+        return entrySet().stream();
+    }
+
+    //**************************************
+    //*             以上为API
+    //**************************************
+
 
     /**
      * 仅子类构造
@@ -159,6 +181,29 @@ public class CQCode implements Map<String, String> {
         this.PARAMS = params;
         //初始化的时候填入的参数列表不可以被移除
         this.FINAL_PARAMS = params.keySet().toArray(new String[0]);
+
+        //遍历参数，判断参数是否都是符合规范的
+        //需要的参数
+        String[] keys = cqCodeTypes.getKeys();
+        //获取可以忽略的参数
+        Set<String> ignoreAbleKeys = cqCodeTypes.getIgnoreAbleKeys();
+        for (String key : keys) {
+            String getParams = params.get(key);
+            if(getParams == null && (!ignoreAbleKeys.contains(key))){
+                throw new CQParamsException("CQ码类型["+ cqCodeTypes +"]的参数["+ key +"]不可忽略。");
+            }
+
+            if(getParams != null){
+                String keyRegex = cqCodeTypes.getKeyRegex(key);
+                if(keyRegex != null && !getParams.matches(keyRegex)){
+                    throw new CQParamsException("CQ码类型["+ cqCodeTypes +"]的参数["+ key +"]应当符合正则匹配：" + keyRegex);
+                }
+
+            }
+
+
+        }
+
 
         //构建toString字符串
         StringJoiner joiner = getJoiner(this.CQ_CODE_TYPE.getFunction());
@@ -179,6 +224,8 @@ public class CQCode implements Map<String, String> {
     private static <T> BinaryOperator<T> throwingMerger(){
         return (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
     }
+
+
 
     //**************************************
     //*          以下为Map接口的实现

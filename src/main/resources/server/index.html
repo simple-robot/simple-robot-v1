@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>被你发现啦~</title><!-- 图标 -->
+    <link  href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
+    <script src="http://cdn.highcharts.com.cn/highcharts/highcharts.js"></script>
+</head>
+<body>
+    <div id="app">
+         <div class="row">
+             <!-- <div class="col-md-1"></div>
+             <div class="col-md-4">
+                    <div id="container" style="width: 600px;height:400px;"></div>
+             </div>
+             <div class="col-md-2"></div>
+             <div class="col-md-4">
+                    {{aaa}}
+             </div>
+             <div class="col-md-1"></div> -->
+             <div v-for="(ch,i) in chars">
+                    <div class="col-md-6">
+                           <!-- highchars DOM -->
+                           <div :id="'container'+i" style="width: 600px;height:400px;"></div>
+                    </div>
+             </div>
+         </div>
+    </div>
+</body>
+<script>
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            aaa: "1234",
+            chars:[
+                    {
+                        chart: {
+                            type: 'bar'                          //指定图表的类型，默认是折线图（line）
+                        },
+                        title: {
+                            text: '我的第一个图表'                 // 标题
+                        },
+                        xAxis: {
+                            categories: ['苹果', '香蕉', '橙子']   // x 轴分类
+                        },
+                        yAxis: {
+                            title: {
+                                text: '吃水果个数'                // y 轴标题
+                            }
+                        },
+                        series: [{                              // 数据列
+                            name: '小明',                        // 数据列名
+                            data: [1, 0, 4]                     // 数据
+                        }, {
+                            name: '小红',
+                            data: [5, 7, 3]
+                        }]
+                    },
+                    {
+                        chart: {
+                            type: 'bar'                          //指定图表的类型，默认是折线图（line）
+                        },
+                        title: {
+                            text: '我的第一个图表'                 // 标题
+                        },
+                        xAxis: {
+                            categories: ['苹果', '香蕉', '橙子']   // x 轴分类
+                        },
+                        yAxis: {
+                            title: {
+                                text: '吃水果个数'                // y 轴标题
+                            }
+                        },
+                        series: [{                              // 数据列
+                            name: '小明',                        // 数据列名
+                            data: [1, 0, 4]                     // 数据
+                        }, {
+                            name: '小红',
+                            data: [5, 7, 3]
+                        }]
+                    },
+                    {
+                        chart: {
+                            type: 'bar'                          //指定图表的类型，默认是折线图（line）
+                        },
+                        title: {
+                            text: '我的第一个图表'                 // 标题
+                        },
+                        xAxis: {
+                            categories: ['苹果', '香蕉', '橙子']   // x 轴分类
+                        },
+                        yAxis: {
+                            title: {
+                                text: '吃水果个数'                // y 轴标题
+                            }
+                        },
+                        series: [{                              // 数据列
+                            name: '小明',                        // 数据列名
+                            data: [1, 0, 4]                     // 数据
+                        }, {
+                            name: '小红',
+                            data: [5, 7, 3]
+                        }]
+                    }
+                ],
+                charsBean:[]
+        },
+        methods: {
+            chart(){
+                var i = 0
+                this.chars.forEach(e => {
+                    let id = 'container' + i
+                    this.charsBean[i++] =  Highcharts.chart(id, this.chars[0])
+                })
+                // var chart = Highcharts.chart('container', this.chars[0]);
+            },
+            up(){
+                let i = 0
+                this.chars.forEach(e => {
+                    let id = 'container' + i
+                    let type = 'column'
+                    series = e.series
+                    series.forEach(s => {
+                        s.type = type
+                        s.data[0] = s.data[0] + 10
+                    })
+                    
+                    console.info(e)
+                    this.charsBean[i++].update(e)
+                })
+                console.info("update")
+                // var chart = Highcharts.chart('container', this.chars[0]);
+            }
+        },
+        mounted() {
+            this.chart()
+            setInterval(this.up, 5000)
+        }
+
+    })
+</script>
+
+</html>

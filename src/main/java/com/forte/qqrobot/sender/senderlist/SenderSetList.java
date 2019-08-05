@@ -1,7 +1,7 @@
 package com.forte.qqrobot.sender.senderlist;
 
 import com.forte.qqrobot.beans.messages.CodesAble;
-import com.forte.qqrobot.beans.messages.Flagable;
+import com.forte.qqrobot.beans.messages.FlagAble;
 import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.msgget.FriendAddRequest;
@@ -306,7 +306,7 @@ public interface SenderSetList extends SenderList {
      * 需要pro
      * @param flag  消息标识
      */
-    default boolean setMsgRecall(Flagable flag){
+    default boolean setMsgRecall(FlagAble flag){
         return setMsgRecall(flag.getFlag());
     }
 

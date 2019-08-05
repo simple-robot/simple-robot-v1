@@ -3,6 +3,10 @@ package com.forte.qqrobot.beans.messages.msgget;
 import com.forte.qqrobot.beans.messages.OriginalAble;
 import com.forte.qqrobot.beans.messages.RootBean;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 /**
  * 消息接收类型接口，定义一个获取接收到的消息的方法
  * 每个方法都有应有对应的set方法
@@ -27,6 +31,12 @@ public interface MsgGet extends OriginalAble, RootBean {
     /** 获取到的时间, 代表某一时间的秒值。注意是秒值！如果类型不对请自行转化 */
     long getTime();
 
+    /**
+     * 将时间作为秒值之间戳转化为LocalDateTime
+     */
+    default LocalDateTime getTimeToLocalDateTime(){
+        return LocalDateTime.ofInstant(Instant.ofEpochSecond(getTime()), ZoneId.systemDefault());
+    }
 
 
 }

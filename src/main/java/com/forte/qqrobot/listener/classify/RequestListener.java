@@ -9,6 +9,7 @@ import com.forte.qqrobot.listener.RequestGroupListener;
  * @date Created in 2019/3/9 17:32
  * @since JDK1.8
  **/
+@Deprecated
 public interface RequestListener extends RequestFriendListener,
                                          RequestGroupListener {
 }

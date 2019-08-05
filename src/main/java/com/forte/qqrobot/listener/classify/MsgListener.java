@@ -10,6 +10,7 @@ import com.forte.qqrobot.listener.MsgPrivateListener;
  * @date Created in 2019/3/9 17:31
  * @since JDK1.8
  **/
+@Deprecated
 public interface MsgListener extends MsgDisGroupListener,
                                      MsgGroupListener,
                                      MsgPrivateListener {

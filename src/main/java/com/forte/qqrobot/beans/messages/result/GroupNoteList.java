@@ -9,7 +9,4 @@ import com.forte.qqrobot.beans.messages.result.inner.GroupNote;
  **/
 public interface GroupNoteList extends InfoResultList<GroupNote> {
 
-    /** 获取群公告列表 */
-//    GroupNote[] getGroupNoteList();
-
 }

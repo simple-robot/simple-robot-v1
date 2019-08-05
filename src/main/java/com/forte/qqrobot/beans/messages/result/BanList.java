@@ -8,11 +8,4 @@ import com.forte.qqrobot.beans.messages.result.inner.BanInfo;
  * @since JDK1.8
  **/
 public interface BanList extends InfoResultList<BanInfo> {
-
-    /**
-     * 获取禁言列表
-     */
-//    BanInfo[] getBanList();
-
-
 }

@@ -85,17 +85,20 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
      * 线程工厂初始化
      */
     protected void threadPoolInit(){
-        BaseLocalThreadPool.setTimeUnit(TimeUnit.SECONDS);
+        BaseLocalThreadPool.PoolConfig poolConfig = new BaseLocalThreadPool.PoolConfig();
+        poolConfig.setTimeUnit(TimeUnit.SECONDS);
         //空线程存活时间
-        BaseLocalThreadPool.setKeepAliveTime(60);
+        poolConfig.setKeepAliveTime(60);
         //线程池的线程工厂
-        BaseLocalThreadPool.setDefaultThreadFactory(Thread::new);
+        poolConfig.setDefaultThreadFactory(Thread::new);
         //核心池数量，可同时执行的线程数量
-        BaseLocalThreadPool.setCorePoolSize(500);
+        poolConfig.setCorePoolSize(500);
         //线程池最大数量
-        BaseLocalThreadPool.setMaximumPoolSize(1200);
+        poolConfig.setMaximumPoolSize(1200);
         //对列策略
-        BaseLocalThreadPool.setWorkQueue(new LinkedBlockingQueue<>());
+        poolConfig.setWorkQueue(new LinkedBlockingQueue<>());
+        //创建并保存线程池
+        ResourceDispatchCenter.saveThreadPool(poolConfig);
     }
 
     /**

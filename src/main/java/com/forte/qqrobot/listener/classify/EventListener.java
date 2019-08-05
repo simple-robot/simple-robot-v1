@@ -11,6 +11,7 @@ import com.forte.qqrobot.listener.EventGroupMemberReduceListener;
  * @date Created in 2019/3/9 17:30
  * @since JDK1.8
  **/
+@Deprecated
 public interface EventListener extends EventFriendAddedListener,
                                         EventGroupAdminListener,
                                         EventGroupMemberJoinListener,

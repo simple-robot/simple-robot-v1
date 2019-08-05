@@ -18,12 +18,17 @@ import java.util.*;
  * @date Created in 2019/4/4 18:02
  * @since JDK1.8
  **/
-public class BaseConfiguration {
+public class BaseConfiguration<T extends BaseConfiguration> {
 
     //**************************************
     //*          config params
     //**************************************
 
+    private final T configuration;
+
+    public BaseConfiguration(){
+        this.configuration = (T) this;
+    }
 
 
     /** 是否扫描了初始化监听器 */
@@ -67,6 +72,15 @@ public class BaseConfiguration {
     private static DependInjector dependInjector;
 
 
+    //**************** 本地服务器设置相关 ****************//
+
+    /** 是否启用本地服务器，默认启动 */
+    private static boolean localServerEnable = true;
+
+    /** 本地服务器使用的端口号，默认为8808 */
+    private static int localServerPort = 8808;
+
+
     //**************************************
     //*             以下为方法
     //**************************************
@@ -77,7 +91,7 @@ public class BaseConfiguration {
      * @param listeners 监听器列表
      */
     @Deprecated
-    public void registerListeners(Object... listeners){
+    public T registerListeners(Object... listeners){
         //获取扫描器
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
         //遍历
@@ -95,6 +109,7 @@ public class BaseConfiguration {
                 QQLog.error("加载["+ listener.getClass() +"]的监听函数出现异常！", e);
             }
         }
+        return configuration;
     }
 
     /**
@@ -104,7 +119,7 @@ public class BaseConfiguration {
      * @param listeners 监听器列表
      */
     @Deprecated
-    public void registerListeners(Class<?>... listeners){
+    public T registerListeners(Class<?>... listeners){
         //获取扫描器
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
 
@@ -123,14 +138,16 @@ public class BaseConfiguration {
                 QQLog.error("加载["+ listener +"]的监听函数出现异常！", e);
             }
         }
+        return configuration;
     }
 
     /**
      * 注册初始化监听器
      * @param listeners 初始化监听器
      */
-    public void registerInitListeners(InitListener... listeners){
+    public T registerInitListeners(InitListener... listeners){
         initListeners.addAll(Arrays.asList(listeners));
+        return configuration;
     }
 
     /**
@@ -146,23 +163,26 @@ public class BaseConfiguration {
      * @param packageName   包名
      */
     @Deprecated
-    public void scannerListener(String packageName){
+    public T scannerListener(String packageName){
         scanner(packageName);
+        return configuration;
     }
 
     /**
      * 包扫描，现在的扫描已经不再仅限于监听器了
      */
-    public void scanner(String packageName){
+    public T scanner(String packageName){
         //添加包路径
         scannerPackage.add(packageName);
+        return configuration;
     }
 
     /**
      * 包扫描初始化监听器
      * @param packageName 包名
      */
-    public void scannerInitListener(String packageName){
+    @Deprecated
+    public T scannerInitListener(String packageName){
         Set<Class<?>> list = new FileScanner().find(packageName, c -> FieldUtils.isChild(c, InitListener.class)).get();
 
         registerInitListeners(list.stream().map(lc -> {
@@ -175,6 +195,7 @@ public class BaseConfiguration {
             }
         }).filter(Objects::nonNull).toArray(InitListener[]::new));
 
+        return configuration;
     }
 
 
@@ -182,10 +203,11 @@ public class BaseConfiguration {
     /**
      * 配置需要进行扫描的路径
      */
-    public void setScannerPackage(String... packages){
+    public T setScannerPackage(String... packages){
         if(packages != null){
             this.scannerPackage.addAll(Arrays.asList(packages));
         }
+        return configuration;
     }
 
     //**************** simple getter & setter ****************//
@@ -200,16 +222,18 @@ public class BaseConfiguration {
         return localQQNick;
     }
 
-    public void setLocalQQNick(String localQQNick) {
+    public T setLocalQQNick(String localQQNick) {
         BaseConfiguration.localQQNick = localQQNick;
+        return configuration;
     }
 
     public static String getLocalQQCode() {
         return BaseConfiguration.localQQCode;
     }
 
-    public void setLocalQQCode(String localQQCode) {
+    public T setLocalQQCode(String localQQCode) {
         BaseConfiguration.localQQCode = localQQCode;
+        return configuration;
     }
 
     public LoginQQInfo getLoginQQInfo() {
@@ -220,33 +244,37 @@ public class BaseConfiguration {
         return encode;
     }
 
-    public void setEncode(String encode) {
+    public T setEncode(String encode) {
         this.encode = encode;
+        return configuration;
     }
 
     public static String getCqPath() {
         return cqPath;
     }
 
-    public void setCqPath(String cqPath) {
+    public T setCqPath(String cqPath) {
         BaseConfiguration.cqPath = cqPath;
+        return configuration;
     }
 
     public String getIp() {
         return ip;
     }
 
-    public void setIp(String ip) {
+    public T setIp(String ip) {
         this.ip = ip;
+        return configuration;
     }
 
     /**
      * 配置loginQQInfo信息
      */
-    public void setLoginQQInfo(LoginQQInfo loginQQInfo) {
+    public T setLoginQQInfo(LoginQQInfo loginQQInfo) {
         BaseConfiguration.loginQQInfo = loginQQInfo;
         BaseConfiguration.localQQCode = loginQQInfo.getQQ();
         BaseConfiguration.localQQNick = loginQQInfo.getName();
+        return configuration;
     }
 
     /**
@@ -259,15 +287,17 @@ public class BaseConfiguration {
     /**
      * 配置依赖获取器
      */
-    public void setDependGetter(DependGetter dependGetter) {
+    public T setDependGetter(DependGetter dependGetter) {
         BaseConfiguration.dependGetter = dependGetter;
+        return configuration;
     }
 
     /**
      * 通过类的全包路径进行指定，通过反射创建实例
      */
-    public void setDependGetter(String packPath) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public T setDependGetter(String packPath) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         BaseConfiguration.dependGetter = (DependGetter) Class.forName(packPath).newInstance();
+        return configuration;
     }
 
 
@@ -275,10 +305,31 @@ public class BaseConfiguration {
         return dependInjector;
     }
 
-    public void setDependInjector(DependInjector dependInjector) {
+    public T setDependInjector(DependInjector dependInjector) {
         BaseConfiguration.dependInjector = dependInjector;
+        return configuration;
     }
 
+    public static boolean isLocalServerEnable() {
+        return localServerEnable;
+    }
 
+    public T setLocalServerEnable(boolean localServerEnable) {
+        BaseConfiguration.localServerEnable = localServerEnable;
+        return configuration;
+    }
+
+    public static int getLocalServerPort() {
+        return localServerPort;
+    }
+
+    public T setLocalServerPort(int localServerPort) {
+        BaseConfiguration.localServerPort = localServerPort;
+        return configuration;
+    }
+
+    public final T getConfiguration(){
+        return configuration;
+    }
 
 }

@@ -8,8 +8,4 @@ import com.forte.qqrobot.beans.messages.result.inner.Share;
  * @since JDK1.8
  **/
 public interface ShareList extends InfoResultList<Share> {
-
-    /** 获取分享列表（文件列表） */
-//    Share[] getShareList();
-
 }

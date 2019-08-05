@@ -12,6 +12,7 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  * @date Created in 2019/3/9 17:39
  * @since JDK1.8
  **/
+@Deprecated
 public class DefaultWholeListener implements EventFriendAddedListener,
                                                 EventGroupAdminListener,
                                                 EventGroupMemberJoinListener,

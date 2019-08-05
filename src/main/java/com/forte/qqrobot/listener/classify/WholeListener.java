@@ -8,6 +8,7 @@ import com.forte.qqrobot.listener.*;
  * @date Created in 2019/3/9 17:38
  * @since JDK1.8
  **/
+@Deprecated
 public interface WholeListener extends EventFriendAddedListener,
                                         EventGroupAdminListener,
                                         EventGroupMemberJoinListener,

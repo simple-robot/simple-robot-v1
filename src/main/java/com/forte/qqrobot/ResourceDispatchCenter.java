@@ -232,6 +232,22 @@ public abstract class ResourceDispatchCenter {
         return BaseLocalThreadPool.getThreadPool(threadPoolName);
     }
 
+    static void saveThreadPool(String threadPoolName){
+        BaseLocalThreadPool.getThreadPool(threadPoolName);
+    }
+
+    static void saveThreadPool(){
+        BaseLocalThreadPool.getThreadPool(THREAD_POOL_NAME);
+    }
+
+    static void saveThreadPool(String threadPoolName, BaseLocalThreadPool.PoolConfig config){
+        BaseLocalThreadPool.getThreadPool(threadPoolName, config);
+    }
+
+    static void saveThreadPool(BaseLocalThreadPool.PoolConfig config){
+        BaseLocalThreadPool.getThreadPool(THREAD_POOL_NAME, config);
+    }
+
     //**************** 其他API ****************//
 
     /**

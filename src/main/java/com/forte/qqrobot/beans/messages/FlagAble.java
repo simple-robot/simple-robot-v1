@@ -5,7 +5,7 @@ package com.forte.qqrobot.beans.messages;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface Flagable {
+public interface FlagAble {
 
     /** 获取标识 */
     String getFlag();

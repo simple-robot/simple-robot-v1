@@ -8,8 +8,4 @@ import com.forte.qqrobot.beans.messages.result.inner.GroupLink;
  * @since JDK1.8
  **/
 public interface GroupLinkList extends InfoResultList<GroupLink> {
-
-    /** 获取群链接列表 */
-//    GroupLink[] getGroupLinkList();
-
 }

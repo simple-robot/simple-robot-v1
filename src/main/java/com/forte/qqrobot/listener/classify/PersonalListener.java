@@ -10,6 +10,7 @@ import com.forte.qqrobot.listener.RequestFriendListener;
  * @date Created in 2019/3/9 17:36
  * @since JDK1.8
  **/
+@Deprecated
 public interface PersonalListener extends  EventFriendAddedListener,
                                             MsgPrivateListener,
                                             RequestFriendListener {
