@@ -22,7 +22,11 @@ HTTP API支持组件GIT地址：https://github.com/ForteScarlet/simple-robot-com
 
 
 ------
-# 以下为已弃用文档
+
+# 以下为已弃用文档，仅留作纪念
+# 以下为已弃用文档，仅留作纪念
+# 以下为已弃用文档，仅留作纪念
+
 ------
 
 
