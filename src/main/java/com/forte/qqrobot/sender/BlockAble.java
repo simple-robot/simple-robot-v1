@@ -7,7 +7,7 @@ package com.forte.qqrobot.sender;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface Blockable {
+public interface BlockAble {
     /**
      * 是否存在监听器函数
      */

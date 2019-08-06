@@ -1,5 +1,6 @@
 package com.forte.qqrobot.anno;
 
+import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 
 import java.lang.annotation.ElementType;
@@ -19,6 +20,8 @@ import java.lang.annotation.Target;
  **/
 @Retention(RetentionPolicy.RUNTIME)	//注解会在class字节码文件中存在，在运行时可以通过反射获取到
 @Target({ElementType.TYPE, ElementType.METHOD}) //接口、类、枚举、注解、方法
+//监听类默认不使用单例类型
+@Beans(single = false)
 public @interface Listen {
 
     /**

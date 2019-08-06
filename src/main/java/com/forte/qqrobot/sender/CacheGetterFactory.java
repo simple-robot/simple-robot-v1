@@ -50,11 +50,11 @@ public class CacheGetterFactory {
     private static final ThreadLocal<Map.Entry<ProxyType, SenderGetList>> LOCAL_PROXY_GETTER = new ThreadLocal<>();
 
     /**
-     * <s>直接使用SenderGetList对象作为key</s> <br>
-     * 由于代理对象的缓存与否与缓存参数有关，则缓存Map则也根据缓存参数挂钩而并非GETTER对象自身
-     * 方法缓存Map作为value
+     * 方法缓存Map
+     * 在初始化本地原始GETTER的同时初始化一个MethodCacheMap
+     * 理论上来讲只要存在原始GETTER就会存在一个Map，且根据这个原始Map来对对象进行获取
      */
-    private static final Map<ProxyType, MethodCacheMap> CACHE_MAP_RECORD = new ConcurrentHashMap<>();
+    private static final Map<SenderGetList, MethodCacheMap> CACHE_MAP_RECORD = new ConcurrentHashMap<>(2);
 
     /**
      * Object中继承来的Method对象数组
@@ -63,14 +63,10 @@ public class CacheGetterFactory {
 
     /**
      * 获取缓存Map
+     * 理论上来讲，LOCAL_GETTER在进入方法的时候首先被初始化，所以不可能为null
      */
-    private synchronized static MethodCacheMap getCacheMap(ProxyType type) {
-        MethodCacheMap cacheMap = CACHE_MAP_RECORD.get(type);
-        if (cacheMap == null) {
-            cacheMap = new MethodCacheMap();
-            CACHE_MAP_RECORD.put(type, cacheMap);
-        }
-        return cacheMap;
+    private synchronized static MethodCacheMap getCacheMap() {
+        return CACHE_MAP_RECORD.get(LOCAL_GETTER.get());
     }
 
     /**
@@ -105,6 +101,27 @@ public class CacheGetterFactory {
 
 
     /**
+     * 初始化原始的LocalGetter
+     * 返回原始GETTER
+     */
+    private static SenderGetList initLocalGetter(SenderGetList getter){
+        if(LOCAL_GETTER.get() == null){
+            //如果不存在原始GETTER，赋值并初始化一个方法缓存器
+            LOCAL_GETTER.set(getter);
+            //同时初始化methodCacheMap
+            initMethodCacheMap(getter);
+        }
+        return LOCAL_GETTER.get();
+    }
+
+    /**
+     * 根据getter，如果不存在此getter则初始化一个cacheMethod
+     */
+    private static void initMethodCacheMap(SenderGetList getter){
+        CACHE_MAP_RECORD.putIfAbsent(getter, new MethodCacheMap(64));
+    }
+
+    /**
      * 构建缓存的代理Getter
      *
      * @param toCacheGetter         getter对象
@@ -114,17 +131,7 @@ public class CacheGetterFactory {
     public static SenderGetList toCacheableGetter(SenderGetList toCacheGetter, Long time, Function<Long, Map.Entry<Supplier<LocalDateTime>, CacheTimeTypes>> timeTypeGetter) {
         Objects.requireNonNull(toCacheGetter, "GETTER对象自身不可为null");
 
-        SenderGetList getter;
-
-        //如果原版getter为null，初始化值
-        if(LOCAL_GETTER.get() == null){
-            LOCAL_GETTER.set(toCacheGetter);
-            getter = toCacheGetter;
-        }else{
-            //看看是否一致，如果不一致则使用本地保存的原本的getter
-            getter = LOCAL_GETTER.get();
-        }
-
+        SenderGetList getter = initLocalGetter(toCacheGetter);
 
         //获取类型
         CacheTimeTypes type = timeTypeGetter == null ? null : timeTypeGetter.apply(time).getValue();
@@ -134,7 +141,8 @@ public class CacheGetterFactory {
         ProxyType proxyType = new ProxyType(time, type);
 
         //获取缓存Map
-        MethodCacheMap cache = getCacheMap(proxyType);
+        MethodCacheMap cache = getCacheMap();
+
 
         Map.Entry<ProxyType, SenderGetList> localCache = LOCAL_PROXY_GETTER.get();
 
@@ -201,24 +209,13 @@ public class CacheGetterFactory {
         Objects.requireNonNull(toTime, "指定的过期日期不可为null");
         Objects.requireNonNull(toCacheGetter, "GETTER对象自身不可为null");
 
-        SenderGetList getter;
-
-        //如果原版getter为null，初始化值
-        if(LOCAL_GETTER.get() == null){
-            LOCAL_GETTER.set(toCacheGetter);
-            getter = toCacheGetter;
-        }else{
-            //看看是否一致，如果不一致则使用本地保存的原本的getter
-            //直接使用 == 来对内存地址进行对比判断
-            getter = LOCAL_GETTER.get();
-        }
-
+        SenderGetList getter = initLocalGetter(toCacheGetter);
 
         //先尝试查询本线程代理对象
         ProxyType proxyType = new ProxyType(toTime.toInstant(ZoneOffset.of("+8")).toEpochMilli(), CacheTimeTypes.DATE);
 
         //获取缓存Map
-        MethodCacheMap cache = getCacheMap(proxyType);
+        MethodCacheMap cache = getCacheMap();
 
         Map.Entry<ProxyType, SenderGetList> localCache = LOCAL_PROXY_GETTER.get();
 

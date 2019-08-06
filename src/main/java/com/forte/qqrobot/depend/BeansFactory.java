@@ -83,24 +83,24 @@ public class BeansFactory {
     private static <T> Beans<T> toBeans(Class<T> clazz, com.forte.qqrobot.anno.depend.Beans beansAnno){
         //如果参数中不存在注解对象，则尝试获取类上的注解对象。获取此类上的@Beans注解
         if(beansAnno == null){
-            beansAnno = clazz.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class);
+            //如果是个监听器则会获取@Listen中的@Beans注解
+            beansAnno = AnnotationUtils.getBeansAnnotationIfListen(clazz);
         }
         BeansData beansData;
         if(beansAnno == null){
             //不存在注解，使用默认值
+
             beansData = BeansData.getInstance();
         }else{
             //存在注解，通过注解获取参数
             beansData = BeansData.getInstance(beansAnno);
         }
 
-
         //准备参数
         //类型
-        Class<T> type = clazz;
         //名称, 如果是类名，开头小写
         String name = beansData.value().trim().length() == 0 ?
-                FieldUtils.headLower(type.getSimpleName()) :
+                FieldUtils.headLower(clazz.getSimpleName()) :
                 beansData.value();
 
         //是否为单例
@@ -188,14 +188,14 @@ public class BeansFactory {
         }
 
         //参数实例完成，获取children并封装对象
-        Beans[] children = getChildren(type, name);
+        Beans[] children = getChildren(clazz, name);
 
         //实例化需要的参数列表, 转为final类型
         final NameTypeEntry[] finalInstanceNeed = instanceNeed;
         //获取实例的函数，转为final类型
         final Function<Object[], T> finalGetInstanceFunction = getInstanceFunction;
 
-        return new Beans<>(name, type, single, allDepend, finalInstanceNeed, finalGetInstanceFunction, children, beansData);
+        return new Beans<>(name, clazz, single, allDepend, finalInstanceNeed, finalGetInstanceFunction, children, beansData);
     }
 
 
