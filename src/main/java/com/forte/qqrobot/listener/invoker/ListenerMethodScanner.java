@@ -3,17 +3,12 @@ package com.forte.qqrobot.listener.invoker;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.anno.*;
 import com.forte.qqrobot.anno.depend.Beans;
-import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
-import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
-import com.forte.qqrobot.listener.SocketListener;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
-import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.MethodUtil;
 
-import java.lang.Exception;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
@@ -44,7 +39,6 @@ public class ListenerMethodScanner {
      * 只对标注了@Beans的函数进行获取
      */
     public Set<ListenerMethod> scanner(Class<?> clazz, Object bean) {
-        Set<ListenerMethod> result = new HashSet<>();
 
         //v1.0 update
         //如果此类不存在@Bean函数，略过
@@ -71,20 +65,21 @@ public class ListenerMethodScanner {
         }
 
         //先判断是不是实现了普通监听器接口
-        boolean isSocketListener = FieldUtils.isChild(clazz, SocketListener.class);
+//        boolean isSocketListener = FieldUtils.isChild(clazz, SocketListener.class);
 
         //判断方法上有没有备用方法注解
         Spare spare = clazz.getAnnotation(Spare.class);
 
 
-        //如果是普通监听器，则认为此方法中全部公共的onMessage都有可能为监听器方法，获取全部onMessage方法
-        //判断条件：方法名为onMessage且第一个参数的类型是MsgGet
-        if(isSocketListener){
-            result.addAll(buildBySocketListener(clazz, spare, listenerGetter, listenerGetterWithAddition));
-        }
+        // TODO 2019/8/6 监听器接口已经被移除，此代码暂做保留，后期想起来之后删掉
+//        //如果是普通监听器，则认为此方法中全部公共的onMessage都有可能为监听器方法，获取全部onMessage方法
+//        //判断条件：方法名为onMessage且第一个参数的类型是MsgGet
+//        if(isSocketListener){
+//            result.addAll(buildBySocketListener(clazz, spare, listenerGetter, listenerGetterWithAddition));
+//        }
 
         //**************** 以上为实现了接口的判断 ****************//
-        result.addAll(buildByNormal(clazz, spare, listenerGetter, listenerGetterWithAddition));
+        Set<ListenerMethod> result = new HashSet<>(buildByNormal(clazz, spare, listenerGetter, listenerGetterWithAddition));
 
 
         //记录并返回结果
@@ -95,44 +90,45 @@ public class ListenerMethodScanner {
 
     /**
      * 通过接口实现的方式来构建监听函数列表
+     * TODO 2019/8/6 监听器接口已经被移除，此代码暂做保留，后期想起来之后删掉
      */
-    private Set<ListenerMethod> buildBySocketListener(Class<?> clazz, Spare spare, Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition) {
-        //尝试获取实例对象
-//        Object obj = getBean(clazz, bean);
-        boolean isSpare = (spare != null);
-
-        Method[] methods = MethodUtil.getPublicMethods(clazz, m -> m.getName().equals(SOCKET_LISTENER_METHOD_NAME) && FieldUtils.isChild(m.getParameterTypes()[0], MsgGet.class));
-
-        //遍历，根据第一个参数判断函数的监听类型并封装
-        //添加所有
-        return Arrays.stream(methods)
-                .map(m -> {
-                    Class<MsgGet> msgGetClass = (Class<MsgGet>) m.getParameterTypes()[0];
-                    //监听器实现来的函数仅会有一个监听类型
-                    MsgGetTypes singleType = MsgGetTypes.getByType(msgGetClass);
-                    MsgGetTypes[] byType = new MsgGetTypes[]{singleType};
-                    if(singleType != null){
-                        //如果不是未知的, 则认定其是正确的onMessage对象，开始封装
-                        //获取其他注解
-                        Filter filter = m.getAnnotation(Filter.class);
-                        BlockFilter blockFilter = m.getAnnotation(BlockFilter.class);
-                        Block block = m.getAnnotation(Block.class);
-                        //尝试获取实例对象
-                        if (isSpare) {
-                            //添加
-                            return build(listenerGetter, listenerGetterWithAddition, m, byType, spare, filter, blockFilter, block);
-                        } else {
-                            //如果没有类上的Spare注解，则方法单独获取
-                            Spare thisSpare = m.getAnnotation(Spare.class);
-                            return build(listenerGetter, listenerGetterWithAddition, m, byType, thisSpare, filter, blockFilter, block);
-                        }
-                    }else{
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-    }
+//    private Set<ListenerMethod> buildBySocketListener(Class<?> clazz, Spare spare, Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition) {
+//        //尝试获取实例对象
+////        Object obj = getBean(clazz, bean);
+//        boolean isSpare = (spare != null);
+//
+//        Method[] methods = MethodUtil.getPublicMethods(clazz, m -> m.getName().equals(SOCKET_LISTENER_METHOD_NAME) && FieldUtils.isChild(m.getParameterTypes()[0], MsgGet.class));
+//
+//        //遍历，根据第一个参数判断函数的监听类型并封装
+//        //添加所有
+//        return Arrays.stream(methods)
+//                .map(m -> {
+//                    Class<MsgGet> msgGetClass = (Class<MsgGet>) m.getParameterTypes()[0];
+//                    //监听器实现来的函数仅会有一个监听类型
+//                    MsgGetTypes singleType = MsgGetTypes.getByType(msgGetClass);
+//                    MsgGetTypes[] byType = new MsgGetTypes[]{singleType};
+//                    if(singleType != null){
+//                        //如果不是未知的, 则认定其是正确的onMessage对象，开始封装
+//                        //获取其他注解
+//                        Filter filter = m.getAnnotation(Filter.class);
+//                        BlockFilter blockFilter = m.getAnnotation(BlockFilter.class);
+//                        Block block = m.getAnnotation(Block.class);
+//                        //尝试获取实例对象
+//                        if (isSpare) {
+//                            //添加
+//                            return build(listenerGetter, listenerGetterWithAddition, m, byType, spare, filter, blockFilter, block);
+//                        } else {
+//                            //如果没有类上的Spare注解，则方法单独获取
+//                            Spare thisSpare = m.getAnnotation(Spare.class);
+//                            return build(listenerGetter, listenerGetterWithAddition, m, byType, thisSpare, filter, blockFilter, block);
+//                        }
+//                    }else{
+//                        return null;
+//                    }
+//                })
+//                .filter(Objects::nonNull)
+//                .collect(Collectors.toSet());
+//    }
 
 
     /**
@@ -178,12 +174,6 @@ public class ListenerMethodScanner {
 
             //如果没有被跳过，说明此方法可以被添加
             //尝试获取实例对象
-//            Object obj;
-//            try {
-//                obj = getBean(clazz, bean);
-//            } catch (Exception e) {
-//                throw new RuntimeException(new IllegalAccessException("无法为[" + clazz + "]创建实例对象"));
-//            }
 
             //获取需要的注解
             Filter filter = method.getAnnotation(Filter.class);
@@ -214,7 +204,7 @@ public class ListenerMethodScanner {
      * @return 扫描结果
      * @throws Exception
      */
-    public Set<ListenerMethod> scanner(Class<?> clazz) throws Exception {
+    public Set<ListenerMethod> scanner(Class<?> clazz) {
         return scanner(clazz, null);
     }
 
@@ -224,7 +214,7 @@ public class ListenerMethodScanner {
      * @return 扫描结果
      * @throws Exception
      */
-    public Set<ListenerMethod> scanner(Object bean) throws Exception {
+    public Set<ListenerMethod> scanner(Object bean) {
         return scanner(bean.getClass(), bean);
     }
 

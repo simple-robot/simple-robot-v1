@@ -6,7 +6,6 @@ import com.forte.qqrobot.anno.depend.AllBeans;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
-import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -107,11 +106,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     private void baseResourceInit(){
         //将CQCodeUtil放入资源调度中心
         ResourceDispatchCenter.saveCQCodeUtil(CQCodeUtil.build());
-        //将DefaultWholeListener放入资源调度中心
-        ResourceDispatchCenter.saveDefaultWholeListener(new DefaultWholeListener());
         //将ListenerMethodScanner放入资源调度中心
         ResourceDispatchCenter.saveListenerMethodScanner(new ListenerMethodScanner());
-
         //将ListenerFilter放入资源调度中心
         ResourceDispatchCenter.saveListenerFilter(new ListenerFilter());
     }

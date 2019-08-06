@@ -1,7 +1,6 @@
 package com.forte.qqrobot;
 
 import com.forte.qqrobot.depend.DependCenter;
-import com.forte.qqrobot.listener.DefaultWholeListener;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -46,14 +45,6 @@ public abstract class ResourceDispatchCenter {
     static void saveCQCodeUtil(CQCodeUtil cqCodeUtil){
         //将CQCodeUtil放入单例工厂
         save(cqCodeUtil);
-    }
-
-    /**
-     * 储存一个送信者
-     * @param defaultWholeListener 单例对象
-     */
-    static void saveDefaultWholeListener(DefaultWholeListener defaultWholeListener){
-        save(defaultWholeListener);
     }
 
     /**
@@ -141,14 +132,6 @@ public abstract class ResourceDispatchCenter {
      */
     public static CQCodeUtil getCQCodeUtil(){
         return get(CQCodeUtil.class);
-    }
-
-    /**
-     * 获取一个DefaultWholeListener单例对象
-     * @return DefaultWholeListener单例对象
-     */
-    public static DefaultWholeListener getDefaultWholeListener(){
-        return get(DefaultWholeListener.class);
     }
 
     /**
