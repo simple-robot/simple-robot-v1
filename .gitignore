@@ -25,8 +25,8 @@
 hs_err_pid*
 ### Maven template
 target/
-### 移除pom.xml文件
-pom.xml
+### 恢复上传pom文件
+### pom.xml
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup

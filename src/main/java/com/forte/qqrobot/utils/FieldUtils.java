@@ -68,7 +68,7 @@ public class FieldUtils {
     static {
 
         //加载字母顺序
-        Map<String, Integer> wordNum = new HashMap<>(26);
+        Map<String, Integer> wordNum = new HashMap<>(32);
 
         for (int i = 1; i <= 26; i++) {
             char c = (char) (97 + (i - 1));
