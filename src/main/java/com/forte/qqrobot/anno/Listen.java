@@ -30,4 +30,9 @@ public @interface Listen {
      */
     MsgGetTypes[] value();
 
+    /**
+     * 假如出现了多个监听器处理同一个消息，使用此参数对其进行排序，默认值为1
+     */
+    int sort() default 1;
+
 }

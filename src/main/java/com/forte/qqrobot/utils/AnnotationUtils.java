@@ -6,8 +6,6 @@ import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.exception.AnnotationException;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

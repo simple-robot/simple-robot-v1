@@ -3,7 +3,6 @@ package com.forte.qqrobot;
 import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.depend.DependInjector;
-import com.forte.qqrobot.listener.InitListener;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.log.QQLog;
@@ -39,9 +38,6 @@ public class BaseConfiguration<T extends BaseConfiguration> {
 
     /** 本机QQ信息, 一般唯一，使用静态 */
     private static LoginQQInfo loginQQInfo = null;
-
-    /** 全部初始化监听器 */
-    private Set<InitListener> initListeners = new HashSet<>();
 
     /** 本机QQ号, 一般唯一，使用静态 */
     private static String localQQCode = "";
@@ -141,22 +137,6 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         return configuration;
     }
 
-    /**
-     * 注册初始化监听器
-     * @param listeners 初始化监听器
-     */
-    public T registerInitListeners(InitListener... listeners){
-        initListeners.addAll(Arrays.asList(listeners));
-        return configuration;
-    }
-
-    /**
-     * 获取初始化监听器
-     */
-    public Set<InitListener> getInitListeners(){
-        return initListeners;
-    }
-
 
     /**
      * 包扫描普通监听器
@@ -174,27 +154,6 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     public T scanner(String packageName){
         //添加包路径
         scannerPackage.add(packageName);
-        return configuration;
-    }
-
-    /**
-     * 包扫描初始化监听器
-     * @param packageName 包名
-     */
-    @Deprecated
-    public T scannerInitListener(String packageName){
-        Set<Class<?>> list = new FileScanner().find(packageName, c -> FieldUtils.isChild(c, InitListener.class)).get();
-
-        registerInitListeners(list.stream().map(lc -> {
-            try {
-                return (InitListener) lc.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-                System.err.println("监听器[" + lc + "]实例化异常：没有无参构造");
-                return null;
-            }
-        }).filter(Objects::nonNull).toArray(InitListener[]::new));
-
         return configuration;
     }
 
