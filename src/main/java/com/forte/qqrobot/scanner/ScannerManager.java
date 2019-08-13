@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -178,10 +179,10 @@ public class ScannerManager implements Register {
      * @param task      你要执行的任务。参数为过滤好的Class数组
      */
     @Override
-    public void performingTasks(Predicate<? super Class<?>> filter,
-                         Consumer<Class<?>[]> task){
+    public <T> T performingTasks(Predicate<? super Class<?>> filter,
+                         Function<Class<?>[], T> task){
 
-        task.accept(classes.stream().filter(filter).toArray(Class<?>[]::new));
+        return task.apply(classes.stream().filter(filter).toArray(Class<?>[]::new));
     }
 
 

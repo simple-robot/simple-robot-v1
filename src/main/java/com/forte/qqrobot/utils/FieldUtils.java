@@ -1288,6 +1288,13 @@ public class FieldUtils {
         }
     }
 
+    /**
+     * 判断一个类是不是不是抽象类也不是接口
+     */
+    public static boolean notInterfaceAndAbstract(Class<?> clazz){
+        return (!clazz.isInterface()) && (!Modifier.isAbstract(clazz.getModifiers()));
+    }
+
 
     /**
      * 获取方法名，如果是个getter规则方法名则移除get并开头小写, 与{@link #getMethodNameWithoutSetter(Method)}类似

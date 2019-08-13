@@ -2,10 +2,12 @@ package com.forte.qqrobot;
 
 import com.alibaba.fastjson.util.TypeUtils;
 import com.forte.plusutils.consoleplus.console.Colors;
+import com.forte.qqrobot.anno.Config;
 import com.forte.qqrobot.anno.depend.AllBeans;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
+import com.forte.qqrobot.exception.RobotRuntionException;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -22,15 +24,20 @@ import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
+import com.forte.qqrobot.utils.BeansUtils;
 import com.forte.qqrobot.utils.CQCodeUtil;
+import com.forte.qqrobot.utils.FieldUtils;
 import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.Closeable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -165,6 +172,47 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
      */
     protected abstract CONFIG getConfiguration();
 
+
+
+    //**************** 以下是一些不强制但是可以通过重写来拓展功能的方法 ****************//
+
+    /**
+     * 依赖扫描之前
+     * @return 所有的执行任务
+     */
+    protected Consumer<Class<?>[]>[] beforeDepend(CONFIG config, Application<CONFIG> app){
+        return null;
+    }
+
+    /**
+     * 依赖扫描之后
+     * 同时也是监听函数扫描之前
+     * @return 所有的执行任务
+     */
+    protected Consumer<Class<?>[]>[] afterDepend(CONFIG config, Application<CONFIG> app){
+        return null;
+    }
+
+
+    /**
+     * 监听函数扫描之后
+     * @return 所有的执行任务
+     */
+    protected Consumer<Class<?>[]>[] afterListener(CONFIG config, Application<CONFIG> app){
+        return null;
+    }
+
+    /** 服务启动前 */
+    protected void beforeStart(){ }
+
+    /** 服务启动后 */
+    protected void afterStart(){ }
+
+
+
+
+
+
     /**
      * 初始化
      */
@@ -234,7 +282,37 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         DependGetter dependGetter = CONFIG.getDependGetter();
 
         //此处可以尝试去寻找被扫描到的接口对象
-        // TODO 寻找携带@Beans且实现了Dependgetter的类
+        // 寻找携带@Config且实现了Dependgetter的类
+        if(dependGetter == null){
+            dependGetter = register.performingTasks(
+                    //过滤出携带者Config注解的、不是接口和抽象类的、是DependGetter的子类的
+                    c -> (c.getAnnotation(Config.class) != null) && (FieldUtils.notInterfaceAndAbstract(c)) && (FieldUtils.isChild(c, DependGetter.class)),
+                    //看看有没有，如果有，赋值。
+                    cs -> {
+                if(cs.length == 1){
+                    //找到一个，尝试实例化
+                    Class<?> c = cs[0];
+                    try {
+                        return (DependGetter) BeansUtils.getInstance(c);
+                    } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
+                        return null;
+                    }
+                }else if(cs.length == 0){
+                    return null;
+                }else{
+                    throw new RobotRuntionException("扫描到多个" + DependGetter.class + "的实现类。");
+                }
+            });
+        }
+
+        // > 依赖扫描之前
+        Consumer<Class<?>[]>[] beforeDependConsumer = beforeDepend(config, app);
+        if(beforeDependConsumer != null){
+            for (Consumer<Class<?>[]> c : beforeDependConsumer) {
+                register.performingTasks(c);
+            }
+        }
+
 
         DependCenter dependCenter = dependGetter == null ? new DependCenter() : new DependCenter(dependGetter);
         ResourceDispatchCenter.saveDependCenter(dependCenter);
@@ -261,17 +339,26 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         this.register.registerDependCenter();
 
 
-        //此处可以在进行一些其他的任务操作
-//        this.register.performingTasks();
-
-
+        // > 依赖注入之后，同时也是监听函数注册之前
+        Consumer<Class<?>[]>[] afterDependConsumer = afterDepend(config, app);
+        if(afterDependConsumer != null){
+            for (Consumer<Class<?>[]> c : afterDependConsumer) {
+                register.performingTasks(c);
+            }
+        }
 
 
         //直接注册监听函数
         this.register.registerListener();
 
 
-
+        // > 监听函数注册之后
+        Consumer<Class<?>[]>[] afterListenerConsumer = afterListener(config, app);
+        if(afterListenerConsumer != null){
+            for (Consumer<Class<?>[]> c : afterListenerConsumer) {
+                register.performingTasks(c);
+            }
+        }
 
 
         //构建监听函数管理器等扫描器所构建的
@@ -303,7 +390,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
 
         //获取配置对象
         CONFIG configuration = getConfiguration();
-        //开始之前
+
+        //用户进行配置
         app.before(configuration);
 
         //配置结束
@@ -312,12 +400,25 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         //获取管理器
         ListenerManager manager = ResourceDispatchCenter.getListenerManager();
 
+
+
+        // > 启动之前
+        beforeStart();
+
+
+
         //开始连接
         long s = System.currentTimeMillis();
         String name = start(manager);
         long e = System.currentTimeMillis();
         String msg = name + "启动成功,耗时(" + (e - s) + "ms)";
         QQLog.info(Colors.builder().add(msg, Colors.FONT.DARK_GREEN).build());
+
+
+
+        // > 启动之后
+        afterStart();
+
 
 
         //获取CQCodeUtil实例

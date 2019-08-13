@@ -121,7 +121,7 @@ public class DependCenter implements DependGetter {
     }
 
     /**
-     * 判断规则默认为非接口、抽象类且存在@Beans注解的class对象
+     * 判断规则默认为非接口、非抽象类且存在@Beans注解的class对象
      * @param loadsClasses  classes对象列表
      */
     public DependCenter load(com.forte.qqrobot.anno.depend.Beans beanAnno, Class<?>... loadsClasses){
@@ -435,6 +435,17 @@ public class DependCenter implements DependGetter {
     public Object[] getMethodParameters(Method method, AdditionalDepends addParams){
         Parameter[] parameters = method.getParameters();
         //优先从额外参数中获取
+        return getMethodParameters(parameters, addParams);
+    }
+
+    /**
+     * 获取可以注入的参数
+     * @param parameters 参数列表
+     * @param addParams     额外参数， 当存在额外参数的时候，优先使用额外参数进行注入
+     * @return
+     */
+    public Object[] getMethodParameters(Parameter[] parameters, AdditionalDepends addParams){
+        //优先从额外参数中获取
         return Arrays.stream(parameters).map(p -> getParameter(p, addParams == null ? AdditionalDepends.getEmpty() : addParams)).toArray();
     }
 
@@ -444,6 +455,14 @@ public class DependCenter implements DependGetter {
      */
     public Object[] getMethodParameters(Method method){
         return getMethodParameters(method, null);
+    }
+
+    /**
+     * 通过方法获取可以注入的参数
+     * @param parameters 方法对象
+     */
+    public Object[] getMethodParameters(Parameter[] parameters){
+        return getMethodParameters(parameters, null);
     }
 
 

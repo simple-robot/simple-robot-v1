@@ -5,6 +5,7 @@ import com.forte.qqrobot.sender.MsgSender;
 
 import java.util.Collection;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -39,8 +40,32 @@ public interface Register {
      * @param filter    过滤器，根据需求获取到你所需要的class类型，不会为空
      * @param task      你要执行的任务。参数为过滤好的Class数组
      */
-    void performingTasks(Predicate<? super Class<?>> filter,
-                         Consumer<Class<?>[]> task);
+    <T> T performingTasks(Predicate<? super Class<?>> filter, Function<Class<?>[], T> task);
+
+
+    default <T> T performingTasks(Function<Class<?>[], T> task){
+        return performingTasks(c -> true, task);
+    }
+
+    /**
+     * 无返回值的执行一个任务
+     */
+    default void performingTasks(Predicate<? super Class<?>> filter, Consumer<Class<?>[]> task){
+        performingTasks(filter, c -> {
+            task.accept(c);
+            return null;
+        });
+    }
+
+    /**
+     * 无返回值的执行一个任务
+     */
+    default void performingTasks(Consumer<Class<?>[]> task){
+        performingTasks(c -> true, c -> {
+            task.accept(c);
+            return null;
+        });
+    }
 
 
 }

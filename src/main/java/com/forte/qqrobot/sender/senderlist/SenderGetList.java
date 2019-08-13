@@ -432,5 +432,14 @@ public interface SenderGetList extends SenderList {
     }
 
 
+    /**
+     * 取消缓存状态
+     */
+    default SenderGetList dontCache(){
+        SenderGetList originalGetter = CacheGetterFactory.getOriginalGetter();
+        //如果没有，则认为自己就是原本的。
+        return originalGetter == null ? this : originalGetter;
+    }
+
 
 }

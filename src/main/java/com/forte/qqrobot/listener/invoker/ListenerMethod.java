@@ -61,6 +61,8 @@ public class ListenerMethod<T> {
     /** 此方法所属的监听类型, 多种类型 */
     private final MsgGetTypes[] type;
 
+    /** 排序索引 */
+    private final int sort;
 
 
     /**
@@ -72,7 +74,7 @@ public class ListenerMethod<T> {
      * @param method        方法本体
      * @param type          监听类型
      */
-    private ListenerMethod(Supplier<T> listenerGetter, Function<DependGetter, T> listenerGetterWithAddition, Filter filter, BlockFilter blockFilter, Spare spare, Block block, Method method, MsgGetTypes[] type) {
+    private ListenerMethod(Supplier<T> listenerGetter, Function<DependGetter, T> listenerGetterWithAddition, Filter filter, BlockFilter blockFilter, Spare spare, Block block, Method method, MsgGetTypes[] type, int sort) {
         this.listenerGetter = listenerGetter;
         this.listenerGetterWithAddition  = listenerGetterWithAddition;
         this.filter = filter;
@@ -81,6 +83,7 @@ public class ListenerMethod<T> {
         this.block = block;
         this.method = method;
         this.type = type;
+        this.sort = sort;
         //生成一个UUID
         UUID = createUUIDString();
     }
@@ -197,7 +200,12 @@ public class ListenerMethod<T> {
      * @param isTypes 某种监听类型
      */
     public boolean isType(MsgGetTypes isTypes){
-        return type.equals(isTypes);
+        for (MsgGetTypes types : type) {
+            if(types.equals(isTypes)){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -236,6 +244,10 @@ public class ListenerMethod<T> {
         return spare;
     }
 
+    public int getSort() {
+        return sort;
+    }
+
     public String getUUID() {
         return UUID;
     }
@@ -260,6 +272,7 @@ public class ListenerMethod<T> {
         private Spare spare = null;
         /** 阻塞注解，如果没有则为null */
         private Block block = null;
+        private int sort = 1;
         /**
          * 构造
          */
@@ -290,12 +303,17 @@ public class ListenerMethod<T> {
             return this;
         }
 
+        public ListenerMethodBuilder sort(int sort){
+            this.sort = sort;
+            return this;
+        }
+
 
         /**
          * 构建对象
          */
         public ListenerMethod build(){
-            return new ListenerMethod(listenerGetter, listenerGetterWithAddition, filter, blockFilter, spare, block, method, type);
+            return new ListenerMethod(listenerGetter, listenerGetterWithAddition, filter, blockFilter, spare, block, method, type, sort);
         }
 
 

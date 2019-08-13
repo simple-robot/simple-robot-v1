@@ -258,6 +258,13 @@ public class CacheGetterFactory {
         return proxyCacheGetter;
     }
 
+
+    public static SenderGetList getOriginalGetter(){
+        return LOCAL_GETTER.get();
+    }
+
+
+
     /**
      * 获取代理对象
      */
