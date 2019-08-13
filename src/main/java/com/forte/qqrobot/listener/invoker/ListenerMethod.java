@@ -5,6 +5,7 @@ import com.forte.qqrobot.anno.Block;
 import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
 import com.forte.qqrobot.anno.Spare;
+import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.depend.DependGetter;
@@ -55,8 +56,10 @@ public class ListenerMethod<T> {
     private final Method method;
 
     /** 此方法所属的监听类型, 多种类型 */
-    private final MsgGetTypes[] type;
+//    private final MsgGetTypes[] type;
 
+    /** 此方法所属的监听类型, 多种类型 */
+    private final MsgGetTypes[] type;
 
 
 

@@ -2,6 +2,8 @@ package com.forte.qqrobot.beans.messages.types;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.beans.messages.msgget.*;
 import com.forte.qqrobot.utils.FieldUtils;
 
@@ -42,6 +44,20 @@ public enum MsgGetTypes {
     /** 事件-群文件上传 */
     groupFileUpload(GroupFileUpload.class),
 
+    /** 其他未知的类型，可尝试用于其他自定义监听 */
+    unknownType(null){
+        /** 根据指定类型进行转化 */
+        public <T> T getBeanForJson(String json, Class<T> type){
+            return JSON.parseObject(json, type);
+        }
+        /** 原本的转化类型将会直接转化为JSONObject对象 */
+        @Override
+        @Deprecated
+        public JSONObject getBeanForJson(String json){
+            return JSON.parseObject(json);
+        }
+    },
+
     ;
 
 
@@ -73,18 +89,24 @@ public enum MsgGetTypes {
     }
 
 
+
+
     /**
      * 通过class对象获取枚举对象
      * @param clazz class对象
      */
     public static MsgGetTypes getByType(Class<? extends MsgGet> clazz){
+        if(clazz == null){
+            return unknownType;
+        }
+
         for (MsgGetTypes type : values()) {
-            if(FieldUtils.isChild(clazz, type.beanClass)){
+            if(type.beanClass != null && FieldUtils.isChild(clazz, type.beanClass)){
                 return type;
             }
         }
 
-        return null;
+        return unknownType;
     }
 
     /**

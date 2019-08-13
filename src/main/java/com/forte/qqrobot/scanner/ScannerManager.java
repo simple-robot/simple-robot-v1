@@ -17,9 +17,13 @@ import org.quartz.Job;
 import org.quartz.SchedulerException;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * 扫描管理器
@@ -75,7 +79,7 @@ public class ScannerManager implements Register {
                 Set<ListenerMethod> scanSet = scanner.scanner(c);
                 if(!scanSet.isEmpty()){
                     QQLog.info("加载["+ c +"]的监听函数成功：");
-                    scanSet.forEach(lm -> QQLog.info(">>>" + lm.getMethodToString()));
+                    scanSet.forEach(lm -> QQLog.info("\t>>>" + lm.getMethodToString()));
                 }
             } catch (Exception e) {
                 throw new RobotRuntionException(e);
@@ -164,4 +168,21 @@ public class ScannerManager implements Register {
         //注入依赖，不再需要携带@Beans
         dependCenter.load(beans, c -> (!c.isInterface()) && (!Modifier.isAbstract(c.getModifiers())), classes.toArray(new Class[0]));
     }
+
+
+
+
+    /**
+     * 执行一些其他的，可能是自定义的任务
+     * @param filter    过滤器，根据需求获取到你所需要的class类型，不会为空
+     * @param task      你要执行的任务。参数为过滤好的Class数组
+     */
+    @Override
+    public void performingTasks(Predicate<? super Class<?>> filter,
+                         Consumer<Class<?>[]> task){
+
+        task.accept(classes.stream().filter(filter).toArray(Class<?>[]::new));
+    }
+
+
 }

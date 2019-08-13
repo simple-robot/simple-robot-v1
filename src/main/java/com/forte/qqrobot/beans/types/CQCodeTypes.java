@@ -3,6 +3,7 @@ package com.forte.qqrobot.beans.types;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -259,7 +260,7 @@ public enum CQCodeTypes {
      * 查看某个字符串中是否存在此类型的CQ码
      */
     public boolean contains(String text){
-        return text.contains(this.matchRegex);
+        return text.matches(".*" + this.matchRegex + ".*");
     }
 
     /**

@@ -42,68 +42,25 @@
                             type: 'bar'                          //指定图表的类型，默认是折线图（line）
                         },
                         title: {
-                            text: '我的第一个图表'                 // 标题
+                            text: 'ALL-API使用量统计'                 // 标题
                         },
                         xAxis: {
-                            categories: ['苹果', '香蕉', '橙子']   // x 轴分类
+                            categories: ['SENDER-API']   // x 轴分类
                         },
                         yAxis: {
                             title: {
-                                text: '吃水果个数'                // y 轴标题
+                                text: 'SENDER-API各使用次数统计'                // y 轴标题
                             }
                         },
                         series: [{                              // 数据列
-                            name: '小明',                        // 数据列名
-                            data: [1, 0, 4]                     // 数据
+                            name: 'sendPrivateMsg',             // 数据列名
+                            data: [1]                     // 数据
                         }, {
-                            name: '小红',
-                            data: [5, 7, 3]
-                        }]
-                    },
-                    {
-                        chart: {
-                            type: 'bar'                          //指定图表的类型，默认是折线图（line）
-                        },
-                        title: {
-                            text: '我的第一个图表'                 // 标题
-                        },
-                        xAxis: {
-                            categories: ['苹果', '香蕉', '橙子']   // x 轴分类
-                        },
-                        yAxis: {
-                            title: {
-                                text: '吃水果个数'                // y 轴标题
-                            }
-                        },
-                        series: [{                              // 数据列
-                            name: '小明',                        // 数据列名
-                            data: [1, 0, 4]                     // 数据
+                            name: 'SendGroupMsg',
+                            data: [5]
                         }, {
-                            name: '小红',
-                            data: [5, 7, 3]
-                        }]
-                    },
-                    {
-                        chart: {
-                            type: 'bar'                          //指定图表的类型，默认是折线图（line）
-                        },
-                        title: {
-                            text: '我的第一个图表'                 // 标题
-                        },
-                        xAxis: {
-                            categories: ['苹果', '香蕉', '橙子']   // x 轴分类
-                        },
-                        yAxis: {
-                            title: {
-                                text: '吃水果个数'                // y 轴标题
-                            }
-                        },
-                        series: [{                              // 数据列
-                            name: '小明',                        // 数据列名
-                            data: [1, 0, 4]                     // 数据
-                        }, {
-                            name: '小红',
-                            data: [5, 7, 3]
+                            name: 'SendLink',
+                            data: [5]
                         }]
                     }
                 ],
@@ -119,27 +76,39 @@
                 // var chart = Highcharts.chart('container', this.chars[0]);
             },
             up(){
-                let i = 0
-                this.chars.forEach(e => {
-                    let id = 'container' + i
-                    let type = 'column'
-                    series = e.series
-                    series.forEach(s => {
-                        s.type = type
-                        s.data[0] = s.data[0] + 10
-                    })
+
+                axios.get("/getDatas").then(re => {
+                    let charsData = re.data
+                    this.chars = charsData
+                    for (let index = 0; index < this.charsBean.length; index++) {
+                        this.charsBean[index].update(this.chars[index])
+                    }
+                });
+
+                // let i = 0
+                // this.chars.forEach(e => {
+                //     let id = 'container' + i
+                //     let type = 'column'
+                //     series = e.series
+                //     series.forEach(s => {
+                //         s.type = type
+                //         s.data[0] = s.data[0] + 10
+                //     })
                     
-                    console.info(e)
-                    this.charsBean[i++].update(e)
-                })
-                console.info("update")
+                //     console.info(e)
+                //     this.charsBean[i++].update(e)
+                // })
                 // var chart = Highcharts.chart('container', this.chars[0]);
             }
         },
         mounted() {
             this.chart()
             setInterval(this.up, 5000)
-        }
+        },
+        in
+
+
+
 
     })
 </script>

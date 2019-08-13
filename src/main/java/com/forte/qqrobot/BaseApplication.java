@@ -193,14 +193,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
      * 配置结束后的方法
      */
     private void afterConfig(CONFIG config, Application<CONFIG> app){
-        //先配置依赖管理器
-        //将依赖管理对象放入资源管理中心
-        DependGetter dependGetter = CONFIG.getDependGetter();
-        DependCenter dependCenter = dependGetter == null ? new DependCenter() : new DependCenter(dependGetter);
-        ResourceDispatchCenter.saveDependCenter(dependCenter);
-        //赋值
-        this.dependGetter = dependCenter;
 
+        //包路径
         String appPackage = app.getClass().getPackage().getName();
 
         Set<String> scanAllPackage = new HashSet<>();
@@ -229,11 +223,24 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
             }};
         }
 
-        //
-
+        //**************** 执行扫描 ****************//
         //进行扫描并保存注册器
-        //这个是普通的依赖注入
         this.register = scanner(scannerPackage);
+
+
+        //**************** 配置依赖注入相关 ****************//
+        //配置依赖管理器
+        //将依赖管理对象放入资源管理中心
+        DependGetter dependGetter = CONFIG.getDependGetter();
+
+        //此处可以尝试去寻找被扫描到的接口对象
+        // TODO 寻找携带@Beans且实现了Dependgetter的类
+
+        DependCenter dependCenter = dependGetter == null ? new DependCenter() : new DependCenter(dependGetter);
+        ResourceDispatchCenter.saveDependCenter(dependCenter);
+        //赋值
+        this.dependGetter = dependCenter;
+
 
         //如果有全局注入，先扫描并注入全局注入
         if(annotation != null){
@@ -254,8 +261,17 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
         this.register.registerDependCenter();
 
 
+        //此处可以在进行一些其他的任务操作
+//        this.register.performingTasks();
+
+
+
+
         //直接注册监听函数
         this.register.registerListener();
+
+
+
 
 
         //构建监听函数管理器等扫描器所构建的

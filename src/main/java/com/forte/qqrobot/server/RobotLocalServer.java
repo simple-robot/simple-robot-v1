@@ -1,5 +1,8 @@
 package com.forte.qqrobot.server;
 
+import com.alibaba.fastjson.JSON;
+import com.forte.qqrobot.server.bean.APIStatistics;
+import com.forte.qqrobot.server.bean.SenderAPIStatistics;
 import com.forte.qqrobot.server.path.ServerContextFactory;
 import com.forte.qqrobot.server.path.ServerContextFactoryImpl;
 import com.sun.net.httpserver.HttpHandler;
@@ -10,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -77,6 +81,35 @@ public class RobotLocalServer {
             }
 
         }));
+
+        map.put("/getDatas", serverContextFactory.createHttpHandler(encoding, methods, (s, ex) -> {
+            // 设置响应头
+            ex.getResponseHeaders().add("Content-Type", "text/html;charset=" + encoding);
+                // 设置响应code和内容长度
+                try {
+                    ex.sendResponseHeaders(200, 0L);
+                } catch (IOException e) {
+                    try {
+                        ex.sendResponseHeaders(500, 0L);
+                    } catch (IOException e1) {
+                        throw new RuntimeException(e1);
+                    }
+                }
+
+            //TODO 暂且使用假数据
+
+            SenderAPIStatistics senderAPIStatistics = new SenderAPIStatistics();
+
+                String[] datas = new String[]{
+                        senderAPIStatistics.toJson(),
+                        senderAPIStatistics.toJson(),
+                        senderAPIStatistics.toJson()
+                };
+
+            return Arrays.toString(datas);
+        }));
+
+
 
 
         return map;

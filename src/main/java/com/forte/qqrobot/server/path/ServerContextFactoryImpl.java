@@ -16,6 +16,9 @@ import java.util.function.BiFunction;
  * @since JDK1.8
  **/
 public class ServerContextFactoryImpl implements ServerContextFactory {
+
+    private static final String SERVER_FACTORY_THREADPOOL_NAME = "ServerContextFactory_ThreadPool";
+
     /**
      * 构建监听地址
      *
@@ -28,7 +31,7 @@ public class ServerContextFactoryImpl implements ServerContextFactory {
         //构建
         return ex -> {
             //使用线程异步接收消息
-            ResourceDispatchCenter.getThreadPool().execute(() -> doHandle(ex, encoding, methods, doHandler));
+            ResourceDispatchCenter.getThreadPool(SERVER_FACTORY_THREADPOOL_NAME).execute(() -> doHandle(ex, encoding, methods, doHandler));
         };
     }
 

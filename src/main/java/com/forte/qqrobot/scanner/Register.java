@@ -3,6 +3,9 @@ package com.forte.qqrobot.scanner;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.sender.MsgSender;
 
+import java.util.Collection;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -28,5 +31,16 @@ public interface Register {
      *  @param beans 需要提供通用Beans注解对象
      * */
     void registerDependCenterWithoutAnnotation(Beans beans);
+
+    /* —————————— 以上为一些必要的操作，以下为自定义执行 —————————— */
+
+    /**
+     * 执行一些其他的，可能是自定义的任务
+     * @param filter    过滤器，根据需求获取到你所需要的class类型，不会为空
+     * @param task      你要执行的任务。参数为过滤好的Class数组
+     */
+    void performingTasks(Predicate<? super Class<?>> filter,
+                         Consumer<Class<?>[]> task);
+
 
 }
