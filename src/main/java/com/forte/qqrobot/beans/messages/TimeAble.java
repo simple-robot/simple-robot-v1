@@ -16,7 +16,6 @@ public interface TimeAble {
     Long getTime();
 
 
-
     /**
      * 将时间视为秒值时间戳来获取{@link LocalDateTime}对象
      */

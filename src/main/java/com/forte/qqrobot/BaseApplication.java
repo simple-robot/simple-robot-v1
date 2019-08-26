@@ -23,10 +23,7 @@ import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.timetask.TimeTaskManager;
-import com.forte.qqrobot.utils.BaseLocalThreadPool;
-import com.forte.qqrobot.utils.BeansUtils;
-import com.forte.qqrobot.utils.CQCodeUtil;
-import com.forte.qqrobot.utils.FieldUtils;
+import com.forte.qqrobot.utils.*;
 import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.Closeable;
@@ -37,17 +34,22 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * 启动类总抽象类，在此实现部分通用功能
  * 实现closeable接口
+ * @param <CONFIG> 对应的插件配置类类型
+ * @param <SP_API> 由组件实现方提供的特殊API对象。
+ *                此类型没有任何限制，一般情况下我希望此类型是提供于我提供的三大API接口中不存在的API。
+ *                例如：获取插件信息等等。
+ *                有时候，这个类型可能就是你实现了三大API接口的拿个对象
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/29 10:18
  * @since JDK1.8
  **/
-public abstract class BaseApplication<CONFIG extends BaseConfiguration> implements Closeable {
+
+public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> implements Closeable {
 
     //java版本检测
     static{
@@ -139,8 +141,10 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
 
     /**
      * 开发者实现的资源初始化
+     * 此方法将会在所有的初始化方法最后执行
+     * 增加一个参数
      */
-    protected abstract void resourceInit();
+    protected abstract void resourceInit(CONFIG config);
 
     //**************** 获取三种送信器 ****************//
 
@@ -160,6 +164,11 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     protected abstract SenderGetList getGetter();
 
     /**
+     * 获取特殊API对象
+     */
+    public abstract SP_API getSpecialApi();
+
+    /**
      * 开发者实现的启动方法
      * v1.1.2-BETA后返回值修改为String，意义为启动结束后打印“启动成功”的时候使用的名字
      * 例如，返回值为“server”，则会输出“server”启动成功
@@ -169,6 +178,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
 
     /**
      * 开发者实现的获取Config对象的方法,对象请保证每次获取的时候都是唯一的
+     * 此方法将会最先被执行
      */
     protected abstract CONFIG getConfiguration();
 
@@ -216,17 +226,17 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
     /**
      * 初始化
      */
-    private void init(){
+    private void init(CONFIG config){
         //配置fastJson
         fastJsonInit();
         //公共资源初始化
         baseResourceInit();
-        //资源初始化
-        resourceInit();
         //线程工厂初始化
         threadPoolInit();
         //定时任务初始化
         timeTaskInit();
+        //资源初始化
+        resourceInit(config);
     }
 
     /**
@@ -328,7 +338,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
             for (String p : scanAllPackage) {
                 //全局扫描中，如果存在携带@beans的注解，则跳过.
                 //全局扫描只能将不存在@Beans注解的依赖进行添加
-                fileScanner.find(p, c -> c.getAnnotation(Beans.class) == null);
+//                fileScanner.find(p, c -> c.getAnnotation(Beans.class) == null);
+                fileScanner.find(p, c -> AnnotationUtils.getBeansAnnotationIfListen(Beans.class) == null);
             }
             //获取扫描结果
             Set<Class<?>> classes = fileScanner.get();
@@ -385,14 +396,14 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration> implemen
      * 执行的主程序
      */
     public void run(Application<CONFIG> app){
-        //先初始化
-        init();
-
         //获取配置对象
         CONFIG configuration = getConfiguration();
 
         //用户进行配置
         app.before(configuration);
+
+        //初始化
+        init(configuration);
 
         //配置结束
         afterConfig(configuration, app);

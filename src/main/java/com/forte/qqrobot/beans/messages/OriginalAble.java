@@ -10,4 +10,6 @@ public interface OriginalAble {
     /** 获取原本的数据 originalData */
     String getOriginalData();
 
+
+
 }

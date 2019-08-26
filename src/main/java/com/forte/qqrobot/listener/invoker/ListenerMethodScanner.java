@@ -7,6 +7,7 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
+import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.MethodUtil;
 
 import java.lang.reflect.Method;
@@ -52,7 +53,8 @@ public class ListenerMethodScanner {
         Supplier listenerGetter;
         Function<DependGetter, ?> listenerGetterWithAddition;
         //获取类上的Beans注解
-        Beans beansAnnotation = clazz.getAnnotation(Beans.class);
+//        Beans beansAnnotation = clazz.getAnnotation(Beans.class);
+        Beans beansAnnotation = AnnotationUtils.getBeansAnnotationIfListen(clazz);
         String name = beansAnnotation == null ? "" : beansAnnotation.value();
         if(name.trim().length() == 0){
             //如果没有指定名称，通过类型获取

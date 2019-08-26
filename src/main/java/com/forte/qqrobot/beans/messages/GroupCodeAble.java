@@ -9,4 +9,19 @@ public interface GroupCodeAble {
 
     String getGroupCode();
 
+    /**
+     * 将{@link #getGroupCode()} 获取到的值转化为long类型
+     * @return long类型的群号
+     * @throws NumberFormatException 存在数字转化隐患
+     */
+    default long getGroupCodeNumber(){
+        String groupCode = getGroupCode();
+        if(groupCode == null || groupCode.trim().length() == 0){
+            return 0L;
+        }else{
+            return Long.parseLong(groupCode);
+        }
+    }
+
+
 }

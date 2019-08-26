@@ -89,7 +89,6 @@ public class BeansFactory {
         BeansData beansData;
         if(beansAnno == null){
             //不存在注解，使用默认值
-
             beansData = BeansData.getInstance();
         }else{
             //存在注解，通过注解获取参数

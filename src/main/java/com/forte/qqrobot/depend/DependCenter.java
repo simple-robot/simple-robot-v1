@@ -5,6 +5,7 @@ import com.forte.qqrobot.depend.parameter.ParamNameGetter;
 import com.forte.qqrobot.depend.util.DependUtil;
 import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.log.QQLog;
+import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.SingleFactory;
 
@@ -116,7 +117,8 @@ public class DependCenter implements DependGetter {
                         &&
                         //存在注解
                         //注解：Beans、Listen
-                (c.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class) != null)
+//                (c.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class) != null)
+                (AnnotationUtils.getBeansAnnotationIfListen(c) != null)
         , loadsClasses);
     }
 
@@ -131,7 +133,8 @@ public class DependCenter implements DependGetter {
                         &&
                         //存在注解
                         //注解：Beans、Listen
-                (c.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class) != null)
+//                (c.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class) != null)
+                        (AnnotationUtils.getBeansAnnotationIfListen(c) != null)
         , loadsClasses);
     }
 
