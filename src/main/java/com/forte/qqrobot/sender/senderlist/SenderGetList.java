@@ -402,6 +402,7 @@ public interface SenderGetList extends SenderList {
     /**
      * 获取默认的缓存器，默认缓存器数据缓存1小时
      */
+    @CacheGetterFactory.NoCache
     default SenderGetList cache(){
         return CacheGetterFactory.toCacheableGetter(this);
     }
@@ -410,6 +411,7 @@ public interface SenderGetList extends SenderList {
      * 转化为缓存getter
      * @param time 缓存保存的秒时长
      */
+    @CacheGetterFactory.NoCache
     default SenderGetList cache(long time){
         return CacheGetterFactory.toCacheableGetter(this, time);
     }
@@ -419,6 +421,7 @@ public interface SenderGetList extends SenderList {
      * @param time          时长
      * @param cacheTypes    时间对应的增量类型
      */
+    @CacheGetterFactory.NoCache
     default SenderGetList cache(long time, CacheTypes cacheTypes){
         return CacheGetterFactory.toCacheableGetter(this, time, cacheTypes);
     }
@@ -427,6 +430,7 @@ public interface SenderGetList extends SenderList {
      * 指定过期时间
      * @param to    到某个指定的时间过期
      */
+    @CacheGetterFactory.NoCache
     default SenderGetList cache(LocalDateTime to){
         return CacheGetterFactory.toCacheableGetter(this, to);
     }
@@ -435,6 +439,7 @@ public interface SenderGetList extends SenderList {
     /**
      * 取消缓存状态
      */
+    @CacheGetterFactory.NoCache
     default SenderGetList dontCache(){
         SenderGetList originalGetter = CacheGetterFactory.getOriginalGetter();
         //如果没有，则认为自己就是原本的。

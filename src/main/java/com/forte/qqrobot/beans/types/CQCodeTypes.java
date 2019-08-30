@@ -1,5 +1,6 @@
 package com.forte.qqrobot.beans.types;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public enum CQCodeTypes {
 
     /** 默认的未知类型，当无法获取或解析的时候将会使用此类型 */
-    defaultType("", new String[0], new String[0], new String[0]),
+    defaultType("", new String[0], new String[0], new String[0] , -99),
     /**
      *  [CQ:face,id={1}] - QQ表情
      *  {1}为emoji字符的unicode编号
@@ -24,7 +25,8 @@ public enum CQCodeTypes {
     face("face",
             new String[]{"id"},
             new String[0],
-            new String[]{"\\d+"}),
+            new String[]{"\\d+"},
+            1),
 
     /**
      * [CQ:bface,id={1}] - 原创表情
@@ -33,7 +35,8 @@ public enum CQCodeTypes {
     bface("bface",
             new String[]{"id"},
             new String[0],
-            new String[]{"\\w+"}),
+            new String[]{"\\w+"},
+            2),
 
     /**
      * [CQ:sface,id={1}] - 小表情
@@ -42,17 +45,23 @@ public enum CQCodeTypes {
     sface("sface",
             new String[]{"id"},
             new String[0],
-            new String[]{"\\d+"}),
+            new String[]{"\\d+"},
+            3),
 
     /**
      * [CQ:image,file={1}] - 发送自定义图片
      * {1}为图片文件名称，图片存放在酷Q目录的data\image\下
      * 举例：[CQ:image,file=1.jpg]（发送data\image\1.jpg）
+     *
+     * 部分插件也支持网络类型或者本地文件类型，所以添加路径格式
+     *
+     *
      */
     image("image",
             new String[]{"file"},
             new String[0],
-            new String[]{"[\\w\\.]+"}),
+            new String[]{"[\\w\\.\\\\/:'=+%_\\?\\-\\*]+"},
+            4),
 
 
     /**
@@ -64,7 +73,8 @@ public enum CQCodeTypes {
     record("record",
             new String[]{"file", "magic"},
             new String[]{"magic"},
-            new String[]{"[\\w\\.]+" , "(true|TRUE|false|FALSE)"}),
+            new String[]{"[\\w\\.]+" , "(true|TRUE|false|FALSE)"},
+            5),
 
     /**
      * [CQ:at,qq={1}] - @某人
@@ -74,7 +84,8 @@ public enum CQCodeTypes {
     at("at",
             new String[]{"qq"},
             new String[0],
-            new String[]{"(\\d+|all)"}),
+            new String[]{"(\\d+|all)"},
+            6),
 
     /**
      * [CQ:rps,type={1}] - 发送猜拳魔法表情
@@ -86,7 +97,8 @@ public enum CQCodeTypes {
     rps("rps",
             new String[]{"type"},
             new String[]{"type"},
-            new String[]{"[1-3]"}),
+            new String[]{"[1-3]"},
+            7),
 
     /**
      * [CQ:dice,type={1}] - 发送掷骰子魔法表情
@@ -95,7 +107,8 @@ public enum CQCodeTypes {
     dice("dice",
             new String[]{"type"},
             new String[]{"type"},
-            new String[]{"[1-6]"}),
+            new String[]{"[1-6]"},
+            8),
 
     /**
      * [CQ:shake] - 戳一戳（原窗口抖动，仅支持好友消息使用）
@@ -103,7 +116,8 @@ public enum CQCodeTypes {
     shake("shake",
             new String[]{},
             new String[]{},
-            new String[]{}),
+            new String[]{},
+            9),
 
     /**
      * [CQ:anonymous,ignore={1}] - 匿名发消息（仅支持群消息使用）
@@ -117,7 +131,8 @@ public enum CQCodeTypes {
     anonymous("anonymous",
             new String[]{"ignore"},
             new String[]{"ignore"},
-            new String[]{"(true|TRUE|false|FALSE)"}),
+            new String[]{"(true|TRUE|false|FALSE)"},
+            10),
 
     /**
      * [CQ:music,type={1},id={2}] - 发送音乐
@@ -131,7 +146,8 @@ public enum CQCodeTypes {
     music("music",
             new String[]{"type", "id"},
             new String[0],
-            new String[]{"(qq|163|xiami)" , "\\d+"}),
+            new String[]{"(qq|163|xiami)" , "\\d+"},
+            11),
 
     /**
      * [CQ:music,type=custom,url={1},audio={2},title={3},content={4},image={5}] - 发送音乐自定义分享
@@ -145,7 +161,8 @@ public enum CQCodeTypes {
     music_custom("music",
             new String[]{"type", "url", "audio", "title", "content", "image"},
             new String[]{"content", "image"},
-            new String[]{"custom" , "[\\w:\\\\/\\?=\\.]+" , "[\\w:\\\\/\\?=\\.]+" , ".+" , ".+",  "[\\w:\\\\/\\?=\\.]*"}),
+            new String[]{"custom" , "[\\w:\\\\/\\?=\\.]+" , "[\\w:\\\\/\\?=\\.]+" , ".+" , ".+",  "[\\w:\\\\/\\?=\\.]*"},
+            12),
 
     /**
      * [CQ:share,url={1},title={2},content={3},image={4}] - 发送链接分享
@@ -158,7 +175,8 @@ public enum CQCodeTypes {
     share("share",
             new String[]{"url", "title", "content", "image"},
             new String[]{"content", "image"},
-            new String[]{"[\\w:\\\\/\\?=\\.]+", ".+" , ".+" , "[\\w:\\\\/\\?=\\.]*"}),
+            new String[]{"[\\w:\\\\/\\?=\\.]+", ".+" , ".+" , "[\\w:\\\\/\\?=\\.]*"},
+            13),
 
     /**
      * emoji表情
@@ -166,7 +184,8 @@ public enum CQCodeTypes {
     emoji("emoji",
             new String[]{"id"},
             new String[0],
-            new String[]{"\\d+"}),
+            new String[]{"\\d+"},
+            14),
 
 
 
@@ -201,6 +220,8 @@ public enum CQCodeTypes {
     private final Set<String> ignoreAbleKeys;
     /** 对此CQ码进行匹配的正则表达式 */
     private final String matchRegex;
+    /** 排序用的值 */
+    private final int sort;
 
     //**************** 静态常量 ****************//
 
@@ -230,6 +251,11 @@ public enum CQCodeTypes {
     /** 获取CQ码全匹配正则 */
     public static String getCqcodeExtractRegex(){
         return CQCODE_EXTRACT_REGEX;
+    }
+
+    /** 获取排序值 */
+    public int getSort(){
+        return sort;
     }
 
     /** 获取某个指定的key的匹配规则 */
@@ -270,11 +296,12 @@ public enum CQCodeTypes {
      * @param ignoreAbleKeys    可以忽略的参数列表
      * @param valuesRegex       对应参数的参数值匹配正则
      */
-    CQCodeTypes(String function, String[] keys, String[] ignoreAbleKeys , String[] valuesRegex){
+    CQCodeTypes(String function, String[] keys, String[] ignoreAbleKeys , String[] valuesRegex , int sort){
         this.function = function;
         this.keys = keys;
         this.ignoreAbleKeys = Arrays.stream(ignoreAbleKeys).collect(Collectors.toSet());
         this.valuesRegex = valuesRegex;
+        this.sort = sort;
 
         //生成匹配正则表达式
         StringJoiner joiner = new StringJoiner("" , CQ_REGEX_HEAD + this.function , CQ_REGEX_END);

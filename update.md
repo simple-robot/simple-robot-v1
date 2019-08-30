@@ -1,12 +1,21 @@
 ## 版本更新记录
 
-- ##### 1.3.1-BETA (未部署)
+- ##### 1.3.5-BETA (未部署)
     - 在`utils.proxyhelper`包中添加供开发者使用的便捷工具
     - 修复`CQCodeUtil`中`isContains`方法的错误判断
-    - 在`codeAble`和`GroupAble`接口忠增加群号/qq号转化为Long类型的相关API    
-
-
-
+    - 在`codeAble`和`GroupAble`接口忠增加群号/qq号转化为Long类型的相关API 
+    - 修改`BaseApplication` 结构。
+    - 在`BaseApplication` 中增加部分穿插在执行流程中的扩增方法，使得开发者可作为插件进行扩展。   
+    - 变更`run()`启动方法的内部执行流程。
+    - 优化image类型的参数正则匹配规则
+    - 在`CQCode`中增加对于字符串或者CQCode对象的拼接API，并提供一个新的返回值：`AppendList`
+    - `CQCode`新实现以下接口：
+        - `java.lang.CharSequence`( String类也实现的接口 )
+        - `Comparable<CQCode>`( 可根据一定类型顺序进行排序 )
+        - `java.io.Serializable`
+    - 移除`GETTER`进入缓存模式时的多余输出    
+    
+        
 
 - ##### 1.3-BETA
     - 增加本地服务器（※ 尚未开放使用）

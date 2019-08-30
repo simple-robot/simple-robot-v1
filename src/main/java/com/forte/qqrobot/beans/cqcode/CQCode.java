@@ -16,7 +16,13 @@ import java.util.stream.Stream;
  * @date Created in 2019/3/9 11:42
  * @since JDK1.8
  **/
-public class CQCode implements Map<String, String> {
+public class CQCode
+        implements Map<String, String>,
+        CharSequence,
+        Comparable<CQCode>,
+        java.io.Serializable
+
+{
 
     /** CQ码类型 */
     private final CQCodeTypes CQ_CODE_TYPE;
@@ -226,6 +232,52 @@ public class CQCode implements Map<String, String> {
     }
 
 
+    /**
+     * 拼接一个{@link CharSequence} 实现类，切割符为空格
+     * @param append 一个{@link CharSequence} 实现类
+     */
+    public AppendList append(CharSequence append){
+        return new CQAppendList().append(this).append(append);
+    }
+
+    /**
+     * 拼接一个{@link CharSequence} 实现类, 并指定字符串输出的时候的切割符
+     * @param append 拼接一个{@link CharSequence} 实现类
+     */
+    public AppendList append(CharSequence append, CharSequence split){
+        return new CQAppendList(split).append(this).append(append);
+    }
+
+    public AppendList append(long append){
+        return new CQAppendList().append(this).append(append);
+    }
+    public AppendList append(int append){
+        return new CQAppendList().append(this).append(append);
+    }
+    public AppendList append(double append){
+        return new CQAppendList().append(this).append(append);
+    }
+    public AppendList append(boolean append){
+        return new CQAppendList().append(this).append(append);
+    }
+    public AppendList append(char append){
+        return new CQAppendList().append(this).append(append);
+    }
+    public AppendList append(long append, CharSequence split){
+        return new CQAppendList(split).append(this).append(append);
+    }
+    public AppendList append(int append, CharSequence split){
+        return new CQAppendList(split).append(this).append(append);
+    }
+    public AppendList append(double append, CharSequence split){
+        return new CQAppendList(split).append(this).append(append);
+    }
+    public AppendList append(boolean append, CharSequence split){
+        return new CQAppendList(split).append(this).append(append);
+    }
+    public AppendList append(char append, CharSequence split){
+        return new CQAppendList(split).append(this).append(append);
+    }
 
     //**************************************
     //*          以下为Map接口的实现
@@ -411,5 +463,26 @@ public class CQCode implements Map<String, String> {
 
     }
 
+    //**************** 其他接口实现类 ****************//
 
+
+    @Override
+    public int length() {
+        return TO_STRING.length();
+    }
+
+    @Override
+    public char charAt(int index) {
+        return TO_STRING.charAt(index);
+    }
+
+    @Override
+    public CharSequence subSequence(int start, int end) {
+        return TO_STRING.subSequence(start, end);
+    }
+
+    @Override
+    public int compareTo(CQCode o) {
+        return Integer.compare(this.CQ_CODE_TYPE.getSort(), o.CQ_CODE_TYPE.getSort());
+    }
 }

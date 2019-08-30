@@ -6,6 +6,10 @@ import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.utils.collections.MethodCacheMap;
 import com.forte.utils.reflect.ProxyUtils;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.time.LocalDateTime;
@@ -158,16 +162,14 @@ public class CacheGetterFactory {
             return senderGetList;
         }
 
-        System.out.println("无记录：" + proxyType);
-
         //构建GETTER的代理对象
         SenderGetList proxyCacheGetter = getProxy(getter, SenderGetList.class, (m, o) -> {
-            //如果是Object的方法，不进行缓存
-            for (Method objectMethod : OBJECT_METHODS) {
-                if(objectMethod.equals(m)){
-                    return m.invoke(getter, o);
-                }
+            //如果被忽略，不进行缓存
+            if(ifIgnore(m)){
+                return m.invoke(getter, o);
             }
+
+
             //执行
             //先查看是否有缓存值
             Object result = cache.get(m);
@@ -232,13 +234,11 @@ public class CacheGetterFactory {
 
         //构建GETTER的代理对象
         SenderGetList proxyCacheGetter = ProxyUtils.proxy(SenderGetList.class, (m, o) -> {
-            //如果是Object的方法，不进行缓存
-            for (Method objectMethod : OBJECT_METHODS) {
-                if(objectMethod.equals(m)){
-                    return m.invoke(getter, o);
-                }
+            //如果被忽略，不进行缓存
+            if(ifIgnore(m)){
+                return m.invoke(getter, o);
             }
-            System.out.println("代理~:" + m);
+
             //执行
             //先查看是否有缓存值
             Object result = cache.get(m);
@@ -273,6 +273,31 @@ public class CacheGetterFactory {
     }
 
 
+    /**
+     * 判断方法是否需要被忽略而不进行缓存
+     * @param m 方法对象
+     */
+    private static boolean ifIgnore(Method m){
+        //如果是Object的方法，不进行缓存
+        for (Method objectMethod : OBJECT_METHODS) {
+            if(objectMethod.equals(m)){
+                return true;
+            }
+        }
+
+        //如果方法存在注解，不进行缓存
+        //如果方法存在注解@NoCache则忽略
+        if(m.getAnnotation(NoCache.class) != null){
+            return true;
+        }
+
+        //如果存在参数，暂时不进行缓存
+        if(m.getParameterCount() > 0){
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * 内部私有类，用于区别缓存类型
@@ -319,5 +344,13 @@ public class CacheGetterFactory {
         }
     }
 
+
+    /**
+     * 不进行方法缓存的标记注解
+     */
+    @Retention(RetentionPolicy.RUNTIME)	//注解会在class字节码文件中存在，在运行时可以通过反射获取到
+    @Target({ElementType.METHOD}) //接口、类、枚举、注解、方法
+    public @interface NoCache{
+    }
 
 }
