@@ -1,6 +1,6 @@
 ## 版本更新记录
 
-- ##### 1.3.5-BETA (未部署)
+- ##### 1.3.5-BETA
     - 在`utils.proxyhelper`包中添加供开发者使用的便捷工具
     - 修复`CQCodeUtil`中`isContains`方法的错误判断
     - 在`codeAble`和`GroupAble`接口忠增加群号/qq号转化为Long类型的相关API 

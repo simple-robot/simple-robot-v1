@@ -19,6 +19,9 @@ public interface Application<CONFIG extends BaseConfiguration> {
 
     void after(CQCodeUtil cqCodeUtil, MsgSender sender);
 
+    /**
+     * 这个方法不需要重写了啦！
+     */
     default String author(){
         return "@ForteScarlet";
     }

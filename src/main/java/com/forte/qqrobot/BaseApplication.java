@@ -143,8 +143,15 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 开发者实现的资源初始化
      * 此方法将会在所有的初始化方法最后执行
      * 增加一个参数
+     * 此资源配置将会在配置之后执行
      */
     protected abstract void resourceInit(CONFIG config);
+    /**
+     * 开发者实现的资源初始化
+     * 此方法将会在所有的初始化方法最后执行
+     * 这个没有参数的将会在配置之前执行，建议从此处配置配置类实例化
+     */
+    protected abstract void resourceInit();
 
     //**************** 获取三种送信器 ****************//
 
@@ -339,7 +346,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
                 //全局扫描中，如果存在携带@beans的注解，则跳过.
                 //全局扫描只能将不存在@Beans注解的依赖进行添加
 //                fileScanner.find(p, c -> c.getAnnotation(Beans.class) == null);
-                fileScanner.find(p, c -> AnnotationUtils.getBeansAnnotationIfListen(Beans.class) == null);
+                fileScanner.find(p, c -> AnnotationUtils.getBeansAnnotationIfListen(c) == null);
             }
             //获取扫描结果
             Set<Class<?>> classes = fileScanner.get();
@@ -396,6 +403,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 执行的主程序
      */
     public void run(Application<CONFIG> app){
+        //无配置资源初始化
+        resourceInit();
+
         //获取配置对象
         CONFIG configuration = getConfiguration();
 

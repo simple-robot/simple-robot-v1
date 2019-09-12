@@ -17,6 +17,12 @@ import java.time.LocalDateTime;
  **/
 public class QQLog extends ColorSystem {
 
+    /** QQLog初始化的时候输出个东西~ */
+    static{
+        System.out.println();
+        System.out.println("_(^w^)L~~ simple-robot@ForteScarlet ~~");
+        System.out.println();
+    }
 
     private static final PrintStream warning;
 

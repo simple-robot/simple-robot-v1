@@ -672,14 +672,14 @@ public class CQCodeUtil {
     }
 
     /**
-     * 将CQ码字符串转化为CQCode类型
+     * 将CQ码字符串转化为CQCode类型, 会去除空格
      * @param cq    cq字符串
      * @return  CQCode对象
      * @throws com.forte.qqrobot.exception.CQParseException
      *  当字符串无法转化为cq码对象的时候将会抛出此异常
      */
     public CQCode toCQCode(String cq){
-        return CQCode.of(cq);
+        return CQCode.of(cq.trim());
     }
 
 
