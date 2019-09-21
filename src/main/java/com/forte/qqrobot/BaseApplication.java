@@ -3,8 +3,8 @@ package com.forte.qqrobot;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.forte.plusutils.consoleplus.console.Colors;
 import com.forte.qqrobot.anno.Config;
+import com.forte.qqrobot.anno.CoreVersion;
 import com.forte.qqrobot.anno.depend.AllBeans;
-import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.RobotRuntionException;
@@ -48,7 +48,11 @@ import java.util.stream.Collectors;
  * @date Created in 2019/3/29 10:18
  * @since JDK1.8
  **/
-
+@CoreVersion(
+        version = "",
+        author = "ForteScarlet",
+        email = "ForteScarlet@163.com"
+)
 public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> implements Closeable {
 
     //java版本检测

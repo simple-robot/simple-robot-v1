@@ -3,7 +3,8 @@ package com.forte.qqrobot.anno;
 import java.lang.annotation.*;
 
 /**
- * 备用注解，用于开发者来标注版本号等信息，暂未使用
+ * 核心版本注解，内部使用
+ *
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
@@ -11,11 +12,9 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE}) //接口、类、枚举、注解、方法
 @Documented
 @Inherited  //可继承的
-public @interface Version {
-    /** 版本 */
+public @interface CoreVersion {
+    //版本
     String version();
-    /** 组件名称 */
-    String value();
     //开发者
     String author();
     //其他注释一类的东西？
@@ -26,8 +25,10 @@ public @interface Version {
     /** 主页 */
     String home() default "";
     /** maven地址 */
-    String mavenUrl() default "";
+    String mavenUrl() default "https://mvnrepository.com/artifact/io.github.ForteScarlet/simple-robot-core";
     /** git地址 */
-    String[] git() default {};
-
+    String[] git() default {
+        "https://github.com/ForteScarlet/simple-robot-core",
+        "https://gitee.com/ForteScarlet/simple-coolQ"
+    };
 }

@@ -25,8 +25,42 @@ public interface SenderSetList extends SenderList {
     boolean setFriendAddRequest(String flag, String friendName, boolean agree);
 
     /**
+     * 同意好友申请
+     * @param flag  唯一标识
+     * @param friendName 备注
+     */
+    default boolean setFriendAddRequestAgree(String flag, String friendName){
+        return setFriendAddRequest(flag, friendName, true);
+    }
+
+    /**
+     * 拒绝好友申请
+     * @param flag  唯一标识
+     */
+    default boolean setFriendAddRequestDisagree(String flag){
+        return setFriendAddRequest(flag, "", false);
+    }
+
+    /**
+     * 同意好友申请
+     * @param request  事件类型对象
+     * @param friendName 备注
+     */
+    default boolean setFriendAddRequestAgree(FriendAddRequest request, String friendName){
+        return setFriendAddRequest(request, friendName, true);
+    }
+
+    /**
+     * 拒绝好友申请
+     * @param request  事件类型
+     */
+    default boolean setFriendAddRequestDisagree(FriendAddRequest request){
+        return setFriendAddRequest(request, "", false);
+    }
+
+    /**
      * 好友请求申请
-     * @param request       事件类型
+     * @param request       事件类型对象
      * @param friendName    如果通过，则此参数为好友备注
      * @param agree         是否通过
      */
@@ -44,8 +78,42 @@ public interface SenderSetList extends SenderList {
     boolean setGroupAddRequest(String flag, GroupAddRequestType requestType, boolean agree, String why);
 
     /**
+     * 同意群添加申请
+     * @param flag  唯一标识
+     * @param requestType   加群类型  邀请/普通添加
+     */
+    default boolean setGroupAddRequestAgree(String flag, GroupAddRequestType requestType){
+        return setGroupAddRequest(flag, requestType, true, "");
+    }
+
+    /**
+     * 拒绝群添加申请
+     * @param flag  唯一标识
+     * @param requestType   加群类型  邀请/普通添加
+     */
+    default boolean setGroupAddRequestDisagree(String flag, GroupAddRequestType requestType, String why){
+        return setGroupAddRequest(flag, requestType, false, why);
+    }
+
+    /**
+     * 同意群添加申请
+     * @param request  群添加事件对象
+     */
+    default boolean setGroupAddRequestAgree(GroupAddRequest request){
+        return setGroupAddRequest(request, true, "");
+    }
+
+    /**
+     * 拒绝群添加申请
+     * @param request  群添加事件对象
+     */
+    default boolean setGroupAddRequestDisagree(GroupAddRequest request, String why){
+        return setGroupAddRequest(request, false, why);
+    }
+
+    /**
      * 群添加申请
-     * @param request   群添加事件
+     * @param request  群添加事件对象
      * @param agree     是否同意
      * @param why       如果拒绝，则此处为拒绝理由
      */
@@ -60,6 +128,8 @@ public interface SenderSetList extends SenderList {
      * @param set   是否设置为管理员
      */
     boolean setGroupAdmin(String group, String QQ, boolean set);
+
+
 
     /**
      * 设置群管理员
