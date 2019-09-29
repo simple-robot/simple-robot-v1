@@ -1,11 +1,10 @@
 package com.forte.qqrobot.scanner;
 
 
-import com.forte.qqrobot.BaseConfiguration;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.depend.DependCenter;
-import com.forte.qqrobot.exception.RobotRuntionException;
+import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.exception.TimeTaskException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -17,14 +16,11 @@ import org.quartz.Job;
 import org.quartz.SchedulerException;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * 扫描管理器
@@ -83,7 +79,7 @@ public class ScannerManager implements Register {
                     scanSet.forEach(lm -> QQLog.info("\t>>>" + lm.getMethodToString()));
                 }
             } catch (Exception e) {
-                throw new RobotRuntionException(e);
+                throw new RobotRuntimeException(e);
             }
         }
 

@@ -1,5 +1,6 @@
 package com.forte.qqrobot.beans.messages.get;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.forte.qqrobot.beans.messages.result.StrangerInfo;
 
 /**
@@ -14,6 +15,7 @@ public interface GetStrangerInfo extends InfoGet<StrangerInfo> {
      * 获取通过此类型请求而获取到的参数的返回值的类型
      */
     @Override
+    @JSONField(serialize = false)
     default Class<? extends StrangerInfo> resultType(){
         return StrangerInfo.class;
     }

@@ -1,12 +1,14 @@
 package com.forte.qqrobot.depend;
 
 import com.forte.qqrobot.exception.DependResourceException;
+import com.forte.qqrobot.exception.RobotDevException;
 import com.forte.qqrobot.utils.FieldUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * 额外的参数对象
@@ -17,8 +19,11 @@ import java.util.Map;
  **/
 public class AdditionalDepends implements DependGetter {
 
+
     /**
      * 根据类型的map
+     * 只有当不是基础数据类型的时候才会在类型Map中进行保存
+     * 否则将只能按照名称保存
      */
     private final Map<Class, Object> type;
 
@@ -52,7 +57,7 @@ public class AdditionalDepends implements DependGetter {
     }
 
     /**
-     * 工厂近供包内使用，请尽可能保证不出现类型冲突
+     * 请尽可能保证不出现类型冲突
      */
     public static AdditionalDepends getInstance(Map<String, Object> nameObjMap) {
         if (nameObjMap == null || nameObjMap.isEmpty()) {
@@ -65,9 +70,13 @@ public class AdditionalDepends implements DependGetter {
         Map<String, Object> nameMap = new HashMap<>();
 
         nameObjMap.forEach((k, v) -> {
-            //不是基础类型
-            typeMap.put(v.getClass(), v);
-            nameMap.put(k, v);
+            //只有当不是基础类型的时候才根据类型添加
+            if(BasicResourceWarehouse.isBasicType(v)){
+//                typeMap.put(v.getClass(), v);
+                typeMap.merge(v.getClass(), v, typeMapMergeThrows(v.getClass()));
+            }
+//            nameMap.put(k, v);
+            nameMap.merge(k, v, nameMapMergeThrows(k));
         });
         //构建
         return new AdditionalDepends(typeMap, nameMap);
@@ -130,4 +139,34 @@ public class AdditionalDepends implements DependGetter {
     public Object constant(String name) {
         return get(name);
     }
+
+    /**
+     * 当类型Map出现键冲突的时候，抛出异常并提示信息
+     * @param type  冲突的键类型
+     */
+    private static <V> BiFunction<? super V, ? super V, ? extends V> typeMapMergeThrows(Class<?> type){
+        return (old, val) -> {
+            throw new RobotDevException("动态参数类型出现重复！" +
+                    "\t\r\nkey(type): \t\t" + type +
+                    "\t\r\nvalue-old: " + old +
+                    "\t\r\nvalue-new: " + val);
+        };
+    }
+
+
+    /**
+     * 当名称Map出现键冲突的时候，抛出异常并提示信息
+     * @param key  冲突的键名称
+     */
+    private static <V> BiFunction<? super V, ? super V, ? extends V> nameMapMergeThrows(String key){
+        return (old, val) -> {
+            throw new RobotDevException("动态参数名称出现重复！" +
+                    "\t\r\nkey(name): \t\t" + key +
+                    "\t\r\nvalue-old: " + old +
+                    "\t\r\nvalue-new: " + val);
+        };
+    }
+
+
+
 }

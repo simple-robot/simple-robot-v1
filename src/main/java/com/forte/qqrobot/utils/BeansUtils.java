@@ -2,7 +2,7 @@ package com.forte.qqrobot.utils;
 
 import com.forte.qqrobot.anno.Constr;
 import com.forte.qqrobot.depend.DependCenter;
-import com.forte.qqrobot.exception.RobotRuntionException;
+import com.forte.qqrobot.exception.RobotRuntimeException;
 
 import java.lang.reflect.*;
 import java.util.Arrays;
@@ -32,7 +32,7 @@ public class BeansUtils {
             if(methods.length == 1){
                 return (T) methods[0].invoke(null);
             }else{
-                throw new RobotRuntionException(clazz + "中存在多个@Constr注解。");
+                throw new RobotRuntimeException(clazz + "中存在多个@Constr注解。");
             }
         }else{
             //如果没有，尝试使用无参构造

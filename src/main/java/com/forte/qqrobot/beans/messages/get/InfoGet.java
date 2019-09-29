@@ -1,5 +1,6 @@
 package com.forte.qqrobot.beans.messages.get;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.forte.qqrobot.beans.messages.RootBean;
 import com.forte.qqrobot.beans.messages.result.InfoResult;
 
@@ -15,6 +16,7 @@ public interface InfoGet<RESULT extends InfoResult> extends RootBean {
     /**
      * 获取通过此类型请求而获取到的参数的返回值的类型
      */
+    @JSONField(serialize = false)
     Class<? extends RESULT> resultType();
 
     /**

@@ -5,7 +5,7 @@ package com.forte.qqrobot.exception;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class CQParseException extends RobotRuntionException {
+public class CQParseException extends RobotRuntimeException {
 
 
     /**

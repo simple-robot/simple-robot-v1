@@ -2,13 +2,15 @@ package com.forte.qqrobot.beans.messages;
 
 import com.forte.qqrobot.utils.FieldUtils;
 
+import java.io.Serializable;
+
 /**
  * 所有的消息接口的根接口b<r>
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/4/18 10:28
  * @since JDK1.8
  **/
-public interface RootBean {
+public interface RootBean extends Serializable {
 
     /** 如果还会出现其他的参数，请自行实现获取方式<br>
      *  如果其他参数不多，你可以试着在方法中使用if_else进行分别；<br>

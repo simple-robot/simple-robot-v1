@@ -5,14 +5,14 @@ package com.forte.qqrobot.exception;
  * @date Created in 2019/4/2 15:56
  * @since JDK1.8
  **/
-public class RobotRuntionException extends RuntimeException {
+public class RobotRuntimeException extends RuntimeException {
 
     /**
      * Constructs a new runtime exception with {@code null} as its
      * detail message.  The cause is not initialized, and may subsequently be
      * initialized by a call to {@link #initCause}.
      */
-    public RobotRuntionException() {
+    public RobotRuntimeException() {
     }
 
     /**
@@ -23,7 +23,7 @@ public class RobotRuntionException extends RuntimeException {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public RobotRuntionException(String message) {
+    public RobotRuntimeException(String message) {
         super(message);
     }
 
@@ -41,7 +41,7 @@ public class RobotRuntionException extends RuntimeException {
      *                unknown.)
      * @since 1.4
      */
-    public RobotRuntionException(String message, Throwable cause) {
+    public RobotRuntimeException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -58,7 +58,7 @@ public class RobotRuntionException extends RuntimeException {
      *              unknown.)
      * @since 1.4
      */
-    public RobotRuntionException(Throwable cause) {
+    public RobotRuntimeException(Throwable cause) {
         super(cause);
     }
 
@@ -76,7 +76,7 @@ public class RobotRuntionException extends RuntimeException {
      *                           be writable
      * @since 1.7
      */
-    public RobotRuntionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public RobotRuntimeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

@@ -17,6 +17,8 @@ public class NameTypeEntry<T> implements Map.Entry<String, Class<T>> {
 
     private final Class<T> TYPE;
 
+    /** 空值 */
+    public static final NameTypeEntry<?>[] EMPTY = new NameTypeEntry[0];
 
     @Override
     public String getKey() {
@@ -33,25 +35,29 @@ public class NameTypeEntry<T> implements Map.Entry<String, Class<T>> {
         this.TYPE = Objects.requireNonNull(type, "类型不可为空");
     }
 
+    public static NameTypeEntry[] getEmpty(){
+        return EMPTY;
+    }
+
     /**
      * 将开头小写后创建
      * 基本统一使用此方法创建实例
      */
-    public static <T> NameTypeEntry getInstanceLower(String name, Class<T> type){
+    public static NameTypeEntry getInstanceLower(String name, Class<?> type){
         return getInstance(name == null ? null : FieldUtils.headLower(name), type);
     }
 
     /**
      * 将开头大写后创建
      */
-    public static <T> NameTypeEntry getInstanceUpper(String name, Class<T> type){
+    public static NameTypeEntry getInstanceUpper(String name, Class<?> type){
         return getInstance(name == null ? null : FieldUtils.headUpper(name), type);
     }
 
     /**
      * 原样创建
      */
-    public static <T> NameTypeEntry getInstance(String name, Class<T> type){
+    public static NameTypeEntry getInstance(String name, Class<?> type){
         return new NameTypeEntry(name, type);
     }
 

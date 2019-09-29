@@ -11,6 +11,7 @@ import com.forte.qqrobot.beans.types.KeywordMatchType;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * 监听器过滤器
@@ -101,9 +102,9 @@ public class ListenerFilter {
     /**
      * 全部的普配流程都走一遍，通过了才行
      */
-    private boolean allFilter(ListenerMethod listenerMethod, MsgGet msgGet, boolean shouldAt) {
+    private boolean allFilter(ListenerMethod listenerMethod, MsgGet msgGet, boolean at) {
         return
-                wordsFilter(listenerMethod, msgGet, shouldAt)
+                wordsFilter(listenerMethod, msgGet, at)
                         && codeFilter(listenerMethod, msgGet)
                         && groupFilter(listenerMethod, msgGet);
     }
@@ -113,10 +114,10 @@ public class ListenerFilter {
      *
      * @param listenerMethod 监听函数
      * @param msgGet         消息封装
-     * @param shouldAt       是否需要被at
+     * @param at       是否被at了
      * @return 是否通过
      */
-    private boolean wordsFilter(ListenerMethod listenerMethod, MsgGet msgGet, boolean shouldAt) {
+    private boolean wordsFilter(ListenerMethod listenerMethod, MsgGet msgGet, boolean at) {
         //获取过滤注解
         Filter filter = listenerMethod.getFilter();
 
@@ -128,12 +129,13 @@ public class ListenerFilter {
                 //如果只有一个参数，直接判断
                 String singleValue = value[0];
                 //如果需要被at，判断的时候移除at的CQ码
-                if (shouldAt) {
+                if (at) {
                     String qqCode = BaseConfiguration.getLocalQQCode();
                     String regex = CQCodeUtil.build().getCQCode_at(qqCode); //"\\[CQ:at,qq="+ qqCode +"\\]";
                     return filter.keywordMatchType().test(msgGet.getMsg().replaceAll(regex, ""), singleValue);
                 } else {
-                    return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
+                    Boolean test = filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
+                    return test;
                 }
             } else {
                 //如果有多个参数，按照规则判断

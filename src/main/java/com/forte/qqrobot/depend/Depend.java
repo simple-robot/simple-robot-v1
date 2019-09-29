@@ -37,6 +37,7 @@ public class Depend<V> {
      * @param single        是否为单例依赖
      * @param supplier      依赖空实例获取函数
      * @param injectDepend  依赖注入函数
+     * @param injectAdditionalDepend  额外依赖注入函数
      */
     public Depend(String name, Class<V> type, boolean single, Supplier<V> supplier, Consumer<V> injectDepend, BiConsumer<V, DependGetter> injectAdditionalDepend) {
         Objects.requireNonNull(name);

@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class AnnotationException extends RobotRuntionException {
+public class AnnotationException extends RobotRuntimeException {
 
     //****************  不应当使用注解+why  ****************//
 

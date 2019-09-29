@@ -197,10 +197,55 @@ public class BeansFactory {
         return new Beans<>(name, clazz, single, allDepend, finalInstanceNeed, finalGetInstanceFunction, children, beansData);
     }
 
+    /**
+     * 通过一个单独的实例bean获取Beans封装类
+     * @param name  依赖名称。<br>
+     *              nullable, if null, then use class simple name.
+     * @param bean 实例Bean
+     * @return      Beans封装类
+     */
+    public static <T> Beans<T> getBeansSingle(String name, T bean){
+        // 首先尝试获取这个类的@Beans注解
+        Class<T> type = (Class<T>) bean.getClass();
+        com.forte.qqrobot.anno.depend.Beans beansAnnotation = AnnotationUtils.getBeansAnnotationIfListen(type);
+        if(beansAnnotation != null){
+            // TODO 尽管已经获取了@Beans 也不要直接toBeans了，改为重写代码
+            return toBeans(type, beansAnnotation);
+        }
+
+        if(name == null || name.trim().length() == 0){
+            name = type.getSimpleName();
+        }
+        // /** 是否为单例 */
+        boolean single = true;
+        // /** 类下所有字段是否都作为依赖注入 */
+        boolean allDepend = false;
+        // /** 实例化所需要的参数列表及其对应的name */
+        // 由于实例已经确定，不需要再去获取参数
+        NameTypeEntry[] instanceNeed = NameTypeEntry.getEmpty();
+
+        // /** 获取实例对象的方法 */
+        // private final Function<Object[], T> getInstanceFunction;
+        Function<Object[], T> getInstanceFunction = o -> bean;
+
+        // /** 假如此Beans是类上的，那么children代表了其类中存在的其他Beans */
+        // private final Beans[] children;
+        Beans<?>[] children = getChildren(type, name);
+
+        // /** Beans注解对象中的参数，用来代替Beans注解 */
+        // private final BeansData beans;
+        BeansData instance = beansAnnotation == null ? BeansData.getInstance() : BeansData.getInstance(beansAnnotation);
+
+        // 参数构建完成，创建实例
+        return new Beans<>(name, type, single, allDepend, instanceNeed, getInstanceFunction, children, instance);
+    }
+
 
     /**
      * 获取类级Beans下的Beans数组
      * 需要保证clazz是携带@Beans注解的类
+     * @param clazz
+     * @param faName
      * @return
      */
     private static <T> Beans<?>[] getChildren(Class<T> clazz, String faName){

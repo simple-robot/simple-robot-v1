@@ -108,9 +108,10 @@ public class ListenerMethod<T> {
      *  - 如果返回值是Boolean或boolean类型，原样返回
      *  - 如果返回值为null，则认为执行失败
      *  - 如果为其他任意返回值，认为执行成功
+     *  TODO 返回值机制将会进行改变，或者通过增加一个动态参数来控制返回值。
      * @param additionalDepends 可以提供的额外参数(动态参数)
      */
-    boolean invoke(AdditionalDepends additionalDepends) throws InvocationTargetException, IllegalAccessException {
+    boolean invoke(AdditionalDepends additionalDepends) throws Throwable {
         //获取方法的参数数组，根据数组顺序准备参数，如果没有的参数使用null
 //        Class<?>[] parameterTypes = method.getParameterTypes();
 //        Object[] args = new Object[parameterTypes.length];

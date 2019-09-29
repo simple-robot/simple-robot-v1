@@ -5,7 +5,7 @@ package com.forte.qqrobot.exception;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class RobotApiException extends RobotRuntionException {
+public class RobotApiException extends RobotRuntimeException {
 
     public static RobotApiException byApiName(String api){
         return new RobotApiException("组件所不支持的API类型：[" + api + "]");

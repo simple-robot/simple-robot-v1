@@ -90,6 +90,55 @@ public class DependCenter implements DependGetter {
     //
     //**************************************
 
+    /**
+     * 根据一个对象直接添加，默认为单例模式
+     * 依赖名称默认使用类名
+     * @param bean 实例对象
+     * @return
+     */
+    public <T> DependCenter load(T bean){
+        return load(bean.getClass().getSimpleName(), bean);
+    }
+
+    /**
+     * 根据一个对象直接添加，默认为单例模式
+     * @param name 依赖名称
+     * @param bean 实例对象
+     */
+    public <T> DependCenter load(String name, T bean){
+        Depend<T> depend = buildDepend(name, bean);
+        saveDepend(depend);
+        return this;
+    }
+
+
+    /**
+     * 根据一个单独的实例构建一个Depend实例
+     * 默认为单例
+     * @param bean  实例对象
+     * @return      构建对应的单例Depend对象
+     */
+    private <T> Depend<T> buildDepend(String name, T bean){
+        Beans<T> beans = BeansFactory.getBeansSingle(name, bean);
+
+        // 实例获取函数
+        Supplier<T> getter = () -> bean;
+
+        //参数注入函数
+        Consumer<T> injectDepend = getInjectDependConsumer(beans);
+//
+        //额外参数注入函数
+        BiConsumer<T, DependGetter> addInjectDependConsumer = getAddInjectDependConsumer(beans);
+
+        return new Depend<>(beans.getName(),
+                beans.getType(),
+                beans.isSingle(),
+                getter,
+                injectDepend,
+                addInjectDependConsumer);
+    }
+
+
 
     /**
      * 加载一批依赖对象
@@ -338,7 +387,7 @@ public class DependCenter implements DependGetter {
      * 获取依赖注入函数
      * 提供额外的参数注入函数并且仅使用额外参数进行注入
      */
-    private <T> BiConsumer<T, ? extends DependGetter> getAddInjectDependConsumer(Beans<T> beans){
+    private <T> BiConsumer<T, DependGetter> getAddInjectDependConsumer(Beans<T> beans){
         //查找所有的字段，取到所有存在@Depend注解的字段或方法
         Class<T> type = beans.getType();
         //获取全部字段, 根据注解获取(或全部注入), 转化为字段值注入函数
@@ -437,6 +486,9 @@ public class DependCenter implements DependGetter {
      */
     public Object[] getMethodParameters(Method method, AdditionalDepends addParams){
         Parameter[] parameters = method.getParameters();
+        if(parameters.length == 0){
+            return new Object[0];
+        }
         //优先从额外参数中获取
         return getMethodParameters(parameters, addParams);
     }
@@ -551,7 +603,7 @@ public class DependCenter implements DependGetter {
         if(!dependGetter.equals(this)){
             T t = dependGetter.get(type);
             if(t != null){
-                return new Depend<T>(type.getSimpleName(), type, true, () -> t, ti -> {}, (ti, a) -> {});
+                return new Depend<>(type.getSimpleName(), type, true, () -> t, ti -> {}, (ti, a) -> {});
             }
         }
 

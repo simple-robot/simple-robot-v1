@@ -146,7 +146,7 @@ public class ListenerManager {
                 //执行函数
                 lisM.invoke(paramGetter.apply(lisM));
 
-            }catch (Exception e){
+            }catch (Throwable e){
                 QQLog.error("阻断函数["+ lisM.getBeanToString() +"]执行函数["+ lisM.getMethodToString() +"]出现错误！", e);
             }
 
@@ -242,7 +242,7 @@ public class ListenerManager {
                 boolean runTrue = lm.invoke(paramGetter.apply(lm));
                 //如果执行成功，计数+1
                 count.addAndGet(runTrue ? 1 : 0);
-            } catch (InvocationTargetException | IllegalAccessException e) {
+            } catch (Throwable e) {
                 QQLog.error("监听器["+ lm.getBeanToString() +"]执行函数["+ lm.getMethodToString() +"]出现错误！", e);
             }
         });
@@ -273,7 +273,7 @@ public class ListenerManager {
                 boolean runTrue = lm.invoke(paramGetter.apply(lm));
                 //如果执行成功，计数+1
                 count.addAndGet(runTrue ? 1 : 0);
-            } catch (InvocationTargetException | IllegalAccessException e) {
+            } catch (Throwable e) {
                 QQLog.error("监听器["+ lm.getBeanToString() +"]执行函数["+ lm.getMethodToString() +"]出现错误！", e);
             }
         });

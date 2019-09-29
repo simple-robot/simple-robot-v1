@@ -4,7 +4,7 @@ package com.forte.qqrobot.exception;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class CQParamsException extends RobotRuntionException {
+public class CQParamsException extends RobotRuntimeException {
     /**
      * Constructs a new runtime exception with {@code null} as its
      * detail message.  The cause is not initialized, and may subsequently be

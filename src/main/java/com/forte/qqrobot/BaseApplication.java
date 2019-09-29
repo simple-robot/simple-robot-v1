@@ -7,7 +7,7 @@ import com.forte.qqrobot.anno.CoreVersion;
 import com.forte.qqrobot.anno.depend.AllBeans;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
-import com.forte.qqrobot.exception.RobotRuntionException;
+import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -321,7 +321,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
                 }else if(cs.length == 0){
                     return null;
                 }else{
-                    throw new RobotRuntionException("扫描到多个" + DependGetter.class + "的实现类。");
+                    throw new RobotRuntimeException("扫描到多个" + DependGetter.class + "的实现类。");
                 }
             });
         }
@@ -339,6 +339,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         ResourceDispatchCenter.saveDependCenter(dependCenter);
         //赋值
         this.dependGetter = dependCenter;
+
+
 
 
         //如果有全局注入，先扫描并注入全局注入
