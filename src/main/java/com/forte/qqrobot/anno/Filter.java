@@ -1,5 +1,6 @@
 package com.forte.qqrobot.anno;
 
+import com.forte.qqrobot.beans.messages.types.PowerType;
 import com.forte.qqrobot.beans.types.KeywordMatchType;
 import com.forte.qqrobot.beans.types.MostType;
 
@@ -59,6 +60,21 @@ public @interface Filter {
      */
     MostType mostGroupType() default MostType.ANY_MATCH;
 
+    //**************** 以下为1.3.5-BETA之后的更新，且尚未实装 ****************//
+
+    /**
+     * 当存在群消息的时候，可以对群消息发信人进行权限过滤
+     * 尚未实装
+     */
+    @Deprecated
+    PowerType[] permission() default {};
+
+    /**
+     * 与{@link #mostType()} 功能类似，当{@link #permission()} 存在多个权限类型的时候，判断其匹配规则。
+     * 尚未实装
+     */
+    @Deprecated
+    MostType mostPermissionType() default MostType.ANY_MATCH;
 
 
 

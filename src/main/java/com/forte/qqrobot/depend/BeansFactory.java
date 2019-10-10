@@ -197,10 +197,62 @@ public class BeansFactory {
         return new Beans<>(name, clazz, single, allDepend, finalInstanceNeed, finalGetInstanceFunction, children, beansData);
     }
 
+
+    /**
+     * 直接通过一个实例对象获取Beans对象
+     * @param <T>
+     * @return
+     */
+    private static <T> Beans<T> toBeans(String dependName, T bean, com.forte.qqrobot.anno.depend.Beans beansAnnotation){
+        //如果参数中不存在注解对象，则尝试获取类上的注解对象。获取此类上的@Beans注解
+        Class<?> beanType = bean.getClass();
+        if(beansAnnotation == null){
+            //如果是个监听器则会获取@Listen中的@Beans注解
+            beansAnnotation = AnnotationUtils.getBeansAnnotationIfListen(beanType);
+        }
+        BeansData beansData;
+        if(beansAnnotation == null){
+            //不存在注解，使用默认值
+            beansData = BeansData.getInstance();
+        }else{
+            //存在注解，通过注解获取参数
+            beansData = BeansData.getInstance(beansAnnotation);
+        }
+
+        //准备参数
+        //类型
+        //名称, 如果是类名，开头小写
+        String name = dependName != null ? dependName : (
+                beansData.value().trim().length() == 0 ?
+                FieldUtils.headLower(beanType.getSimpleName()) :
+                beansData.value()
+        );
+
+        //是否为单例
+        boolean single = true;
+
+        //是否全部字段标注@Depend
+        boolean allDepend = beansData.allDepend();
+
+        //实例化需要的参数列表, 通过实例对象转化Beans，不需要实例化参数列表
+        NameTypeEntry[] instanceNeed = new NameTypeEntry[0];
+
+        //获取实例的函数
+        Function<Object[], T> getInstanceFunction = args -> bean;
+
+
+        //参数实例完成，获取children并封装对象
+        Beans[] children = getChildren(beanType, name);
+
+
+        return new Beans<>(name, (Class<T>) beanType, single, allDepend, instanceNeed, getInstanceFunction, children, beansData);
+    }
+
+
     /**
      * 通过一个单独的实例bean获取Beans封装类
      * @param name  依赖名称。<br>
-     *              nullable, if null, then use class simple name.
+     *              nullable, if null, use class simple name.
      * @param bean 实例Bean
      * @return      Beans封装类
      */
@@ -209,8 +261,8 @@ public class BeansFactory {
         Class<T> type = (Class<T>) bean.getClass();
         com.forte.qqrobot.anno.depend.Beans beansAnnotation = AnnotationUtils.getBeansAnnotationIfListen(type);
         if(beansAnnotation != null){
-            // TODO 尽管已经获取了@Beans 也不要直接toBeans了，改为重写代码
-            return toBeans(type, beansAnnotation);
+            // 如果能直接获取到注解，使用注解参数，但是使用实例注入的时候，不论单例参数是否为true，都必然返回此对象
+            return toBeans(name, bean, beansAnnotation);
         }
 
         if(name == null || name.trim().length() == 0){
@@ -234,7 +286,11 @@ public class BeansFactory {
 
         // /** Beans注解对象中的参数，用来代替Beans注解 */
         // private final BeansData beans;
-        BeansData instance = beansAnnotation == null ? BeansData.getInstance() : BeansData.getInstance(beansAnnotation);
+        BeansData instance = BeansData.getInstance();
+        instance.setAllDepend(allDepend);
+        instance.setSingle(single);
+        instance.setValue(name);
+
 
         // 参数构建完成，创建实例
         return new Beans<>(name, type, single, allDepend, instanceNeed, getInstanceFunction, children, instance);

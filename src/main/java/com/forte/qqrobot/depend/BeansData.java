@@ -13,19 +13,19 @@ import java.util.Arrays;
 public class BeansData {
 
     /** \@Beans注解的参数：value */
-    private final String value;
+    private String value;
 
     /** \@Beans注解的参数：single */
-    private final boolean single;
+    private boolean single;
 
     /** 是否全部标记为Depend */
-    private final boolean allDepend;
+    private boolean allDepend;
 
     /** 如果标记，默认的@Depend注解对象 */
-    private final Depend depend;
+    private Depend depend;
 
     /** \@Beans注解的参数：constructor */
-    private final Class[] constructor;
+    private Class[] constructor;
 
     /** 一个默认参数的@Beans参数
      *  默认对象中，当allDepend对象为false的时候，depend为null
@@ -81,6 +81,25 @@ public class BeansData {
         return constructor;
     }
 
+    //**************** 开放字段的setter方法 ****************//
 
+    public void setValue(String value) {
+        this.value = value;
+    }
 
+    public void setSingle(boolean single) {
+        this.single = single;
+    }
+
+    public void setAllDepend(boolean allDepend) {
+        this.allDepend = allDepend;
+    }
+
+    public void setDepend(Depend depend) {
+        this.depend = depend;
+    }
+
+    public void setConstructor(Class[] constructor) {
+        this.constructor = constructor;
+    }
 }
