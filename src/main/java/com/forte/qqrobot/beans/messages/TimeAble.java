@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * 此接口定义对象可以获取到实现值
+ * 此接口定义对象可以获取到时间值，并对时间值进行一些转化
  * TODO 尚未投入使用
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8

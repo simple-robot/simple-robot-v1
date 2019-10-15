@@ -7,6 +7,9 @@ package com.forte.qqrobot.beans.messages;
  **/
 public interface GroupCodeAble {
 
+    /**
+     * 获取消息中存在的群号信息
+     */
     String getGroupCode();
 
     /**

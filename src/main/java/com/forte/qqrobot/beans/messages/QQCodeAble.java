@@ -8,6 +8,10 @@ package com.forte.qqrobot.beans.messages;
  **/
 public interface QQCodeAble {
 
+    /**
+     * 获取QQ号信息。
+     * 假如一个消息封装中存在多个QQ号信息，例如同时存在处理者与被处理者，一般情况下我们认为其返回值为被处理者。
+     */
     String getQQCode();
 
     /**
@@ -15,7 +19,7 @@ public interface QQCodeAble {
      * @return long类型的qq号
      * @throws NumberFormatException 存在数字转化隐患
      */
-    default Long getQQCodeNumber(){
+    default long getQQCodeNumber(){
         String qqCode = getQQCode();
         if(qqCode == null || qqCode.trim().length() == 0){
             return 0L;

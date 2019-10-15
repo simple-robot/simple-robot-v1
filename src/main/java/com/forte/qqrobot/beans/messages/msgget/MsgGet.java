@@ -16,7 +16,7 @@ import java.time.ZoneId;
  **/
 public interface MsgGet extends OriginalAble, RootBean {
 
-    /** 获取ID，如果没有此参数推荐使用UUID等来代替 */
+    /** 获取ID, 一般用于消息类型判断 */
     String getId();
 
     /**
@@ -28,7 +28,7 @@ public interface MsgGet extends OriginalAble, RootBean {
     /** 获取消息的字体 */
     String getFont();
 
-    /** 获取到的时间, 代表某一时间的秒值。注意是秒值！如果类型不对请自行转化 */
+    /** 获取到的时间, 代表某一时间的秒值。一般情况下是秒值。如果类型不对请自行转化 */
     long getTime();
 
     /**
