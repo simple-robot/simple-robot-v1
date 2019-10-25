@@ -21,6 +21,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)	//注解会在class字节码文件中存在，在运行时可以通过反射获取到
 @Target({ElementType.TYPE, ElementType.METHOD}) //接口、类、枚举、注解、方法
 //监听类默认不使用单例类型
+//会牺牲一部分性能
 @Beans(single = false)
 public @interface Listen {
 
@@ -34,5 +35,22 @@ public @interface Listen {
      * 假如出现了多个监听器处理同一个消息，使用此参数对其进行排序，默认值为1
      */
     int sort() default 1;
+
+
+    /**
+     * 通过额外注册的监听类型进行监听器注册，最终会转化为{@link Listen}
+     */
+    @Retention(RetentionPolicy.RUNTIME)	//注解会在class字节码文件中存在，在运行时可以通过反射获取到
+    @Target({ElementType.TYPE, ElementType.METHOD}) //接口、类、枚举、注解、方法
+    //监听类默认不使用单例类型
+    @Beans(single = false)
+    public static @interface byName {
+
+        /** 额外注册的或者额外提供的监听类型的名称。 */
+        String[] value();
+
+        int sort() default 1;
+    }
+
 
 }
