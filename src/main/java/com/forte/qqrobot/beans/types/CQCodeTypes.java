@@ -161,7 +161,7 @@ public enum CQCodeTypes {
     music_custom("music",
             new String[]{"type", "url", "audio", "title", "content", "image"},
             new String[]{"content", "image"},
-            new String[]{"custom" , "[\\w:\\\\/\\?=\\.]+" , "[\\w:\\\\/\\?=\\.]+" , ".+" , ".+",  "[\\w:\\\\/\\?=\\.]*"},
+            new String[]{"custom" , ".+" , ".+" , ".+" , ".+",  "[\\w:\\\\/\\?=\\.]*"},
             12),
 
     /**
@@ -175,7 +175,7 @@ public enum CQCodeTypes {
     share("share",
             new String[]{"url", "title", "content", "image"},
             new String[]{"content", "image"},
-            new String[]{"[\\w:\\\\/\\?=\\.]+", ".+" , ".+" , "[\\w:\\\\/\\?=\\.]*"},
+            new String[]{".+", ".+" , ".+" , ".+"},
             13),
 
     /**

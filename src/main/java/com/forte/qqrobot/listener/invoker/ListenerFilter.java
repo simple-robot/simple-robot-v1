@@ -129,14 +129,15 @@ public class ListenerFilter {
                 //如果只有一个参数，直接判断
                 String singleValue = value[0];
                 //如果需要被at，判断的时候移除at的CQ码
-                if (at) {
-                    String qqCode = BaseConfiguration.getLocalQQCode();
-                    String regex = CQCodeUtil.build().getCQCode_at(qqCode); //"\\[CQ:at,qq="+ qqCode +"\\]";
-                    return filter.keywordMatchType().test(msgGet.getMsg().replaceAll(regex, ""), singleValue);
-                } else {
-                    Boolean test = filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
-                    return test;
-                }
+                //2019/10/25 不再移除CQ码
+//                if (at) {
+////                    String qqCode = BaseConfiguration.getLocalQQCode();
+////                    String regex = CQCodeUtil.build().getCQCode_at(qqCode); //"\\[CQ:at,qq="+ qqCode +"\\]";
+//                    return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
+//                } else {
+//                    return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
+//                }
+                return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
             } else {
                 //如果有多个参数，按照规则判断
                 //根据获取规则匹配

@@ -52,7 +52,6 @@ public enum MsgGetTypes {
         }
         /** 原本的转化类型将会直接转化为JSONObject对象 */
         @Override
-        @Deprecated
         public JSONObject getBeanForJson(String json){
             return JSON.parseObject(json);
         }

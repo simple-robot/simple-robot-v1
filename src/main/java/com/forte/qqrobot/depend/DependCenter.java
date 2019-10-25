@@ -126,7 +126,7 @@ public class DependCenter implements DependGetter {
 
         //参数注入函数
         Consumer<T> injectDepend = getInjectDependConsumer(beans);
-//
+
         //额外参数注入函数
         BiConsumer<T, DependGetter> addInjectDependConsumer = getAddInjectDependConsumer(beans);
 

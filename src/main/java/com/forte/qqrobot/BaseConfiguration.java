@@ -1,8 +1,11 @@
 package com.forte.qqrobot;
 
+import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
+import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.depend.DependInjector;
+import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.log.QQLog;
@@ -29,12 +32,16 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         this.configuration = (T) this;
     }
 
+    /*
+        干脆都换成static得了
+
+     */
 
     /** 是否扫描了初始化监听器 */
 //    private boolean scannedInitListener = false;
 
     /** 服务器ip，默认为127.0.0.1 */
-    private String ip = "127.0.0.1";
+    private static String ip = "127.0.0.1";
 
     /** 本机QQ信息, 一般唯一，使用静态 */
     private static LoginQQInfo loginQQInfo = null;
@@ -65,6 +72,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      *  基本全局唯一，使用静态
      *  TODO 此参数暂不可用，是否可用再商议
      * */
+    @Deprecated
     private static DependInjector dependInjector;
 
 
@@ -142,7 +150,6 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * 包扫描普通监听器
      * @param packageName   包名
      */
-    @Deprecated
     public T scannerListener(String packageName){
         scanner(packageName);
         return configuration;
@@ -156,6 +163,23 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         scannerPackage.add(packageName);
         return configuration;
     }
+
+
+    /**
+     * 注册一个自定义类型的MsgGet监听枚举
+     * 尚在施工中
+     */
+    @Deprecated
+    public void registerMsgGetType(String name, Class<? extends MsgGet> msgType){
+        // come soon
+        throw new RobotRuntimeException("此方法尚在施工中。");
+    }
+
+
+
+
+
+
 
 
     //**************** getter & setter ****************//
@@ -222,7 +246,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     }
 
     public T setIp(String ip) {
-        this.ip = ip;
+        BaseConfiguration.ip = ip;
         return configuration;
     }
 

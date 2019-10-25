@@ -14,7 +14,7 @@
     <artifactId>simple-robot-core</artifactId>
 
     <!-- 版本号 -->
-    <version>1.3.5-BETA</version>
+    <version>1.3.9-BETA</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>
@@ -299,7 +299,7 @@
         <dependency>
             <groupId>io.github.ForteScarlet.plusutils</groupId>
             <artifactId>simple-plusutils</artifactId>
-            <version>1.0</version>
+            <version>1.3</version>
         </dependency>
 
         <!--log4j-->

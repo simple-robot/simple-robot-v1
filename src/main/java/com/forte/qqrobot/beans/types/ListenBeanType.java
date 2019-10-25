@@ -8,6 +8,7 @@ import java.util.function.Supplier;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+@Deprecated
 public enum ListenBeanType {
 
     /** 以监听函数为准的单例，即每一个监听函数对应一个唯一单例 */
@@ -20,10 +21,8 @@ public enum ListenBeanType {
     GLOBAL_SINGLE(supplier -> {
         //将此类型保存至依赖资源管理中心
         Object single = supplier.get();
-
         //TODO 存入单例
-
-        return null;
+        return () -> single;
     }),
     /** 非单例，每一次都新建一个新的实例对象, 即使用原本传入的新实例获取方法原样返回不做处理 */
     NEW_INSTANCE_EVERY_TIME(supplier -> supplier)

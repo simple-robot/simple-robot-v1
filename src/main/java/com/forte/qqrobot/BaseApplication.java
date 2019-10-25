@@ -340,7 +340,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //赋值
         this.dependGetter = dependCenter;
 
-        //注入一些其他的东西
+        // ***** 注入一些其他的东西 ***** //
+
         dependCenter.load(CQCodeUtil.build());
 
 
