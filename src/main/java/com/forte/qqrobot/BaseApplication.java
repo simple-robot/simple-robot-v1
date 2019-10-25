@@ -262,7 +262,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 配置结束后的方法
      */
     private void afterConfig(CONFIG config, Application<CONFIG> app){
-
         //包路径
         String appPackage = app.getClass().getPackage().getName();
 
@@ -340,9 +339,17 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //赋值
         this.dependGetter = dependCenter;
 
-        // ***** 注入一些其他的东西 ***** //
+        // ***** 注入一些其他的东西且无视异常 ***** //
 
-        dependCenter.load(CQCodeUtil.build());
+        // 注入自己
+        dependCenter.loadIgnoreThrow(dependCenter);
+        // 注入CQCodeUtil
+        dependCenter.loadIgnoreThrow(CQCodeUtil.build());
+        // 注入当前这个启动器
+        dependCenter.loadIgnoreThrow(this);
+        // 注入配置类
+        dependCenter.loadIgnoreThrow(config);
+
 
 
 

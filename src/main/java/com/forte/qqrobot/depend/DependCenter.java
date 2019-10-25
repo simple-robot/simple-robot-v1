@@ -102,6 +102,21 @@ public class DependCenter implements DependGetter {
 
     /**
      * 根据一个对象直接添加，默认为单例模式
+     * 依赖名称默认使用类名 <br>
+     * 无视出现的异常
+     * @param bean 实例对象
+     * @return
+     */
+    public <T> DependCenter loadIgnoreThrow(T bean){
+        try {
+            return load(bean.getClass().getSimpleName(), bean);
+        }catch (Exception e){
+            return this;
+        }
+    }
+
+    /**
+     * 根据一个对象直接添加，默认为单例模式
      * @param name 依赖名称
      * @param bean 实例对象
      */
