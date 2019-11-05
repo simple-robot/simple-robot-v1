@@ -333,10 +333,12 @@ public class DependCenter implements DependGetter {
         Class<T> type = beans.getType();
         //获取全部字段, 根据注解获取(或全部注入), 转化为字段值注入函数
         Consumer<T>[] consumerArray = Arrays.stream(FieldUtils.getFields(type, true))
-                .filter(f -> beans.getBeans().allDepend() || f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class) != null)
+//                .filter(f -> beans.getBeans().allDepend() || f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class) != null)
+                .filter(f -> beans.getBeans().allDepend() || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
-                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
+//                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
+                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
                     if((beans.getBeans().allDepend()) && (dependAnnotation == null)){
                         dependAnnotation = beans.getBeans().depend();
                     }
@@ -407,11 +409,13 @@ public class DependCenter implements DependGetter {
         Class<T> type = beans.getType();
         //获取全部字段, 根据注解获取(或全部注入), 转化为字段值注入函数
         BiConsumer<T, DependGetter>[] consumerArray = Arrays.stream(FieldUtils.getFields(type, true))
-                .filter(f -> beans.getBeans().allDepend() || f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class) != null)
+//                .filter(f -> beans.getBeans().allDepend() || f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class) != null)
+                .filter(f -> beans.getBeans().allDepend() || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
                     //获取字段注解
-                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
+//                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
+                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
                     //如果没有注解且allDepend为true，获取默认注解
                     if((beans.getBeans().allDepend()) && (dependAnnotation == null)){
                         dependAnnotation = beans.getBeans().depend();
@@ -541,7 +545,8 @@ public class DependCenter implements DependGetter {
      */
     private Object getParameter(Parameter parameter, AdditionalDepends additionalDepends){
         //获取注解
-        com.forte.qqrobot.anno.depend.Depend dependAnnotation = parameter.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
+//        com.forte.qqrobot.anno.depend.Depend dependAnnotation = parameter.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
+        com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(parameter, com.forte.qqrobot.anno.depend.Depend.class);
 
         //获取到的参数
         Object param;

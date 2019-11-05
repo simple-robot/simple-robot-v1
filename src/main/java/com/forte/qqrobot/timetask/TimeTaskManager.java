@@ -9,6 +9,7 @@ import com.forte.qqrobot.beans.types.TimeType;
 import com.forte.qqrobot.exception.TimeTaskException;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.MsgSender;
+import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.FieldUtils;
 import org.quartz.*;
 
@@ -69,7 +70,7 @@ public class TimeTaskManager {
         List<Annotation> annoList = new ArrayList<>();
         //首先判断是否存在注解
         for(Class<Annotation> tc : timeTaskAnnos){
-            Annotation an = clazz.getAnnotation(tc);
+            Annotation an = AnnotationUtils.getAnnotation(clazz, tc);
             if(an != null){
                 annoList.add(an);
             }

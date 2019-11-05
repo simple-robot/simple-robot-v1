@@ -3,6 +3,7 @@ package com.forte.qqrobot.utils.proxyhelper;
 import com.alibaba.fastjson.JSONObject;
 import com.forte.qqrobot.anno.Ignore;
 import com.forte.qqrobot.anno.Key;
+import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.utils.reflect.ProxyUtils;
 
 import java.lang.invoke.MethodHandles;
@@ -55,7 +56,8 @@ public class JSONParameterCreatorHelper {
             }
 
             //如果携带@Ignore注解
-            if(m.getAnnotation(Ignore.class) != null){
+//            if(m.getAnnotation(Ignore.class) != null){
+            if(AnnotationUtils.getAnnotation(m, Ignore.class) != null){
                 return ifIgnore.apply(m, o);
             }
 
@@ -64,7 +66,8 @@ public class JSONParameterCreatorHelper {
                 Parameter[] parameters = m.getParameters();
                 for (int i = 0; i < parameters.length; i++) {
                     Parameter parameter = parameters[i];
-                    Key keyAnnotation = parameter.getAnnotation(Key.class);
+//                    Key keyAnnotation = parameter.getAnnotation(Key.class);
+                    Key keyAnnotation = AnnotationUtils.getAnnotation(parameter, Key.class);
                     String key;
                     if(keyAnnotation == null || keyAnnotation.value().trim().length() == 0){
                         key = parameter.getName();

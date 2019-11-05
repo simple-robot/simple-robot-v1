@@ -272,7 +272,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         Set<String> scannerPackage = config.getScannerPackage();
 
         //查看启动类上是否存在@AllBeans注解
-        AllBeans annotation = app.getClass().getAnnotation(AllBeans.class);
+//        AllBeans annotation = app.getClass().getAnnotation(AllBeans.class);
+        AllBeans annotation = AnnotationUtils.getAnnotation(app.getClass(), AllBeans.class);
         if(annotation != null){
             //如果存在全局包扫描
             String[] value = annotation.value();
@@ -306,7 +307,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         if(dependGetter == null){
             dependGetter = register.performingTasks(
                     //过滤出携带者Config注解的、不是接口和抽象类的、是DependGetter的子类的
-                    c -> (c.getAnnotation(Config.class) != null) && (FieldUtils.notInterfaceAndAbstract(c)) && (FieldUtils.isChild(c, DependGetter.class)),
+                    c -> (AnnotationUtils.getAnnotation(c, Config.class) != null) &&
+                            (FieldUtils.notInterfaceAndAbstract(c)) && (FieldUtils.isChild(c, DependGetter.class)),
                     //看看有没有，如果有，赋值。
                     cs -> {
                 if(cs.length == 1){

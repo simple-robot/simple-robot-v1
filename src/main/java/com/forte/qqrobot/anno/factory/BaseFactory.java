@@ -1,4 +1,4 @@
-package com.forte.qqrobot.listener.factory;
+package com.forte.qqrobot.anno.factory;
 
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.exception.RobotDevException;
@@ -50,7 +50,7 @@ public abstract class BaseFactory<E extends Enum<E>> {
     protected E registerEnum(String name, Object... params) throws NoSuchMethodException, IllegalAccessException {
         // 判断是否可以新增
         throwOrPass(name, params);
-        return EnumUtils.newEnum(enumType(), name, params);
+        return EnumUtils.newEnum(enumType(), name, constructorTypes(), params);
     }
 
     /**

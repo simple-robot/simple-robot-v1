@@ -3,6 +3,7 @@ package com.forte.qqrobot.sender;
 import com.forte.qqrobot.beans.types.CacheTimeTypes;
 import com.forte.qqrobot.beans.types.CacheTypes;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
+import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.utils.collections.MethodCacheMap;
 import com.forte.utils.reflect.ProxyUtils;
 
@@ -287,7 +288,7 @@ public class CacheGetterFactory {
 
         //如果方法存在注解，不进行缓存
         //如果方法存在注解@NoCache则忽略
-        if(m.getAnnotation(NoCache.class) != null){
+        if(AnnotationUtils.getAnnotation(m, NoCache.class) != null){
             return true;
         }
 

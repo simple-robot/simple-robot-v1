@@ -70,15 +70,8 @@ public class ListenerMethodScanner {
 //        boolean isSocketListener = FieldUtils.isChild(clazz, SocketListener.class);
 
         //判断方法上有没有备用方法注解
-        Spare spare = clazz.getAnnotation(Spare.class);
+        Spare spare = AnnotationUtils.getAnnotation(clazz, Spare.class);
 
-
-        // TODO 2019/8/6 监听器接口已经被移除，此代码暂做保留，后期想起来之后删掉
-//        //如果是普通监听器，则认为此方法中全部公共的onMessage都有可能为监听器方法，获取全部onMessage方法
-//        //判断条件：方法名为onMessage且第一个参数的类型是MsgGet
-//        if(isSocketListener){
-//            result.addAll(buildBySocketListener(clazz, spare, listenerGetter, listenerGetterWithAddition));
-//        }
 
         //**************** 以上为实现了接口的判断 ****************//
         Set<ListenerMethod> result = new HashSet<>(buildByNormal(clazz, spare, listenerGetter, listenerGetterWithAddition));
@@ -91,49 +84,6 @@ public class ListenerMethodScanner {
 
 
     /**
-     * 通过接口实现的方式来构建监听函数列表
-     * TODO 2019/8/6 监听器接口已经被移除，此代码暂做保留，后期想起来之后删掉
-     */
-//    private Set<ListenerMethod> buildBySocketListener(Class<?> clazz, Spare spare, Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition) {
-//        //尝试获取实例对象
-////        Object obj = getBean(clazz, bean);
-//        boolean isSpare = (spare != null);
-//
-//        Method[] methods = MethodUtil.getPublicMethods(clazz, m -> m.getName().equals(SOCKET_LISTENER_METHOD_NAME) && FieldUtils.isChild(m.getParameterTypes()[0], MsgGet.class));
-//
-//        //遍历，根据第一个参数判断函数的监听类型并封装
-//        //添加所有
-//        return Arrays.stream(methods)
-//                .map(m -> {
-//                    Class<MsgGet> msgGetClass = (Class<MsgGet>) m.getParameterTypes()[0];
-//                    //监听器实现来的函数仅会有一个监听类型
-//                    MsgGetTypes singleType = MsgGetTypes.getByType(msgGetClass);
-//                    MsgGetTypes[] byType = new MsgGetTypes[]{singleType};
-//                    if(singleType != null){
-//                        //如果不是未知的, 则认定其是正确的onMessage对象，开始封装
-//                        //获取其他注解
-//                        Filter filter = m.getAnnotation(Filter.class);
-//                        BlockFilter blockFilter = m.getAnnotation(BlockFilter.class);
-//                        Block block = m.getAnnotation(Block.class);
-//                        //尝试获取实例对象
-//                        if (isSpare) {
-//                            //添加
-//                            return build(listenerGetter, listenerGetterWithAddition, m, byType, spare, filter, blockFilter, block);
-//                        } else {
-//                            //如果没有类上的Spare注解，则方法单独获取
-//                            Spare thisSpare = m.getAnnotation(Spare.class);
-//                            return build(listenerGetter, listenerGetterWithAddition, m, byType, thisSpare, filter, blockFilter, block);
-//                        }
-//                    }else{
-//                        return null;
-//                    }
-//                })
-//                .filter(Objects::nonNull)
-//                .collect(Collectors.toSet());
-//    }
-
-
-    /**
      * 通过普通的注解的形式加载监听函数
      */
     private Set<ListenerMethod> buildByNormal(Class<?> clazz, Spare spare, Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition) {
@@ -141,9 +91,10 @@ public class ListenerMethodScanner {
         //不使用else，两者不冲突
         //开始判断当前类, 判断类上是否有@Listen注解
         //判断类上可以存在的注解
-        Listen classListen = clazz.getAnnotation(Listen.class);
-
-        Block classBlock = clazz.getAnnotation(Block.class);
+//        Listen classListen = clazz.getAnnotation(Listen.class);
+//        Block classBlock = clazz.getAnnotation(Block.class);
+        Listen classListen = AnnotationUtils.getAnnotation(clazz, Listen.class);
+        Block classBlock = AnnotationUtils.getAnnotation(clazz, Block.class);
 
 
         //提前准备方法获取过滤器
@@ -152,10 +103,11 @@ public class ListenerMethodScanner {
         //创建过滤器，排除有忽略注解的方法和静态方法
         if(classListen != null){
             //如果存在监听, 获取所有公共方法
-            getFilter = m -> !MethodUtil.isStatic(m) && (m.getAnnotation(Ignore.class) == null);
+//            getFilter = m -> !MethodUtil.isStatic(m) && (m.getAnnotation(Ignore.class) == null);
+            getFilter = m -> !MethodUtil.isStatic(m) && (AnnotationUtils.getAnnotation(m, Ignore.class) == null);
         }else{
             //如果不存在，获取有@Listen注解的公共方法
-            getFilter = m -> !MethodUtil.isStatic(m) && (m.getAnnotation(Ignore.class) == null) && m.getAnnotation(Listen.class) != null;
+            getFilter = m -> !MethodUtil.isStatic(m) && (AnnotationUtils.getAnnotation(m, Ignore.class) == null) && AnnotationUtils.getAnnotation(m, Listen.class) != null;
         }
 
         //参数获取类型
@@ -167,7 +119,8 @@ public class ListenerMethodScanner {
         return Arrays.stream(publicMethods).map(method -> {
 
             //获取方法上的@Listen注解
-            Listen methodListen = method.getAnnotation(Listen.class);
+//            Listen methodListen = method.getAnnotation(Listen.class);
+            Listen methodListen = AnnotationUtils.getAnnotation(method, Listen.class);
 
             //如果类上没有注解，方法上也没有，则跳过此方法
             if (classListen == null && methodListen == null) {
@@ -178,15 +131,19 @@ public class ListenerMethodScanner {
             //尝试获取实例对象
 
             //获取需要的注解
-            Filter filter = method.getAnnotation(Filter.class);
-            BlockFilter blockFilter = method.getAnnotation(BlockFilter.class);
+//            Filter filter = method.getAnnotation(Filter.class);
+//            BlockFilter blockFilter = method.getAnnotation(BlockFilter.class);
+            Filter filter = AnnotationUtils.getAnnotation(method, Filter.class);
+            BlockFilter blockFilter = AnnotationUtils.getAnnotation(method, BlockFilter.class);
             //获取类上的阻断注解
-            Block block = method.getAnnotation(Block.class);
+//            Block block = method.getAnnotation(Block.class);
+            Block block = AnnotationUtils.getAnnotation(method, Block.class);
             //如果方法上没有阻断注解，则使用类上注解，如果方法上存在则使用方法上的注解,此时当不存在的时候直接使用null即可
             block = (block == null) ? classBlock : block;
 
             //如果是全局备用，则直接备用，如果没有全局备用，获取此方法的Spare注解
-            Spare thisSpare = isSpare ? spare : method.getAnnotation(Spare.class);
+//            Spare thisSpare = isSpare ? spare : method.getAnnotation(Spare.class);
+            Spare thisSpare = isSpare ? spare : AnnotationUtils.getAnnotation(method, Spare.class);
             //监听类型
             MsgGetTypes[] msgGetType = Optional.ofNullable(methodListen).map(Listen::value).orElse(msgGetTypes);
 
@@ -274,7 +231,8 @@ public class ListenerMethodScanner {
         }else{
             //如果参数的bean为null，说明没有实例对象
             //尝试实例化,先查询是存在@Constr注解的静态方法，返回值应与Clazz相同
-            Method[] constrs = MethodUtil.getMethods(clazz, m -> MethodUtil.isStatic(m) && (m.getReturnType().equals(clazz)) && (m.getAnnotation(Constr.class) != null));
+            Method[] constrs = MethodUtil.getMethods(clazz, m -> MethodUtil.isStatic(m) &&
+                    (m.getReturnType().equals(clazz)) && (AnnotationUtils.getAnnotation(m, Constr.class) != null));
 
             //如果存在，遍历执行，直到执行成功，否则抛出异常
             if(constrs.length > 0){

@@ -3,6 +3,7 @@ package com.forte.qqrobot.anno;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 
+import java.io.Closeable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,6 +24,7 @@ import java.lang.annotation.Target;
 //监听类默认不使用单例类型
 //会牺牲一部分性能
 @Beans(single = false)
+@ByNameType(Listen.ByName.class)
 public @interface Listen {
 
     /**
@@ -44,12 +46,15 @@ public @interface Listen {
     @Target({ElementType.TYPE, ElementType.METHOD}) //接口、类、枚举、注解、方法
     //监听类默认不使用单例类型
     @Beans(single = false)
-    public static @interface byName {
+    @ByNameFrom(Listen.class)
+    @interface ByName {
 
         /** 额外注册的或者额外提供的监听类型的名称。 */
+        @ByNameField(MsgGetTypes.class)
         String[] value();
 
         int sort() default 1;
+
     }
 
 

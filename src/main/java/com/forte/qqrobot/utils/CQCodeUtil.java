@@ -438,7 +438,7 @@ public class CQCodeUtil {
      */
     @Deprecated
     public String getCQCode_anonymous(){
-        return getCQCodeString(CQCodeTypes.anonymous, null);
+        return getCQCodeString(CQCodeTypes.anonymous, (String) null);
     }
 
     /**
@@ -448,7 +448,7 @@ public class CQCodeUtil {
      * @return 匿名发消息
      */
     public CQCode getCQCode_Anonymous(){
-        return getCQCode(CQCodeTypes.anonymous, null);
+        return getCQCode(CQCodeTypes.anonymous, (String) null);
     }
 
 

@@ -308,7 +308,9 @@ public class BeansFactory {
         //获取此类下所有标注了@Beans的方法并进行过滤
         //方法上的@Beans不可省略
         return Arrays.stream(clazz.getDeclaredMethods()).filter(m -> {
-            com.forte.qqrobot.anno.depend.Beans beanAnnotation = m.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class);
+//            com.forte.qqrobot.anno.depend.Beans beanAnnotation = m.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class);
+            com.forte.qqrobot.anno.depend.Beans beanAnnotation =
+                    AnnotationUtils.getAnnotation(m, com.forte.qqrobot.anno.depend.Beans.class);
             if(beanAnnotation != null){
                 //如果存在此注解，判断内容：是否存在返回值
                 if(m.getReturnType().equals(void.class)){
@@ -322,7 +324,9 @@ public class BeansFactory {
             //是否为静态
             final boolean isStatic = Modifier.isStatic(m.getModifiers());
             //注解信息
-            com.forte.qqrobot.anno.depend.Beans beanAnnotation = m.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class);
+//            com.forte.qqrobot.anno.depend.Beans beanAnnotation = m.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class);
+            com.forte.qqrobot.anno.depend.Beans beanAnnotation =
+                    AnnotationUtils.getAnnotation(m, com.forte.qqrobot.anno.depend.Beans.class);
             //转化为Beans对象
 
             Class<?> type = m.getReturnType();
@@ -373,7 +377,8 @@ public class BeansFactory {
     static NameTypeEntry[] getNameTypeArrayByParameters(Parameter[] parameters){
         return Arrays.stream(parameters).map(p -> {
             //判断参数上是否存在@Depend注解
-            Depend dependAnnotation = p.getAnnotation(Depend.class);
+//            Depend dependAnnotation = p.getAnnotation(Depend.class);
+            Depend dependAnnotation = AnnotationUtils.getAnnotation(p, Depend.class);
             String pName = paramNameGetter.getParameterName(p);
             Class<?> pType = p.getType();
             if(dependAnnotation != null){

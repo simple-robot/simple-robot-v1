@@ -2,6 +2,7 @@ package com.forte.qqrobot.utils.proxyhelper;
 
 import com.forte.qqrobot.anno.Ignore;
 import com.forte.qqrobot.anno.Key;
+import com.forte.qqrobot.utils.AnnotationUtils;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -53,7 +54,7 @@ public class UrlParameterCreatorHelper {
             }
 
             //如果携带@Ignore注解
-            if(m.getAnnotation(Ignore.class) != null){
+            if(AnnotationUtils.getAnnotation(m, Ignore.class) != null){
                 return ifIgnore.apply(m, o);
             }
 
@@ -69,7 +70,8 @@ public class UrlParameterCreatorHelper {
             Parameter[] parameters = m.getParameters();
             for (int i = 0; i < parameters.length; i++) {
                 String key;
-                Key keyAnnotation = parameters[i].getAnnotation(Key.class);
+//                Key keyAnnotation = parameters[i].getAnnotation(Key.class);
+                Key keyAnnotation = AnnotationUtils.getAnnotation(parameters[i], Key.class);
                 if(keyAnnotation == null || keyAnnotation.value().trim().length() == 0){
                     key = parameters[i].getName();
                 }else{

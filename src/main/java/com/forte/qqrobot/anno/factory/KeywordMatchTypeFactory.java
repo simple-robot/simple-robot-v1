@@ -1,4 +1,4 @@
-package com.forte.qqrobot.listener.factory;
+package com.forte.qqrobot.anno.factory;
 
 import com.forte.qqrobot.beans.types.KeywordMatchType;
 
@@ -29,7 +29,7 @@ public class KeywordMatchTypeFactory extends BaseFactory<KeywordMatchType> {
 
     private KeywordMatchTypeFactory(){
         if(FACTORY != null){
-            throw new RuntimeException("no! you know? You don't need more examples.");
+            throw new RuntimeException("no! you know, You don't need more examples.");
         }
     }
 
@@ -79,7 +79,8 @@ public class KeywordMatchTypeFactory extends BaseFactory<KeywordMatchType> {
 
     @Override
     protected void requireCanUse(String name, Object[] params) {
-        // 参数只可能有一个，即BiPredicate
+        // 参数只可能有一个，即BiPredicate<String, String>
+        // 所以只要不报错，就说明参数没问题
         BiPredicate<String, String> filter = (BiPredicate<String, String>) params[0];
     }
 }
