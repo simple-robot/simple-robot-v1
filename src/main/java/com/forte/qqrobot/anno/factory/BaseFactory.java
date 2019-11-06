@@ -12,7 +12,10 @@ import java.util.function.IntFunction;
  *
  * 创建枚举实例的基础类
  * 所有的实现类均应当作为单例使用，此类实现类没有多例的必要性。<br>
- * 实现类需要自行实现对外窗口。
+ * 实现类需要自行实现对外窗口。<br>
+ *
+ * 一般对外窗口叫做register，第一个参数为枚举名称，其余参数为构造所需参数。
+ *
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
@@ -31,7 +34,6 @@ public abstract class BaseFactory<E extends Enum<E>> {
 
     /**
      * 返回此枚举需要的构造参数列表
-     * TODO 由于EnumUtils自身的bug，暂时不使用
      */
     protected abstract Class<?>[] constructorTypes();
 

@@ -101,16 +101,16 @@ public enum TimeTaskTemplate {
     ;
 
     /** 创建一个trigger触发器实例 */
-    private Function<String, Trigger> triggerCreater;
+    private Function<String, Trigger> triggerCreator;
 
     /** 构造 */
-    TimeTaskTemplate(Function<String, Trigger> triggerCreater){
-        this.triggerCreater = triggerCreater;
+    TimeTaskTemplate(Function<String, Trigger> triggerCreator){
+        this.triggerCreator = triggerCreator;
     }
 
     /** 获取定时触发器 */
     public Trigger getTrigger(String name){
-        return triggerCreater.apply(name);
+        return triggerCreator.apply(name);
     }
 
 }

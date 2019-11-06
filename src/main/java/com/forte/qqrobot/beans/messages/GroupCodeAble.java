@@ -17,7 +17,7 @@ public interface GroupCodeAble {
      * @return long类型的群号
      * @throws NumberFormatException 存在数字转化隐患
      */
-    default long getGroupCodeNumber(){
+    default Long getGroupCodeNumber(){
         String groupCode = getGroupCode();
         if(groupCode == null || groupCode.trim().length() == 0){
             return 0L;

@@ -29,7 +29,7 @@ public interface MsgGet extends OriginalAble, RootBean {
     String getFont();
 
     /** 获取到的时间, 代表某一时间的秒值。一般情况下是秒值。如果类型不对请自行转化 */
-    long getTime();
+    Long getTime();
 
     /**
      * 将时间作为秒值之间戳转化为LocalDateTime

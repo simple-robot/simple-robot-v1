@@ -19,7 +19,7 @@ public interface QQCodeAble {
      * @return long类型的qq号
      * @throws NumberFormatException 存在数字转化隐患
      */
-    default long getQQCodeNumber(){
+    default Long getQQCodeNumber(){
         String qqCode = getQQCode();
         if(qqCode == null || qqCode.trim().length() == 0){
             return 0L;

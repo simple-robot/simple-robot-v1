@@ -45,8 +45,12 @@ public class KeywordMatchTypeFactory extends BaseFactory<KeywordMatchType> {
      * @throws NoSuchMethodException
      * @throws IllegalAccessException
      */
-    public KeywordMatchType register(String name, BiPredicate<String, String> filter) throws NoSuchMethodException, IllegalAccessException {
-        return super.registerEnum(name, filter);
+    public KeywordMatchType register(String name, BiPredicate<String, String> filter) {
+        try {
+            return super.registerEnum(name, filter);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -57,7 +61,7 @@ public class KeywordMatchTypeFactory extends BaseFactory<KeywordMatchType> {
      * @throws NoSuchMethodException
      * @throws IllegalAccessException
      */
-    public static KeywordMatchType registerType(String name, BiPredicate<String, String> filter) throws NoSuchMethodException, IllegalAccessException {
+    public static KeywordMatchType registerType(String name, BiPredicate<String, String> filter) {
         return getInstance().register(name, filter);
     }
 

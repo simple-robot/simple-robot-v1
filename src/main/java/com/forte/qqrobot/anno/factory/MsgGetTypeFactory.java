@@ -84,15 +84,19 @@ public class MsgGetTypeFactory extends BaseFactory<MsgGetTypes> {
     /**
      * 获取一个MsgGetType的新枚举
      */
-    public MsgGetTypes register(String name, Class<? extends MsgGet> listenType) throws NoSuchMethodException, IllegalAccessException {
+    public MsgGetTypes register(String name, Class<? extends MsgGet> listenType) {
         // 执行父类中的注册方法
-        return super.registerEnum(name, listenType);
+        try {
+            return super.registerEnum(name, listenType);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * 获取一个MsgGetType的新枚举 - 静态窗口
      */
-    public static MsgGetTypes registerType(String name, Class<? extends MsgGet> listenType) throws NoSuchMethodException, IllegalAccessException {
+    public static MsgGetTypes registerType(String name, Class<? extends MsgGet> listenType) {
         return getInstance().register(name, listenType);
     }
 

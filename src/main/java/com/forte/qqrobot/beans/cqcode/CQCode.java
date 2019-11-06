@@ -58,7 +58,9 @@ public class CQCode
      * @return CQCode实例对象
      */
     public static CQCode of(String typeStr, String[] params){
-        return of(CQCodeTypes.getTypeByFunction(typeStr), params);
+        // 获取参数的key列表
+        String[] keyArray = Arrays.stream(params).map(p -> p.split("=")[0]).toArray(String[]::new);
+        return of(CQCodeTypes.getTypeByFunctionAndParams(typeStr, keyArray), params);
     }
 
     /**
@@ -68,7 +70,8 @@ public class CQCode
      * @return CQCode实例对象
      */
     public static CQCode of(String typeStr, Map<String, String> params){
-        return of(CQCodeTypes.getTypeByFunction(typeStr), params);
+        String[] paramsArray = params.keySet().toArray(new String[0]);
+        return of(CQCodeTypes.getTypeByFunctionAndParams(typeStr, paramsArray), params);
     }
 
     /**

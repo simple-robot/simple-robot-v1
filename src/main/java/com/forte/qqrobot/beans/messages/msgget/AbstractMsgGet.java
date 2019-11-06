@@ -60,7 +60,7 @@ public abstract class AbstractMsgGet implements MsgGet {
     }
 
     @Override
-    public long getTime() {
+    public Long getTime() {
         return time;
     }
 

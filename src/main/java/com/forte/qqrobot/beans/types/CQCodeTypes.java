@@ -1,10 +1,10 @@
 package com.forte.qqrobot.beans.types;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.regex.Pattern;
+import com.forte.utils.reflect.EnumUtils;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -146,7 +146,7 @@ public enum CQCodeTypes {
     music("music",
             new String[]{"type", "id"},
             new String[0],
-            new String[]{"(qq|163|xiami)" , "\\d+"},
+            new String[]{".+" , "\\d+"},
             11),
 
     /**
@@ -194,13 +194,39 @@ public enum CQCodeTypes {
 
     /**
      * 根据function名(即[CQ:后面的名字)获取CQCodeTypes对象实例
+     * 已经过时，需要额外通过参数列表进行匹配
      * @param function 名称
      * @return CQCodeTypes实例对象
+     * @see #getTypeByFunctionAndParams(String, String...)
      */
+    @Deprecated
     public static CQCodeTypes getTypeByFunction(String function){
-        for (CQCodeTypes type : values()) {
+//        for (CQCodeTypes type : values()) {
+        for (CQCodeTypes type : EnumUtils.values(CQCodeTypes.class, CQCodeTypes[]::new)) {
             if(type.function.equals(function)){
                 return type;
+            }
+        }
+        return defaultType;
+    }
+
+    /**
+     * 根据类型和参数名称列表来获取一个具体的枚举类型对象实例
+     * @param function   function 值
+     * @param paramNames 参数列表值，需要保证顺序
+     * @return CQCodeTypes实例对象
+     */
+    public static CQCodeTypes getTypeByFunctionAndParams(String function, String... paramNames){
+        // 首先，对传入的参数进行排序
+        for (CQCodeTypes type : EnumUtils.values(CQCodeTypes.class, CQCodeTypes[]::new)) {
+            if(type.function.equals(function)){
+                // 由于无法确定类型，所以每次都需要排一次序
+                String[] ps = type.paramSort(paramNames);
+                String keyJoin = String.join(",", ps);
+                // 如果类型相同，则判断参数列表
+                if(keyJoin.matches(type.paramMatch)){
+                    return type;
+                }
             }
         }
         return defaultType;
@@ -222,6 +248,22 @@ public enum CQCodeTypes {
     private final String matchRegex;
     /** 排序用的值 */
     private final int sort;
+    /**
+     * 用来判断参数是否匹配的
+     * 有时候相同的function可能有不同的两套参数列表，例如music
+     * 所以在转化的时候还需要考虑一下参数列表
+     * */
+    private final String paramMatch;
+
+    /**
+     * 参数排序，将某个数组根据参数列表进行排序
+     */
+    private final Function<String[], String[]> paramSort;
+
+    /**
+     * 唯一id，通过function:keys判断
+     */
+    private final String equalsID;
 
     //**************** 静态常量 ****************//
 
@@ -232,6 +274,14 @@ public enum CQCodeTypes {
     /** 用于从字符串中提取CQCode码字符串的正则表达式 */
 //    private static final String CQCODE_EXTRACT_REGEX = "\\[CQ:((?!(\\[CQ:)).)+\\]";
     private static final String CQCODE_EXTRACT_REGEX = "\\[CQ:((?!(\\[CQ:))\\w)+\\,((?!(\\[CQ:)).)+\\]";
+
+    /**
+     * 内部维护一个Map，key为function，value为CQCodeTypes的数组，并提供一个register函数。
+     * 需要保证不会出现重复，则通过function和参数列表判断，参数列表通过set转化后拼接进行比对。
+     * 以为set对字符串的排序规则是固定的，则这样拼接出来的必定是唯一的结果。
+     * 不考虑可忽略参数
+     */
+    private static final Map<String, CQCodeTypes[]> AllCQCodeTypeMap = new HashMap<>(32);
 
     /** 获取方法类型名称 */
     public String getFunction(){
@@ -272,6 +322,21 @@ public enum CQCodeTypes {
         return null;
     }
 
+    public String[] paramSort(String... params){
+        return paramSort.apply(params);
+    }
+
+    /**
+     * 判断参数列表是否符合匹配规则
+     * @param keys
+     * @return
+     */
+    public boolean matchKeys(String... keys){
+        String keysJoin = String.join(",", keys);
+        return keysJoin.matches(paramMatch);
+    }
+
+
     /** 获取匹配字符串 */
     public String getMatchRegex(){
         return this.matchRegex;
@@ -290,6 +355,25 @@ public enum CQCodeTypes {
     }
 
     /**
+     * 注册一个CQCodeTypes
+     * @param cqCodeTypes CQ码类型
+     */
+    public static boolean register(CQCodeTypes cqCodeTypes){
+        // 获取function
+        String function = cqCodeTypes.function;
+        // 获取他的参数列表
+//        String keyJoin = Arrays.stream(cqCodeTypes.keys).sorted().collect(Collectors.joining());
+        String ID = cqCodeTypes.equalsID;
+
+        System.out.println(ID);
+        // TODO 完成额外type注册
+
+        return false;
+
+    }
+
+
+    /**
      * 构造方法
      * @param function          cq码类型
      * @param keys              参数列表
@@ -302,6 +386,7 @@ public enum CQCodeTypes {
         this.ignoreAbleKeys = Arrays.stream(ignoreAbleKeys).collect(Collectors.toSet());
         this.valuesRegex = valuesRegex;
         this.sort = sort;
+        this.equalsID = function + ":" + Arrays.stream(keys).sorted().collect(Collectors.joining());
 
         //生成匹配正则表达式
         StringJoiner joiner = new StringJoiner("" , CQ_REGEX_HEAD + this.function , CQ_REGEX_END);
@@ -321,14 +406,48 @@ public enum CQCodeTypes {
         //遍历完成，生成字符串
         this.matchRegex = joiner.toString();
 
+        // 生成参数匹配字符串
+        // 大概规则：
+        // 参数1,参数2(,可忽略参数3)
+        StringBuilder paramMatchBuilder = new StringBuilder();
+        boolean first = true;
+        for (String key : keys) {
+            // 判断是否可以忽略
+            boolean ignore = this.ignoreAbleKeys.contains(key);
+            if(ignore){
+                // 可以省略
+                paramMatchBuilder.append("(");
+                if(!first){
+                    paramMatchBuilder.append(",");
+                }
+                paramMatchBuilder.append(key);
+                paramMatchBuilder.append(")?");
+            }else{
+                // 不可省略, 则不带括号
+                if(!first){
+                    paramMatchBuilder.append(",");
+                }
+                paramMatchBuilder.append(key);
+            }
+            first = false;
+        }
+        this.paramMatch = paramMatchBuilder.toString();
+
+        // 生成参数排序函数
+        int paramSort = 1;
+        Map<String, Integer> sortMap = new HashMap<>(keys.length);
+        for (String key : keys) {
+            sortMap.put(key, paramSort++);
+        }
+
+        this.paramSort = srr -> {
+            String[] sortArray = Arrays.copyOf(srr, srr.length);
+            Arrays.sort(sortArray, Comparator.comparing(s -> sortMap.getOrDefault(s, -1)));
+            return sortArray;
+        };
+
+        // 注册自己
+        register(this);
     }
-
-//    /**
-////     * 获取本类全部常量对象
-////     */
-//    private static CQCodeTypes[] getAllTypes(){
-//        return values();
-//    }
-
 
 }
