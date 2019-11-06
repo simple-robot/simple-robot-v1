@@ -1,14 +1,21 @@
 package com.forte.qqrobot.beans.types;
 
+import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.utils.reflect.EnumUtils;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * CQ码的全部function名
+ *
+ * 此枚举保存全部的CQCode类型。<br>
+ * 且提供了一个{@link com.forte.qqrobot.anno.factory.CQCodeTypeFactory}来支持动态扩展此枚举。<br>
+ * 请不要使用任何非工厂创建的形式（例如自己通过反射或者其他工具）创建此类的实例对象。此类中维护一个function映射，
+ * 用于通过function值快速定位CQCodeType，并且提供了一个注册接口{@link #register(CQCodeTypes)} 来支持额外注册的实例对象，并对其进行验证。
+ * 包括{@link com.forte.qqrobot.anno.factory.CQCodeTypeFactory}中也提供了直接创建新枚举实例的相关接口，并提供参数验证。
+ * 假如您使用了其他手段自己创建了一个额外的实例，可能会导致valueOf所取值与内部的function映射值不相符、参数冲突等一系列问题。
+ *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/8 14:55
  * @since JDK1.8
@@ -214,18 +221,18 @@ public enum CQCodeTypes {
      * 根据类型和参数名称列表来获取一个具体的枚举类型对象实例
      * @param function   function 值
      * @param paramNames 参数列表值，需要保证顺序
-     * @return CQCodeTypes实例对象
+     * @return CQCodeTypes实例对象, 如果没有则会返回defaultType
      */
     public static CQCodeTypes getTypeByFunctionAndParams(String function, String... paramNames){
-        // 首先，对传入的参数进行排序
-        for (CQCodeTypes type : EnumUtils.values(CQCodeTypes.class, CQCodeTypes[]::new)) {
-            if(type.function.equals(function)){
-                // 由于无法确定类型，所以每次都需要排一次序
-                String[] ps = type.paramSort(paramNames);
-                String keyJoin = String.join(",", ps);
-                // 如果类型相同，则判断参数列表
-                if(keyJoin.matches(type.paramMatch)){
-                    return type;
+        // 获取对应function的values
+        CQCodeTypes[] cqCodeTypes = AllCQCodeTypeMap.get(function);
+        if(cqCodeTypes == null || cqCodeTypes.length == 0){
+            return defaultType;
+        }else{
+            // 如果存在，则遍历并匹配参数match
+            for (CQCodeTypes cqCodeType : cqCodeTypes) {
+                if(cqCodeType.matchKeys(paramNames)){
+                    return cqCodeType;
                 }
             }
         }
@@ -283,6 +290,14 @@ public enum CQCodeTypes {
      */
     private static final Map<String, CQCodeTypes[]> AllCQCodeTypeMap = new HashMap<>(32);
 
+    // 静态代码块，注册AllCQCodeTypeMap
+    // 这个时候直接使用values吧
+    static {
+        for (CQCodeTypes value : values()) {
+            register(value);
+        }
+    }
+
     /** 获取方法类型名称 */
     public String getFunction(){
         return function;
@@ -327,13 +342,21 @@ public enum CQCodeTypes {
     }
 
     /**
+     * 排序后使用,拼接，用于对参数进行匹配
+     * @param params
+     * @return
+     */
+    public String toParamMatch(String... params){
+        return String.join(",",paramSort(params));
+    }
+
+    /**
      * 判断参数列表是否符合匹配规则
      * @param keys
      * @return
      */
     public boolean matchKeys(String... keys){
-        String keysJoin = String.join(",", keys);
-        return keysJoin.matches(paramMatch);
+        return toParamMatch(keys).matches(paramMatch);
     }
 
 
@@ -356,20 +379,107 @@ public enum CQCodeTypes {
 
     /**
      * 注册一个CQCodeTypes
-     * @param cqCodeTypes CQ码类型
+     * @param newType CQ码类型
      */
-    public static boolean register(CQCodeTypes cqCodeTypes){
+    public static synchronized CQCodeTypes register(CQCodeTypes newType){
+        // non null
+        Objects.requireNonNull(newType);
+
         // 获取function
-        String function = cqCodeTypes.function;
+        String function = newType.function;
         // 获取他的参数列表
-//        String keyJoin = Arrays.stream(cqCodeTypes.keys).sorted().collect(Collectors.joining());
-        String ID = cqCodeTypes.equalsID;
+        CQCodeTypes[] cqCodeTypesWithFunction = AllCQCodeTypeMap.get(function);
+        if(cqCodeTypesWithFunction == null){
+            // 如果没用这个function的CQ类型，直接保存一个
+            AllCQCodeTypeMap.put(newType.function, new CQCodeTypes[]{newType});
+        }else{
+            // 如果存在，判断是否有相同ID
+            for (CQCodeTypes ct : cqCodeTypesWithFunction) {
+                if(ct.equalsID(newType)){
+                    // 如果是等值的，抛出异常
+                    throw new IllegalArgumentException(
+                            "已经存在此CQ码！\n"
+                            + "function: " + ct.function + '\n'
+                            + "keys:     " + Arrays.toString(ct.keys)
+                    );
 
-        System.out.println(ID);
-        // TODO 完成额外type注册
+                }
+            }
+            // 如果一切安好，则说明可以添加
+            // 数组扩容并替换
+            CQCodeTypes[] newTypeArray = new CQCodeTypes[cqCodeTypesWithFunction.length + 1];
+            System.arraycopy(cqCodeTypesWithFunction, 0, newTypeArray, 0, cqCodeTypesWithFunction.length);
+            newTypeArray[cqCodeTypesWithFunction.length] = newType;
+            // 保存新的数组
+            AllCQCodeTypeMap.put(newType.function, newTypeArray);
+        }
+        return newType;
+    }
 
+    /**
+     * 返回某个function下的全部CQCodeTypes
+     * @param function  function类型
+     */
+    public static CQCodeTypes[] getCQCodeTypesByFunction(String function){
+        CQCodeTypes[] cqCodeTypes = AllCQCodeTypeMap.get(function);
+        return Arrays.copyOf(cqCodeTypes, cqCodeTypes.length);
+    }
+
+    /**
+     * 判断是否为两个等值的CQ码
+     */
+    public boolean equalsID(Object o){
+        if(o instanceof CQCodeTypes){
+            return equalsID.equals(((CQCodeTypes) o).equalsID);
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 判断是否存在某个equalsID
+     * @param id equalsID
+     */
+    public boolean containsID(String id){
+        // 遍历values值
+        for (CQCodeTypes value : EnumUtils.values(CQCodeTypes.class, CQCodeTypes[]::new)) {
+            if(value.equalsID.equals(id)){
+                return true;
+            }
+        }
         return false;
+    }
 
+    /**
+     * 判断是否存在某个equalsID
+     * @param function  function值
+     * @param keys      keys列表
+     */
+    public static boolean containsID(String function, String... keys){
+        // 不同于另一个方法，此方法通过AllCQCodeTypeMap判断
+        CQCodeTypes[] cqCodeTypes = AllCQCodeTypeMap.get(function);
+        if(cqCodeTypes == null || cqCodeTypes.length == 0){
+            return false;
+        }else{
+            String ID = toEqualsID(function, keys);
+            // 查看有没有
+            for (CQCodeTypes cqCodeType : cqCodeTypes) {
+                if(cqCodeType.equalsID.equals(ID)){
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+
+    /**
+     * 根据function和keys构建一个equalsID
+     * @param function  function
+     * @param keys      key数组
+     */
+    private static String toEqualsID(String function, String[] keys){
+        return function + ":" + Arrays.stream(keys).sorted().collect(Collectors.joining());
     }
 
 
@@ -386,7 +496,8 @@ public enum CQCodeTypes {
         this.ignoreAbleKeys = Arrays.stream(ignoreAbleKeys).collect(Collectors.toSet());
         this.valuesRegex = valuesRegex;
         this.sort = sort;
-        this.equalsID = function + ":" + Arrays.stream(keys).sorted().collect(Collectors.joining());
+//        this.equalsID = function + ":" + Arrays.stream(keys).sorted().collect(Collectors.joining());
+        this.equalsID = toEqualsID(function, keys);
 
         //生成匹配正则表达式
         StringJoiner joiner = new StringJoiner("" , CQ_REGEX_HEAD + this.function , CQ_REGEX_END);
@@ -447,7 +558,8 @@ public enum CQCodeTypes {
         };
 
         // 注册自己
-        register(this);
+        // 根据枚举反编译规则，不能直接在构造中注册自己
+//        register(this);
     }
 
 }

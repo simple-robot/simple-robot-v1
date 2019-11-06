@@ -205,7 +205,7 @@ public class CQCode
             if(getParams != null){
                 String keyRegex = cqCodeTypes.getKeyRegex(key);
                 if(keyRegex != null && !getParams.matches(keyRegex)){
-                    throw new CQParamsException("CQ码类型["+ cqCodeTypes +"]的参数["+ key +"]应当符合正则匹配：" + keyRegex);
+                    throw new CQParamsException("CQ码类型["+ cqCodeTypes +"]的参数["+ key +"]应当符合正则匹配：" + keyRegex + ", 而不是：" + getParams);
                 }
 
             }
