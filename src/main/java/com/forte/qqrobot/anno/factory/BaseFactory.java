@@ -1,6 +1,8 @@
 package com.forte.qqrobot.anno.factory;
 
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.exception.EnumInstantiationException;
+import com.forte.qqrobot.exception.EnumInstantiationRequireException;
 import com.forte.qqrobot.exception.RobotDevException;
 import com.forte.utils.reflect.EnumUtils;
 
@@ -51,8 +53,20 @@ public abstract class BaseFactory<E extends Enum<E>> {
      */
     protected E registerEnum(String name, Object... params) throws NoSuchMethodException, IllegalAccessException {
         // 判断是否可以新增
-        throwOrPass(name, params);
-        return EnumUtils.newEnum(enumType(), name, constructorTypes(), params);
+        try {
+            throwOrPass(name, params);
+        }catch (Exception e){
+            // 如果有异常，使用此异常统一抛出
+            throw new EnumInstantiationRequireException(enumType(), e);
+        }
+
+        // 实例化
+        try {
+            return EnumUtils.newEnum(enumType(), name, constructorTypes(), params);
+        }catch (Exception e){
+            // 实例化过程如果出现异常，统一使用此异常抛出
+            throw new EnumInstantiationException(enumType(), e);
+        }
     }
 
     /**

@@ -31,7 +31,7 @@ public class CQAppendList implements AppendList {
     /**
      * 内部拼接用的list类
      */
-    private List<CharSequence> list;
+    private final List<CharSequence> list;
 
     /**
      * 最终输出的时候的字符串拼接类, 每一次的输出都会刷新此对象
@@ -203,6 +203,70 @@ public class CQAppendList implements AppendList {
         return result;
     }
 
+    /**
+     * 字符串有多少个
+     */
+    private int stringNum(){
+        return (int) stream().filter(c -> c instanceof String).count();
+    }
+
+    /**
+     * 字符串总长度
+     */
+    private int stringLengthSum(){
+        return stream().filter(c -> c instanceof String).mapToInt(CharSequence::length).sum();
+    }
+
+    /**
+     * 最长的字符串的长度
+     */
+    private int stringMaxLength(){
+        return stream().filter(c -> c instanceof String).mapToInt(CharSequence::length).max().orElse(0);
+    }
+
+    /**
+     * 字符串合并，有时候如果前后两个都是字符串，则直接合并这两个为一个元素。
+     * 合并的只有String类型
+     */
+    @Override
+    public AppendList merge(){
+        // 此操作需要线程唯一
+        synchronized (list) {
+            // 初始长度是list中，最长的字符串的长度的两倍
+            StringBuilder mergeBuilder = new StringBuilder(stringMaxLength() << 1);
+            // 保存结果的list
+            List<CharSequence> mergeList = new ArrayList<>();
+
+            // 遍历list
+            for (CharSequence l : list) {
+                // 如果是字符串，记录
+                if(l instanceof String){
+                    mergeBuilder.append(l);
+                }else{
+                    // 如果不是，输出并保存
+                    if(mergeBuilder.length() > 0){
+                        String lastString = mergeBuilder.toString();
+                        mergeBuilder.delete(0, mergeBuilder.length());
+                        mergeList.add(lastString);
+                    }
+                    mergeList.add(l);
+                }
+            }
+            // 最终收尾
+            // 如果不是，输出并保存
+            if(mergeBuilder.length() > 0){
+                String lastString = mergeBuilder.toString();
+                mergeBuilder.delete(0, mergeBuilder.length());
+                mergeList.add(lastString);
+            }
+
+            // 清空原本的list，并保存新的list
+            list.clear();
+            list.addAll(mergeList);
+        }
+        // 结束操作，返回自己
+        return this;
+    }
 
 
 }

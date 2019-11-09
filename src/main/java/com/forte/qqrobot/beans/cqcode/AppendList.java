@@ -83,4 +83,10 @@ public interface AppendList {
     /** 转化为仅保留CQCode的流对象 */
     Stream<CQCode> streamCQCode();
 
+    /**
+     * 1.3.10 add, 当上一个消息与下一个消息为同类型的时候，合并。
+     * 以CQ码实现类来讲，一般用于合并字符串，CQ码不合并。
+     * */
+    AppendList merge();
+
 }

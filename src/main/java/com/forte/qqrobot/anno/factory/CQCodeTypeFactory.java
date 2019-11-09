@@ -5,6 +5,8 @@ import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.utils.ObjectsPlus;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.StringJoiner;
 import java.util.function.IntFunction;
 
 /**
@@ -152,6 +154,31 @@ public class CQCodeTypeFactory extends BaseFactory<CQCodeTypes> {
                     "keys       ("+keys.length+"): " + Arrays.toString(keys) + "\n" +
                     "ignore keys("+ignoreAbleKeys.length+"): " + Arrays.toString(ignoreAbleKeys) );
         }
+
+        // 忽略参数列表中的值应当包含在keys中
+        // 双方排序，排序后进行判断
+//        Arrays.sort(keys, Comparator.comparing(k -> k));
+
+//        Arrays.sort(ignoreAbleKeys, Comparator.comparing(k -> k));
+
+        // 将忽略列表拼装为正则匹配并进行匹配
+        // ([id])?([keys])?
+        StringJoiner keyJoiner = new StringJoiner("][", "[", "]");
+        // 排序后添加至joiner
+        Arrays.stream(keys).sorted().forEach(keyJoiner::add);
+        String keyMatcher = keyJoiner.toString();
+
+        // 遍历ignore列表并判断
+        for (String ignoreAbleKey : ignoreAbleKeys) {
+            if(!keyMatcher.contains("[" + ignoreAbleKey + "]")){
+                throw new IllegalArgumentException("可忽略参数列表中存在未知参数! \n" +
+                        "参数列表:    " + Arrays.toString(keys) + "\n" +
+                        "未知忽略参数: " + ignoreAbleKey
+                        );
+            }
+        }
+
+
 
         // 参数列表与正则匹配列表
         if(keys.length != valuesRegex.length){

@@ -1,9 +1,14 @@
 package com.forte.qqrobot.utils;
 
+import com.forte.qqrobot.beans.cqcode.AppendList;
+import com.forte.qqrobot.beans.cqcode.CQAppendList;
 import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.types.CQCodeTypes;
+import com.forte.qqrobot.exception.CQParseException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -692,6 +697,74 @@ public class CQCodeUtil {
     }
 
 
+    /**
+     * 根据消息内容对普通消息与CQ码相关消息进行分隔。
+     * 消息需要是转义前的消息，否则会出现问题。
+     * @param msg 消息正文
+     * @return 切割结果
+     */
+    public AppendList splitToList(String msg){
+        // 是否处于CQ码读取状态，当读取到'['字符的时候开启。
+        AtomicBoolean onCQ = new AtomicBoolean(false);
+
+        StringBuilder sb = new StringBuilder();
+
+        // 构建一个无拼接间隙的CQAppendList
+        AppendList list = new CQAppendList("");
+
+        // 索引记录
+        AtomicInteger index = new AtomicInteger(0);
+
+        // 遍历字符
+        msg.chars().forEach(c -> {
+            // 判断是不是CQ的开头
+            if(c == '['){
+                // 如果在CQ码读取期间又碰到了一个开头，则抛出异常
+                if(onCQ.get()){
+                    throw new CQParseException("请使用转义消息文本: 重复的CQ码头标识 '['. error index: " + index);
+                }else{
+                    // 开启CQ码读取并输出之前的读取
+                    onCQ.set(true);
+                    if(sb.length() > 0){
+                        // 如果原本有内容，输出并清空
+                        String lastMsg = sb.toString();
+                        sb.delete(0, sb.length());
+                        list.append(lastMsg);
+                    }
+                    sb.append((char) c);
+                }
+            }else if(c == ']'){
+                // 如果是结尾, 但是之前并没有处于CQ读取状态，则抛出异常
+                if(!onCQ.get()){
+                    throw new CQParseException("请使用转义消息文本：重复的CQ码尾标识 ']'. error index: " + index);
+                }else{
+                    // 结束CQ码的读取并输出之前的读取
+                    onCQ.set(false);
+                    // 记录当前
+                    sb.append((char) c);
+                    if(sb.length() > 0){
+                        // 如果原本有内容，输出并清空
+                        String lastMsg = sb.toString();
+                        sb.delete(0, sb.length());
+                        list.append(lastMsg);
+                    }
+                }
+            }else{
+                // 其他情况就当成是普通的字符，直接读取
+                sb.append((char) c);
+            }
+
+            // 索引 + 1
+            index.addAndGet(1);
+        });
+
+        // 结束后收尾
+        if(sb.length() > 0){
+            list.append(sb.toString());
+        }
+
+        return list;
+    }
 
 
 }

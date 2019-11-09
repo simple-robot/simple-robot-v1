@@ -5,6 +5,7 @@ import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.depend.DependInjector;
+import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -228,7 +229,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     }
 
     public T setEncode(String encode) {
-        this.encode = encode;
+        BaseConfiguration.encode = encode;
         return configuration;
     }
 
@@ -245,7 +246,40 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         return ip;
     }
 
+    /**
+     * 配置IP，默认为本地IP <code>127.0.0.1</code> <br>
+     * 一般情况下，此IP代表了酷Q端的IP。
+     * @param ip
+     * @return
+     */
     public T setIp(String ip) {
+        // 验证IP，首先假如上来就是个xxx.xxx.xxx.xxx，直接报错
+        if(ip.equals("xxx.xxx.xxx.xxx")){
+            throw new ConfigurationException("are you sure 'xxx.xxx.xxx.xxx' is an ip value ?");
+        }
+
+        // 当然，有可能是域名的情况，所以只有当符合\d+.\d+.\d+.\d+的时候才验证
+        // ip: 0-255
+
+        // 是否跳过。一些情况下，直接跳过检测
+        // 例如ip是本地ip
+        boolean breakMatch = ip.equals("127.0.0.1") || ip.equals("localhost");
+
+        if(!breakMatch){
+            if(ip.matches("\\d+\\.\\d+\\.\\d+\\.\\d+")){
+                // 是ip的格式，验证IP是不是都在0~255范围内
+                // 切割并验证
+                for (String s : ip.split("\\.")) {
+                    int number = Integer.parseInt(s);
+                    if(number<0 || number>255){
+                        throw new ConfigurationException("ip number can not use '"+ s +"'");
+                    }
+                }
+            }
+        }
+
+        // 其他情况的话，不管了，万一是个域名呢
+
         BaseConfiguration.ip = ip;
         return configuration;
     }
