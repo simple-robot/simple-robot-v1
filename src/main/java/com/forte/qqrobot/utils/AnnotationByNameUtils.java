@@ -72,6 +72,9 @@ public class AnnotationByNameUtils {
      * @param <BY_NAME> ByName注解
      */
     public static <FROM extends Annotation, BY_NAME extends Annotation> FROM byName(BY_NAME byName, Class<FROM> fromType){
+        if(byName == null || fromType == null){
+            return null;
+        }
         // 获取ByName中的ByNameFrom注解
         Class<? extends Annotation> byNameType = byName.annotationType();
         ByNameFrom from = byNameType.getAnnotation(ByNameFrom.class);

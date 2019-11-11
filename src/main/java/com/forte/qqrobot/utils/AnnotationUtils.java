@@ -39,6 +39,7 @@ public class AnnotationUtils {
             return fromClass;
         }
 
+
         //类上没有，查询所有方法是否存在@Listen注解
         //因为@Listen上的@Beans注解都是一样的
         for (Method method : from.getMethods()) {
@@ -78,7 +79,7 @@ public class AnnotationUtils {
         boolean annotationable = false;
         if (target != null) {
             for (ElementType elType : target.value()) {
-                if (elType == ElementType.ANNOTATION_TYPE) {
+                if (elType == ElementType.TYPE || elType == ElementType.ANNOTATION_TYPE) {
                     annotationable = true;
                     break;
                 }
@@ -86,6 +87,7 @@ public class AnnotationUtils {
         }
 
         annotation = annotationable ? getAnnotationFromArrays(from.getAnnotations(), annotationType) : null;
+
 
         // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
         if (annotation == null) {

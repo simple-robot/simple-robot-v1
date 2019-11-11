@@ -14,8 +14,8 @@
     <artifactId>simple-robot-core</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署需要大于1.3.9-BETA -->
-    <version>1.3.10</version>
+    <!-- 下次部署需要大于1.3.11 -->
+    <version>1.3.11</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>
