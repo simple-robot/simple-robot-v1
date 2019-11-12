@@ -38,6 +38,11 @@ public @interface Listen {
      */
     int sort() default 1;
 
+    /**
+     * 相当于一个ID，此
+     * @return
+     */
+    String name() default "";
 
     /**
      * 通过额外注册的监听类型进行监听器注册，最终会转化为{@link Listen}
@@ -54,6 +59,8 @@ public @interface Listen {
         String[] value();
 
         int sort() default 1;
+
+        String name() default "";
 
     }
 

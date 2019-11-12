@@ -87,6 +87,9 @@ public class AnnotationByNameUtils {
 
         Map<String, BiFunction<Method, Object[], Object>> stringBiFunctionMap = byNameField(byName);
 
+        // 改变annotationType方法的返回值为原本的类型
+        stringBiFunctionMap.put("annotationType", (m, o) -> fromType);
+
         return ProxyUtils.annotationProxy(fromTypeValue,
                 proxyByMethodMap(byNameType, withObject(
                         byName,

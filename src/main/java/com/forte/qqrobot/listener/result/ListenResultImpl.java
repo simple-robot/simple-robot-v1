@@ -7,7 +7,7 @@ package com.forte.qqrobot.listener.result;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class BaseListenResult<T> implements ListenResult<T> {
+public class ListenResultImpl<T> implements ListenResult<T> {
 
     /**
      * 排序值
@@ -24,6 +24,15 @@ public class BaseListenResult<T> implements ListenResult<T> {
      */
     private Boolean success;
 
+    private Boolean toBreak;
+
+    private Throwable error;
+
+
+    public static <T> ListenResult<T> result(int sort, T result, boolean success, boolean toBreak, Throwable error){
+        return new ListenResultImpl<>(sort, result, success, toBreak, error);
+    }
+
 
     /**
      * 基础的全参构造
@@ -31,10 +40,12 @@ public class BaseListenResult<T> implements ListenResult<T> {
      * @param result    返回值
      * @param success   成功与否
      */
-    public BaseListenResult(int sort, T result, boolean success){
+    public ListenResultImpl(int sort, T result, boolean success, boolean toBreak, Throwable error){
         this.sort = sort;
         this.result = result;
         this.success = success;
+        this.toBreak = toBreak;
+        this.error = error;
     }
 
 
@@ -60,6 +71,11 @@ public class BaseListenResult<T> implements ListenResult<T> {
         return success;
     }
 
+    @Override
+    public Boolean isToBreak() {
+        return getToBreak();
+    }
+
     public void setSuccess(boolean success) {
         this.success = success;
     }
@@ -74,8 +90,33 @@ public class BaseListenResult<T> implements ListenResult<T> {
         return getSort();
     }
 
+    public Boolean getSuccess() {
+        return success;
+    }
+
+    public void setSuccess(Boolean success) {
+        this.success = success;
+    }
+
+    public Boolean getToBreak() {
+        return toBreak;
+    }
+
+    public void setToBreak(Boolean toBreak) {
+        this.toBreak = toBreak;
+    }
+
     @Override
-    public int compareTo(ListenResult<T> o) {
-        return Integer.compare(o.sortValue(), sortValue());
+    public Throwable getError() {
+        return error;
+    }
+
+    public void setError(Throwable error) {
+        this.error = error;
+    }
+
+    @Override
+    public int compareTo(ListenResult o) {
+        return Integer.compare(sortValue(), o.sortValue());
     }
 }

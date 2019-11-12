@@ -7,7 +7,10 @@ import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.depend.AdditionalDepends;
+import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
+import com.forte.qqrobot.listener.result.ListenResult;
+import com.forte.qqrobot.listener.result.ListenResultImpl;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.sender.senderlist.*;
@@ -27,9 +30,12 @@ import java.util.stream.Collectors;
  **/
 public class ListenerManager {
 
-    /**保存全部监听函数并进行两层分类
+    /**
+     * 保存全部监听函数并进行两层分类
      * 第一层，按照接收的消息类型分类
      * 第二层，按照是否为普通函数分类
+     * 理论上，这个Map的内容值将不能再变更，否则将会出现排序上的混乱。
+     * 但如如果添加后再进行排序，则又会降低效率。
      */
     private final Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> LISTENER_METHOD_MAP;
 
@@ -62,7 +68,7 @@ public class ListenerManager {
     /**
      * 接收到了消息
      */
-    public void onMsg(MsgGet msgget, SenderSendList sender, SenderSetList setter, SenderGetList getter){
+    public ListenResult[] onMsg(MsgGet msgget, SenderSendList sender, SenderSetList setter, SenderGetList getter){
 
         //对外接口，表示接收到了消息, 对消息进行监听分配
         //组装参数，此参数保证全部类型全部唯一, 且参数索引2的位置为是否被at
@@ -70,14 +76,14 @@ public class ListenerManager {
         boolean at = (boolean) params[2];
 
         //为消息分配监听函数
-        invoke(msgget, params, at, sender, setter, getter);
+        return invoke(msgget, params, at, sender, setter, getter);
     }
 
     /**
      * 接收到了消息
      */
-    public void onMsg(MsgGet msgget, SenderList sender){
-        onMsg(msgget,
+    public ListenResult[] onMsg(MsgGet msgget, SenderList sender){
+        return onMsg(msgget,
                 sender.isSenderList() ? (SenderSendList) sender : null,
                 sender.isSetterList() ? (SenderSetList) sender : null,
                 sender.isGetterList() ? (SenderGetList) sender : null);
@@ -88,11 +94,10 @@ public class ListenerManager {
      * @param msgGet    接收的消息
      * @param args      参数列表
      * @param at        是否被at
+     * @return 执行的结果集，已经排序了。
      */
-    private void invoke(MsgGet msgGet, Set<Object> args, boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+    private ListenResult[] invoke(MsgGet msgGet, Set<Object> args, boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
         //构建MsgSender对象
-
-        //增加参数
 
         //参数获取getter
         Function<ListenerMethod, AdditionalDepends> paramGetter = buildParamGetter(msgGet, args, at, sendList, setList, getList);
@@ -107,15 +112,24 @@ public class ListenerManager {
             //如果存在阻断，执行阻断
             invokeBlock(blockMethod, paramGetter, msgGet, at);
 
+            // TODO 考虑移除此阻断机制
+
+            ListenResult<Object> blockResult = ListenResultImpl.result(1, null, true, false, null);
+
+            return new ListenResult[]{blockResult};
         }else{
             //如果不存在阻断，正常执行
             //先执行普通监听函数
-            int invokeNum = invokeNormal(type, paramGetter, msgGet, at);
+            Map.Entry<Integer, List<ListenResult>> normalIntResult = invokeNormal(type, paramGetter, msgGet, at);
+            int invokeNum = normalIntResult.getKey();
 
             //如果没有普通监听函数执行成功，则尝试执行备用监听函数
             if(invokeNum <= 0){
-                invokeSpare(type, paramGetter, msgGet, at);
+                Map.Entry<Integer, List<ListenResult>> spareIntList = invokeSpare(type, paramGetter, msgGet, at);
+                normalIntResult.getValue().addAll(spareIntList.getValue());
             }
+            // 将结果转化为数组并返回
+            return normalIntResult.getValue().toArray(new ListenResult[0]);
         }
     }
 
@@ -125,8 +139,8 @@ public class ListenerManager {
      * @param args      参数列表
      * @param at        是否被at
      */
-    private void invoke(MsgGet msgGet, Object[] args, boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
-        invoke(msgGet, Arrays.stream(args).collect(Collectors.toSet()), at, sendList, setList, getList);
+    private ListenResult[] invoke(MsgGet msgGet, Object[] args, boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+        return invoke(msgGet, Arrays.stream(args).collect(Collectors.toSet()), at, sendList, setList, getList);
     }
 
     /**
@@ -167,7 +181,7 @@ public class ListenerManager {
         //获取cqCodeUtil
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
         //获取全部CQ码
-        //2019/10/15 不再必定获取所有CO码了
+        //2019/10/15 不再必定获取所有CQ码了
 //        CQCode[] cqCodes = cqCodeUtil.getCQCodeFromMsg(msg).toArray(new CQCode[0]);
         //判断是否at自己
         //获取本机QQ号
@@ -226,29 +240,57 @@ public class ListenerManager {
      * @param paramGetter   获取参数集合的函数
      * @param msgGet        接收的消息
      * @param at            是否被at
-     * @return              执行成功函数数量
+     * @return              执行成功函数数量 & 结果集合(排过序的)
      */
-    private int invokeNormal(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, boolean at){
+    private Map.Entry<Integer, List<ListenResult>> invokeNormal(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, boolean at){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
+        //执行结果集合
+        List<ListenResult> results = new ArrayList<>();
+
         //获取监听函数过滤器
         ListenerFilter listenerFilter = ResourceDispatchCenter.getListenerFilter();
 
         //获取这个消息分类下的普通方法
         List<ListenerMethod> normalMethods = getNormalMethods(msgGetTypes);
 
-        normalMethods.stream().filter(lm -> listenerFilter.filter(lm, msgGet, at)).forEach(lm -> {
-            //过滤后，执行
-            try {
-                boolean runTrue = lm.invoke(paramGetter.apply(lm));
-                //如果执行成功，计数+1
-                count.addAndGet(runTrue ? 1 : 0);
-            } catch (Throwable e) {
-                QQLog.error("监听器["+ lm.getBeanToString() +"]执行函数["+ lm.getMethodToString() +"]出现错误！", e);
-            }
-        });
+//        normalMethods.stream().filter(lm -> listenerFilter.filter(lm, msgGet, at)).forEach(lm -> {
+//            //过滤后，执行
+//            try {
+////                boolean runTrue = lm.invoke(paramGetter.apply(lm));
+//                ListenResult result = lm.invoke(paramGetter.apply(lm));
+//                //如果执行成功，计数+1
+//                count.addAndGet(result.isSuccess() ? 1 : 0);
+//            } catch (Throwable e) {
+//                QQLog.error("监听器["+ lm.getBeanToString() +"]执行函数["+ lm.getMethodToString() +"]出现错误！", e);
+//            }
+//        });
 
-        return count.get();
+        // 这个first就是第一个出现的break。但是，没啥用
+        Optional<ListenResult> first = normalMethods.stream()
+                // 先过滤掉不符合条件的函数
+                .filter(lm -> listenerFilter.filter(lm, msgGet, at))
+                // 对ListenMethod进行排序
+                .sorted()
+                // 在根据是否截断进行过滤，当出现了第一个截断返回值的时候停止执行
+                // 通过filter与findFirst组合使用来实现。
+                .map(lm -> {
+                    try {
+                        ListenResult result = lm.invoke(paramGetter.apply(lm));
+                        results.add(result);
+                        return result;
+                    } catch (Throwable e) {
+                        // invoke里已经对方法的执行做了处理，如果还是会出错则代表是其他步骤出现了异常。
+                       throw new RobotRuntimeException(e);
+                    }
+
+                })
+                .filter(ListenResult::isToBreak)
+                .findFirst();
+
+
+        Collections.sort(results);
+        return new AbstractMap.SimpleEntry<>(count.get(), results);
     }
 
 
@@ -259,27 +301,55 @@ public class ListenerManager {
      * @param msgGet        接收的消息
      * @param at            是否被at
      */
-    private int invokeSpare(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, boolean at){
+    private Map.Entry<Integer, List<ListenResult>> invokeSpare(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, boolean at){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
+
+        //执行结果集合
+        List<ListenResult> results = new ArrayList<>();
+
         //获取监听函数过滤器
         ListenerFilter listenerFilter = ResourceDispatchCenter.getListenerFilter();
 
         //获取这个消息分类下的备用方法
         List<ListenerMethod> spareMethods = getSpareMethods(msgGetTypes);
 
-        spareMethods.stream().filter(lm -> listenerFilter.filter(lm, msgGet, at)).forEach(lm -> {
-            //过滤完成后执行方法
-            try {
-                boolean runTrue = lm.invoke(paramGetter.apply(lm));
-                //如果执行成功，计数+1
-                count.addAndGet(runTrue ? 1 : 0);
-            } catch (Throwable e) {
-                QQLog.error("监听器["+ lm.getBeanToString() +"]执行函数["+ lm.getMethodToString() +"]出现错误！", e);
-            }
-        });
+//        spareMethods.stream().filter(lm -> listenerFilter.filter(lm, msgGet, at)).forEach(lm -> {
+//            //过滤完成后执行方法
+//            try {
+////                boolean runTrue = lm.invoke(paramGetter.apply(lm));
+//                ListenResult result = lm.invoke(paramGetter.apply(lm));
+//                //如果执行成功，计数+1
+//                count.addAndGet(result.isSuccess() ? 1 : 0);
+//            } catch (Throwable e) {
+//                QQLog.error("监听器["+ lm.getBeanToString() +"]执行函数["+ lm.getMethodToString() +"]出现错误！", e);
+//            }
+//        });
 
-        return count.get();
+        // 这个first就是第一个出现的break。但是，没啥用
+        Optional<ListenResult> first = spareMethods.stream()
+                // 先过滤掉不符合条件的函数
+                .filter(lm -> listenerFilter.filter(lm, msgGet, at))
+                // 对ListenMethod进行排序
+                .sorted()
+                // 在根据是否截断进行过滤，当出现了第一个截断返回值的时候停止执行
+                // 通过filter与findFirst组合使用来实现。
+                .map(lm -> {
+                    try {
+                        ListenResult result = lm.invoke(paramGetter.apply(lm));
+                        results.add(result);
+                        return result;
+                    } catch (Throwable e) {
+                        // invoke里已经对方法的执行做了处理，如果还是会出错则代表是其他步骤出现了异常。
+                        throw new RobotRuntimeException(e);
+                    }
+
+                })
+                .filter(ListenResult::isToBreak)
+                .findFirst();
+
+        Collections.sort(results);
+        return new AbstractMap.SimpleEntry<>(count.get(), results);
     }
 
 
@@ -310,6 +380,10 @@ public class ListenerManager {
      * @param methods 函数集合
      */
     public ListenerManager(Collection<ListenerMethod> methods){
+        /*
+             构建的时候需要进行排序
+         */
+
         //如果没有东西
         if(methods == null || methods.isEmpty()){
             this.LISTENER_METHOD_MAP = Collections.EMPTY_MAP;
@@ -343,7 +417,10 @@ public class ListenerManager {
             this.LISTENER_METHOD_MAP = firstMap.entrySet().stream().flatMap(e -> {
                 //准备数据
                 Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> result = new HashMap<>(firstMap.size());
-                result.put(e.getKey(), e.getValue().stream().collect(Collectors.groupingBy(lm -> !lm.isSpare())));
+                Map<Boolean, List<ListenerMethod>> groupBySpare = e.getValue().stream().collect(Collectors.groupingBy(lm -> !lm.isSpare()));
+                // 将结果集进行排序
+                groupBySpare.forEach((k, v) -> Collections.sort(v));
+                result.put(e.getKey(), groupBySpare);
                 return result.entrySet().stream();
             }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }

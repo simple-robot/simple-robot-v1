@@ -4,6 +4,7 @@ import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.anno.*;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
@@ -16,6 +17,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 监听函数扫描器
@@ -99,24 +101,31 @@ public class ListenerMethodScanner {
 
         //提前准备方法获取过滤器
         Predicate<Method> getFilter;
+        int sortClass;
+        String nameClass;
 
         //创建过滤器，排除有忽略注解的方法和静态方法
         if(classListen != null){
             //如果存在监听, 获取所有公共方法
 //            getFilter = m -> !MethodUtil.isStatic(m) && (m.getAnnotation(Ignore.class) == null);
             getFilter = m -> !MethodUtil.isStatic(m) && (AnnotationUtils.getAnnotation(m, Ignore.class) == null);
+            sortClass = classListen.sort();
+            nameClass = classListen.name();
         }else{
             //如果不存在，获取有@Listen注解的公共方法
             getFilter = m -> !MethodUtil.isStatic(m) && (AnnotationUtils.getAnnotation(m, Ignore.class) == null) && AnnotationUtils.getAnnotation(m, Listen.class) != null;
+            sortClass = 1;
+            nameClass = "";
         }
 
         //参数获取类型
         MsgGetTypes[] msgGetTypes = Optional.ofNullable(classListen).map(Listen::value).orElse(null);
         //方法集合, 排除静态方法
-        Method[] publicMethods = Arrays.stream(MethodUtil.getPublicMethods(clazz, getFilter)).toArray(Method[]::new);
+//        Method[] publicMethods = Arrays.stream(MethodUtil.getPublicMethods(clazz, getFilter)).toArray(Method[]::new);
+        Stream<Method> publicMethodsStream = Arrays.stream(MethodUtil.getPublicMethods(clazz, getFilter));
 
         //遍历并构建ListenerMethod对象
-        return Arrays.stream(publicMethods).map(method -> {
+        return publicMethodsStream.map(method -> {
 
             //获取方法上的@Listen注解
 //            Listen methodListen = method.getAnnotation(Listen.class);
@@ -147,9 +156,28 @@ public class ListenerMethodScanner {
             //监听类型
             MsgGetTypes[] msgGetType = Optional.ofNullable(methodListen).map(Listen::value).orElse(msgGetTypes);
 
+            //排序
+            int sort = Optional.ofNullable(methodListen).map(Listen::sort).orElse(sortClass);
+            // id, 如果存在类上的id且也存在方法上的，拼接上下两id，否则使用类级别
+            // 类上的id默认是空字符
+            String id = Optional.ofNullable(methodListen).map(l -> nameClass + l.name()).orElse(nameClass);
+
+            // 是否为阻断函数
+            ListenBreak listenBreak = AnnotationUtils.getAnnotation(method, ListenBreak.class);
+            Predicate<Object> toBreak;
+            if(listenBreak == null){
+                // 如果不存在注解，则默认
+                toBreak = BreakType.ALWAYS_NO.getResultTest();
+            }else{
+                toBreak = listenBreak.value().getResultTest();
+            }
+
 
             //构建对象并添加
-            return build(listenerGetter, listenerGetterWithAddition, method, msgGetType, thisSpare, filter, blockFilter, block);
+            ListenerMethod.ListenerMethodBuilder builder = builder(listenerGetter, listenerGetterWithAddition, method, msgGetType, thisSpare, filter, blockFilter, block);
+            builder.listenBreak(toBreak).sort(sort).id(id);
+
+            return builder.build();
         }).filter(Objects::nonNull).collect(Collectors.toSet());
 
     }
@@ -194,6 +222,25 @@ public class ListenerMethodScanner {
         return new ListenerPlug(listenerMethodSet);
     }
 
+//    /**
+//     * 构建ListenerMethod对象
+//     * @param listenerGetter 监听器实例获取函数
+//     * @param method    方法本体
+//     * @param types     监听类型
+//     * @param spare         Spare注解
+//     * @param filter        filter注解
+//     * @param blockFilter   blockFilter注解
+//     * @return  ListenerMethod实例对象
+//     */
+//    private ListenerMethod build(Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition, Method method, MsgGetTypes[] types, Spare spare, Filter filter, BlockFilter blockFilter, Block block){
+//        return ListenerMethod.build(listenerGetter, listenerGetterWithAddition, method, types)
+//                             .spare(spare)
+//                             .filter(filter)
+//                             .blockFilter(blockFilter)
+//                             .block(block)
+//                             .build();
+//    }
+
     /**
      * 构建ListenerMethod对象
      * @param listenerGetter 监听器实例获取函数
@@ -204,13 +251,12 @@ public class ListenerMethodScanner {
      * @param blockFilter   blockFilter注解
      * @return  ListenerMethod实例对象
      */
-    private ListenerMethod build(Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition, Method method, MsgGetTypes[] types, Spare spare, Filter filter, BlockFilter blockFilter, Block block){
+    private ListenerMethod.ListenerMethodBuilder builder(Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition, Method method, MsgGetTypes[] types, Spare spare, Filter filter, BlockFilter blockFilter, Block block){
         return ListenerMethod.build(listenerGetter, listenerGetterWithAddition, method, types)
                              .spare(spare)
                              .filter(filter)
                              .blockFilter(blockFilter)
-                             .block(block)
-                             .build();
+                             .block(block);
     }
 
     /**

@@ -7,13 +7,17 @@ import com.forte.qqrobot.anno.Filter;
 import com.forte.qqrobot.anno.Spare;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.depend.DependGetter;
+import com.forte.qqrobot.listener.result.ListenResult;
+import com.forte.qqrobot.listener.result.ListenResultImpl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -23,7 +27,7 @@ import java.util.stream.Collectors;
  * @date Created in 2019/3/25 18:28
  * @since JDK1.8
  **/
-public class ListenerMethod<T> {
+public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
     //**************** 所有字段均不可改变 ****************//
 
@@ -64,6 +68,8 @@ public class ListenerMethod<T> {
     /** 排序索引 */
     private final int sort;
 
+    /** 是否监听截断, 将invoke的结果传入，返回一个结果 */
+    private final Predicate<Object> listenBreak;
 
     /**
      * 全参数构造
@@ -74,7 +80,18 @@ public class ListenerMethod<T> {
      * @param method        方法本体
      * @param type          监听类型
      */
-    private ListenerMethod(Supplier<T> listenerGetter, Function<DependGetter, T> listenerGetterWithAddition, Filter filter, BlockFilter blockFilter, Spare spare, Block block, Method method, MsgGetTypes[] type, int sort) {
+    private ListenerMethod(Supplier<T> listenerGetter,
+                           Function<DependGetter, T> listenerGetterWithAddition,
+                           Filter filter,
+                           BlockFilter blockFilter,
+                           Spare spare,
+                           Block block,
+                           Method method,
+                           MsgGetTypes[] type,
+                           int sort,
+                           Predicate<Object> listenBreak,
+                           String name
+                           ) {
         this.listenerGetter = listenerGetter;
         this.listenerGetterWithAddition  = listenerGetterWithAddition;
         this.filter = filter;
@@ -84,16 +101,28 @@ public class ListenerMethod<T> {
         this.method = method;
         this.type = type;
         this.sort = sort;
-        //生成一个UUID
-        UUID = createUUIDString();
+        this.listenBreak = listenBreak;
+        // UUID 使用 方法包路径 + (方法名 + 参数类型列表 | name)
+
+        String id;
+
+        if(name == null || name.trim().length() == 0){
+            String s1 = Arrays.toString(method.getParameterTypes());
+            String s = s1.substring(1, s1.length() - 1);
+            id = method.getDeclaringClass().getTypeName() + "#" + method.getName() + "("+ s +")";
+        }else{
+            id = name;
+        }
+
+        this.UUID = id;
     }
 
-    /**
-     * 生成UUID
-     */
-    private static String createUUIDString(){
-        return java.util.UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
-    }
+//    /**
+//     * 生成UUID
+//     */
+//    private static String createUUIDString(){
+//        return java.util.UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+//    }
 
 
 
@@ -108,10 +137,12 @@ public class ListenerMethod<T> {
      *  - 如果返回值是Boolean或boolean类型，原样返回
      *  - 如果返回值为null，则认为执行失败
      *  - 如果为其他任意返回值，认为执行成功
-     *  TODO 返回值机制将会进行改变，或者通过增加一个动态参数来控制返回值。
+     *
+     *  反回值机制改变，或者通过增加一个动态参数来控制返回值。
+     *
      * @param additionalDepends 可以提供的额外参数(动态参数)
      */
-    boolean invoke(AdditionalDepends additionalDepends) throws Throwable {
+    ListenResult invoke(AdditionalDepends additionalDepends) throws Throwable {
         //获取方法的参数数组，根据数组顺序准备参数，如果没有的参数使用null
 //        Class<?>[] parameterTypes = method.getParameterTypes();
 //        Object[] args = new Object[parameterTypes.length];
@@ -124,17 +155,34 @@ public class ListenerMethod<T> {
         T listener = listenerGetterWithAddition.apply(additionalDepends);
 
         //执行方法
-        Object invoke = method.invoke(listener, args);
-        if(invoke == null){
-            return false;
-        }else if(invoke.getClass().equals(Boolean.class)){
-            return (Boolean) invoke;
-        }else if(invoke.getClass().equals(boolean.class)) {
-            return (boolean) invoke;
-        }else{
-            return true;
+        boolean success = false;
+        Object invoke = null;
+        Throwable error = null;
+        // break 初始值
+
+        // 捕获异常
+        try {
+            invoke = method.invoke(listener, args);
+            success = true;
+        }catch (Throwable e){
+            error = e;
         }
 
+        // 如果返回值本身就实现了ListenResult，直接将其返回
+        if(invoke instanceof ListenResult){
+            return (ListenResult) invoke;
+        }
+
+        int sort = this.sort;
+        // 根据返回值判断是否需要截断
+        boolean toBreak = listenBreak.test(invoke);
+
+
+        // 构建一个result
+        ListenResult<Object> result = ListenResultImpl.result(sort, invoke, success, toBreak, error);
+
+        // 可能有些判断
+        return result;
     }
 
     /**
@@ -253,6 +301,12 @@ public class ListenerMethod<T> {
         return UUID;
     }
 
+    @Override
+    public int compareTo(ListenerMethod o) {
+        return Integer.compare(sort, o.sort);
+    }
+
+
     /**
      * 内部类，对象构建类
      */
@@ -274,6 +328,10 @@ public class ListenerMethod<T> {
         /** 阻塞注解，如果没有则为null */
         private Block block = null;
         private int sort = 1;
+        // 是否监听截断，默认为false - 不截断
+        private Predicate<Object> listenBreak = BreakType.ALWAYS_BREAK.getResultTest();
+        // id, 默认使用内部自动创建
+        private String id = "";
         /**
          * 构造
          */
@@ -309,12 +367,22 @@ public class ListenerMethod<T> {
             return this;
         }
 
+        public ListenerMethodBuilder listenBreak(Predicate<Object> toBreak){
+            this.listenBreak = toBreak;
+            return this;
+        }
+
+        public ListenerMethodBuilder id(String id){
+            this.id = id;
+            return this;
+        }
+
 
         /**
          * 构建对象
          */
         public ListenerMethod build(){
-            return new ListenerMethod(listenerGetter, listenerGetterWithAddition, filter, blockFilter, spare, block, method, type, sort);
+            return new ListenerMethod(listenerGetter, listenerGetterWithAddition, filter, blockFilter, spare, block, method, type, sort, listenBreak, id);
         }
 
 

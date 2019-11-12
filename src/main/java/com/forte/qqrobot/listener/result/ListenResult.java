@@ -10,13 +10,19 @@ package com.forte.qqrobot.listener.result;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface ListenResult<T> extends Comparable<ListenResult<T>> {
+public interface ListenResult<T> extends Comparable<ListenResult> {
 
     /**
      * 函数是否执行成功
      * @return 是否成功
      */
     Boolean isSuccess();
+
+    /**
+     * 是否阻断接下来的监听函数
+     * @return 是否阻断
+     */
+    Boolean isToBreak();
 
     /**
      * 获取执行结果响应
@@ -29,5 +35,11 @@ public interface ListenResult<T> extends Comparable<ListenResult<T>> {
      * @return 排序值
      */
     int sortValue();
+
+    /**
+     * 如果出现了异常，则此为异常
+     * @return 出现的异常（如果有的话
+     */
+    Throwable getError();
 
 }
