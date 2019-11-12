@@ -1,5 +1,6 @@
 package com.forte.qqrobot;
 
+import com.forte.config.Conf;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
@@ -21,6 +22,7 @@ import java.util.*;
  * @date Created in 2019/4/4 18:02
  * @since JDK1.8
  **/
+@Conf("simple.robot.conf")
 public class BaseConfiguration<T extends BaseConfiguration> {
 
     //**************************************
@@ -42,22 +44,27 @@ public class BaseConfiguration<T extends BaseConfiguration> {
 //    private boolean scannedInitListener = false;
 
     /** 服务器ip，默认为127.0.0.1 */
-    private static String ip = "127.0.0.1";
+    @Conf("ip")
+    private String ip = "127.0.0.1";
 
     /** 本机QQ信息, 一般唯一，使用静态 */
-    private static LoginQQInfo loginQQInfo = null;
+    private LoginQQInfo loginQQInfo = null;
 
     /** 本机QQ号, 一般唯一，使用静态 */
-    private static String localQQCode = "";
+    @Conf("localQQCode")
+    private String localQQCode = "";
 
     /** 本机QQ的昵称, 一般唯一，使用静态 */
-    private static String localQQNick = "";
+    @Conf("localQQNick")
+    private String localQQNick = "";
 
     /** 使用的编码格式，默认为UTF-8，静态，全局唯一 */
-    private static String encode = "UTF-8";
+    @Conf("encode")
+    private String encode = "UTF-8";
 
     /** 酷Q根路径的配置，默认为null, 路径一般不会有多个，使用静态即可 */
-    private static String cqPath;
+    @Conf("cqPath")
+    private String cqPath;
 
     /** 需要进行的包扫描路径，默认为null */
     private Set<String> scannerPackage = new HashSet<>();
@@ -67,23 +74,18 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /** 自定义依赖对象实例化规则，假如同时使用了spring之类的框架，需要对此进行配置
      *  基本全局唯一，使用静态
      * */
-    private static DependGetter dependGetter = null;
-
-    /** 依赖实例注入器，自定义依赖实例中的依赖注入规则，假如使用了Spring这类的框架需要进行配置
-     *  基本全局唯一，使用静态
-     *  TODO 此参数暂不可用，是否可用再商议
-     * */
-    @Deprecated
-    private static DependInjector dependInjector;
+    private DependGetter dependGetter = null;
 
 
-    //**************** 本地服务器设置相关 ****************//
+    //**************** 本地服务器设置相关 尚未实装 ****************//
 
     /** 是否启用本地服务器，默认启动 */
-    private static boolean localServerEnable = true;
+    @Conf("localServerEnable")
+    private boolean localServerEnable = true;
 
     /** 本地服务器使用的端口号，默认为8808 */
-    private static int localServerPort = 8808;
+    @Conf("localServerPort")
+    private int localServerPort = 8808;
 
 
     //**************************************
@@ -207,16 +209,16 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     }
 
     public T setLocalQQNick(String localQQNick) {
-        BaseConfiguration.localQQNick = localQQNick;
+        this.localQQNick = localQQNick;
         return configuration;
     }
 
-    public static String getLocalQQCode() {
-        return BaseConfiguration.localQQCode;
+    public String getLocalQQCode() {
+        return this.localQQCode;
     }
 
     public T setLocalQQCode(String localQQCode) {
-        BaseConfiguration.localQQCode = localQQCode;
+        this.localQQCode = localQQCode;
         return configuration;
     }
 
@@ -224,21 +226,21 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         return loginQQInfo;
     }
 
-    public static String getEncode() {
+    public String getEncode() {
         return encode;
     }
 
     public T setEncode(String encode) {
-        BaseConfiguration.encode = encode;
+        this.encode = encode;
         return configuration;
     }
 
-    public static String getCqPath() {
+    public String getCqPath() {
         return cqPath;
     }
 
     public T setCqPath(String cqPath) {
-        BaseConfiguration.cqPath = cqPath;
+        this.cqPath = cqPath;
         return configuration;
     }
 
@@ -280,7 +282,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
 
         // 其他情况的话，不管了，万一是个域名呢
 
-        BaseConfiguration.ip = ip;
+        this.ip = ip;
         return configuration;
     }
 
@@ -288,16 +290,16 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * 配置loginQQInfo信息
      */
     public T setLoginQQInfo(LoginQQInfo loginQQInfo) {
-        BaseConfiguration.loginQQInfo = loginQQInfo;
-        BaseConfiguration.localQQCode = loginQQInfo.getQQ();
-        BaseConfiguration.localQQNick = loginQQInfo.getName();
+        this.loginQQInfo = loginQQInfo;
+        this.localQQCode = loginQQInfo.getQQ();
+        this.localQQNick = loginQQInfo.getName();
         return configuration;
     }
 
     /**
      * 获取依赖获取器
      */
-    public static DependGetter getDependGetter() {
+    public DependGetter getDependGetter() {
         return dependGetter;
     }
 
@@ -305,7 +307,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * 配置依赖获取器
      */
     public T setDependGetter(DependGetter dependGetter) {
-        BaseConfiguration.dependGetter = dependGetter;
+        this.dependGetter = dependGetter;
         return configuration;
     }
 
@@ -313,35 +315,27 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * 通过类的全包路径进行指定，通过反射创建实例
      */
     public T setDependGetter(String packPath) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        BaseConfiguration.dependGetter = (DependGetter) Class.forName(packPath).newInstance();
+        this.dependGetter = (DependGetter) Class.forName(packPath).newInstance();
         return configuration;
     }
 
 
-    public static DependInjector getDependInjector() {
-        return dependInjector;
-    }
 
-    public T setDependInjector(DependInjector dependInjector) {
-        BaseConfiguration.dependInjector = dependInjector;
-        return configuration;
-    }
-
-    public static boolean isLocalServerEnable() {
+    public boolean isLocalServerEnable() {
         return localServerEnable;
     }
 
     public T setLocalServerEnable(boolean localServerEnable) {
-        BaseConfiguration.localServerEnable = localServerEnable;
+        this.localServerEnable = localServerEnable;
         return configuration;
     }
 
-    public static int getLocalServerPort() {
+    public int getLocalServerPort() {
         return localServerPort;
     }
 
     public T setLocalServerPort(int localServerPort) {
-        BaseConfiguration.localServerPort = localServerPort;
+        this.localServerPort = localServerPort;
         return configuration;
     }
 
@@ -349,4 +343,18 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         return configuration;
     }
 
+
+    @Override
+    public String toString() {
+        return "BaseConfiguration{" +
+                "ip='" + ip + '\'' +
+                ", localQQCode='" + localQQCode + '\'' +
+                ", localQQNick='" + localQQNick + '\'' +
+                ", encode='" + encode + '\'' +
+                ", cqPath='" + cqPath + '\'' +
+                ", scannerPackage=" + scannerPackage +
+                ", localServerEnable=" + localServerEnable +
+                ", localServerPort=" + localServerPort +
+                '}';
+    }
 }

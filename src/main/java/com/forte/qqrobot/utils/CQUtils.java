@@ -1,8 +1,10 @@
 package com.forte.qqrobot.utils;
 
 import com.forte.qqrobot.BaseConfiguration;
+import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.exception.ConfigurationException;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.Optional;
 
@@ -55,7 +57,8 @@ public class CQUtils {
      * @throws ConfigurationException 如果没有配置酷q路径，抛出此异常
      */
     private static String getRootPath(){
-        return Optional.ofNullable(BaseConfiguration.getCqPath()).orElseThrow(() -> new ConfigurationException("您未配置酷Q根路径！"));
+        String cqPath = ResourceDispatchCenter.getBaseConfigration().getCqPath();
+        return Optional.ofNullable(cqPath).orElseThrow(() -> new ConfigurationException("您未配置酷Q根路径！"));
     }
 
     /**

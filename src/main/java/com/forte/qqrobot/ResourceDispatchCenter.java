@@ -12,6 +12,8 @@ import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.SingleFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 /**
@@ -19,7 +21,7 @@ import java.util.concurrent.Executor;
  * <br>主要用于框架内部，用于获取一些功能性类的单例对象
  * <br>获取前需要保证在初始化方法 Application 中已经储存过
  * <br>用户一般使用的是依赖资源: {@link com.forte.qqrobot.depend.DependCenter}
- * 所有的资源几乎都在这里，甚至包括
+ * 所有的资源几乎都在这里
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/9 14:42
  * @since JDK1.8
@@ -29,6 +31,9 @@ public abstract class ResourceDispatchCenter {
     /** 资源调度中心使用的单例工厂 */
     private static final SingleFactory resourceSingleFactory = SingleFactory.build(ResourceDispatchCenter.class);
 
+    /** 保存配置类的类型。仅保存注入的第一个 */
+    private static Class<? extends BaseConfiguration> configType = null;
+
     /**
      * 记录一个单例对象
      * @param bean  单例对象
@@ -36,6 +41,9 @@ public abstract class ResourceDispatchCenter {
      */
     protected static <T> void save(T bean){
         resourceSingleFactory.set(bean);
+        if(configType == null && (bean instanceof BaseConfiguration)){
+            configType = (Class<BaseConfiguration>) bean.getClass();
+        }
     }
 
     /**
@@ -124,6 +132,13 @@ public abstract class ResourceDispatchCenter {
      */
     protected static <T> T get(Class<T> beanClass){
         return resourceSingleFactory.get(beanClass);
+    }
+
+    /**
+     * 获取基础配置类
+     */
+    public static BaseConfiguration getBaseConfigration(){
+        return get(configType);
     }
 
     /**

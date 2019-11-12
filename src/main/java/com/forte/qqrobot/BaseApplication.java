@@ -300,7 +300,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //**************** 配置依赖注入相关 ****************//
         //配置依赖管理器
         //将依赖管理对象放入资源管理中心
-        DependGetter dependGetter = CONFIG.getDependGetter();
+        DependGetter dependGetter = getConfiguration().getDependGetter();
 
         //此处可以尝试去寻找被扫描到的接口对象
         // 寻找携带@Config且实现了Dependgetter的类

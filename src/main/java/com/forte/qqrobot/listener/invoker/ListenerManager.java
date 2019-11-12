@@ -185,7 +185,8 @@ public class ListenerManager {
 //        CQCode[] cqCodes = cqCodeUtil.getCQCodeFromMsg(msg).toArray(new CQCode[0]);
         //判断是否at自己
         //获取本机QQ号
-        String localQQCode = BaseConfiguration.getLocalQQCode();
+//        String localQQCode = BaseConfiguration.getLocalQQCode();
+        String localQQCode = ResourceDispatchCenter.getBaseConfigration().getLocalQQCode();
         boolean at1 = cqCodeUtil.isAt(msg, localQQCode);
         //组装参数
         //* 组装参数不再携带QQWebSocketSender对象和QQHttpSender对象，而是交给Manager动态创建         *
