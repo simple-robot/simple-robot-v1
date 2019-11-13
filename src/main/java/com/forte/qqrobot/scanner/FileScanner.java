@@ -67,7 +67,7 @@ public class FileScanner {
         URL url = classLoader.getResource(packageName.replace(".", "/"));
         //如果路径为null，抛出异常
         if(url == null){
-            throw new RuntimeException("路径不存在！");
+            throw new RuntimeException("包路径不存在: " + packageName);
         }
 
         //路径字符串

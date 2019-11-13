@@ -183,9 +183,13 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 开发者实现的启动方法
      * v1.1.2-BETA后返回值修改为String，意义为启动结束后打印“启动成功”的时候使用的名字
      * 例如，返回值为“server”，则会输出“server”启动成功
-     * @param manager 监听管理器，用于分配获取到的消息
+     *
+     * v1.4.1之后增加一个参数：dependCenter
+     *
+     * @param dependCenter 依赖管理器，可以支持组件额外注入部分依赖。
+     * @param manager      监听管理器，用于分配获取到的消息
      */
-    protected abstract String start(ListenerManager manager);
+    protected abstract String start(DependCenter dependCenter, ListenerManager manager);
 
     /**
      * 开发者实现的获取Config对象的方法,对象请保证每次获取的时候都是唯一的
@@ -261,7 +265,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     /**
      * 配置结束后的方法
      */
-    private void afterConfig(CONFIG config, Application<CONFIG> app){
+    private DependCenter afterConfig(CONFIG config, Application<CONFIG> app){
         //包路径
         String appPackage = app.getClass().getPackage().getName();
 
@@ -407,6 +411,10 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //保存
         ResourceDispatchCenter.saveListenerManager(manager);
         ResourceDispatchCenter.savePlug(plug);
+
+
+        //返回依赖管理器
+        return dependCenter;
     }
 
     /**
@@ -433,8 +441,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //初始化
         init(configuration);
 
-        //配置结束
-        afterConfig(configuration, app);
+        //配置结束, 获取依赖管理器
+        DependCenter dependCenter = afterConfig(configuration, app);
 
         //获取管理器
         ListenerManager manager = ResourceDispatchCenter.getListenerManager();
@@ -448,7 +456,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
         //开始连接
         long s = System.currentTimeMillis();
-        String name = start(manager);
+
+        String name = start(dependCenter, manager);
+
         long e = System.currentTimeMillis();
         String msg = name + "启动成功,耗时(" + (e - s) + "ms)";
         QQLog.info(Colors.builder().add(msg, Colors.FONT.DARK_GREEN).build());

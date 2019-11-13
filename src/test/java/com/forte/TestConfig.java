@@ -12,18 +12,18 @@ import com.forte.qqrobot.BaseConfiguration;
  **/
 public class TestConfig extends BaseConfiguration<TestConfig> {
 
-    @Conf("setverIp")
-    private String setverIp;
+    @Conf("serverIp")
+    private String serverIp;
 
     @Conf("serverPort")
     private Integer serverPort;
 
-    public String getSetverIp() {
-        return setverIp;
+    public String getServerIp() {
+        return serverIp;
     }
 
-    public void setSetverIp(String setverIp) {
-        this.setverIp = setverIp;
+    public void setServerIp(String serverIp) {
+        this.serverIp = serverIp;
     }
 
     public Integer getServerPort() {
@@ -37,7 +37,7 @@ public class TestConfig extends BaseConfiguration<TestConfig> {
     @Override
     public String toString() {
         return "TestConfig{" +
-                "setverIp='" + setverIp + '\'' +
+                "serverIp='" + serverIp + '\'' +
                 ", serverPort=" + serverPort +
                 "} " + super.toString();
     }
