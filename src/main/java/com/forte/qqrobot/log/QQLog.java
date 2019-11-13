@@ -2,7 +2,10 @@ package com.forte.qqrobot.log;
 
 import com.forte.plusutils.consoleplus.FortePlusPrintStream;
 import com.forte.plusutils.consoleplus.console.Colors;
+import com.forte.plusutils.consoleplus.console.ColorsBuilder;
+import com.forte.plusutils.consoleplus.console.colors.FontColorTypes;
 import com.forte.plusutils.consoleplus.system.ColorSystem;
+import com.forte.qqrobot.utils.RandomUtil;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -46,8 +49,15 @@ public class QQLog extends ColorSystem {
 
         /* QQLog初始化的时候输出个东西~ */
         System.out.println();
-        System.out.println("_(^w^)L~~ simple-robot@ForteScarlet ~~");
+        String oh_hi_is_me = "_(^w^)L~~ by simple-robot@ForteScarlet ~~";
+        ColorsBuilder hi_i_am_builder = Colors.builder();
+        oh_hi_is_me.chars().forEach(ic -> hi_i_am_builder.add((char) ic, wowThatIsRainbow$()));
+        System.out.println(hi_i_am_builder.build().toString());
         System.out.println();
+    }
+
+    private static FontColorTypes wowThatIsRainbow$(){
+        return RandomUtil.getRandomElement(FontColorTypes.values());
     }
 
     /**
