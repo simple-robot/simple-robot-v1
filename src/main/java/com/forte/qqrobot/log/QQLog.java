@@ -3,6 +3,8 @@ package com.forte.qqrobot.log;
 import com.forte.plusutils.consoleplus.FortePlusPrintStream;
 import com.forte.plusutils.consoleplus.console.Colors;
 import com.forte.plusutils.consoleplus.console.ColorsBuilder;
+import com.forte.plusutils.consoleplus.console.colors.BackGroundColorTypes;
+import com.forte.plusutils.consoleplus.console.colors.ColorTypes;
 import com.forte.plusutils.consoleplus.console.colors.FontColorTypes;
 import com.forte.plusutils.consoleplus.system.ColorSystem;
 import com.forte.qqrobot.utils.RandomUtil;
@@ -47,17 +49,33 @@ public class QQLog extends ColorSystem {
         }
         warning = warningPrintStream;
 
-        /* QQLog初始化的时候输出个东西~ */
-        System.out.println();
         String oh_hi_is_me = "_(^w^)L~~ by simple-robot@ForteScarlet ~~";
+        int length = oh_hi_is_me.length();
+        char line = '~';
+        /* QQLog初始化的时候输出个东西~ */
+        ColorsBuilder hi_i_am_builder_HEAD = Colors.builder();
+        for (int i = 0; i < length; i++) {
+            hi_i_am_builder_HEAD.add(line, wowThatIsRainbowToo$());
+        }
+
+        System.out.println(hi_i_am_builder_HEAD.build().toString());
+
         ColorsBuilder hi_i_am_builder = Colors.builder();
         oh_hi_is_me.chars().forEach(ic -> hi_i_am_builder.add((char) ic, wowThatIsRainbow$()));
         System.out.println(hi_i_am_builder.build().toString());
-        System.out.println();
+        ColorsBuilder hi_i_am_builder_END = Colors.builder();
+        for (int i = 0; i < length; i++) {
+            hi_i_am_builder_END.add(line, wowThatIsRainbowToo$());
+        }
+
+        System.out.println(hi_i_am_builder_END.build().toString());
     }
 
-    private static FontColorTypes wowThatIsRainbow$(){
+    private static ColorTypes wowThatIsRainbow$(){
         return RandomUtil.getRandomElement(FontColorTypes.values());
+    }
+    private static ColorTypes wowThatIsRainbowToo$(){
+        return RandomUtil.getRandomElement(BackGroundColorTypes.values());
     }
 
     /**
