@@ -1,29 +1,32 @@
 # 基于网络接口的酷Q机器人java开发框架核心
 
-# 警告！
-从2019-04-29开始，核心部分与组件部分开始分离！
 
-~~*目前还没想好是组件与核心分git地址还是分分支*~~
+从2019-04-29开始，框架重构完毕，现在分为核心部分与组件部分。
 
-*目前核心框架存在于分支`core`中*
-
-**以下文档为旧文档，内容与新框架内容几乎完全是两个东西..目前留着仅作为纪念。**
-
-新文档请见文档地址：
+**新文档请见文档地址：**
 https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1049734
 
 由于目前核心部分与组件部分相互分离，所以核心与组件的github地址也相互分离了。
-所有组件均依赖于核心框架，~~但是由于支持组件均暂时未上传maven中央仓库，所以请暂时加群以获取jar包~~
+所有组件均依赖于核心框架，支持maven坐标，具体坐标请见**文档**或**入群咨询**
 
-已经支持maven坐标，具体坐标请见文档或入群咨询
+qq群号：**782930037**
 
-qq群号：782930037
+LEMOC支持组件框架GITHUB地址：https://github.com/ForteScarlet/simple-robot-component-lemoc
 
-LEMOC支持组件GIT地址：https://github.com/ForteScarlet/simple-robot-component-lemoc
+HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/simple-robot-component-httpapi 
 
+CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/simple-robot-component-coolHttpApi
 
-HTTP API支持组件GIT地址：https://github.com/ForteScarlet/simple-robot-component-httpapi 
+**以下文档为旧文档，内容与新框架内容几乎完全是两个东西..目前留着仅作为纪念。**
 
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 ------
 
