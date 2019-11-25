@@ -104,13 +104,12 @@ public class ConfigResolvor {
 
 
                     // 构建函数
-                    // 判断是否可以注入的函数
                     String getterName = conf.getterName();
                     if(getterName.trim().length() == 0){
                         getterName = null;
                     }
+                    // 判断是否可以注入的函数
                     Predicate<T> canInject = canInject(type, field, conf.onlyNull(), conf.getter(), getterName);
-                    // 实际进行注入的函数, 一个实例，一个参数
 
                     String setterName = conf.setterName();
                     if(setterName.trim().length() == 0){
@@ -121,6 +120,7 @@ public class ConfigResolvor {
                         setterParamType = field.getType();
                     }
 
+                    // 实际进行注入的函数, 一个实例，一个参数
                     BiConsumer<T, Object> doInject = doInject(type, field, conf.setter(), setterName, setterParamType);
 
 
@@ -220,7 +220,6 @@ public class ConfigResolvor {
      */
     private static <T> BiConsumer<T, Object> doInject(Class<T> type, Field field, boolean setter, String setterName, Class<?> setterParamType){
         // 实际进行注入的函数, 一个实例，一个参数
-
         BiConsumer<T, Object> doInject = null;
 
         if(setter){
@@ -238,6 +237,7 @@ public class ConfigResolvor {
                         }
                     };
                 } catch (NoSuchMethodException ignore) {
+
                 }
             }
 

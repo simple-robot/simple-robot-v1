@@ -6,6 +6,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.beans.messages.msgget.*;
 import com.forte.qqrobot.utils.FieldUtils;
+import com.forte.utils.reflect.EnumUtils;
+
+import java.util.function.IntFunction;
 
 /**
  * 枚举类型，定义全部的消息接收类型
@@ -79,8 +82,9 @@ public enum MsgGetTypes {
     }
 
     /**
-     * 转化为对应的对象，使用Object类型接收
-     * @param json
+     * 转化为对应的对象，使用Object类型接收。
+     * 此方法不会自动配置原始数据字符串
+     * @param json json字符串
      * @return
      */
     public Object getBeanForJson(String json){
@@ -99,7 +103,7 @@ public enum MsgGetTypes {
             return unknownType;
         }
 
-        for (MsgGetTypes type : values()) {
+        for (MsgGetTypes type : EnumUtils.values(MsgGetTypes.class, MsgGetTypes[]::new)) {
             if(type.beanClass != null && FieldUtils.isChild(clazz, type.beanClass)){
                 return type;
             }

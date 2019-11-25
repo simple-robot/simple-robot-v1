@@ -1,9 +1,7 @@
 package com.forte.qqrobot.listener.invoker;
 
 
-import com.forte.qqrobot.BaseConfiguration;
 import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.depend.AdditionalDepends;
@@ -13,10 +11,12 @@ import com.forte.qqrobot.listener.result.ListenResult;
 import com.forte.qqrobot.listener.result.ListenResultImpl;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.MsgSender;
-import com.forte.qqrobot.sender.senderlist.*;
+import com.forte.qqrobot.sender.senderlist.SenderGetList;
+import com.forte.qqrobot.sender.senderlist.SenderList;
+import com.forte.qqrobot.sender.senderlist.SenderSendList;
+import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -114,7 +114,7 @@ public class ListenerManager {
 
             // TODO 考虑移除此阻断机制
 
-            ListenResult<Object> blockResult = ListenResultImpl.result(1, null, true, false, null);
+            ListenResult<Object> blockResult = ListenResultImpl.result(1, null, true, false, false, null);
 
             return new ListenResult[]{blockResult};
         }else{
@@ -267,12 +267,13 @@ public class ListenerManager {
 //            }
 //        });
 
-        // 这个first就是第一个出现的break。但是，没啥用
+        // 这个first就是第一个出现的ListenBreak。但是，没啥用
         Optional<ListenResult> first = normalMethods.stream()
                 // 先过滤掉不符合条件的函数
                 .filter(lm -> listenerFilter.filter(lm, msgGet, at))
                 // 对ListenMethod进行排序
-                .sorted()
+                // 不需要排序，会影响效率。监听函数在初始化的时候已经排序过一次了。
+//                .sorted()
                 // 在根据是否截断进行过滤，当出现了第一个截断返回值的时候停止执行
                 // 通过filter与findFirst组合使用来实现。
                 .map(lm -> {
@@ -289,7 +290,7 @@ public class ListenerManager {
                 .filter(ListenResult::isToBreak)
                 .findFirst();
 
-
+        // 对结果集进行排序
         Collections.sort(results);
         return new AbstractMap.SimpleEntry<>(count.get(), results);
     }
@@ -332,7 +333,7 @@ public class ListenerManager {
                 // 先过滤掉不符合条件的函数
                 .filter(lm -> listenerFilter.filter(lm, msgGet, at))
                 // 对ListenMethod进行排序
-                .sorted()
+//                .sorted()
                 // 在根据是否截断进行过滤，当出现了第一个截断返回值的时候停止执行
                 // 通过filter与findFirst组合使用来实现。
                 .map(lm -> {

@@ -3,16 +3,21 @@ package com.forte.qqrobot;
 import com.forte.config.Conf;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
+import com.forte.qqrobot.beans.types.ResultSelectType;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.log.QQLog;
+import com.forte.qqrobot.utils.BaseLocalThreadPool;
 
 import java.util.Arrays;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,7 +28,8 @@ import java.util.stream.Stream;
  * @date Created in 2019/4/4 18:02
  * @since JDK1.8
  **/
-@Conf("simple.robot.conf")
+// 从这里的话..idea配置不高亮啊........所以就先把完整的写在字段上吧
+@Conf("")
 public class BaseConfiguration<T extends BaseConfiguration> {
 
     //**************************************
@@ -47,66 +53,149 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 服务器ip，默认为127.0.0.1
      */
-    @Conf("ip")
+    @Conf("simple.robot.conf.ip")
     private String ip = "127.0.0.1";
 
     /**
-     * 本机QQ信息, 一般唯一，使用静态
+     * 本机QQ信息, 一般唯一
      */
     private LoginQQInfo loginQQInfo = null;
 
     /**
-     * 本机QQ号, 一般唯一，使用静态
+     * 本机QQ号, 一般唯一
      */
-    @Conf("localQQCode")
+    @Conf("simple.robot.conf.localQQCode")
     private String localQQCode = "";
 
     /**
-     * 本机QQ的昵称, 一般唯一，使用静态
+     * 本机QQ的昵称, 一般唯一
      */
-    @Conf("localQQNick")
+    @Conf("simple.robot.conf.localQQNick")
     private String localQQNick = "";
 
     /**
-     * 使用的编码格式，默认为UTF-8，静态，全局唯一
+     * 使用的编码格式，默认为UTF-8
      */
-    @Conf("encode")
+    @Conf("simple.robot.conf.encode")
     private String encode = "UTF-8";
 
     /**
-     * 酷Q根路径的配置，默认为null, 路径一般不会有多个，使用静态即可
+     * 酷Q根路径的配置，默认为null, 路径一般不会有多个
      */
-    @Conf("cqPath")
+    @Conf("simple.robot.conf.cqPath")
     private String cqPath;
 
     /**
      * 需要进行的包扫描路径，默认为空
      */
 //    private Set<String> scannerPackage = new HashSet<>();
-    @Conf("scannerPackage")
+    @Conf("simple.robot.conf.scannerPackage")
     private String[] scannerPackage = {};
+
+    /**
+     * 监听函数返回值的选择器，默认为选择第一个出现的Break监听。
+     */
+    @Conf(value = "simple.robot.conf.resultSelectType", setterName = "setResultSelectTypeByName", setterParameterType = String.class)
+    private ResultSelectType resultSelectType = ResultSelectType.FIRST_BREAK;
+
+    public void setResultSelectTypeByName(String name){
+        this.resultSelectType = ResultSelectType.valueOf(name);
+    }
 
     //**************** 依赖相关 ****************//
 
     /**
      * 自定义依赖对象实例化规则，假如同时使用了spring之类的框架，需要对此进行配置
-     * 基本全局唯一，使用静态
      */
     private DependGetter dependGetter = null;
 
 
-    //**************** 本地服务器设置相关 尚未实装 ****************//
+    //**************** 线程工厂配置 ****************//
+
+    //  ///
+    //※ 各个配置的详细说明查看com.forte.qqrobot.utils.BaseLocalThreadPool.PoolConfig对象内的字段注释。
+    //  ///
+
+    // 如果这个不是null，则优先使用此配置
+    private BaseLocalThreadPool.PoolConfig poolConfig = null;
+
+    @Conf("simple.robot.conf.threadPool.corePoolSize")
+    private Integer corePoolSize = 4;
+    @Conf("simple.robot.conf.threadPool.maximumPoolSize")
+    private Integer maximumPoolSize = 512;
+    @Conf("simple.robot.conf.threadPool.keepAliveTime")
+    private Long keepAliveTime = 5L;
+    @Conf(value = "simple.robot.conf.threadPool.timeUnit", setterName = "setTimeUnitByName", setterParameterType = String.class)
+    private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
+    // 这个比较特殊, 是使用一个类的包名进行实例化
+    @Conf("simple.robot.conf.threadPool.workQueue")
+    private String workQueueFrom = "java.util.concurrent.SynchronousQueue";
+    // 当此参数为null的时候，通过workQueueFrom参数来反射获取实例
+    private BlockingQueue<Runnable> workQueue = null;
+    // 线程工厂更特殊，干脆不能进行代码配置了
+    private ThreadFactory defaultThreadFactory = Thread::new;
+
+    /**
+     * 通过name获取枚举对象
+     */
+    public void setTimeUnitByName(String name){
+        this.timeUnit = TimeUnit.valueOf(name);
+    }
+
+    /**
+     * 获取线程池的阻塞队列
+     */
+    public BlockingQueue<Runnable> getWorkQueue(){
+        if(this.workQueue != null){
+            return this.workQueue;
+        }else{
+            if(this.workQueueFrom == null){
+                return null;
+            }else{
+                try {
+                    Class<?> clz = Class.forName(workQueueFrom);
+                    Object instance = clz.newInstance();
+                    this.workQueue = (BlockingQueue<Runnable>) instance;
+                    return this.workQueue;
+                } catch (Exception e) {
+                    throw new ConfigurationException("无法读取包路径'"+ workQueueFrom +"'来作为'"+ BlockingQueue.class +"'实例。", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取线程池配置对象
+     */
+    public BaseLocalThreadPool.PoolConfig getPoolConfig(){
+        if(this.poolConfig != null){
+            return this.poolConfig;
+        }else{
+            BaseLocalThreadPool.PoolConfig config = new BaseLocalThreadPool.PoolConfig();
+            config.setTimeUnit(this.timeUnit);
+            config.setKeepAliveTime(this.keepAliveTime);
+            config.setDefaultThreadFactory(defaultThreadFactory);
+            config.setCorePoolSize(corePoolSize);
+            config.setMaximumPoolSize(maximumPoolSize);
+            config.setWorkQueue(getWorkQueue());
+
+            this.poolConfig = config;
+            return config;
+        }
+    }
+
+    //**************** 本地服务器设置相关 >尚未实装< ****************//
 
     /**
      * 是否启用本地服务器，默认启动
      */
-    @Conf("localServerEnable")
+    @Conf("simple.robot.conf.localServerEnable")
     private boolean localServerEnable = true;
 
     /**
      * 本地服务器使用的端口号，默认为8808
      */
-    @Conf("localServerPort")
+    @Conf("simple.robot.conf.localServerPort")
     private int localServerPort = 8808;
 
 
@@ -373,15 +462,86 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     }
 
 
+    public Integer getCorePoolSize() {
+        return corePoolSize;
+    }
+
+    public void setCorePoolSize(Integer corePoolSize) {
+        this.corePoolSize = corePoolSize;
+    }
+
+    public Integer getMaximumPoolSize() {
+        return maximumPoolSize;
+    }
+
+    public void setMaximumPoolSize(Integer maximumPoolSize) {
+        this.maximumPoolSize = maximumPoolSize;
+    }
+
+    public Long getKeepAliveTime() {
+        return keepAliveTime;
+    }
+
+    public void setKeepAliveTime(Long keepAliveTime) {
+        this.keepAliveTime = keepAliveTime;
+    }
+
+    public TimeUnit getTimeUnit() {
+        return timeUnit;
+    }
+
+    public void setTimeUnit(TimeUnit timeUnit) {
+        this.timeUnit = timeUnit;
+    }
+
+    public String getWorkQueueFrom() {
+        return workQueueFrom;
+    }
+
+    public void setWorkQueueFrom(String workQueueFrom) {
+        this.workQueueFrom = workQueueFrom;
+    }
+
+    public void setWorkQueue(BlockingQueue<Runnable> workQueue) {
+        this.workQueue = workQueue;
+    }
+
+    public ThreadFactory getDefaultThreadFactory() {
+        return defaultThreadFactory;
+    }
+
+    public void setDefaultThreadFactory(ThreadFactory defaultThreadFactory) {
+        this.defaultThreadFactory = defaultThreadFactory;
+    }
+
+    public void setPoolConfig(BaseLocalThreadPool.PoolConfig poolConfig) {
+        this.poolConfig = poolConfig;
+    }
+
+    public ResultSelectType getResultSelectType() {
+        return resultSelectType;
+    }
+
+    public void setResultSelectType(ResultSelectType resultSelectType) {
+        this.resultSelectType = resultSelectType;
+    }
+
     @Override
     public String toString() {
         return "BaseConfiguration{" +
-                "ip='" + ip + '\'' +
+                ", ip='" + ip + '\'' +
                 ", localQQCode='" + localQQCode + '\'' +
                 ", localQQNick='" + localQQNick + '\'' +
                 ", encode='" + encode + '\'' +
                 ", cqPath='" + cqPath + '\'' +
                 ", scannerPackage=" + Arrays.toString(scannerPackage) +
+                ", corePoolSize=" + corePoolSize +
+                ", maximumPoolSize=" + maximumPoolSize +
+                ", keepAliveTime=" + keepAliveTime +
+                ", timeUnit=" + timeUnit +
+                ", workQueueFrom='" + workQueueFrom + '\'' +
+                ", workQueue=" + workQueue +
+                ", defaultThreadFactory=" + defaultThreadFactory +
                 ", localServerEnable=" + localServerEnable +
                 ", localServerPort=" + localServerPort +
                 '}';

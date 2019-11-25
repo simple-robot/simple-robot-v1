@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * @param <SP_API> 由组件实现方提供的特殊API对象。
  *                此类型没有任何限制，一般情况下我希望此类型是提供于我提供的三大API接口中不存在的API。
  *                例如：获取插件信息等等。
- *                有时候，这个类型可能就是你实现了三大API接口的拿个对象
+ *                有时候，这个类型可能就是你实现了三大API接口的那个对象
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/29 10:18
  * @since JDK1.8
@@ -58,8 +58,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     //java版本检测
     static{
         //初始化警察局
-        PoliceStation.getInstance();
-
+//        PoliceStation.getInstance();
         try{
             //获取java版本
             String javaVersion = System.getProperties().getProperty("java.version");
@@ -96,21 +95,21 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     /**
      * 线程工厂初始化
      */
-    protected void threadPoolInit(){
-        BaseLocalThreadPool.PoolConfig poolConfig = new BaseLocalThreadPool.PoolConfig();
-        poolConfig.setTimeUnit(TimeUnit.SECONDS);
-        //空线程存活时间
-        poolConfig.setKeepAliveTime(60);
-        //线程池的线程工厂
-        poolConfig.setDefaultThreadFactory(Thread::new);
-        //核心池数量，可同时执行的线程数量
-        poolConfig.setCorePoolSize(500);
-        //线程池最大数量
-        poolConfig.setMaximumPoolSize(1200);
-        //对列策略
-        poolConfig.setWorkQueue(new LinkedBlockingQueue<>());
+    protected void threadPoolInit(CONFIG config){
+//        BaseLocalThreadPool.PoolConfig poolConfig = new BaseLocalThreadPool.PoolConfig();
+//        poolConfig.setTimeUnit(TimeUnit.SECONDS);
+//        //空线程存活时间
+//        poolConfig.setKeepAliveTime(60);
+//        //线程池的线程工厂
+//        poolConfig.setDefaultThreadFactory(Thread::new);
+//        //核心池数量，可同时执行的线程数量
+//        poolConfig.setCorePoolSize(500);
+//        //线程池最大数量
+//        poolConfig.setMaximumPoolSize(1200);
+//        //对列策略
+//        poolConfig.setWorkQueue(new LinkedBlockingQueue<>());
         //创建并保存线程池
-        ResourceDispatchCenter.saveThreadPool(poolConfig);
+        ResourceDispatchCenter.saveThreadPool(config.getPoolConfig());
     }
 
     /**
@@ -247,7 +246,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //公共资源初始化
         baseResourceInit();
         //线程工厂初始化
-        threadPoolInit();
+        threadPoolInit(config);
         //定时任务初始化
         timeTaskInit();
         //资源初始化
@@ -475,6 +474,19 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //构建没有监听函数的送信器并保存
         MsgSender sender = MsgSender.build(getSender(), getSetter(), getGetter());
         this.NO_METHOD_SENDER = sender;
+
+        // 记录无监听函数的送信器
+//        dependCenter.loadIgnoreThrow(sender);
+//        if(sender.SENDER != null){
+//            dependCenter.loadIgnoreThrow(sender.SENDER);
+//        }
+//        if(sender.SETTER != null){
+//            dependCenter.loadIgnoreThrow(sender.SETTER);
+//        }
+//        if(sender.GETTER != null){
+//            dependCenter.loadIgnoreThrow(sender.GETTER);
+//        }
+
 
         //连接之后的收尾工作
         after();

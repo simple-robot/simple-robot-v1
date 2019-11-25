@@ -14,10 +14,12 @@ public class ParamGetterManager {
 
     private static final ParamNameGetter PARAM_NAME_GETTER;
 
+    /*
+     * 此方法并行不通，考虑其他方法。
+     */
     static {
         ParamNameGetter paramNameGetter;
         try {
-
             String method = ParamGetterManager.class.getDeclaredMethod("method", String.class)
                     .getParameters()[0].getName();
 

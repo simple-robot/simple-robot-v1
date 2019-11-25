@@ -5,13 +5,13 @@ package com.forte.qqrobot.depend;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-@FunctionalInterface
+//@FunctionalInterface
 public interface DependInjector {
 
     /**
      * 传入一个对象实例，对此对象实例中的所需依赖进行注入
      */
-    <T> void inject(T t);
+//    <T> void inject(T t);
 
 
 }

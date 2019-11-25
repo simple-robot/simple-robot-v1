@@ -328,7 +328,13 @@ public class MsgSender implements Sender{
      * 是所有工厂方法的汇总方法之一
      */
     public static MsgSender build(SenderList senderList, ListenerMethod listenerMethod){
-        return (senderList == null && listenerMethod == null) ? buildEmpty() : new MsgSender(senderList, listenerMethod);
+        return (senderList == null && listenerMethod == null) ? buildEmpty()
+                :
+                (listenerMethod == null ?
+                        new NoListenerMsgSender(senderList)
+                        :
+                        new MsgSender(senderList, listenerMethod)
+                );
     }
 
     //**************** 全 ****************//
@@ -340,7 +346,11 @@ public class MsgSender implements Sender{
         return  (sender == null && setter == null && getter == null && listenerMethod == null) ?
                 buildEmpty()
                 :
-                new MsgSender(sender, setter, getter, listenerMethod);
+                (listenerMethod == null ?
+                        new NoListenerMsgSender(sender, setter, getter)
+                        :
+                        new MsgSender(sender, setter, getter, listenerMethod)
+                );
     }
 
 
@@ -447,5 +457,20 @@ public class MsgSender implements Sender{
         //为listenerMethod赋值
         this.LISTENER_METHOD = listenerMethod;
     }
+
+    /**
+     * 无监听函数的送信器, 便于区分
+     */
+    public static class NoListenerMsgSender extends MsgSender {
+
+        private NoListenerMsgSender(SenderSendList sender, SenderSetList setter, SenderGetList getter) {
+            super(sender, setter, getter, null);
+        }
+
+        public NoListenerMsgSender(SenderList senderList) {
+            super(senderList, null);
+        }
+    }
+
 
 }

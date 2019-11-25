@@ -471,6 +471,18 @@ public abstract class BaseLocalThreadPool {
         public void setDefaultThreadFactory(ThreadFactory defaultThreadFactory) {
             this.defaultThreadFactory = defaultThreadFactory;
         }
+
+        @Override
+        public String toString() {
+            return "PoolConfig{" +
+                    "corePoolSize=" + corePoolSize +
+                    ", maximumPoolSize=" + maximumPoolSize +
+                    ", keepAliveTime=" + keepAliveTime +
+                    ", timeUnit=" + timeUnit +
+                    ", workQueue=" + workQueue +
+                    ", defaultThreadFactory=" + defaultThreadFactory +
+                    '}';
+        }
     }
 
 }

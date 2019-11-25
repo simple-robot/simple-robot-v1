@@ -26,11 +26,35 @@ public class ListenResultImpl<T> implements ListenResult<T> {
 
     private Boolean toBreak;
 
+    private Boolean toBreakPlugin;
+
     private Throwable error;
 
 
-    public static <T> ListenResult<T> result(int sort, T result, boolean success, boolean toBreak, Throwable error){
-        return new ListenResultImpl<>(sort, result, success, toBreak, error);
+    public static <T> ListenResult<T> result(int sort, T result, boolean success, boolean toBreak, boolean toBreakPlugin, Throwable error){
+        return new ListenResultImpl<>(sort, result, success, toBreak, toBreakPlugin, error);
+    }
+
+    public static <T> ListenResult<T> resultBreak(int sort, T result, boolean success, boolean toBreakPlugin, Throwable error){
+        return new ListenResultImpl<>(sort, result, success, true, toBreakPlugin, error);
+    }
+
+    public static <T> ListenResult<T> resultEmpty(int sort,  boolean success,  boolean toBreak, boolean toBreakPlugin, Throwable error){
+        return new ListenResultImpl<>(sort, null, success, toBreak, toBreakPlugin, error);
+    }
+
+    //**************** 没有throwable参数的 ****************//
+
+    public static <T> ListenResult<T> result(int sort, T result, boolean success, boolean toBreak, boolean toBreakPlugin){
+        return new ListenResultImpl<>(sort, result, success, toBreak, toBreakPlugin, null);
+    }
+
+    public static <T> ListenResult<T> resultBreak(int sort, T result, boolean success, boolean toBreakPlugin){
+        return new ListenResultImpl<>(sort, result, success, true, toBreakPlugin, null);
+    }
+
+    public static <T> ListenResult<T> resultEmpty(int sort,  boolean success,  boolean toBreak, boolean toBreakPlugin){
+        return new ListenResultImpl<>(sort, null, success, toBreak, toBreakPlugin, null);
     }
 
 
@@ -40,11 +64,12 @@ public class ListenResultImpl<T> implements ListenResult<T> {
      * @param result    返回值
      * @param success   成功与否
      */
-    public ListenResultImpl(int sort, T result, boolean success, boolean toBreak, Throwable error){
+    public ListenResultImpl(int sort, T result, boolean success, boolean toBreak, boolean toBreakPlugin, Throwable error){
         this.sort = sort;
         this.result = result;
         this.success = success;
         this.toBreak = toBreak;
+        this.toBreakPlugin = toBreakPlugin;
         this.error = error;
     }
 
@@ -106,6 +131,19 @@ public class ListenResultImpl<T> implements ListenResult<T> {
         this.toBreak = toBreak;
     }
 
+    public Boolean getToBreakPlugin() {
+        return toBreakPlugin;
+    }
+
+    @Override
+    public Boolean isToBreakPlugin(){
+        return getToBreakPlugin();
+    }
+
+    public void setToBreakPlugin(Boolean toBreakPlugin) {
+        this.toBreakPlugin = toBreakPlugin;
+    }
+
     @Override
     public Throwable getError() {
         return error;
@@ -115,8 +153,4 @@ public class ListenResultImpl<T> implements ListenResult<T> {
         this.error = error;
     }
 
-    @Override
-    public int compareTo(ListenResult o) {
-        return Integer.compare(sortValue(), o.sortValue());
-    }
 }

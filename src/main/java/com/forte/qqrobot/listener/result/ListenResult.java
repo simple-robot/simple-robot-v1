@@ -25,6 +25,12 @@ public interface ListenResult<T> extends Comparable<ListenResult> {
     Boolean isToBreak();
 
     /**
+     * 是否截断酷Q中低优先级的其他插件。
+     * 此返回值需要插件功能性的支持，否则将无效。
+     */
+    Boolean isToBreakPlugin();
+
+    /**
      * 获取执行结果响应
      * @return 获取执行结果
      */
@@ -42,4 +48,13 @@ public interface ListenResult<T> extends Comparable<ListenResult> {
      */
     Throwable getError();
 
+    /**
+     * 默认的排序方式为根据sortValue值进行排序
+     * @param o 对比对象
+     * @return  排序结果
+     */
+    @Override
+    default int compareTo(ListenResult o) {
+        return Integer.compare(sortValue(), o.sortValue());
+    }
 }

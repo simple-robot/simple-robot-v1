@@ -172,10 +172,22 @@ public class ListenerMethodScanner {
                 toBreak = listenBreak.value().getResultTest();
             }
 
+            // 是否阻断插件
+            ListenBreakPlugin listenBreakPlugin = AnnotationUtils.getAnnotation(method, ListenBreakPlugin.class);
+            Predicate<Object> toBreakPlugin;
+            if(listenBreakPlugin == null){
+                // 如果不存在注解，则默认
+                toBreakPlugin = BreakType.ALWAYS_NO.getResultTest();
+            }else{
+                toBreakPlugin = listenBreakPlugin.value().getResultTest();
+            }
+
 
             //构建对象并添加
             ListenerMethod.ListenerMethodBuilder builder = builder(listenerGetter, listenerGetterWithAddition, method, msgGetType, thisSpare, filter, blockFilter, block);
-            builder.listenBreak(toBreak).sort(sort).id(id);
+            builder.listenBreak(toBreak)
+                    .listenBreakPlugin(toBreakPlugin)
+                    .sort(sort).id(id);
 
             return builder.build();
         }).filter(Objects::nonNull).collect(Collectors.toSet());

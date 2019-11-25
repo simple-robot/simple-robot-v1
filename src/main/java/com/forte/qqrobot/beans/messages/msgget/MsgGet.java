@@ -8,8 +8,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * 消息接收类型接口，定义一个获取接收到的消息的方法
- * 每个方法都有应有对应的set方法
+ * 消息接收类型接口，定义一个获取接收到的消息的方法. <br>
+ * 2019/11/25 update <br>
+ * 有些插件支持在某些接收消息的时候返回一些特定的消息来达到快捷响应的目的，考虑支持此方式。
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/4/18 10:30
  * @since JDK1.8
