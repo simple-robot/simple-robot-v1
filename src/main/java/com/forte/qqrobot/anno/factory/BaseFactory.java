@@ -40,32 +40,37 @@ public abstract class BaseFactory<E extends Enum<E>> {
     protected abstract Class<?>[] constructorTypes();
 
     /**
-     *
+     * 接受一个数值参数，返回一个枚举数组。
+     * <br>
+     * 主要用于在获取values的时候将结果转化为数组用。
+     * <br>
+     * 可以考虑不再强制需要实现，不过还是手动实现的效率高一点。我猜的。
      */
     protected abstract IntFunction<E[]> toArrayFunction();
 
     /**
-     * 创建一个新的MsgGetType枚举对象。<br>
+     * 创建一个新的枚举对象。<br>
      * 请注意不要出现冲突的名称
      * @param name              枚举名称
      * @param params            参数列表
-     * @return
+     * @return 新建的枚举实例对象
      */
     protected E registerEnum(String name, Object... params) throws NoSuchMethodException, IllegalAccessException {
         // 判断是否可以新增
+        Class<E> eType = enumType();
         try {
             throwOrPass(name, params);
         }catch (Exception e){
             // 如果有异常，使用此异常统一抛出
-            throw new EnumInstantiationRequireException(enumType(), e);
+            throw new EnumInstantiationRequireException(eType, e);
         }
 
         // 实例化
         try {
-            return EnumUtils.newEnum(enumType(), name, constructorTypes(), params);
+            return EnumUtils.newEnum(eType, name, constructorTypes(), params);
         }catch (Exception e){
             // 实例化过程如果出现异常，统一使用此异常抛出
-            throw new EnumInstantiationException(enumType(), e);
+            throw new EnumInstantiationException(eType, e);
         }
     }
 
@@ -123,10 +128,7 @@ public abstract class BaseFactory<E extends Enum<E>> {
     }
 
     /**
-     * 根据名称与监听类型来判断是否存在重复类型。
-     * 1.名称不可重复<br>
-     * 2.类型不能是MsgGet本身。
-     * 3.理论上也不能出现相同的监听类型
+     * 字工厂自主实现的参数权限判断。提供新枚举实例的枚举名称与参数列表。
      * @param name          名称
      * @param params        参数列表
      */
