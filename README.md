@@ -6,6 +6,11 @@
 **新文档请见文档地址：**
 https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1049734
 
+<br>
+
+**在线javadoc文档(由码云平台生成)：**
+https://apidoc.gitee.com/ForteScarlet/simple-coolQ
+
 由于目前核心部分与组件部分相互分离，所以核心与组件的github地址也相互分离了。
 所有组件均依赖于核心框架，支持maven坐标，具体坐标请见**文档**或**入群咨询**
 
