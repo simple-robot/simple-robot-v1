@@ -15,7 +15,7 @@
 
     <!-- 版本号 -->
     <!-- 下次部署需要大于1.3.11 -->
-    <version>1.4.1-TEST</version>
+    <version>1.4.0</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>

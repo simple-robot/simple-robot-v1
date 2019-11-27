@@ -9,16 +9,13 @@ import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.SingleFactory;
 
-import java.io.Closeable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
-import java.util.stream.Collectors;
 
 /**
  * 依赖资源管理中心

@@ -3,6 +3,7 @@ package com.forte.qqrobot.beans.cqcode;
 import com.forte.qqrobot.beans.types.CQCodeTypes;
 import com.forte.qqrobot.exception.CQParseException;
 import com.forte.qqrobot.utils.CQCodeUtil;
+import com.forte.utils.basis.CharSequenceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,9 @@ public class CQAppendList implements AppendList {
      */
     private static final String DEFAULT_SPLIT = " ";
 
-
+    /**
+     * CQCodeUtil对象
+     */
     private static final CQCodeUtil CQ_CODE_UTIL = CQCodeUtil.build();
 
     /**
@@ -79,6 +82,21 @@ public class CQAppendList implements AppendList {
         }
     }
 
+    /**
+     * 添加一个值
+     */
+    private void add(CharSequence value){
+        if(value != null && value.length() > 0){
+            // 如果不是CQ码，转义
+            if(!(value instanceof CQCode)){
+                list.add(CQ_CODE_UTIL.escapeOutCQCode( value.toString() ));
+            }else{
+                // 否则，直接添加
+                list.add(value);
+            }
+        }
+    }
+
     @Override
     public AppendList append(long append) {
         list.add(Long.toString(append));
@@ -111,13 +129,13 @@ public class CQAppendList implements AppendList {
 
     @Override
     public AppendList append(CharSequence append) {
-        list.add(ifCQCode(append));
+        add(ifCQCode(append));
         return this;
     }
 
     @Override
     public AppendList appendTrim(CharSequence append) {
-        append(append.toString().trim());
+        append(CharSequenceUtils.trim(append));
         return this;
     }
 
@@ -196,7 +214,7 @@ public class CQAppendList implements AppendList {
      * 转为拼接字符串
      */
     @Override
-    public synchronized String toString() {
+    public String toString() {
         list.forEach(joiner::add);
         String result = joiner.toString();
         updateJoiner();

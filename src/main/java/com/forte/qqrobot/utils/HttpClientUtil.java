@@ -57,6 +57,7 @@ public class HttpClientUtil {
     public static final String CONTENT_TYPE_JSON_URL = "application/json;charset=utf-8";
 
     static {
+        // 全局cookieStore
         cookieStore = new BasicCookieStore();
     }
     /** cookie */

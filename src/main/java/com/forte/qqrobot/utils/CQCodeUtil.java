@@ -30,9 +30,7 @@ public class CQCodeUtil {
     private static final CQCodeUtil CQ_CODE_UTIL = new CQCodeUtil();
 
     /**
-     * 公共静态方法，创建一个实例对象
-     * 如果无法从资源调度中心获取，则创建一个新的实例
-     * 本类不需要过于拘谨于单例，使用单例只是为了缩减对象的创建频率
+     * 获取CQCodeUtil实例对象
      */
     public static CQCodeUtil build(){
         return CQ_CODE_UTIL;
