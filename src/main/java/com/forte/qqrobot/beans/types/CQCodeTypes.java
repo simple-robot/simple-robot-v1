@@ -2,9 +2,12 @@ package com.forte.qqrobot.beans.types;
 
 import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.utils.reflect.EnumUtils;
+import com.forte.utils.regex.RegexUtil;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -15,18 +18,22 @@ import java.util.stream.Collectors;
  * 用于通过function值快速定位CQCodeType，并且提供了一个注册接口{@link #register(CQCodeTypes)} 来支持额外注册的实例对象，并对其进行验证。
  * 包括{@link com.forte.qqrobot.anno.factory.CQCodeTypeFactory}中也提供了直接创建新枚举实例的相关接口，并提供参数验证。
  * 假如您使用了其他手段自己创建了一个额外的实例，可能会导致valueOf所取值与内部的function映射值不相符、参数冲突等一系列问题。
- *
+ * <br>
+ * <br>
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/8 14:55
  * @since JDK1.8
  **/
 public enum CQCodeTypes {
 
-    /** 默认的未知类型，当无法获取或解析的时候将会使用此类型 */
+    /**
+     * 默认的未知类型，当无法获取或解析的时候将会使用此类型
+     * */
     defaultType("", new String[0], new String[0], new String[0] , -99),
+
     /**
      *  [CQ:face,id={1}] - QQ表情
-     *  {1}为emoji字符的unicode编号
+     *  {1} 为≥0的数字
      * 举例：[CQ:emoji,id=128513]（发送一个大笑的emoji表情）
      */
     face("face",
@@ -42,7 +49,7 @@ public enum CQCodeTypes {
     bface("bface",
             new String[]{"id"},
             new String[0],
-            new String[]{"\\w+"},
+            new String[]{".+"},
             2),
 
     /**
@@ -52,7 +59,7 @@ public enum CQCodeTypes {
     sface("sface",
             new String[]{"id"},
             new String[0],
-            new String[]{"\\d+"},
+            new String[]{".+"},
             3),
 
     /**
@@ -65,13 +72,14 @@ public enum CQCodeTypes {
      *
      */
     image("image",
-            new String[]{"file"},
-            new String[0],
-            new String[]{"[\\w\\.\\\\/:'=+%_\\?\\-\\*]+"},
+            new String[]{"file", "url"},
+            new String[]{"url"},
+            new String[]{".+", ".+"},
             4),
 
 
     /**
+     * 语音
      * [CQ:record,file={1},magic={2}] - 发送语音
      * {1}为音频文件名称，音频存放在酷Q目录的data\record\下
      * {2}为是否为变声，若该参数为true则显示变声标记。该参数可被忽略。
@@ -80,7 +88,7 @@ public enum CQCodeTypes {
     record("record",
             new String[]{"file", "magic"},
             new String[]{"magic"},
-            new String[]{"[\\w\\.]+" , "(true|TRUE|false|FALSE)"},
+            new String[]{".+" , "(true|TRUE|false|FALSE)"},
             5),
 
     /**
@@ -95,6 +103,7 @@ public enum CQCodeTypes {
             6),
 
     /**
+     * 猜拳魔法
      * [CQ:rps,type={1}] - 发送猜拳魔法表情
      * {1}为猜拳结果的类型，暂不支持发送时自定义。该参数可被忽略。
      * 1 - 猜拳结果为石头
@@ -121,9 +130,9 @@ public enum CQCodeTypes {
      * [CQ:shake] - 戳一戳（原窗口抖动，仅支持好友消息使用）
      */
     shake("shake",
-            new String[]{},
-            new String[]{},
-            new String[]{},
+            new String[0],
+            new String[0],
+            new String[0],
             9),
 
     /**
@@ -138,22 +147,24 @@ public enum CQCodeTypes {
     anonymous("anonymous",
             new String[]{"ignore"},
             new String[]{"ignore"},
-            new String[]{"(true|TRUE|false|FALSE)"},
+            new String[]{"(true|false|ignore)"},
             10),
 
     /**
-     * [CQ:music,type={1},id={2}] - 发送音乐
-     * {1}为音乐平台类型，目前支持qq、163、xiami
-     * {2}为对应音乐平台的数字音乐id
+     * 音乐
+     * [CQ:music,type={1},id={2},style={3}]
+     * {1} 音乐平台类型，目前支持qq、163
+     * {2} 对应音乐平台的数字音乐id
+     * {3} 音乐卡片的风格。仅 Pro 支持该参数，该参数可被忽略。
      * 注意：音乐只能作为单独的一条消息发送
-     * 举例：
+     * 例子
      * [CQ:music,type=qq,id=422594]（发送一首QQ音乐的“Time after time”歌曲到群内）
      * [CQ:music,type=163,id=28406557]（发送一首网易云音乐的“桜咲く”歌曲到群内）
      */
     music("music",
-            new String[]{"type", "id"},
-            new String[0],
-            new String[]{".+" , "\\d+"},
+            new String[]{"type", "id", "style"},
+            new String[]{"style"},
+            new String[]{".+" , ".+", ".+"},
             11),
 
     /**
@@ -168,7 +179,7 @@ public enum CQCodeTypes {
     music_custom("music",
             new String[]{"type", "url", "audio", "title", "content", "image"},
             new String[]{"content", "image"},
-            new String[]{"custom" , ".+" , ".+" , ".+" , ".+",  "[\\w:\\\\/\\?=\\.]*"},
+            new String[]{"custom" , ".+" , ".+" , ".+" , ".+",  ".+"},
             12),
 
     /**
@@ -195,6 +206,38 @@ public enum CQCodeTypes {
             14),
 
 
+    /**
+     * 地点
+     * [CQ:location,lat={1},lon={2},title={3},content={4}]
+     * {1} 纬度
+     * {2} 经度
+     * {3} 分享地点的名称
+     * {4} 分享地点的具体地址
+     */
+    location("location",
+            new String[]{"lat", "lon", "title", "content"},
+            new String[0],
+            new String[]{"\\d+(\\.\\d+)?", "\\d+(\\.\\d+)?", ".+", ".+"},
+            15
+    ),
+
+    /**
+     * 签到
+     * [CQ:sign,location={1},title={2},image={3}]
+     * 该CQ码仅支持接收。
+     * {1} 用户签到的地点，为中文字串
+     * {2} 用户签到时发表的心情文字
+     * {3} 签到卡片所使用的背景图片连接
+     */
+    sign("sign",
+            new String[]{"location", "title", "image"},
+            new String[0],
+            new String[]{".+", ".+", ".+"},
+            16),
+
+
+
+
 
     ;
 
@@ -219,7 +262,7 @@ public enum CQCodeTypes {
 
     /**
      * 根据类型和参数名称列表来获取一个具体的枚举类型对象实例
-     * @param function   function 值
+     * @param function   function 值, 即类型，例如"image"或者"share"之类的
      * @param paramNames 参数列表值，需要保证顺序
      * @return CQCodeTypes实例对象, 如果没有则会返回defaultType
      */
@@ -229,10 +272,13 @@ public enum CQCodeTypes {
         if(cqCodeTypes == null || cqCodeTypes.length == 0){
             return defaultType;
         }else{
-            // 如果存在，则遍历并匹配参数match
-            for (CQCodeTypes cqCodeType : cqCodeTypes) {
-                if(cqCodeType.matchKeys(paramNames)){
-                    return cqCodeType;
+            // 筛选paramNames
+
+            // 如果不为null，则遍历并匹配参数match
+            for (CQCodeTypes type : cqCodeTypes) {
+                // 根据type筛选params并匹配
+                if(type.matchKeys(type.selectNeed(paramNames))){
+                    return type;
                 }
             }
         }
@@ -253,6 +299,8 @@ public enum CQCodeTypes {
     private final Set<String> ignoreAbleKeys;
     /** 对此CQ码进行匹配的正则表达式 */
     private final String matchRegex;
+    /** 此CQ码进行匹配的正则表达式的对象 */
+    private final Pattern matchRegexPattern;
     /** 排序用的值 */
     private final int sort;
     /**
@@ -337,6 +385,32 @@ public enum CQCodeTypes {
         return null;
     }
 
+    /**
+     * 从参数列表中筛选出来非多余的参数
+     * @param params 参数列表
+     * @return 非多余的列表
+     */
+    public String[] selectNeed(String... params){
+        // 如果存在key列表且param也不为空
+        if((keys.length > 0) && (params.length > 0)){
+            int count = 0;
+            String[] value = new String[keys.length];
+            // 遍历所有的params，看看他们是不是在keys的列表里
+            for (String param : params) {
+                for (String key : keys) {
+                    if(param.equals(key)){
+                        value[count++] = param;
+                        break;
+                    }
+                }
+            }
+            return Arrays.copyOf(value, count);
+        }else{
+            // 否则直接返回空
+            return new String[0];
+        }
+    }
+
     public String[] paramSort(String... params){
         return paramSort.apply(params);
     }
@@ -352,7 +426,7 @@ public enum CQCodeTypes {
 
     /**
      * 判断参数列表是否符合匹配规则
-     * @param keys
+     * @param keys 参数列表，即key的列表，例如["name", "id"]
      * @return
      */
     public boolean matchKeys(String... keys){
@@ -374,7 +448,8 @@ public enum CQCodeTypes {
      * 查看某个字符串中是否存在此类型的CQ码
      */
     public boolean contains(String text){
-        return text.matches(".*" + this.matchRegex + ".*");
+//        return text.matches(".*" + this.matchRegex + ".*");
+        return matchRegexPattern.matcher(text).find();
     }
 
     /**
@@ -516,6 +591,8 @@ public enum CQCodeTypes {
 
         //遍历完成，生成字符串
         this.matchRegex = joiner.toString();
+        //创建封装类
+        this.matchRegexPattern = RegexUtil.getPattern(matchRegex);
 
         // 生成参数匹配字符串
         // 大概规则：

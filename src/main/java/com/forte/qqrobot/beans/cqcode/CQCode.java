@@ -25,16 +25,13 @@ public class CQCode
 {
 
     /** CQ码类型 */
-    private final CQCodeTypes CQ_CODE_TYPE;
+    private CQCodeTypes CqCodeType;
 
     /** CQ码参数集 */
-    private final Map<String, String> PARAMS;
+    private final Map<String, String> params;
 
     /** toString用的字符串 */
-    private final String TO_STRING;
-
-    /** 不可以被改变的参数 */
-    private final String[] FINAL_PARAMS;
+    private String toString;
 
     /**
      * 工厂方法
@@ -106,8 +103,30 @@ public class CQCode
      * 获取CQCode的类型
      * @return CQCode的类型
      */
-    public CQCodeTypes getCQCodeTypes() {
-        return CQ_CODE_TYPE;
+    public CQCodeTypes getCQCodeType() {
+        return CqCodeType;
+    }
+
+    /**
+     * 获取CQCode的类型。<br>
+     * 这是一个名字比较短的方法。
+     */
+    public CQCodeTypes getType(){
+        return getCQCodeType();
+    }
+
+    public void setCqCodeType(CQCodeTypes type){
+        this.CqCodeType = type;
+        // 更新toString字符串
+        updateToString();
+    }
+
+    /**
+     * 重新设置CQCode的type
+     * @param type
+     */
+    public void setType(CQCodeTypes type){
+        setCqCodeType(type);
     }
 
 
@@ -117,19 +136,35 @@ public class CQCode
      */
     @Override
     public String toString() {
-        return TO_STRING;
+        return toString;
     }
+
+    /**
+     * 更新toString的值。
+     * 假如你变更了params内的值，updateToString会把额外的参数也更新至toString中。
+     */
+    public void updateToString(){
+        //构建toString字符串
+        StringJoiner joiner = getJoiner(this.CqCodeType.getFunction());
+        this.params.forEach((k, v) -> joiner.add(k+"="+v));
+        this.toString = joiner.toString();
+    }
+
 
     /**
      * 是否获取根据当前真实参数获取ToString字符串
      * 如果为false，则获取此类构建时候确定的CQ码字符串,
-     * 如果为true则会根据当前CQCode的真实参数来构建CQ码字符串
+     * 如果为true则会根据当前CQCode的真实参数来构建CQ码字符串.
+     * @deprecated
+     *  updateToString()方法存在之后此方法意义不大了。
+     * @see #updateToString()
      */
+    @Deprecated
     public String toString(boolean realParam){
         if(realParam){
             //构建toString字符串
-            StringJoiner joiner = getJoiner(this.CQ_CODE_TYPE.getFunction());
-            PARAMS.forEach((k,v) -> joiner.add(k+"="+v));
+            StringJoiner joiner = getJoiner(this.CqCodeType.getFunction());
+            params.forEach((k, v) -> joiner.add(k+"="+v));
             return joiner.toString();
         }else
             return toString();
@@ -142,7 +177,7 @@ public class CQCode
      */
     @Deprecated
     public Map<String, String> getParams() {
-        return PARAMS;
+        return params;
     }
 
     /**
@@ -186,10 +221,8 @@ public class CQCode
      * 仅子类构造
      */
     protected CQCode(CQCodeTypes cqCodeTypes, Map<String, String> params){
-        this.CQ_CODE_TYPE = cqCodeTypes;
-        this.PARAMS = params;
-        //初始化的时候填入的参数列表不可以被移除
-        this.FINAL_PARAMS = params.keySet().toArray(new String[0]);
+        this.CqCodeType = cqCodeTypes;
+        this.params = params;
 
         //遍历参数，判断参数是否都是符合规范的
         //需要的参数
@@ -213,11 +246,7 @@ public class CQCode
 
         }
 
-
-        //构建toString字符串
-        StringJoiner joiner = getJoiner(this.CQ_CODE_TYPE.getFunction());
-        PARAMS.forEach((k,v) -> joiner.add(k+"="+v));
-        this.TO_STRING = joiner.toString();
+        updateToString();
     }
 
 
@@ -230,6 +259,9 @@ public class CQCode
         return new StringJoiner(",", "[CQ:", "]").add(function);
     }
 
+    /**
+     * key 冲突的解决方案。
+     */
     private static <T> BinaryOperator<T> throwingMerger(){
         return (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
     }
@@ -283,6 +315,11 @@ public class CQCode
     }
 
     //**************************************
+    //*         getter & setter
+    //**************************************
+
+
+    //**************************************
     //*          以下为Map接口的实现
     //**************************************
 
@@ -292,7 +329,7 @@ public class CQCode
      */
     @Override
     public int size() {
-        return PARAMS.size();
+        return params.size();
     }
 
     /**
@@ -300,15 +337,15 @@ public class CQCode
      */
     @Override
     public boolean isEmpty() {
-        return PARAMS.isEmpty();
+        return params.isEmpty();
     }
 
     /**
-     * 是否存在某种参数
+     * 是否存在某种key
      */
     @Override
     public boolean containsKey(Object key) {
-        return PARAMS.containsKey(key);
+        return params.containsKey(key);
     }
 
     /**
@@ -317,7 +354,7 @@ public class CQCode
      */
     @Override
     public boolean containsValue(Object value) {
-        return PARAMS.containsValue(CQCodeUtil.build().escapeValue(String.valueOf(value)));
+        return params.containsValue(CQCodeUtil.build().escapeValue(String.valueOf(value)));
     }
 
     /**
@@ -326,22 +363,17 @@ public class CQCode
      */
     @Override
     public String get(Object key) {
-        return CQCodeUtil.build().escapeValueDecode(PARAMS.get(key));
+        return CQCodeUtil.build().escapeValueDecode(params.get(key));
     }
 
     /**
      * 放入某个参数
      * 如果是final参数则抛出异常
+     * v1.4.1 从此之后不再干预finalParam一类的东西了，依靠用户自觉性。
      */
     @Override
     public String put(String key, String value) {
-        for (String final_param : FINAL_PARAMS) {
-            if(final_param.equals(key)){
-                throw new CQParamsException("参数["+ key +"]值不可被替换。");
-            }
-        }
-
-        return PARAMS.put(key, CQCodeUtil.build().escapeValue(value));
+        return params.put(key, CQCodeUtil.build().escapeValue(value));
     }
 
     /**
@@ -353,18 +385,10 @@ public class CQCode
 
     /**
      * 移除掉某个参数
-     * 此类被构造的时候所填入的参数不可被移除
-     * @throws com.forte.qqrobot.exception.CQParamsException 当移除了不可移除的参数后将会抛出此异常
      */
     @Override
     public String remove(Object key) {
-        for (String notKey : FINAL_PARAMS) {
-            if(notKey.equals(key)){
-                throw new CQParamsException("参数["+ key +"]在CQ码类型["+ CQ_CODE_TYPE +"]中不可被移除。");
-            }
-        }
-
-        return PARAMS.remove(key);
+        return params.remove(key);
     }
 
     /**
@@ -377,17 +401,11 @@ public class CQCode
     }
 
     /**
-     * 移除掉所有的参数-除了FINAL参数
+     * 移除掉所有的参数
      */
     @Override
     public void clear() {
-        for (String key : PARAMS.keySet()) {
-            for (String finalParam : FINAL_PARAMS) {
-                if(!key.equals(finalParam)){
-                    PARAMS.remove(key);
-                }
-            }
-        }
+        params.clear();
     }
 
     /**
@@ -395,7 +413,7 @@ public class CQCode
      */
     @Override
     public Set<String> keySet() {
-        return PARAMS.keySet();
+        return params.keySet();
     }
 
     /**
@@ -404,7 +422,7 @@ public class CQCode
      */
     @Override
     public Collection<String> values() {
-        return PARAMS.values().stream().map(CQCodeUtil.build()::escapeValueDecode).collect(Collectors.toList());
+        return params.values().stream().map(CQCodeUtil.build()::escapeValueDecode).collect(Collectors.toList());
     }
 
     /**
@@ -412,25 +430,21 @@ public class CQCode
      */
     @Override
     public Set<Entry<String, String>> entrySet() {
-        return PARAMS.entrySet().stream().map(e -> new CQCodeEntry(e, FINAL_PARAMS)).collect(Collectors.toSet());
+        return params.entrySet().stream().map(CQCodeEntry::new).collect(Collectors.toSet());
     }
 
 
     /**
-     * CQ码对象中使用的Entry对象，覆盖原本的Entry对象并进行参数转化
+     * CQ码对象中使用的Entry对象，覆盖原本的Entry对象并进行参数转义
      */
     public static class CQCodeEntry implements Map.Entry<String, String>{
 
         /** 真正的entry对象 */
         private final Entry<String, String> realEntry;
 
-        /** 不可变参数 */
-        private final String[] FINAL_KEYS;
-
         /** 构造 */
-        CQCodeEntry(Entry<String, String> realEntry, String[] finalKeys){
+        CQCodeEntry(Entry<String, String> realEntry){
             this.realEntry = realEntry;
-            this.FINAL_KEYS = finalKeys;
         }
 
         /**
@@ -456,11 +470,6 @@ public class CQCode
          */
         @Override
         public String setValue(String value) {
-            for (String finalKey : FINAL_KEYS) {
-                if(finalKey.equals(value)){
-                    throw new CQParamsException("参数["+ finalKey +"]不可变。");
-                }
-            }
             return realEntry.setValue(value);
         }
 
@@ -471,21 +480,21 @@ public class CQCode
 
     @Override
     public int length() {
-        return TO_STRING.length();
+        return toString.length();
     }
 
     @Override
     public char charAt(int index) {
-        return TO_STRING.charAt(index);
+        return toString.charAt(index);
     }
 
     @Override
     public CharSequence subSequence(int start, int end) {
-        return TO_STRING.subSequence(start, end);
+        return toString.subSequence(start, end);
     }
 
     @Override
     public int compareTo(CQCode o) {
-        return Integer.compare(this.CQ_CODE_TYPE.getSort(), o.CQ_CODE_TYPE.getSort());
+        return Integer.compare(this.CqCodeType.getSort(), o.CqCodeType.getSort());
     }
 }
