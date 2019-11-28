@@ -12,6 +12,8 @@
 *.ctxt
 
 .idea
+.idea/*
+.idea/**
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -96,3 +98,16 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
+src/main/java/com/forte/qqrobot/aop/
+src/main/java/com/forte/qqrobot/beans/messages/send/
+src/main/java/com/forte/qqrobot/beans/messages/set/
+src/test/java/com/forte/Test4.java
+src/test/java/com/forte/Test5.java
+src/test/java/com/forte/Test6.java
+src/test/java/com/forte/Test8.java
+src/test/java/com/forte/Test9.java
+src/test/java/com/forte/TestApplication.java
+src/test/java/com/forte/test/
+src/test/java/com/forte/test3/
+src/test/java/com/forte/test4/
+src/test/java/com/forte/tset2/
