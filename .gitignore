@@ -4,16 +4,12 @@
 *.class
 
 #.idea
-.idea
+.idea/
 # Log file
 *.log
 
 # BlueJ files
 *.ctxt
-
-.idea
-.idea/*
-.idea/**
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
