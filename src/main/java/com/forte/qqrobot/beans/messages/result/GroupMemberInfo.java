@@ -18,6 +18,17 @@ public interface GroupMemberInfo extends InfoResult {
     String getName();
     /** 群昵称 */
     String getNickName();
+    /**
+     * 获取昵称，如果没有设置昵称那么获取QQ名
+     */
+    default String getNickOrName(){
+        String nick = getNickName();
+        if(nick==null||nick.length() == 0){
+            return getName();
+        }else{
+            return nick;
+        }
+    }
     /** 群名片 */
     String getCard();
     /** 获取性别 -1:男，1:女，0:未知  */

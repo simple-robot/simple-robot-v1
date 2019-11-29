@@ -203,7 +203,7 @@ public class ListenerManager {
 
         //参数获取getter
         return lm -> {
-            Map<String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>(16);
             map.put("msgGet", msgGet);
             map.put(msgGet.getClass().getSimpleName(), msgGet);
             map.put("at", at);
@@ -255,31 +255,21 @@ public class ListenerManager {
         //获取这个消息分类下的普通方法
         List<ListenerMethod> normalMethods = getNormalMethods(msgGetTypes);
 
-//        normalMethods.stream().filter(lm -> listenerFilter.filter(lm, msgGet, at)).forEach(lm -> {
-//            //过滤后，执行
-//            try {
-////                boolean runTrue = lm.invoke(paramGetter.apply(lm));
-//                ListenResult result = lm.invoke(paramGetter.apply(lm));
-//                //如果执行成功，计数+1
-//                count.addAndGet(result.isSuccess() ? 1 : 0);
-//            } catch (Throwable e) {
-//                QQLog.error("监听器["+ lm.getBeanToString() +"]执行函数["+ lm.getMethodToString() +"]出现错误！", e);
-//            }
-//        });
-
         // 这个first就是第一个出现的ListenBreak。但是，没啥用
         Optional<ListenResult> first = normalMethods.stream()
                 // 先过滤掉不符合条件的函数
                 .filter(lm -> listenerFilter.filter(lm, msgGet, at))
-                // 对ListenMethod进行排序
-                // 不需要排序，会影响效率。监听函数在初始化的时候已经排序过一次了。
-//                .sorted()
                 // 在根据是否截断进行过滤，当出现了第一个截断返回值的时候停止执行
                 // 通过filter与findFirst组合使用来实现。
                 .map(lm -> {
                     try {
                         ListenResult result = lm.invoke(paramGetter.apply(lm));
                         results.add(result);
+                        // 如果有异常，输出这个异常
+                        Throwable error = result.getError();
+                        if(error != null){
+                            QQLog.error("监听函数["+ lm.getUUID() +"]执行异常：", error);
+                        }
                         return result;
                     } catch (Throwable e) {
                         // invoke里已经对方法的执行做了处理，如果还是会出错则代表是其他步骤出现了异常。
@@ -316,33 +306,23 @@ public class ListenerManager {
         //获取这个消息分类下的备用方法
         List<ListenerMethod> spareMethods = getSpareMethods(msgGetTypes);
 
-//        spareMethods.stream().filter(lm -> listenerFilter.filter(lm, msgGet, at)).forEach(lm -> {
-//            //过滤完成后执行方法
-//            try {
-////                boolean runTrue = lm.invoke(paramGetter.apply(lm));
-//                ListenResult result = lm.invoke(paramGetter.apply(lm));
-//                //如果执行成功，计数+1
-//                count.addAndGet(result.isSuccess() ? 1 : 0);
-//            } catch (Throwable e) {
-//                QQLog.error("监听器["+ lm.getBeanToString() +"]执行函数["+ lm.getMethodToString() +"]出现错误！", e);
-//            }
-//        });
-
         // 这个first就是第一个出现的break。但是，没啥用
         Optional<ListenResult> first = spareMethods.stream()
                 // 先过滤掉不符合条件的函数
                 .filter(lm -> listenerFilter.filter(lm, msgGet, at))
-                // 对ListenMethod进行排序
-//                .sorted()
-                // 在根据是否截断进行过滤，当出现了第一个截断返回值的时候停止执行
                 // 通过filter与findFirst组合使用来实现。
                 .map(lm -> {
                     try {
                         ListenResult result = lm.invoke(paramGetter.apply(lm));
                         results.add(result);
+                        // 如果有异常，输出这个异常
+                        Throwable error = result.getError();
+                        if(error != null){
+                            QQLog.error("监听函数["+ lm.getUUID() +"]执行异常：", error);
+                        }
                         return result;
                     } catch (Throwable e) {
-                        // invoke里已经对方法的执行做了处理，如果还是会出错则代表是其他步骤出现了异常。
+                        // 如果出现异常，暂时先抛出，后期使用异常管理
                         throw new RobotRuntimeException(e);
                     }
 
