@@ -103,7 +103,7 @@ public class CQCode
      * 获取CQCode的类型
      * @return CQCode的类型
      */
-    public CQCodeTypes getCQCodeType() {
+    public CQCodeTypes getCQCodeTypes() {
         return CqCodeType;
     }
 
@@ -112,10 +112,10 @@ public class CQCode
      * 这是一个名字比较短的方法。
      */
     public CQCodeTypes getType(){
-        return getCQCodeType();
+        return getCQCodeTypes();
     }
 
-    public void setCqCodeType(CQCodeTypes type){
+    public void setCqCodeTypes(CQCodeTypes type){
         this.CqCodeType = type;
         // 更新toString字符串
         updateToString();
@@ -126,7 +126,7 @@ public class CQCode
      * @param type
      */
     public void setType(CQCodeTypes type){
-        setCqCodeType(type);
+        setCqCodeTypes(type);
     }
 
 

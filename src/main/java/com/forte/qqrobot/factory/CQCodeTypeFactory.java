@@ -1,11 +1,10 @@
-package com.forte.qqrobot.anno.factory;
+package com.forte.qqrobot.factory;
 
 import com.forte.qqrobot.beans.types.CQCodeTypes;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.utils.ObjectsPlus;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.StringJoiner;
 import java.util.function.IntFunction;
 

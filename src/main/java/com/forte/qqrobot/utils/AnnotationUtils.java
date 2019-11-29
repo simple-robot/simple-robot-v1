@@ -1,9 +1,6 @@
 package com.forte.qqrobot.utils;
 
-import com.forte.qqrobot.anno.ByNameType;
-import com.forte.qqrobot.anno.Constr;
-import com.forte.qqrobot.anno.Filter;
-import com.forte.qqrobot.anno.Listen;
+import com.forte.qqrobot.anno.*;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.exception.AnnotationException;
 
@@ -14,7 +11,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * 对于一些注解的获取等相关的工具类
@@ -86,12 +85,19 @@ public class AnnotationUtils {
             }
         }
 
-        annotation = annotationable ? getAnnotationFromArrays(from.getAnnotations(), annotationType) : null;
+        Annotation[] annotations = from.getAnnotations();
+        annotation = annotationable ? getAnnotationFromArrays(annotations, annotationType) : null;
 
 
         // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
         if (annotation == null) {
             annotation = getByNameAnnotation(from, annotationType);
+        }
+
+        // 如果无法通过注解本身所指向的byName注解获取，看看有没有反向指向此类型的注解
+        // 此情况下不进行深层获取
+        if(annotation == null){
+            annotation = getAnnotationFromByNames(annotations, annotationType);
         }
 
         return annotation;
@@ -127,11 +133,18 @@ public class AnnotationUtils {
             }
         }
 
-        annotation = annotationable ? getAnnotationFromArrays(from.getAnnotations(), annotationType) : null;
+        Annotation[] annotations = from.getAnnotations();
+        annotation = annotationable ? getAnnotationFromArrays(annotations, annotationType) : null;
 
         // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
         if (annotation == null) {
             annotation = getByNameAnnotation(from, annotationType);
+        }
+
+        // 如果无法通过注解本身所指向的byName注解获取，看看有没有反向指向此类型的注解
+        // 此情况下不进行深层获取
+        if(annotation == null){
+            annotation = getAnnotationFromByNames(annotations, annotationType);
         }
 
         return annotation;
@@ -165,11 +178,18 @@ public class AnnotationUtils {
             }
         }
 
-        annotation = annotationable ? getAnnotationFromArrays(from.getAnnotations(), annotationType) : null;
+        Annotation[] annotations = from.getAnnotations();
+        annotation = annotationable ? getAnnotationFromArrays(annotations, annotationType) : null;
 
         // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
         if (annotation == null) {
             annotation = getByNameAnnotation(from, annotationType);
+        }
+
+        // 如果无法通过注解本身所指向的byName注解获取，看看有没有反向指向此类型的注解
+        // 此情况下不进行深层获取
+        if(annotation == null){
+            annotation = getAnnotationFromByNames(annotations, annotationType);
         }
 
         return annotation;
@@ -203,16 +223,47 @@ public class AnnotationUtils {
             }
         }
 
-        annotation = annotationable ? getAnnotationFromArrays(from.getAnnotations(), annotationType) : null;
+        Annotation[] annotations = from.getAnnotations();
+        annotation = annotationable ? getAnnotationFromArrays(annotations, annotationType) : null;
 
         // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
         if (annotation == null) {
             annotation = getByNameAnnotation(from, annotationType);
         }
 
+        // 如果无法通过注解本身所指向的byName注解获取，看看有没有反向指向此类型的注解
+        // 此情况下不进行深层获取
+        if(annotation == null){
+            annotation = getAnnotationFromByNames(annotations, annotationType);
+        }
+
         return annotation;
 
     }
+
+
+    /**
+     * 逆向查询，把ByName转化为正常的注解。
+     * @param annotations    获取源头上拿到的注解列表，例如类上、字段上等等。
+     * @param annotationType 想要获取的注解类型。
+     */
+    private static <T extends Annotation> T getAnnotationFromByNames(Annotation[] annotations, Class<T> annotationType){
+        // 获取所有的注解
+        return Arrays.stream(annotations).map(a -> {
+            // 这个注解a存在@ByNameFrom
+            ByNameFrom byNameFrom = a.annotationType().getAnnotation(ByNameFrom.class);
+            if(byNameFrom == null){
+                return null;
+            }else{
+                return new AbstractMap.SimpleEntry<>(a, byNameFrom);
+            }
+        })
+                .filter(Objects::nonNull)
+                .filter(a -> a.getValue().value().equals(annotationType))
+                .map(a -> AnnotationByNameUtils.byName(a.getKey(), annotationType))
+                .findFirst().orElse(null);
+    }
+
 
     /**
      * 通过参数对象获取，且是通过byName注解获取

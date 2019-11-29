@@ -34,14 +34,6 @@ public class AnnotationByNameUtils {
      * @param byName byName
      */
     public static Listen byName(Listen.ByName byName) {
-//        Map<String, BiFunction<Method, Object[], Object>> stringBiFunctionMap = byNameField(byName);
-//
-//        return ProxyUtils.annotationProxy(Listen.class,
-//                proxyByMethodMap(Listen.ByName.class, withObject(
-//                        byName,
-//                        stringBiFunctionMap
-//                ))
-//        );
         return byName(byName, Listen.class);
     }
 
@@ -53,14 +45,6 @@ public class AnnotationByNameUtils {
      * @param byName byName
      */
     public static Filter byName(Filter.ByName byName) {
-//        Map<String, BiFunction<Method, Object[], Object>> stringBiFunctionMap = byNameField(byName);
-//
-//        return ProxyUtils.annotationProxy(Filter.class,
-//                proxyByMethodMap(Filter.ByName.class, withObject(
-//                        byName,
-//                        stringBiFunctionMap
-//                ))
-//        );
         return byName(byName, Filter.class);
     }
 
@@ -79,7 +63,7 @@ public class AnnotationByNameUtils {
         Class<? extends Annotation> byNameType = byName.annotationType();
         ByNameFrom from = byNameType.getAnnotation(ByNameFrom.class);
         if(from == null){
-            throw new IllegalArgumentException("annotation " + byNameType + "does not exist ByNameFrom Type.");
+            throw new IllegalArgumentException("annotation " + byNameType + " does not exist ByNameFrom Type.");
         }
         Class<FROM> fromTypeValue = (Class<FROM>) from.value();
 
@@ -131,6 +115,7 @@ public class AnnotationByNameUtils {
 
         return new HashMap<String, BiFunction<Method, Object[], Object>>(methods.length) {{
             for (Method method : methods) {
+                method.setAccessible(true);
                 ByNameField byNameField = method.getAnnotation(ByNameField.class);
                 if (byNameField != null) {
                     // 存在byNameField

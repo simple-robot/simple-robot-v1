@@ -1,22 +1,20 @@
 package com.forte.qqrobot.beans.types;
 
-import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.utils.reflect.EnumUtils;
 import com.forte.utils.regex.RegexUtil;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  *
  * 此枚举保存全部的CQCode类型。<br>
- * 且提供了一个{@link com.forte.qqrobot.anno.factory.CQCodeTypeFactory}来支持动态扩展此枚举。<br>
+ * 且提供了一个{@link com.forte.qqrobot.factory.CQCodeTypeFactory}来支持动态扩展此枚举。<br>
  * 请不要使用任何非工厂创建的形式（例如自己通过反射或者其他工具）创建此类的实例对象。此类中维护一个function映射，
  * 用于通过function值快速定位CQCodeType，并且提供了一个注册接口{@link #register(CQCodeTypes)} 来支持额外注册的实例对象，并对其进行验证。
- * 包括{@link com.forte.qqrobot.anno.factory.CQCodeTypeFactory}中也提供了直接创建新枚举实例的相关接口，并提供参数验证。
+ * 包括{@link com.forte.qqrobot.factory.CQCodeTypeFactory}中也提供了直接创建新枚举实例的相关接口，并提供参数验证。
  * 假如您使用了其他手段自己创建了一个额外的实例，可能会导致valueOf所取值与内部的function映射值不相符、参数冲突等一系列问题。
  * <br>
  * <br>

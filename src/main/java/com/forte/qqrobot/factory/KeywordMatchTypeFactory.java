@@ -1,4 +1,4 @@
-package com.forte.qqrobot.anno.factory;
+package com.forte.qqrobot.factory;
 
 import com.forte.qqrobot.beans.types.KeywordMatchType;
 

@@ -39,8 +39,7 @@ public @interface Listen {
     int sort() default 1;
 
     /**
-     * 相当于一个ID，此
-     * @return
+     * 相当于一个ID，此参数为空的时候会自动根据包、类、方法名、参数列表生成一个唯一ID
      */
     String name() default "";
 
