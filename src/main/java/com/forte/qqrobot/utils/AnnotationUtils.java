@@ -7,13 +7,10 @@ import com.forte.qqrobot.exception.AnnotationException;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Objects;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 对于一些注解的获取等相关的工具类
@@ -30,6 +27,13 @@ public class AnnotationUtils {
 
 
     /**
+     * 注解缓存，记录曾经保存过的注解与其所在类
+     *
+     */
+    private static final Map<AnnotatedElement, Set<Annotation>> ANNOTATION_CACHE = new ConcurrentHashMap<>(32);
+
+
+   /**
      * 尝试从一个类对象中获取到@Beans注解
      */
     public static Beans getBeansAnnotationIfListen(Class<?> from) {
@@ -63,12 +67,20 @@ public class AnnotationUtils {
      * @param annotationType 想要获取的注解类型
      * @return 获取到的第一个注解对象
      */
-    public static <T extends Annotation> T getAnnotation(Class<?> from, Class<T> annotationType) {
+    public static <T extends Annotation> T getAnnotation(AnnotatedElement from, Class<T> annotationType) {
+        // 首先尝试获取缓存
+        T cache = getCache(from, annotationType);
+        if(cache != null){
+            return cache;
+        }
+
+
         //先尝试直接获取
         T annotation = from.getAnnotation(annotationType);
 
         //如果存在直接返回，否则查询
         if (annotation != null) {
+            saveCache(from, annotation);
             return annotation;
         }
 
@@ -100,146 +112,14 @@ public class AnnotationUtils {
             annotation = getAnnotationFromByNames(annotations, annotationType);
         }
 
-        return annotation;
-    }
-
-    /**
-     * 从某个字段上获取注解，可深层获取，如果存在多个则只返回获取到的第一个注解信息
-     *
-     * @param from           想要获取注解对象的字段对象
-     * @param annotationType 想要获取的注解类型
-     * @return 获取到的第一个注解对象
-     * @see #getAnnotation(Class, Class)
-     */
-    public static <T extends Annotation> T getAnnotation(Field from, Class<T> annotationType) {
-        //先尝试直接获取
-        T annotation = from.getAnnotation(annotationType);
-
-        //如果存在直接返回，否则查询
-        if (annotation != null) {
-            return annotation;
-        }
-
-        // 获取target注解
-        Target target = annotationType.getAnnotation(Target.class);
-        // 判断这个注解能否标注在其他注解上，如果不能，则不再深入获取
-        boolean annotationable = false;
-        if (target != null) {
-            for (ElementType elType : target.value()) {
-                if (elType == ElementType.ANNOTATION_TYPE) {
-                    annotationable = true;
-                    break;
-                }
-            }
-        }
-
-        Annotation[] annotations = from.getAnnotations();
-        annotation = annotationable ? getAnnotationFromArrays(annotations, annotationType) : null;
-
-        // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
-        if (annotation == null) {
-            annotation = getByNameAnnotation(from, annotationType);
-        }
-
-        // 如果无法通过注解本身所指向的byName注解获取，看看有没有反向指向此类型的注解
-        // 此情况下不进行深层获取
-        if(annotation == null){
-            annotation = getAnnotationFromByNames(annotations, annotationType);
+        // 如果最终不是null，计入缓存
+        if(annotation != null){
+            saveCache(from, annotation);
         }
 
         return annotation;
     }
 
-    /**
-     * 尝试从参数对象中获取某注解
-     *
-     * @param from           参数对象
-     * @param annotationType 注解类型
-     */
-    public static <T extends Annotation> T getAnnotation(Parameter from, Class<T> annotationType) {
-        //先尝试直接获取
-        T annotation = from.getAnnotation(annotationType);
-
-        //如果存在直接返回，否则查询
-        if (annotation != null) {
-            return annotation;
-        }
-
-        // 获取target注解
-        Target target = annotationType.getAnnotation(Target.class);
-        // 判断这个注解能否标注在其他注解上，如果不能，则不再深入获取
-        boolean annotationable = false;
-        if (target != null) {
-            for (ElementType elType : target.value()) {
-                if (elType == ElementType.ANNOTATION_TYPE) {
-                    annotationable = true;
-                    break;
-                }
-            }
-        }
-
-        Annotation[] annotations = from.getAnnotations();
-        annotation = annotationable ? getAnnotationFromArrays(annotations, annotationType) : null;
-
-        // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
-        if (annotation == null) {
-            annotation = getByNameAnnotation(from, annotationType);
-        }
-
-        // 如果无法通过注解本身所指向的byName注解获取，看看有没有反向指向此类型的注解
-        // 此情况下不进行深层获取
-        if(annotation == null){
-            annotation = getAnnotationFromByNames(annotations, annotationType);
-        }
-
-        return annotation;
-    }
-
-    /**
-     * 尝试从方法上获取某个类型的注解
-     *
-     * @param from           方法对象
-     * @param annotationType 注解的类型
-     */
-    public static <T extends Annotation> T getAnnotation(Method from, Class<T> annotationType) {
-        //先尝试直接获取
-        T annotation = from.getAnnotation(annotationType);
-
-        //如果存在直接返回，否则查询
-        if (annotation != null) {
-            return annotation;
-        }
-
-        // 获取target注解
-        Target target = annotationType.getAnnotation(Target.class);
-        // 判断这个注解能否标注在其他注解上，如果不能，则不再深入获取
-        boolean annotationable = false;
-        if (target != null) {
-            for (ElementType elType : target.value()) {
-                if (elType == ElementType.ANNOTATION_TYPE) {
-                    annotationable = true;
-                    break;
-                }
-            }
-        }
-
-        Annotation[] annotations = from.getAnnotations();
-        annotation = annotationable ? getAnnotationFromArrays(annotations, annotationType) : null;
-
-        // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
-        if (annotation == null) {
-            annotation = getByNameAnnotation(from, annotationType);
-        }
-
-        // 如果无法通过注解本身所指向的byName注解获取，看看有没有反向指向此类型的注解
-        // 此情况下不进行深层获取
-        if(annotation == null){
-            annotation = getAnnotationFromByNames(annotations, annotationType);
-        }
-
-        return annotation;
-
-    }
 
 
     /**
@@ -270,7 +150,7 @@ public class AnnotationUtils {
      * @param from              来源
      * @param annotationType    父注解类型
      */
-    private static <T extends Annotation> T getByNameAnnotation(Parameter from, Class<T> annotationType){
+    private static <T extends Annotation> T getByNameAnnotation(AnnotatedElement from, Class<T> annotationType){
         // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
         ByNameType byNameType = annotationType.getAnnotation(ByNameType.class);
         if (byNameType != null) {
@@ -284,67 +164,6 @@ public class AnnotationUtils {
             return null;
         }
     }
-
-    /**
-     * 通过字段对象获取，且是通过byName注解获取
-     * @param from              来源
-     * @param annotationType    父注解类型
-     */
-    private static <T extends Annotation> T getByNameAnnotation(Field from, Class<T> annotationType){
-        // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
-        ByNameType byNameType = annotationType.getAnnotation(ByNameType.class);
-        if (byNameType != null) {
-            // 存在byNameType，看看是啥
-            Class<? extends Annotation> byNameAnnotationType = byNameType.value();
-            // 尝试通过这个ByName获取真正的对应注解
-            // 获取ByName注解的时候不再使用深层获取，而是直接获取
-            Annotation byNameOnFrom = from.getAnnotation(byNameAnnotationType);
-            return AnnotationByNameUtils.byName(byNameOnFrom, annotationType);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * 通过类对象获取，且是通过byName注解获取
-     * @param from              来源
-     * @param annotationType    父注解类型
-     */
-    private static <T extends Annotation> T getByNameAnnotation(Class<?> from, Class<T> annotationType){
-        // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
-        ByNameType byNameType = annotationType.getAnnotation(ByNameType.class);
-        if (byNameType != null) {
-            // 存在byNameType，看看是啥
-            Class<? extends Annotation> byNameAnnotationType = byNameType.value();
-            // 尝试通过这个ByName获取真正的对应注解
-            // 获取ByName注解的时候不再使用深层获取，而是直接获取
-            Annotation byNameOnFrom = from.getAnnotation(byNameAnnotationType);
-            return AnnotationByNameUtils.byName(byNameOnFrom, annotationType);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * 通过方法对象获取，且是通过byName注解获取
-     * @param from              来源
-     * @param annotationType    父注解类型
-     */
-    private static <T extends Annotation> T getByNameAnnotation(Method from, Class<T> annotationType) {
-        // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
-        ByNameType byNameType = annotationType.getAnnotation(ByNameType.class);
-        if (byNameType != null) {
-            // 存在byNameType，看看是啥
-            Class<? extends Annotation> byNameAnnotationType = byNameType.value();
-            // 尝试通过这个ByName获取真正的对应注解
-            // 获取ByName注解的时候不再使用深层获取，而是直接获取
-            Annotation byNameOnFrom = from.getAnnotation(byNameAnnotationType);
-            return AnnotationByNameUtils.byName(byNameOnFrom, annotationType);
-        } else {
-            return null;
-        }
-    }
-
 
     /**
      * @param array
@@ -412,7 +231,7 @@ public class AnnotationUtils {
      */
     public static Method getConstrMethod(Class clz) {
         return Arrays.stream(clz.getDeclaredMethods()).filter(m -> {
-            Constr constr = m.getAnnotation(Constr.class);
+            Constr constr = getAnnotation(m, Constr.class);
             if (constr != null) {
                 if (!Modifier.isStatic(m.getModifiers())) {
                     throw new AnnotationException(clz, m, Constr.class, "不是静态");
@@ -432,5 +251,52 @@ public class AnnotationUtils {
             }
         }).findAny().orElse(null);
     }
+
+
+    /**
+     * 从缓存中获取缓存注解
+     * @param from          来源
+     * @param annotatedType 注解类型
+     * @return  注解缓存，可能为null
+     */
+    private static <T extends Annotation> T getCache(AnnotatedElement from, Class<T> annotatedType){
+        Set<Annotation> list = ANNOTATION_CACHE.get(from);
+        if(list != null){
+            // 寻找
+            for (Annotation a : list) {
+                if(a.annotationType().equals(annotatedType)){
+                    return (T) a;
+                }
+            }
+        }
+        // 找不到，返回null
+        return null;
+    }
+
+    /**
+     * 记录一条缓存记录。
+     */
+    private static boolean saveCache(AnnotatedElement from, Annotation annotation){
+        Set<Annotation> list;
+        synchronized (ANNOTATION_CACHE) {
+             list = ANNOTATION_CACHE.get(from);
+            // 如果为空，新建一个并保存
+            if(list == null){
+                list = new CopyOnWriteArraySet<>();
+                ANNOTATION_CACHE.put(from, list);
+            }
+        }
+
+        // 记录这个注解
+        return list.add(annotation);
+    }
+
+    /**
+     * 清除缓存
+     */
+    public static void cleanCache(){
+        ANNOTATION_CACHE.clear();
+    }
+
 
 }

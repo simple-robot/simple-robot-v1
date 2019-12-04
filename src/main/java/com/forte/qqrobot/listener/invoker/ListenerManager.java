@@ -265,6 +265,10 @@ public class ListenerManager {
                     try {
                         ListenResult result = lm.invoke(paramGetter.apply(lm));
                         results.add(result);
+                        // 如果执行成功，计数+1
+                        if(result.isSuccess()){
+                            count.addAndGet(1);
+                        }
                         // 如果有异常，输出这个异常
                         Throwable error = result.getError();
                         if(error != null){
@@ -315,6 +319,10 @@ public class ListenerManager {
                     try {
                         ListenResult result = lm.invoke(paramGetter.apply(lm));
                         results.add(result);
+                        // 如果执行成功，计数+1
+                        if(result.isSuccess()){
+                            count.addAndGet(1);
+                        }
                         // 如果有异常，输出这个异常
                         Throwable error = result.getError();
                         if(error != null){

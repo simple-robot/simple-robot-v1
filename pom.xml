@@ -14,8 +14,8 @@
     <artifactId>simple-robot-core</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署需要大于1.4.0 -->
-    <version>1.4.0</version>
+    <!-- 下次部署需要大于1.4.1 2019/11/30 -->
+    <version>1.4.1</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>
@@ -301,20 +301,6 @@
             <artifactId>simple-plusutils</artifactId>
             <version>1.3.1</version>
         </dependency>
-
-        <!--log4j-->
-        <!-- https://mvnrepository.com/artifact/log4j/log4j -->
-        <!--<dependency>-->
-            <!--<groupId>log4j</groupId>-->
-            <!--<artifactId>log4j</artifactId>-->
-            <!--<version>1.2.17</version>-->
-        <!--</dependency>-->
-        <!--&lt;!&ndash; slf4j &ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>org.slf4j</groupId>-->
-            <!--<artifactId>slf4j-nop</artifactId>-->
-            <!--<version>1.7.2</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>commons-io</groupId>

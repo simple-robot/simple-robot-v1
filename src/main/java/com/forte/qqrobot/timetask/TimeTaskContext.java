@@ -1,6 +1,7 @@
 package com.forte.qqrobot.timetask;
 
 import com.forte.qqrobot.beans.cqcode.CQCode;
+import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
 import org.quartz.JobDataMap;
@@ -16,6 +17,9 @@ public class TimeTaskContext {
     private static final String MSG_SENDER_KEY = "msg_sender";
 
     private static final String CQ_CODE_UTIL_KEY = "cq_code_util";
+
+    private static final String DEPEND_CENTER = "depend_center";
+
 
     /** 从一个Context中取出MsgSender */
     public static MsgSender getMsgSender(JobExecutionContext context){
@@ -35,6 +39,16 @@ public class TimeTaskContext {
     /** 保存一个CQCodeUtil */
     public static void giveCQCodeUtil(JobDataMap jobDataMap, CQCodeUtil cqCodeUtil){
         give(jobDataMap, CQ_CODE_UTIL_KEY, cqCodeUtil);
+    }
+
+    /** 从一个Context中取出DependCenter */
+    public static DependCenter getDependCenter(JobExecutionContext context){
+        return get(context, DEPEND_CENTER, DependCenter.class);
+    }
+
+    /** 保存一个DependCenter */
+    public static void giveDependCenter(JobDataMap jobDataMap, DependCenter dependCenter){
+        give(jobDataMap, DEPEND_CENTER, dependCenter);
     }
 
 

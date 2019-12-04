@@ -36,12 +36,16 @@ public class TimeTaskManager {
 
     private static final String JOBDETAIL_NAME = "job_";
 
+    /** 已经注册了的数量。初始量为0 */
+    private int registerNum = 0;
+
     /** 尝试加载一个疑似是定时任务的类 */
     public void register(Class<? extends Job> timeTaskClass, MsgSender sender){
         List<Annotation> timeTaskAnnos = isTimeTask(timeTaskClass);
         if(timeTaskAnnos.size() > 0){
             //遍历
             timeTaskAnnos.forEach(a -> register(timeTaskClass, a, sender));
+            registerNum += timeTaskAnnos.size();
         }
     }
 
@@ -51,6 +55,7 @@ public class TimeTaskManager {
         if(timeTaskAnnos.size() > 0){
             //遍历
             timeTaskAnnos.forEach(a -> register(timeTaskClass, a, senderSupplier.get()));
+            registerNum += timeTaskAnnos.size();
         }
     }
 
@@ -58,7 +63,10 @@ public class TimeTaskManager {
      * 启动定时任务
      */
     public void start() throws SchedulerException {
-        ResourceDispatchCenter.getStdSchedulerFactory().getScheduler().start();
+        // 只有注册量在0以上的时候才初始化定时任务框架
+        if(registerNum > 0){
+            ResourceDispatchCenter.getStdSchedulerFactory().getScheduler().start();
+        }
     }
 
 
@@ -140,6 +148,9 @@ public class TimeTaskManager {
                 TimeTaskContext.giveMsgSender(jobDataMap, sender);
                 //保存一个cq工具类实例
                 TimeTaskContext.giveCQCodeUtil(jobDataMap, ResourceDispatchCenter.getCQCodeUtil());
+                //保存一个依赖工厂，以实现定时任务内的依赖注入。
+                TimeTaskContext.giveDependCenter(jobDataMap, ResourceDispatchCenter.getDependCenter());
+
 
                 scheduler.scheduleJob(jobDetail, trigger);
                 QQLog.info("加载定时任务[ "+ name +" ]成功！");

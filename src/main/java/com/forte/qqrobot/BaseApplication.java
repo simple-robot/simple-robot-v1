@@ -130,8 +130,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     private void timeTaskInit(){
         //将定时任务类添加到资源调度中心
         ResourceDispatchCenter.saveTimeTaskManager(new TimeTaskManager());
-        //将定时任务工厂添加到资源调度中心
-        ResourceDispatchCenter.saveStdSchedulerFactory(new StdSchedulerFactory());
+//        将定时任务工厂添加到资源调度中心
+//        ResourceDispatchCenter.saveStdSchedulerFactory(new StdSchedulerFactory());
     }
 
     /**

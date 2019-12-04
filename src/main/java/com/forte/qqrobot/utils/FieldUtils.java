@@ -1219,20 +1219,48 @@ public class FieldUtils {
         return BASIS_TYPES_MAP.getOrDefault(type, type);
     }
 
+//    /**
+//     * 单词开头大写
+//     *
+//     * @param str
+//     * @return
+//     * @author ForteScarlet
+//     */
+//    public static String headUpper(String str) {
+//        //拿到第一个字母
+//        String head = (str.charAt(0) + "").toUpperCase();
+//        //拿到其他
+//        String body = str.substring(1);
+//        return head + body;
+//    }
+
     /**
      * 单词开头大写
      *
-     * @param str
-     * @return
      * @author ForteScarlet
      */
     public static String headUpper(String str) {
-        //拿到第一个字母
-        String head = (str.charAt(0) + "").toUpperCase();
-        //拿到其他
-        String body = str.substring(1);
-        return head + body;
+        if(str != null && str.length() > 0){
+            char[] chars = str.toCharArray();
+            chars[0] = Character.toUpperCase(chars[0]);
+            return String.valueOf(chars);
+        }else{
+            return str;
+        }
     }
+
+//    /**
+//     * 单词开头小写
+//     *
+//     * @author ForteScarlet
+//     */
+//    public static String headLower(String str) {
+//        //拿到第一个字母
+//        String head = (str.charAt(0) + "").toLowerCase();
+//        //拿到其他
+//        String body = str.substring(1);
+//        return head + body;
+//    }
 
     /**
      * 单词开头小写
@@ -1240,11 +1268,13 @@ public class FieldUtils {
      * @author ForteScarlet
      */
     public static String headLower(String str) {
-        //拿到第一个字母
-        String head = (str.charAt(0) + "").toLowerCase();
-        //拿到其他
-        String body = str.substring(1);
-        return head + body;
+        if(str != null && str.length() > 0){
+            char[] chars = str.toCharArray();
+            chars[0] = Character.toLowerCase(chars[0]);
+            return String.valueOf(chars);
+        }else{
+            return str;
+        }
     }
 
 

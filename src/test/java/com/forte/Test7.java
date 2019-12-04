@@ -3,14 +3,12 @@ package com.forte;
 import com.forte.config.ConfigurationHelper;
 import com.forte.config.InjectableConfig;
 import com.forte.qqrobot.BaseApplication;
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
+import com.forte.testrun.TestApplication;
+import com.forte.testrun.TestConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Properties;
-import java.util.Set;
 
 /**
  * @author ForteScarlet <[email]ForteScarlet@163.com>

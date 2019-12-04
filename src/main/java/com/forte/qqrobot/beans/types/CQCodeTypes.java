@@ -70,9 +70,9 @@ public enum CQCodeTypes {
      *
      */
     image("image",
-            new String[]{"file", "url"},
-            new String[]{"url"},
-            new String[]{".+", ".+"},
+            new String[]{"file"},
+            new String[0],
+            new String[]{".+"},
             4),
 
 

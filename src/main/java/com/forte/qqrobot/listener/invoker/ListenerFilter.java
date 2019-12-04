@@ -1,17 +1,11 @@
 package com.forte.qqrobot.listener.invoker;
 
-import com.forte.qqrobot.BaseConfiguration;
 import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
-import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.KeywordMatchType;
-import com.forte.qqrobot.utils.CQCodeUtil;
-
-import java.lang.reflect.Method;
-import java.util.Arrays;
 
 /**
  * 监听器过滤器
@@ -25,9 +19,8 @@ public class ListenerFilter {
     /**
      * 过滤
      *
-     * @param listenerMethod
-     * @param at
-     * @return
+     * @param listenerMethod 监听函数对象
+     * @param at             是否被at了
      */
     public boolean filter(ListenerMethod listenerMethod, MsgGet msgGet, boolean at) {
         //如果不存在filter注解，直接放过
@@ -46,7 +39,7 @@ public class ListenerFilter {
 
         //**************** 正常判断 ****************//
 
-        return allFilter(listenerMethod, msgGet, at);
+        return allFilter(listenerMethod, msgGet);
     }
 
 
@@ -104,9 +97,9 @@ public class ListenerFilter {
     /**
      * 全部的普配流程都走一遍，通过了才行
      */
-    private boolean allFilter(ListenerMethod listenerMethod, MsgGet msgGet, boolean at) {
+    private boolean allFilter(ListenerMethod listenerMethod, MsgGet msgGet) {
         return
-                wordsFilter(listenerMethod, msgGet, at)
+                wordsFilter(listenerMethod, msgGet)
                         && codeFilter(listenerMethod, msgGet)
                         && groupFilter(listenerMethod, msgGet);
     }
@@ -116,10 +109,9 @@ public class ListenerFilter {
      *
      * @param listenerMethod 监听函数
      * @param msgGet         消息封装
-     * @param at       是否被at了
      * @return 是否通过
      */
-    private boolean wordsFilter(ListenerMethod listenerMethod, MsgGet msgGet, boolean at) {
+    private boolean wordsFilter(ListenerMethod listenerMethod, MsgGet msgGet) {
         //获取过滤注解
         Filter filter = listenerMethod.getFilter();
 
@@ -153,7 +145,7 @@ public class ListenerFilter {
     /**
      * QQ号、群号的过滤规则，固定为去空并全匹配
      */
-    private static final KeywordMatchType codesMatchType = KeywordMatchType.TRIM_EQUALS;
+    private static final KeywordMatchType CODES_MATCH_TYPE = KeywordMatchType.TRIM_EQUALS;
 
 
     /**
@@ -188,10 +180,10 @@ public class ListenerFilter {
             }
             if (codes.length == 1) {
                 String code = codes[0];
-                return codesMatchType.test(qqCode, code);
+                return CODES_MATCH_TYPE.test(qqCode, code);
             } else {
                 //有多个
-                return filter.mostCodeType().test(qqCode, codes, codesMatchType);
+                return filter.mostCodeType().test(qqCode, codes, CODES_MATCH_TYPE);
             }
         }
     }
@@ -230,9 +222,9 @@ public class ListenerFilter {
             if (groups.length == 1) {
                 //只有一条
                 String group = groups[0];
-                return codesMatchType.test(groupCode, group);
+                return CODES_MATCH_TYPE.test(groupCode, group);
             } else {
-                return filter.mostGroupType().test(groupCode, groups, codesMatchType);
+                return filter.mostGroupType().test(groupCode, groups, CODES_MATCH_TYPE);
             }
         }
 

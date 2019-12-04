@@ -192,10 +192,16 @@ public abstract class ResourceDispatchCenter {
 
     /**
      * 获取一个StdSchedulerFactory单例对象
+     * 这个比较特殊，为了优化，只有在获取不到的时候才会实例化。
      * @return  StdSchedulerFactory单例对象
      */
     public static StdSchedulerFactory getStdSchedulerFactory(){
-        return get(StdSchedulerFactory.class);
+        StdSchedulerFactory stdSchedulerFactory = get(StdSchedulerFactory.class);
+        if(stdSchedulerFactory == null){
+            stdSchedulerFactory = new StdSchedulerFactory();
+            saveStdSchedulerFactory(stdSchedulerFactory);
+        }
+        return stdSchedulerFactory;
     }
 
     /**

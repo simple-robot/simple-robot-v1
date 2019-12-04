@@ -49,7 +49,10 @@ public class DependCenter implements DependGetter, DependInjector {
     /** 以名称为key的资源仓库 */
     private final Map<String, Depend> nameResourceWarehouse;
 
-    /** 以Class为key的资源仓库 */
+    /**
+     * 以Class为key的资源仓库
+     * 一般来讲，应当只存在一个。但是如果名称唯一则是有可能存在多个的。
+     * */
     private final Map<Class, List<Depend>> classResourceWareHouse;
 
     /**
@@ -96,7 +99,7 @@ public class DependCenter implements DependGetter, DependInjector {
      * @return
      */
     public <T> DependCenter load(T bean){
-        return load(bean.getClass().getSimpleName(), bean);
+        return load(FieldUtils.headLower(bean.getClass().getSimpleName()), bean);
     }
 
     /**
@@ -277,7 +280,7 @@ public class DependCenter implements DependGetter, DependInjector {
                 throw new DependResourceException("已存在依赖：" + depend.getName());
             }
 
-            classResourceWareHouse.merge(depend.getType(), new ArrayList<Depend>() {{
+            classResourceWareHouse.merge(depend.getType(), new ArrayList<Depend>(2) {{
                 add(depend);
             }}, (old, val) -> {
                 old.add(val.get(0));
@@ -383,7 +386,7 @@ public class DependCenter implements DependGetter, DependInjector {
                     //赋值函数
                     return (Consumer<T>) b -> {
                         //值判断, 判断此字段是否可以进行注入
-                            if (canInjFunction.apply(b)) {
+                        if (canInjFunction.apply(b)) {
                                 //值赋值
                                 setterConsumer.accept(b);
                             }
@@ -626,9 +629,14 @@ public class DependCenter implements DependGetter, DependInjector {
             }
         }
 
+        // 先直接获取
         List<Depend> depends = classResourceWareHouse.get(type);
+
+        // 是否需要重新保存
+        boolean save = false;
+
+        //没有获取到，尝试通过子类型获取
         if (depends == null || depends.size() == 0) {
-            //没有获取到，尝试通过子类型获取
             Set<Class> keys = classResourceWareHouse.keySet();
             Class[] classes = keys.stream().filter(k -> FieldUtils.isChild(k, type)).toArray(Class[]::new);
             if(classes.length == 0){
@@ -639,6 +647,8 @@ public class DependCenter implements DependGetter, DependInjector {
                 throw new DependResourceException("存在不止一个[" + type + "]类型的子类型："+ Arrays.toString(classes) +",请尝试使用名称获取。");
             }else{
                 depends = classResourceWareHouse.get(classes[0]);
+                // 需要标记为重新保存
+                save = true;
             }
         }
 
@@ -650,8 +660,27 @@ public class DependCenter implements DependGetter, DependInjector {
             //多于一个
             throw new DependResourceException("存在不止一个[" + type + "]类型的依赖，请尝试使用名称获取。");
         } else {
-            return depends.get(0);
+            // 只有唯一的一个
+            Depend single = depends.get(0);
+            if(save){
+                // 需要重新保存以实现缓存
+                // 一般来讲，既然能够拿到，则说明这个依赖必定存在于name中，所以直接保存类型
+                classResourceWareHouse.merge(type, new ArrayList<Depend>(1) {{
+                    add(single);
+                }}, (old, val) -> {
+                    old.add(val.get(0));
+                    return old;
+                });
+            }
+            return single;
         }
+    }
+
+    /**
+     * 直接记录一个新的依赖
+     */
+    private void saveNew(Depend depend){
+
     }
 
     public <T> Depend<T> getDepend(String name, Class<T> type){
@@ -673,7 +702,10 @@ public class DependCenter implements DependGetter, DependInjector {
             }
         }
         Depend<?> depend = nameResourceWarehouse.get(name);
-        return depend == null ? null : depend;
+
+        // TODO 获取不到则抛出异常
+
+        return depend;
     }
 
     /**

@@ -36,6 +36,9 @@ public class BeansFactory {
      * 传入的calss默认认为全部可以转化为Beans对象，过滤判断交给调用方
      */
     public static List<Beans> getBeans(com.forte.qqrobot.anno.depend.Beans beansAnno, Class<?>... classCollection) {
+        if(classCollection.length == 0){
+            return new ArrayList<>(1);
+        }
         //两个set，用于对于依赖的去重判断
         //名称绝不可以相同，当名称不同的时候，类是可以相同的
         Set<String> nameSet = new HashSet<>();
