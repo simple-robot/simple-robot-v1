@@ -21,8 +21,8 @@ public interface MsgGet extends OriginalAble, RootBean {
     String getId();
 
     /**
-     * 消息接收类型定义接口获取接收到的消息类型<br>
-     * 如果没有消息推荐使用空字符串来代替
+     * 一般来讲，监听到的消息大部分都会有个“消息内容”。定义此方法获取消息内容。
+     * 如果不存在，则为null。（旧版本推荐为空字符串，现在不了。我变卦了）
      */
     String getMsg();
 

@@ -7,20 +7,20 @@ package com.forte.qqrobot.beans.messages.msgget;
 public interface EventGet extends MsgGet {
 
     /**
-     * 事件中获取消息默认内容为空且无法设置
+     * 事件中获取消息默认内容为空
      */
     @Override
     default String getMsg(){
-        return "";
+        return null;
     }
     default void setMsg(String msg){}
 
     /**
-     * 事件中字体的获取默认为空且无法设置
+     * 事件中字体的获取默认为空
      */
     @Override
     default String getFont(){
-        return "";
+        return null;
     }
     default void setFont(String font){}
 

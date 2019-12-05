@@ -9,7 +9,9 @@ package com.forte.qqrobot.beans.messages.types;
  **/
 public enum GroupBanType {
 
+    /** 禁言 */
     BAN(0),
+    /** 取消禁言 */
     LIFT_BAN(1),
     ;
 
