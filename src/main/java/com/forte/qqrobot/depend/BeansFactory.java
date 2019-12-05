@@ -1,5 +1,6 @@
 package com.forte.qqrobot.depend;
 
+import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.depend.parameter.ParamGetterManager;
 import com.forte.qqrobot.depend.parameter.ParamNameGetter;
@@ -311,7 +312,10 @@ public class BeansFactory {
         //获取此类下所有标注了@Beans的方法并进行过滤
         //方法上的@Beans不可省略
         return Arrays.stream(clazz.getDeclaredMethods()).filter(m -> {
-//            com.forte.qqrobot.anno.depend.Beans beanAnnotation = m.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class);
+            // 特殊判断：如果方法上存在@Listen注解，忽略
+            if(AnnotationUtils.getAnnotation(m, Listen.class) != null){
+                return false;
+            }
             com.forte.qqrobot.anno.depend.Beans beanAnnotation =
                     AnnotationUtils.getAnnotation(m, com.forte.qqrobot.anno.depend.Beans.class);
             if(beanAnnotation != null){

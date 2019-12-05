@@ -183,7 +183,6 @@ public class DependCenter implements DependGetter, DependInjector {
                         &&
                         //存在注解
                         //注解：Beans、Listen
-//                (c.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class) != null)
                 (AnnotationUtils.getBeansAnnotationIfListen(c) != null)
         , loadsClasses);
     }
