@@ -23,6 +23,9 @@ public enum MsgGetTypes {
     /** 讨论组信息 */
     discussMsg(DiscussMsg.class),
 
+    /** 群禁言事件 */
+    groupBan(GroupBan.class),
+
     /** 群消息 */
     groupMsg(GroupMsg.class),
 
@@ -47,7 +50,10 @@ public enum MsgGetTypes {
     /** 事件-群文件上传 */
     groupFileUpload(GroupFileUpload.class),
 
-    /** 其他未知的类型，可尝试用于其他自定义监听 */
+    /** 其他未知的类型，可尝试用于其他自定义监听
+     *  ※ 用处不大了，提供了枚举的自定义实例，此元素后期考虑删除。
+     * */
+    @Deprecated
     unknownType(null){
         /** 根据指定类型进行转化 */
         public <T> T getBeanForJson(String json, Class<T> type){

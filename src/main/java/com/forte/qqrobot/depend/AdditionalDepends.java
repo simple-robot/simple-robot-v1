@@ -50,6 +50,21 @@ public class AdditionalDepends implements DependGetter {
     }
 
     /**
+     * 记录一个新值
+     * @param name  name
+     * @param value value
+     */
+    public void put(String name, Object value){
+        //只有当不是基础类型的时候才根据类型添加
+        if(!BasicResourceWarehouse.isBasicType(value)){
+            // 类型重复，覆盖处理
+            this.type.put(value.getClass(), value);
+        }
+        // 名称绝对不可重复
+        this.name.merge(name, value, nameMapMergeThrows(name));
+    }
+
+    /**
      * 获取空参数对象
      */
     public static AdditionalDepends getEmpty() {
@@ -74,7 +89,6 @@ public class AdditionalDepends implements DependGetter {
             if(!BasicResourceWarehouse.isBasicType(v)){
                 // 类型重复，覆盖处理
                 typeMap.put(v.getClass(), v);
-//                typeMap.merge(v.getClass(), v, typeMapMergeThrows(v.getClass()));
             }
 //            nameMap.put(k, v);
             // 名称绝对不可重复

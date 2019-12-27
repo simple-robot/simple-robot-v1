@@ -10,8 +10,11 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.depend.DependGetter;
+import com.forte.qqrobot.listener.intercept.ListenContext;
+import com.forte.qqrobot.listener.result.BasicResultParser;
 import com.forte.qqrobot.listener.result.ListenResult;
 import com.forte.qqrobot.listener.result.ListenResultImpl;
+import com.forte.qqrobot.listener.result.ListenResultParser;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -71,6 +74,9 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     /** 是否插件截断，将invoke的结果传入，返回一个结果 */
     private final Predicate<Object> listenBreakPlugin;
 
+    /** 结果转化器 */
+    private final ListenResultParser resultParser;
+
     /**
      * 全参数构造
      * @param listenerGetter 监听器对象实例获取函数
@@ -91,6 +97,7 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
                            int sort,
                            Predicate<Object> listenBreak,
                            Predicate<Object> listenBreakPlugin,
+                           ListenResultParser resultParser,
                            String name
                            ) {
         this.listenerGetter = listenerGetter;
@@ -104,6 +111,7 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         this.sort = sort;
         this.listenBreak = listenBreak;
         this.listenBreakPlugin = listenBreakPlugin;
+        this.resultParser = resultParser;
         // UUID 使用 方法包路径 + (方法名 + 参数类型列表 | name)
 
         String id;
@@ -118,15 +126,6 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
         this.UUID = id;
     }
-
-//    /**
-//     * 生成UUID
-//     */
-//    private static String createUUIDString(){
-//        return java.util.UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
-//    }
-
-
 
 
     //**************************************
@@ -145,25 +144,32 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
      * @param additionalDepends 可以提供的额外参数(动态参数)
      */
     ListenResult invoke(AdditionalDepends additionalDepends) throws Throwable {
-        //获取方法的参数数组，根据数组顺序准备参数，如果没有的参数使用null
-//        Class<?>[] parameterTypes = method.getParameterTypes();
-//        Object[] args = new Object[parameterTypes.length];
+        // 构建一个监听函数上下文对象
+        ListenContext context = ListenContext.getInstance();
+        additionalDepends.put("context", context);
+        // TODO init()
+
         //遍历参数类型数组, 进行参数注入
         //将参数注入单独提出
         //获取方法执行的参数
         Object[] args = ResourceDispatchCenter.getDependCenter().getMethodParameters(method, additionalDepends);
 
+        // TODO paramInit()
+
         // 获取实例
-        // TODO 考虑到系统优化，
+        // 考虑到系统优化，
         //  后期将监听函数的实例修改为单例，并且在获取监听函数实例的时候不再提供额外参数。
-        T listener = listenerGetterWithAddition.apply(additionalDepends);
-//        T listener = listenerGetter.get();
+        // 2019/12/27 已修改
+//        T listener = listenerGetterWithAddition.apply(additionalDepends);
+        T listener = listenerGetter.get();
 
         //执行方法
         boolean success = false;
         Object invoke = null;
         Throwable error = null;
         // break 初始值
+
+        ListenResult result;
 
         // 捕获异常
         try {
@@ -173,21 +179,12 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
             error = e;
         }
 
-        // 如果返回值本身就实现了ListenResult，直接将其返回
-        if(invoke instanceof ListenResult){
-            return (ListenResult) invoke;
-        }
-
-        int sort = this.sort;
         // 根据返回值判断是否需要截断
         boolean toBreak = listenBreak.test(invoke);
         boolean toBreakPlugin = listenBreakPlugin.test(invoke);
 
+        result = resultParser.parse(invoke, sort, toBreak, toBreakPlugin, error);
 
-        // 构建一个result
-        ListenResult<Object> result = ListenResultImpl.result(sort, invoke, success, toBreak, toBreakPlugin, error);
-        // 可能有些判断
-        // ...
         return result;
     }
 
@@ -334,11 +331,13 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         /** 阻塞注解，如果没有则为null */
         private Block block = null;
         private int sort = 1;
-        // 是否监听截断，默认为false - 不截断
+        /** 是否监听截断，默认为false - 不截断 */
         private Predicate<Object> listenBreak = BreakType.ALWAYS_BREAK.getResultTest();
-        // 是否插件截断，默认为false - 不截断
+        /** 是否插件截断，默认为false - 不截断 */
         private Predicate<Object> listenBreakPlugin = BreakType.ALWAYS_BREAK.getResultTest();
-        // id, 默认使用内部自动创建
+        /** 结果转化器，默认为特殊转化器 */
+        private ListenResultParser resultParser = BasicResultParser.getInstance();
+        /** id, 默认使用内部自动创建 */
         private String id = "";
         /**
          * 构造
@@ -385,17 +384,37 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
             return this;
         }
 
+        public ListenerMethodBuilder resultParser(ListenResultParser parser){
+            this.resultParser = parser;
+            return this;
+        }
+
         public ListenerMethodBuilder id(String id){
             this.id = id;
             return this;
         }
 
 
+
         /**
          * 构建对象
          */
         public ListenerMethod build(){
-            return new ListenerMethod(listenerGetter, listenerGetterWithAddition, filter, blockFilter, spare, block, method, type, sort, listenBreak, listenBreakPlugin, id);
+            return new ListenerMethod<>(
+                    listenerGetter,
+                    listenerGetterWithAddition,
+                    filter,
+                    blockFilter,
+                    spare,
+                    block,
+                    method,
+                    type,
+                    sort,
+                    listenBreak,
+                    listenBreakPlugin,
+                    resultParser,
+                    id
+            );
         }
 
 

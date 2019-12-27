@@ -9,6 +9,7 @@ import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
+import com.forte.qqrobot.log.LogLevel;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 
@@ -127,13 +128,36 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     private Long keepAliveTime = 5L;
     @Conf(value = "simple.robot.conf.threadPool.timeUnit", setterName = "setTimeUnitByName", setterParameterType = String.class)
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
-    // 这个比较特殊, 是使用一个类的包名进行实例化
+    /**
+     * 这个比较特殊, 是使用一个类的包名进行实例化
+     */
     @Conf("simple.robot.conf.threadPool.workQueue")
     private String workQueueFrom = "java.util.concurrent.SynchronousQueue";
-    // 当此参数为null的时候，通过workQueueFrom参数来反射获取实例
+
+    /**
+     * 当此参数为null的时候，通过workQueueFrom参数来反射获取实例
+     */
     private BlockingQueue<Runnable> workQueue = null;
     // 线程工厂更特殊，干脆不能进行代码配置了
     private ThreadFactory defaultThreadFactory = Thread::new;
+
+    /**
+     * 日志等级, 默认为info级别
+     */
+    @Conf(value = "simple.robot.conf.logLevel", setterName = "setLogLevelByName", setterParameterType = String.class)
+    private LogLevel logLevel = LogLevel.INFO ;
+    public void setLogLevelByName(String name){
+        this.logLevel = LogLevel.valueOf(name);
+    }
+
+
+    //**************************************
+    //*             function area
+    //**************************************
+
+
+
+
 
     /**
      * 通过name获取枚举对象
@@ -524,6 +548,14 @@ public class BaseConfiguration<T extends BaseConfiguration> {
 
     public void setResultSelectType(ResultSelectType resultSelectType) {
         this.resultSelectType = resultSelectType;
+    }
+
+    public LogLevel getLogLevel() {
+        return logLevel;
+    }
+
+    public void setLogLevel(LogLevel logLevel) {
+        this.logLevel = logLevel;
     }
 
     @Override

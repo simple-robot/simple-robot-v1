@@ -6,6 +6,8 @@ import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.exception.RobotRuntimeException;
+import com.forte.qqrobot.listener.intercept.MsgIntercept;
+import com.forte.qqrobot.listener.intercept.MsgGetContext;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.listener.result.ListenResult;
 import com.forte.qqrobot.listener.result.ListenResultImpl;
@@ -53,27 +55,36 @@ public class ListenerManager {
     }};
 
 
-//    /** 消息发送器-send */
-//    private final SenderSendList SENDER;
-//
-//    /** 消息发送器-set */
-//    private final SenderSetList SETTER;
-//
-//    /** 消息发送器-get */
-//    private final SenderGetList GETTER;
+    /**
+     * 拦截器列表
+     */
+    private MsgIntercept[] intercepts;
 
-
+    private static final ListenResult[] EMPTY_RESULT = new ListenResult[0];
 
 
     /**
      * 接收到了消息
      */
     public ListenResult[] onMsg(MsgGet msgget, SenderSendList sender, SenderSetList setter, SenderGetList getter){
+        // 消息拦截
+        // 构建上下文对象
+        MsgGetContext msgContext = new MsgGetContext(msgget, sender, setter, getter);
+        // 遍历所有的消息拦截器
+        for (MsgIntercept intercept : intercepts) {
+            if(!intercept.intercept(msgContext)){
+                // 如果出现返回值false，返回一个空数组
+                return EMPTY_RESULT;
+            }
+        }
+
+        // 拦截结束，重新赋值MsgGet
+        msgget = msgContext.getMsgGet();
 
         //对外接口，表示接收到了消息, 对消息进行监听分配
         //组装参数，此参数保证全部类型全部唯一, 且参数索引2的位置为是否被at
         Object[] params = getParams(msgget);
-        boolean at = (boolean) params[2];
+        AtDetection at = (AtDetection) params[2];
 
         //为消息分配监听函数
         return invoke(msgget, params, at, sender, setter, getter);
@@ -90,13 +101,23 @@ public class ListenerManager {
     }
 
     /**
+     * 接收到了消息
+     */
+    public ListenResult[] onMsg(MsgGet msgget, MsgSender sender){
+        return onMsg(msgget,
+                sender == null ? null : sender.SENDER,
+                sender == null ? null : sender.SETTER,
+                sender == null ? null : sender.GETTER);
+    }
+
+    /**
      * 接收到了消息响应
      * @param msgGet    接收的消息
      * @param args      参数列表
      * @param at        是否被at
      * @return 执行的结果集，已经排序了。
      */
-    private ListenResult[] invoke(MsgGet msgGet, Set<Object> args, boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+    private ListenResult[] invoke(MsgGet msgGet, Set<Object> args, AtDetection at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
         //构建MsgSender对象
 
         //参数获取getter
@@ -106,14 +127,13 @@ public class ListenerManager {
 
         //先查看是否存在阻断函数，如果存在阻断函数则执行仅执行阻断函数
         //获取阻断器
-        Plug Plug = ResourceDispatchCenter.getPlug();
-        Set<ListenerMethod> blockMethod = Plug.getBlockMethod(type);
+        Plug plug = ResourceDispatchCenter.getPlug();
+        Set<ListenerMethod> blockMethod = plug.getBlockMethod(type);
         if(blockMethod != null){
             //如果存在阻断，执行阻断
             invokeBlock(blockMethod, paramGetter, msgGet, at);
 
             // TODO 考虑移除此阻断机制
-
             ListenResult<Object> blockResult = ListenResultImpl.result(1, null, true, false, false, null);
 
             return new ListenResult[]{blockResult};
@@ -139,7 +159,7 @@ public class ListenerManager {
      * @param args      参数列表
      * @param at        是否被at
      */
-    private ListenResult[] invoke(MsgGet msgGet, Object[] args, boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+    private ListenResult[] invoke(MsgGet msgGet, Object[] args, AtDetection at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
         return invoke(msgGet, Arrays.stream(args).collect(Collectors.toSet()), at, sendList, setList, getList);
     }
 
@@ -150,7 +170,7 @@ public class ListenerManager {
      * @param msgGet        接收到的消息
      * @param at            是否被at
      */
-    private void invokeBlock(Set<ListenerMethod> blockMethod, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, boolean at){
+    private void invokeBlock(Set<ListenerMethod> blockMethod, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, AtDetection at){
         //过滤
         //获取过滤器
         ListenerFilter filter = ResourceDispatchCenter.getListenerFilter();
@@ -180,24 +200,22 @@ public class ListenerManager {
         //配置参数
         //获取cqCodeUtil
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
-        //获取全部CQ码
-        //2019/10/15 不再必定获取所有CQ码了
-//        CQCode[] cqCodes = cqCodeUtil.getCQCodeFromMsg(msg).toArray(new CQCode[0]);
         //判断是否at自己
         //获取本机QQ号
-//        String localQQCode = BaseConfiguration.getLocalQQCode();
-        String localQQCode = ResourceDispatchCenter.getBaseConfigration().getLocalQQCode();
-        boolean at1 = cqCodeUtil.isAt(msg, localQQCode);
+        AtDetection atDetection = () -> {
+            String localQQCode = ResourceDispatchCenter.getBaseConfigration().getLocalQQCode();
+            return cqCodeUtil.isAt(msg, localQQCode);
+        };
         //组装参数
         //* 组装参数不再携带QQWebSocketSender对象和QQHttpSender对象，而是交给Manager动态创建         *
-        return new Object[]{msgGet, cqCodeUtil, at1};
+        return new Object[]{msgGet, cqCodeUtil, atDetection};
     }
 
     /**
      * 构建参数获取getter
      * 额外参数作为 {@link AdditionalDepends} 类进行封装
      */
-    private Function<ListenerMethod, AdditionalDepends> buildParamGetter(MsgGet msgGet, Set<Object> args, Boolean at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+    private Function<ListenerMethod, AdditionalDepends> buildParamGetter(MsgGet msgGet, Set<Object> args, AtDetection at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
         //增加参数:MsgGetTypes
         MsgGetTypes msgType = MsgGetTypes.getByType(msgGet.getClass());
 
@@ -243,7 +261,7 @@ public class ListenerManager {
      * @param at            是否被at
      * @return              执行成功函数数量 & 结果集合(排过序的)
      */
-    private Map.Entry<Integer, List<ListenResult>> invokeNormal(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, boolean at){
+    private Map.Entry<Integer, List<ListenResult>> invokeNormal(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, AtDetection at){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
         //执行结果集合
@@ -297,7 +315,7 @@ public class ListenerManager {
      * @param msgGet        接收的消息
      * @param at            是否被at
      */
-    private Map.Entry<Integer, List<ListenResult>> invokeSpare(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, boolean at){
+    private Map.Entry<Integer, List<ListenResult>> invokeSpare(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, AtDetection at){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
 
@@ -368,12 +386,17 @@ public class ListenerManager {
     /**
      * 构造方法，对函数进行分组保存
      * @param methods 函数集合
+     * @param intercepts 消息拦截器数组
      */
-    public ListenerManager(Collection<ListenerMethod> methods){
+    public ListenerManager(Collection<ListenerMethod> methods, MsgIntercept... intercepts){
+        // 先排序并构建拦截器
+        Arrays.sort(intercepts);
+        this.intercepts = intercepts;
+
+
         /*
              构建的时候需要进行排序
          */
-
         //如果没有东西
         if(methods == null || methods.isEmpty()){
             this.LISTENER_METHOD_MAP = Collections.EMPTY_MAP;

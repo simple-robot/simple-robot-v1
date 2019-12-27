@@ -22,7 +22,7 @@ public class ListenerFilter {
      * @param listenerMethod 监听函数对象
      * @param at             是否被at了
      */
-    public boolean filter(ListenerMethod listenerMethod, MsgGet msgGet, boolean at) {
+    public boolean filter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at) {
         //如果不存在filter注解，直接放过
         if (!listenerMethod.hasFilter()) {
             return true;
@@ -32,7 +32,7 @@ public class ListenerFilter {
 
         boolean shouldAt = filter.at();
         //根据是否需要被at判断
-        if (shouldAt && !at) {
+        if (shouldAt && !at.test()) {
             //如果需要被at，而at不为true，则返回false
             return false;
         }
@@ -46,10 +46,10 @@ public class ListenerFilter {
     /**
      * 根据BlockFilter注解过滤
      *
-     * @param listenerMethod
-     * @param at
+     * @param listenerMethod 监听函数
+     * @param at             是否被at
      */
-    public boolean blockFilter(ListenerMethod listenerMethod, MsgGet msgGet, boolean at) {
+    public boolean blockFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at) {
         //如果不存在filter注解，则使用普通过滤器判断
         if (!listenerMethod.hasBlockFilter()) {
             return filter(listenerMethod, msgGet, at);
@@ -60,7 +60,7 @@ public class ListenerFilter {
 
         boolean shouldAt = filter.at();
         //根据是否需要被at判断
-        if (shouldAt && !at) {
+        if (shouldAt && !at.test()) {
             //如果需要被at，而at不为true，则返回false
             return false;
         }
@@ -74,14 +74,6 @@ public class ListenerFilter {
             if (value.length == 1) {
                 //如果只有一个参数，直接判断
                 String singleValue = value[0];
-                //如果需要被at，判断的时候移除at的CQ码
-//                if (shouldAt) {
-//                    String qqCode = BaseConfiguration.getLocalQQCode();
-//                    String regex = CQCodeUtil.build().getCQCode_at(qqCode); //"\\[CQ:at,qq="+ qqCode +"\\]";
-//                    return filter.keywordMatchType().test(msgGet.getMsg().replaceAll(regex, ""), singleValue);
-//                } else {
-//                    return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
-//                }
                 // 不再移除atCQ码
                 return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
             } else {
@@ -100,8 +92,9 @@ public class ListenerFilter {
     private boolean allFilter(ListenerMethod listenerMethod, MsgGet msgGet) {
         return
                 wordsFilter(listenerMethod, msgGet)
+                        && groupFilter(listenerMethod, msgGet)
                         && codeFilter(listenerMethod, msgGet)
-                        && groupFilter(listenerMethod, msgGet);
+                ;
     }
 
     /**
@@ -124,13 +117,6 @@ public class ListenerFilter {
                 String singleValue = value[0];
                 //如果需要被at，判断的时候移除at的CQ码
                 //2019/10/25 不再移除CQ码
-//                if (at) {
-////                    String qqCode = BaseConfiguration.getLocalQQCode();
-////                    String regex = CQCodeUtil.build().getCQCode_at(qqCode); //"\\[CQ:at,qq="+ qqCode +"\\]";
-//                    return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
-//                } else {
-//                    return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
-//                }
                 return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
             } else {
                 //如果有多个参数，按照规则判断
@@ -227,8 +213,6 @@ public class ListenerFilter {
                 return filter.mostGroupType().test(groupCode, groups, CODES_MATCH_TYPE);
             }
         }
-
-
     }
 
 

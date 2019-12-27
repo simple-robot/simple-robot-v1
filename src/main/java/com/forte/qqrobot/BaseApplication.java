@@ -8,6 +8,7 @@ import com.forte.qqrobot.anno.depend.AllBeans;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.RobotRuntimeException;
+import com.forte.qqrobot.listener.intercept.MsgIntercept;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -28,9 +29,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.Closeable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -96,18 +95,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 线程工厂初始化
      */
     protected void threadPoolInit(CONFIG config){
-//        BaseLocalThreadPool.PoolConfig poolConfig = new BaseLocalThreadPool.PoolConfig();
-//        poolConfig.setTimeUnit(TimeUnit.SECONDS);
-//        //空线程存活时间
-//        poolConfig.setKeepAliveTime(60);
-//        //线程池的线程工厂
-//        poolConfig.setDefaultThreadFactory(Thread::new);
-//        //核心池数量，可同时执行的线程数量
-//        poolConfig.setCorePoolSize(500);
-//        //线程池最大数量
-//        poolConfig.setMaximumPoolSize(1200);
-//        //对列策略
-//        poolConfig.setWorkQueue(new LinkedBlockingQueue<>());
         //创建并保存线程池
         ResourceDispatchCenter.saveThreadPool(config.getPoolConfig());
     }
@@ -132,6 +119,11 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         ResourceDispatchCenter.saveTimeTaskManager(new TimeTaskManager());
 //        将定时任务工厂添加到资源调度中心
 //        ResourceDispatchCenter.saveStdSchedulerFactory(new StdSchedulerFactory());
+    }
+
+    // 设置日志输出等级
+    private void logInit(CONFIG config){
+        QQLog.setGlobalLevel(config.getLogLevel());
     }
 
     /**
@@ -251,6 +243,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         timeTaskInit();
         //资源初始化
         resourceInit(config);
+        //日志初始化
+        logInit(config);
     }
 
     /**
@@ -298,7 +292,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //**************** 执行扫描 ****************//
         //进行扫描并保存注册器
         this.register = scanner(scannerPackage);
-
 
         //**************** 配置依赖注入相关 ****************//
         //配置依赖管理器
@@ -366,7 +359,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
             for (String p : scanAllPackage) {
                 //全局扫描中，如果存在携带@beans的注解，则跳过.
                 //全局扫描只能将不存在@Beans注解的依赖进行添加
-//                fileScanner.find(p, c -> c.getAnnotation(Beans.class) == null);
                 fileScanner.find(p, c -> AnnotationUtils.getBeansAnnotationIfListen(c) == null);
             }
             //获取扫描结果
@@ -376,7 +368,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
         //注入依赖-普通的扫描依赖
         this.register.registerDependCenter();
-
 
         // > 依赖注入之后，同时也是监听函数注册之前
         Consumer<Class<?>[]>[] afterDependConsumer = afterDepend(config, app);
@@ -404,7 +395,14 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
 
         //根据配置类的扫描结果来构建监听器管理器和阻断器
-        ListenerManager manager = scanner.buildManager();
+        // 准备获取消息拦截器
+        MsgIntercept[] msgIntercepts = register.performingTasks(
+                c -> FieldUtils.isChild(c, MsgIntercept.class),
+                (Class<?>[] cs) -> Arrays.stream(cs).map(dependCenter::get).toArray(MsgIntercept[]::new)
+        );
+        // 构建管理中心
+        ListenerManager manager = scanner.buildManager(msgIntercepts);
+        // 构建阻断器
         Plug plug = scanner.buildPlug();
 
         //保存
@@ -474,21 +472,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //构建没有监听函数的送信器并保存
         MsgSender sender = MsgSender.build(getSender(), getSetter(), getGetter());
         this.NO_METHOD_SENDER = sender;
+        // MsgSender存入依赖中心
+        dependCenter.loadIgnoreThrow(sender);
 
-        // 记录无监听函数的送信器
-//        dependCenter.loadIgnoreThrow(sender);
-//        if(sender.SENDER != null){
-//            dependCenter.loadIgnoreThrow(sender.SENDER);
-//        }
-//        if(sender.SETTER != null){
-//            dependCenter.loadIgnoreThrow(sender.SETTER);
-//        }
-//        if(sender.GETTER != null){
-//            dependCenter.loadIgnoreThrow(sender.GETTER);
-//        }
-
-
-        //连接之后的收尾工作
         after();
 
         //连接之后

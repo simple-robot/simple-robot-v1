@@ -6,10 +6,13 @@ import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.depend.DependGetter;
+import com.forte.qqrobot.listener.intercept.MsgIntercept;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
+import com.forte.qqrobot.listener.result.BodyResultParser;
 import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.MethodUtil;
+import com.forte.utils.regex.RegexUtil;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -35,7 +38,7 @@ public class ListenerMethodScanner {
     /**
      * 全部的监听函数set集合
      */
-    private final Set<ListenerMethod> listenerMethodSet = new HashSet<>();
+    private final Set<ListenerMethod> listenerMethodSet = new HashSet<>(16);
 
     /**
      * 传入一个可能是监听器对象的Class对象
@@ -43,19 +46,10 @@ public class ListenerMethodScanner {
      */
     public Set<ListenerMethod> scanner(Class<?> clazz, Object bean) {
 
-        //v1.0 update
-        //如果此类不存在@Bean函数，略过
-        //v1.0.3 update
-        //可以通过批量加载注入beans，所以现在@Beans应该不再是必须的了
-//        if(clazz.getAnnotation(Beans.class) == null){
-////            return result;
-////        }
-
         //获取实例的函数
         Supplier listenerGetter;
         Function<DependGetter, ?> listenerGetterWithAddition;
         //获取类上的Beans注解
-//        Beans beansAnnotation = clazz.getAnnotation(Beans.class);
         Beans beansAnnotation = AnnotationUtils.getBeansAnnotationIfListen(clazz);
         String name = beansAnnotation == null ? "" : beansAnnotation.value();
         if(name.trim().length() == 0){
@@ -68,10 +62,7 @@ public class ListenerMethodScanner {
             listenerGetterWithAddition = add -> ResourceDispatchCenter.getDependCenter().get(name, add);
         }
 
-        //先判断是不是实现了普通监听器接口
-//        boolean isSocketListener = FieldUtils.isChild(clazz, SocketListener.class);
-
-        //判断方法上有没有备用方法注解
+        //判断有没有备用方法注解
         Spare spare = AnnotationUtils.getAnnotation(clazz, Spare.class);
 
 
@@ -93,10 +84,9 @@ public class ListenerMethodScanner {
         //不使用else，两者不冲突
         //开始判断当前类, 判断类上是否有@Listen注解
         //判断类上可以存在的注解
-//        Listen classListen = clazz.getAnnotation(Listen.class);
-//        Block classBlock = clazz.getAnnotation(Block.class);
         Listen classListen = AnnotationUtils.getAnnotation(clazz, Listen.class);
         Block classBlock = AnnotationUtils.getAnnotation(clazz, Block.class);
+        ListenBody classBody = AnnotationUtils.getAnnotation(clazz, ListenBody.class);
 
 
         //提前准备方法获取过滤器
@@ -140,19 +130,16 @@ public class ListenerMethodScanner {
             //尝试获取实例对象
 
             //获取需要的注解
-//            Filter filter = method.getAnnotation(Filter.class);
-//            BlockFilter blockFilter = method.getAnnotation(BlockFilter.class);
             Filter filter = AnnotationUtils.getAnnotation(method, Filter.class);
             BlockFilter blockFilter = AnnotationUtils.getAnnotation(method, BlockFilter.class);
             //获取类上的阻断注解
-//            Block block = method.getAnnotation(Block.class);
             Block block = AnnotationUtils.getAnnotation(method, Block.class);
             //如果方法上没有阻断注解，则使用类上注解，如果方法上存在则使用方法上的注解,此时当不存在的时候直接使用null即可
             block = (block == null) ? classBlock : block;
 
             //如果是全局备用，则直接备用，如果没有全局备用，获取此方法的Spare注解
-//            Spare thisSpare = isSpare ? spare : method.getAnnotation(Spare.class);
             Spare thisSpare = isSpare ? spare : AnnotationUtils.getAnnotation(method, Spare.class);
+            ListenBody thisBody = classBody != null ? classBody : AnnotationUtils.getAnnotation(method, ListenBody.class);
             //监听类型
             MsgGetTypes[] msgGetType = Optional.ofNullable(methodListen).map(Listen::value).orElse(msgGetTypes);
 
@@ -182,12 +169,16 @@ public class ListenerMethodScanner {
                 toBreakPlugin = listenBreakPlugin.value().getResultTest();
             }
 
-
             //构建对象并添加
             ListenerMethod.ListenerMethodBuilder builder = builder(listenerGetter, listenerGetterWithAddition, method, msgGetType, thisSpare, filter, blockFilter, block);
             builder.listenBreak(toBreak)
                     .listenBreakPlugin(toBreakPlugin)
                     .sort(sort).id(id);
+
+
+            if(thisBody != null){
+                builder.resultParser(BodyResultParser.getInstance());
+            }
 
             return builder.build();
         }).filter(Objects::nonNull).collect(Collectors.toSet());
@@ -222,8 +213,8 @@ public class ListenerMethodScanner {
      * 构建监听函数管理器实例
      * @return 监听函数管理器实例
      */
-    public ListenerManager buildManager(){
-        return new ListenerManager(listenerMethodSet);
+    public ListenerManager buildManager(MsgIntercept... intercepts){
+        return new ListenerManager(listenerMethodSet, intercepts);
     }
 
     /**

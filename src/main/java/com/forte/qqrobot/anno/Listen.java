@@ -11,10 +11,23 @@ import java.lang.annotation.Target;
 
 
 /**
- * 标记用
- * 添加此注解，标注为一个监听器类
- * 标注在类上将会记录全部的方法
- * 标注在方法上将会记录此方法
+ * 标记用<br>
+ * 添加此注解，标注为一个监听器类<br>
+ * 标注在类上将会记录全部的方法<br>
+ * 标注在方法上将会记录此方法<br>
+ * <br>
+ *     当监听函数存在返回值且未标记@ListenBody的时候，部分返回值存在特殊含义：<br>
+ *     <ul>
+ *         <li>如果返回值本身为ListenResult对象则其他参数均无效，以其本身为主。</li>
+ *         <li>布尔类型代表函数是否执行成功。</li>
+ *         <li>返回值为null的时候代表执行未成功。</li>
+ *         <li>数值类型小于0代表执行未成功。</li>
+ *     </ul>
+ *
+ *
+ *
+ *
+ *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/26 10:29
  * @since JDK1.8
@@ -23,7 +36,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD}) //接口、类、枚举、注解、方法
 //监听类默认不使用单例类型
 //会牺牲一部分性能
-@Beans(single = false)
+//2019/12/27 恢复为单例
+@Beans
 @ByNameType(Listen.ByName.class)
 public @interface Listen {
 
@@ -49,7 +63,7 @@ public @interface Listen {
     @Retention(RetentionPolicy.RUNTIME)	//注解会在class字节码文件中存在，在运行时可以通过反射获取到
     @Target({ElementType.TYPE, ElementType.METHOD}) //接口、类、枚举、注解、方法
     //监听类默认不使用单例类型
-    @Beans(single = false)
+    @Beans
     @ByNameFrom(Listen.class)
     @interface ByName {
 

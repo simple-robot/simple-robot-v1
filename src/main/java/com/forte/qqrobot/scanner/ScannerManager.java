@@ -17,6 +17,7 @@ import org.quartz.SchedulerException;
 
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -71,6 +72,11 @@ public class ScannerManager implements Register {
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
         //遍历并加载
         for (Class<?> c : classes) {
+            // 如果c是个接口或者抽象类，则直接跳过
+            int modifiers = c.getModifiers();
+            if(Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)){
+                continue;
+            }
             try {
                 //扫描
                 Set<ListenerMethod> scanSet = scanner.scanner(c);

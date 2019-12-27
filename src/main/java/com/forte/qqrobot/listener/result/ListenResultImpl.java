@@ -72,6 +72,10 @@ public class ListenResultImpl<T> implements ListenResult<T> {
         this.toBreakPlugin = toBreakPlugin;
         this.error = error;
     }
+    /** 无参构造 */
+    public ListenResultImpl(){ }
+
+
 
 
 

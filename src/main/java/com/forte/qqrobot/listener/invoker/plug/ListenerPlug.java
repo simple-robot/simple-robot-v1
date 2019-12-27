@@ -65,6 +65,7 @@ public class ListenerPlug implements Plug {
      * @param append    是否追加，如果为true，则如果当前已经存在阻断函数，将会追加；<br>
      *                  如果为false，则如果当前已经存在阻断函数，将会顶替；
      */
+    @Override
     public void onBlock(String blockName, boolean append) {
         //更新函数
         UnaryOperator<Map<MsgGetTypes, Set<ListenerMethod>>> update;
@@ -129,6 +130,7 @@ public class ListenerPlug implements Plug {
      * @param listenerMethod    监听函数
      * @param append            是否追加
      */
+    @Override
     public void onBlockByName(ListenerMethod listenerMethod, boolean append) {
         //将此名称下的全部加入阻断列表
         //如果不追加，清空当前阻断
@@ -147,6 +149,7 @@ public class ListenerPlug implements Plug {
      * @param listenerMethod    监听函数
      * @param append            是否叠加
      */
+    @Override
     public void onBlockByMethod(ListenerMethod listenerMethod, boolean append){
         //类型
         MsgGetTypes[] types = listenerMethod.getTypes();
@@ -192,6 +195,7 @@ public class ListenerPlug implements Plug {
     /**
      * 取消当前阻断, 需要线程同步
      */
+    @Override
     public void unBlock() {
         NORMAL_BLOCK.getAndSet(null);
         //移除阻断记录
@@ -202,6 +206,7 @@ public class ListenerPlug implements Plug {
     /**
      * 全局阻塞一个监听函数
      */
+    @Override
     public void onGlobalBlock(String name){
         //更新
         GLOBAL_BLOCK.getAndSet(ALL_LISTENERMETHODS.get(name));
@@ -212,6 +217,7 @@ public class ListenerPlug implements Plug {
     /**
      * 根据此监听函数的某指定索引的名称来添加全局阻塞
      */
+    @Override
     public void onGlobalBlock(ListenerMethod listenerMethod, int blockNameIndex) throws NoSuchBlockNameException {
         //获取名称
         try {
@@ -225,6 +231,7 @@ public class ListenerPlug implements Plug {
     /**
      * 使用此监听器的第一个名称来启动全局阻塞
      */
+    @Override
     public void onGlobalBlock(ListenerMethod listenerMethod){
         //获取名称能够保证至少长度为1
         try {
@@ -238,6 +245,7 @@ public class ListenerPlug implements Plug {
     /**
      * 取消全局阻塞
      */
+    @Override
     public void unGlobalBlock(){
         //设置为null
         GLOBAL_BLOCK.getAndSet(null);
@@ -312,6 +320,7 @@ public class ListenerPlug implements Plug {
      * 判断是否存在阻塞函数
      * @return 是否存在阻塞函数
      */
+    @Override
     public boolean hasBlock(){
         return hasGlobalBlock() && hasGlobalBlock();
     }
@@ -320,6 +329,7 @@ public class ListenerPlug implements Plug {
      * 判断是否存在全局阻塞函数
      * @return 是否存在全局阻塞函数
      */
+    @Override
     public boolean hasGlobalBlock(){
         return GLOBAL_BLOCK.get() != null;
     }
@@ -328,6 +338,7 @@ public class ListenerPlug implements Plug {
      * 判断是否存在普通阻塞
      * @return  是否存在全局阻塞函数
      */
+    @Override
     public boolean hasNormalBlock(){
         return NORMAL_BLOCK.get() != null;
     }
@@ -341,6 +352,7 @@ public class ListenerPlug implements Plug {
      * 获取当前在全局阻塞状态的阻断名
      * @return
      */
+    @Override
     public String getGlobalBlockName(){
         return ON_GLOBAL_BLOCK_NAME.get();
     }
@@ -349,6 +361,7 @@ public class ListenerPlug implements Plug {
      * 获取当前处于阻断状态的阻断名
      * @return
      */
+    @Override
     public String[] getNormalBlockNameArray(){
         return ON_NORMAL_BLOCK_NAMES.toArray(new String[0]);
     }
@@ -356,6 +369,7 @@ public class ListenerPlug implements Plug {
     /**
      * 判断某个分组下的阻断是否处于阻断状态
      */
+    @Override
     public boolean isOnGlobalBlock(String blockName){
         String onGlobal = ON_GLOBAL_BLOCK_NAME.get();
         return onGlobal != null && onGlobal.equals(blockName);
@@ -366,6 +380,7 @@ public class ListenerPlug implements Plug {
      * @param name 阻断组名
      * @return  是否存在
      */
+    @Override
     public boolean isOnNormalBlock(String name){
         return ON_NORMAL_BLOCK_NAMES.contains(name);
     }
@@ -374,6 +389,7 @@ public class ListenerPlug implements Plug {
      * 判断此监听函数的所有所在组是否都存在与阻断队列中
      * @return 所有所在组是否都存在与阻断队列中
      */
+    @Override
     public boolean isAllOnNormalBlockByName(ListenerMethod listenerMethod){
         //获取全部组名
         String[] blockNames = getBlockNames(listenerMethod);
@@ -386,6 +402,7 @@ public class ListenerPlug implements Plug {
      * 判断此监听函数的所在组是否有任意存在于阻断队列中
      * @return 是否有任意存在于阻断队列中
      */
+    @Override
     public boolean isAnyOnNormalBlockByName(ListenerMethod listenerMethod){
         //获取全部组名
         String[] blockNames = getBlockNames(listenerMethod);
@@ -398,6 +415,7 @@ public class ListenerPlug implements Plug {
      * 判断此监听函数的所在组是否有没有任何存在于阻断队列中
      * @return 是否有没有任何存在于阻断队列中
      */
+    @Override
     public boolean isNoneOnNormalBlockByName(ListenerMethod listenerMethod){
         //获取全部组名
         String[] blockNames = getBlockNames(listenerMethod);
@@ -409,6 +427,7 @@ public class ListenerPlug implements Plug {
     /**
      * 根据组名或默认名称判断
      */
+    @Override
     public boolean isOnNormalBlockByThis(ListenerMethod listenerMethod){
         //先根据组名，如果组名没有再判断默认名
         return isAnyOnNormalBlockByName(listenerMethod) || ON_NORMAL_BLOCK_NAMES.contains(getDefaultName(listenerMethod));
@@ -417,6 +436,7 @@ public class ListenerPlug implements Plug {
     /**
      * 仅根据默认名称判断
      */
+    @Override
     public boolean osOnNormalBlockByOnlyThis(ListenerMethod listenerMethod){
         return ON_NORMAL_BLOCK_NAMES.contains(getDefaultName(listenerMethod));
     }
@@ -435,6 +455,7 @@ public class ListenerPlug implements Plug {
      * global -> if null -> normal -> if null -> null
      * @return 当前生效的阻塞函数集合
      */
+    @Override
     public Map<MsgGetTypes, Set<ListenerMethod>> getBlockMethod(){
         return Optional.ofNullable(getGlobalBlockMethod()).orElseGet(this::getNormalBlockMethod);
     }
@@ -446,6 +467,7 @@ public class ListenerPlug implements Plug {
      * @param type
      * @return
      */
+    @Override
     public Set<ListenerMethod> getBlockMethod(MsgGetTypes type){
         return Optional.ofNullable(getGlobalBlockMethod(type)).orElseGet(() -> getNormalBlockMethod(type));
     }
@@ -454,6 +476,7 @@ public class ListenerPlug implements Plug {
      * 获取当前的全局阻塞函数
      * @return 当前的全局阻塞函数
      */
+    @Override
     public Map<MsgGetTypes, Set<ListenerMethod>> getGlobalBlockMethod(){
         return GLOBAL_BLOCK.get();
     }
@@ -462,6 +485,7 @@ public class ListenerPlug implements Plug {
      * 根据消息分类获取当前的全局阻塞函数
      * @return 当前的全局阻塞函数
      */
+    @Override
     public Set<ListenerMethod> getGlobalBlockMethod(MsgGetTypes type){
         return Optional.ofNullable(GLOBAL_BLOCK.get()).map(b -> b.get(type)).orElse(null);
     }
@@ -470,6 +494,7 @@ public class ListenerPlug implements Plug {
      * 获取当前的普通阻塞函数
      * @return 当前的普通阻塞函数
      */
+    @Override
     public Map<MsgGetTypes, Set<ListenerMethod>> getNormalBlockMethod(){
         return NORMAL_BLOCK.get();
     }
@@ -478,6 +503,7 @@ public class ListenerPlug implements Plug {
      * 根据分类获取当前的普通阻塞函数
      * @return 当前的普通阻塞函数
      */
+    @Override
     public Set<ListenerMethod> getNormalBlockMethod(MsgGetTypes type){
         return Optional.ofNullable(NORMAL_BLOCK.get()).map(b -> b.get(type)).orElse(null);
     }

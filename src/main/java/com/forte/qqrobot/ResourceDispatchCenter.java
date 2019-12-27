@@ -39,7 +39,7 @@ public abstract class ResourceDispatchCenter {
      * @param bean  单例对象
      * @param <T>   单例对象的类型
      */
-    protected static <T> void save(T bean){
+    public static <T> void save(T bean){
         resourceSingleFactory.set(bean);
         if(configType == null && (bean instanceof BaseConfiguration)){
             configType = (Class<BaseConfiguration>) bean.getClass();
