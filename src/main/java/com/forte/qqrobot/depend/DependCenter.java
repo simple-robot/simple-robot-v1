@@ -265,7 +265,7 @@ public class DependCenter implements DependGetter, DependInjector {
             throw new DependResourceException("已经存在名称为["+ depend +"]的依赖");
         }
 
-        QQLog.debug("load Depend >> " + depend);
+        QQLog.info("load Depend >> " + depend);
 
         //判断类型，如果是基础数据类型，保存到基础，否则保存至其他
         if (BasicResourceWarehouse.isBasicType(depend.getType())) {

@@ -15,10 +15,10 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 public class ListenContext {
 
-    /** 全局生效的数据Map */
+    /** 全局生效的数据Map，全局域 */
     private static Map<String, Object> globalContext = new ConcurrentHashMap<>(4);
 
-    /** 单次生效的Map, 使用懒加载 */
+    /** 单次生效的Map, 使用懒加载，当前域 */
     private Map<String, Object> normalMap;
 
     /** 获取实例对象 */
@@ -38,7 +38,7 @@ public class ListenContext {
 
     /**
      * 默认的get方法。<br>
-     *     会优先从当前上下文获取，获取不到则寻找全局上下文
+     *     会优先从当前域获取，获取不到则寻找全局域
      * @param key key
      * @return 值
      */
@@ -49,7 +49,7 @@ public class ListenContext {
 
 
     /**
-     * 从当前上下文中获取
+     * 从当前域中获取
      * @param key key
      * @return 值
      */
@@ -58,7 +58,7 @@ public class ListenContext {
     }
 
     /**
-     * 从全局上下文中获取
+     * 从全局域中获取
      * @param key key
      * @return 值
      */
@@ -67,7 +67,7 @@ public class ListenContext {
     }
 
     /**
-     * 默认的记录一个上下文值，默认记录在当前上下文
+     * 默认的记录一个域值，默认记录在当前域
      * @param key    键
      * @param value  值
      */
@@ -76,7 +76,7 @@ public class ListenContext {
     }
 
     /**
-     * 记录一个当前上下文值
+     * 记录一个当前域值
      * @param key    键
      * @param value  值
      */
@@ -85,7 +85,7 @@ public class ListenContext {
     }
 
     /**
-     * 记录一个全局上下文值
+     * 记录一个全局域值
      * @param key    键
      * @param value  值
      */
@@ -95,42 +95,42 @@ public class ListenContext {
 
 
     /**
-     * 清除上下文。默认为清除当前上下文
+     * 清除域。默认为清除当前域
      */
     public void clear(){
         getNormalMap().clear();
     }
 
     /**
-     * 清除全局上下文
+     * 清除全局域
      */
     public void clearGlobal(){
         clearContext();
     }
 
     /**
-     * 清除全局上下文
+     * 清除全局域
      */
     public static void clearContext(){
         globalContext.clear();
     }
 
     /**
-     * 当前上下文keySet
+     * 当前域keySet
      */
     public Set<String> normalKeySet(){
         return getNormalMap().keySet();
     }
 
     /**
-     * 全局上下文keySet
+     * 全局域keySet
      */
     public Set<String> globalKeySet(){
         return keySet();
     }
 
     /**
-     * 全局上下文keySet
+     * 全局域keySet
      */
     public static Set<String> keySet(){
         return globalContext.keySet();

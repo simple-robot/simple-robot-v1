@@ -55,9 +55,12 @@ public class QQLog extends ColorSystem {
         }
         warning = warningPrintStream;
 
+        String sp1 = Colors.builder().add(' ', wowThatIsRainbowToo$()).add(' ', wowThatIsRainbowToo$()).build().toString();
+        String sp2 = Colors.builder().add(' ', wowThatIsRainbowToo$()).add(' ', wowThatIsRainbowToo$()).build().toString();
+
         String oh_hi_is_me = "_(^w^)L~~ by simple-robot@ForteScarlet ~~";
-        int length = oh_hi_is_me.length();
-        char line = '~';
+        int length = oh_hi_is_me.length() + 4;
+        char line = ' ';
         /* QQLog初始化的时候输出个东西~ */
         ColorsBuilder hi_i_am_builder_HEAD = Colors.builder();
         for (int i = 0; i < length; i++) {
@@ -68,7 +71,7 @@ public class QQLog extends ColorSystem {
 
         ColorsBuilder hi_i_am_builder = Colors.builder();
         oh_hi_is_me.chars().forEach(ic -> hi_i_am_builder.add((char) ic, wowThatIsRainbow$()));
-        System.out.println(hi_i_am_builder.build().toString());
+        System.out.println(sp1 + hi_i_am_builder.build().toString() + sp2);
         ColorsBuilder hi_i_am_builder_END = Colors.builder();
         for (int i = 0; i < length; i++) {
             hi_i_am_builder_END.add(line, wowThatIsRainbowToo$());
