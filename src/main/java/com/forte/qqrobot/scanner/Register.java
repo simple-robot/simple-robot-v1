@@ -1,6 +1,8 @@
 package com.forte.qqrobot.scanner;
 
 import com.forte.qqrobot.anno.depend.Beans;
+import com.forte.qqrobot.depend.DependCenter;
+import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.sender.MsgSender;
 
 import java.util.Collection;
@@ -16,8 +18,8 @@ import java.util.function.Supplier;
  **/
 public interface Register {
 
-    /** 注册监听函数 */
-    void registerListener();
+    /** 注册监听函数, 此处一般由Base */
+    void registerListener(ListenerMethodScanner scanner);
 
     /** 注册定时任务 */
     void registerTimeTask(MsgSender sender);
@@ -26,7 +28,7 @@ public interface Register {
     void registerTimeTask(Supplier<MsgSender> senderSupplier);
 
     /** 进行依赖注入 */
-    void registerDependCenter();
+    void registerDependCenter(DependCenter dependCenter);
 
     /** 不需要@Beans注解的依赖注入
      *  @param beans 需要提供通用Beans注解对象

@@ -1,6 +1,11 @@
 ## 版本更新记录
 
-- ##### now
+- ##### now 
+    - 简单系统优化
+    - filter中增加对code与group的过滤规则自定义参数
+    
+
+- ##### 1.5.0
     - 将@Listen标记恢复为单例
     - 增加@ListenBody注解
     - MsgGetTypes增加群禁言类型

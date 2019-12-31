@@ -145,6 +145,9 @@ public class ListenerFilter {
         //获取过滤注解
         Filter filter = listenerMethod.getFilter();
 
+        // 匹配规则
+        KeywordMatchType codeMatchType = filter.codeMatchType();
+
         QQCodeAble qqCodeAble;
         if (msgGet instanceof QQCodeAble) {
             qqCodeAble = (QQCodeAble) msgGet;
@@ -166,10 +169,10 @@ public class ListenerFilter {
             }
             if (codes.length == 1) {
                 String code = codes[0];
-                return CODES_MATCH_TYPE.test(qqCode, code);
+                return codeMatchType.test(qqCode, code);
             } else {
                 //有多个
-                return filter.mostCodeType().test(qqCode, codes, CODES_MATCH_TYPE);
+                return filter.mostCodeType().test(qqCode, codes, codeMatchType);
             }
         }
     }
@@ -185,6 +188,9 @@ public class ListenerFilter {
     private boolean groupFilter(ListenerMethod listenerMethod, MsgGet msgGet) {
         //获取过滤注解
         Filter filter = listenerMethod.getFilter();
+
+        // 群号匹配规则
+        KeywordMatchType groupMatchType = filter.groupMatchType();
 
         GroupCodeAble groupCodeAble;
         if (msgGet instanceof GroupCodeAble) {
@@ -208,9 +214,9 @@ public class ListenerFilter {
             if (groups.length == 1) {
                 //只有一条
                 String group = groups[0];
-                return CODES_MATCH_TYPE.test(groupCode, group);
+                return groupMatchType.test(groupCode, group);
             } else {
-                return filter.mostGroupType().test(groupCode, groups, CODES_MATCH_TYPE);
+                return filter.mostGroupType().test(groupCode, groups, groupMatchType);
             }
         }
     }

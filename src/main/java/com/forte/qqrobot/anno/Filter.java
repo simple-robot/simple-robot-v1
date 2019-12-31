@@ -52,6 +52,11 @@ public @interface Filter {
     String[] code() default {};
 
     /**
+     * 对于单个QQ号的匹配规则，一般来讲使用默认的equals即可
+     */
+    KeywordMatchType codeMatchType() default KeywordMatchType.TRIM_EQUALS;
+
+    /**
      * 与{@link #mostType()} 功能类似，当{@link #code()}存在多个code的时候，判断其匹配规则。
      * 默认为任意存在即可
      */
@@ -63,6 +68,11 @@ public @interface Filter {
      * 如果为空数组则为全部匹配
      */
     String[] group() default {};
+
+    /**
+     * 对于单个群号的匹配规则，一般来讲使用默认的equals即可
+     */
+    KeywordMatchType groupMatchType() default KeywordMatchType.TRIM_EQUALS;
 
     /**
      * 与{@link #mostType()} 功能类似，当{@link #group()}存在多个group的时候，判断其匹配规则。

@@ -25,7 +25,7 @@ public interface MsgIntercept extends Interceptor<MsgGet, MsgGetContext>, Compar
 
     /**
      * 实现的排序方法。
-     * 无特许需求请不要重写此方法。
+     * 无特殊需求请不要重写此方法。
      * @return 排序值
      */
     @Override

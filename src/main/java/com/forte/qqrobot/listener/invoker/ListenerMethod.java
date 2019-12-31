@@ -38,12 +38,12 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     private final String UUID;
 
     /**
-     * 监听函数获取函数
+     * 监听函数实例对象的获取函数
      * */
     private final Supplier<T> listenerGetter;
 
     /**
-     * 监听函数获取函数：提供额外参数
+     * 监听函数实例对象的获取函数，并提供额外参数
      */
     private final Function<DependGetter, T> listenerGetterWithAddition;
 
@@ -77,6 +77,9 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     /** 结果转化器 */
     private final ListenResultParser resultParser;
 
+    //**************** 以下为可以动态变更的值 ****************//
+    
+    
     /**
      * 全参数构造
      * @param listenerGetter 监听器对象实例获取函数
@@ -156,12 +159,12 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
         // TODO paramInit()
 
-        // 获取实例
+        // 获取监听函数所在类实例
         // 考虑到系统优化，
         //  后期将监听函数的实例修改为单例，并且在获取监听函数实例的时候不再提供额外参数。
         // 2019/12/27 已修改
 //        T listener = listenerGetterWithAddition.apply(additionalDepends);
-        T listener = listenerGetter.get();
+        T listener = getListener();
 
         //执行方法
         boolean success = false;
@@ -176,6 +179,8 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
             invoke = method.invoke(listener, args);
             success = true;
         }catch (Throwable e){
+            // 出现异常，判定为执行失败
+            success = false;
             error = e;
         }
 
@@ -271,6 +276,30 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     //**************************************
     //*         getter & setter
     //**************************************
+
+
+    public Function<DependGetter, T> getListenerGetterWithAddition() {
+        return listenerGetterWithAddition;
+    }
+
+    /**
+     * 使用copy的对象
+     */
+    public MsgGetTypes[] getType() {
+        return Arrays.copyOf(type, type.length);
+    }
+
+    public Predicate<Object> getListenBreak() {
+        return listenBreak;
+    }
+
+    public Predicate<Object> getListenBreakPlugin() {
+        return listenBreakPlugin;
+    }
+
+    public ListenResultParser getResultParser() {
+        return resultParser;
+    }
 
     public T getListener() {
         return listenerGetter.get();

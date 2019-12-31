@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * @date Created in 2019/3/26 16:23
  * @since JDK1.8
  **/
-public class ListenerManager {
+public class ListenerManager implements MsgReceiver {
 
     /**
      * 保存全部监听函数并进行两层分类
@@ -66,6 +66,7 @@ public class ListenerManager {
     /**
      * 接收到了消息
      */
+    @Override
     public ListenResult[] onMsg(MsgGet msgget, SenderSendList sender, SenderSetList setter, SenderGetList getter){
         // 消息拦截
         // 构建上下文对象
@@ -93,6 +94,7 @@ public class ListenerManager {
     /**
      * 接收到了消息
      */
+    @Override
     public ListenResult[] onMsg(MsgGet msgget, SenderList sender){
         return onMsg(msgget,
                 sender.isSenderList() ? (SenderSendList) sender : null,
@@ -103,6 +105,7 @@ public class ListenerManager {
     /**
      * 接收到了消息
      */
+    @Override
     public ListenResult[] onMsg(MsgGet msgget, MsgSender sender){
         return onMsg(msgget,
                 sender == null ? null : sender.SENDER,
@@ -224,8 +227,9 @@ public class ListenerManager {
             Map<String, Object> map = new HashMap<>(16);
             map.put("msgGet", msgGet);
             map.put(msgGet.getClass().getSimpleName(), msgGet);
-            map.put("at", at);
+            map.put("atDetection", at);
             map.put("msgType", msgType);
+            map.put(msgType.toString(), msgType);
             MsgSender msgSender = MsgSender.build(sendList, setList, getList, lm);
             map.put("msgSender", msgSender);
             //将整合的送信器与原生sender都传入

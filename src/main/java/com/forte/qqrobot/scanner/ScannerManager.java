@@ -67,9 +67,7 @@ public class ScannerManager implements Register {
     /**
      * 注册其中的监听器
      */
-    private void registerListener(Set<Class<?>> classes){
-        //获取监听器注册器
-        ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
+    private void registerListener(ListenerMethodScanner scanner, Set<Class<?>> classes){
         //遍历并加载
         for (Class<?> c : classes) {
             // 如果c是个接口或者抽象类，则直接跳过
@@ -93,8 +91,8 @@ public class ScannerManager implements Register {
 
     /** 注册监听器 */
     @Override
-    public void registerListener(){
-        registerListener(classes);
+    public void registerListener(ListenerMethodScanner scanner){
+        registerListener(scanner, classes);
     }
 
     /**
@@ -155,8 +153,7 @@ public class ScannerManager implements Register {
      * 进行依赖注入
      */
     @Override
-    public void registerDependCenter() {
-        DependCenter dependCenter = ResourceDispatchCenter.getDependCenter();
+    public void registerDependCenter(DependCenter dependCenter) {
         //通过注解加载依赖
         dependCenter.load(classes);
     }

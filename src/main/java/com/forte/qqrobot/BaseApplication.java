@@ -194,10 +194,11 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
     /**
      * 依赖扫描之前
-     * @return 所有的执行任务
+     * @param config 配置文件
+     * @param app    启动器接口实现类
+     * @param register 注册器
      */
-    protected Consumer<Class<?>[]>[] beforeDepend(CONFIG config, Application<CONFIG> app){
-        return null;
+    protected void beforeDepend(CONFIG config, Application<CONFIG> app, Register register){
     }
 
     /**
@@ -205,8 +206,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 同时也是监听函数扫描之前
      * @return 所有的执行任务
      */
-    protected Consumer<Class<?>[]>[] afterDepend(CONFIG config, Application<CONFIG> app){
-        return null;
+    protected void afterDepend(CONFIG config, Application<CONFIG> app, Register register, DependCenter dependCenter){
     }
 
 
@@ -224,6 +224,10 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     /** 服务启动后 */
     protected void afterStart(){ }
 
+    /**  监听函数注册之前，可以执行重写并进行额外的监听注入 */
+    protected void beforeRegisterListener(CONFIG config, Application<CONFIG> app, ListenerMethodScanner scanner, DependCenter dependCenter) {
+
+    }
 
 
 
@@ -259,9 +263,12 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 配置结束后的方法
      */
     private DependCenter afterConfig(CONFIG config, Application<CONFIG> app){
+
+        //构建监听扫描器
+        ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
+
         //包路径
         String appPackage = app.getClass().getPackage().getName();
-
         Set<String> scanAllPackage = new HashSet<>();
 
         //配置完成后，如果没有进行扫描，则默认扫描启动类同级包
@@ -269,7 +276,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         Set<String> scannerPackage = config.getScannerPackage();
 
         //查看启动类上是否存在@AllBeans注解
-//        AllBeans annotation = app.getClass().getAnnotation(AllBeans.class);
         AllBeans annotation = AnnotationUtils.getAnnotation(app.getClass(), AllBeans.class);
         if(annotation != null){
             //如果存在全局包扫描
@@ -324,16 +330,12 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         }
 
         // > 依赖扫描之前
-        Consumer<Class<?>[]>[] beforeDependConsumer = beforeDepend(config, app);
-        if(beforeDependConsumer != null){
-            for (Consumer<Class<?>[]> c : beforeDependConsumer) {
-                register.performingTasks(c);
-            }
-        }
+        beforeDepend(config, app, register);
 
 
         DependCenter dependCenter = dependGetter == null ? new DependCenter() : new DependCenter(dependGetter);
         ResourceDispatchCenter.saveDependCenter(dependCenter);
+
         //赋值
         this.dependGetter = dependCenter;
 
@@ -367,19 +369,17 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         }
 
         //注入依赖-普通的扫描依赖
-        this.register.registerDependCenter();
+        this.register.registerDependCenter(dependCenter);
 
-        // > 依赖注入之后，同时也是监听函数注册之前
-        Consumer<Class<?>[]>[] afterDependConsumer = afterDepend(config, app);
-        if(afterDependConsumer != null){
-            for (Consumer<Class<?>[]> c : afterDependConsumer) {
-                register.performingTasks(c);
-            }
-        }
 
+        // > 依赖注入之后
+        afterDepend(config, app, this.register, dependCenter);
+
+        // > 监听函数注册之前
+        beforeRegisterListener(config, app, scanner, dependCenter);
 
         //直接注册监听函数
-        this.register.registerListener();
+        this.register.registerListener(scanner);
 
 
         // > 监听函数注册之后
@@ -391,15 +391,15 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         }
 
 
-        //构建监听函数管理器等扫描器所构建的
-        ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
-
         //根据配置类的扫描结果来构建监听器管理器和阻断器
         // 准备获取消息拦截器
         MsgIntercept[] msgIntercepts = register.performingTasks(
                 c -> FieldUtils.isChild(c, MsgIntercept.class),
                 (Class<?>[] cs) -> Arrays.stream(cs).map(dependCenter::get).toArray(MsgIntercept[]::new)
         );
+
+
+
         // 构建管理中心
         ListenerManager manager = scanner.buildManager(msgIntercepts);
         // 构建阻断器

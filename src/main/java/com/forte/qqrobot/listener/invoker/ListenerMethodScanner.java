@@ -30,10 +30,6 @@ import java.util.stream.Stream;
  **/
 public class ListenerMethodScanner {
 
-    /**
-     * SocketListener接口的唯一方法名
-     */
-    private static final String SOCKET_LISTENER_METHOD_NAME = "onMessage";
 
     /**
      * 全部的监听函数set集合
@@ -73,6 +69,24 @@ public class ListenerMethodScanner {
         //记录并返回结果
         listenerMethodSet.addAll(result);
         return result;
+    }
+
+    /**
+     * 注册额外的ListenerMethod
+     * @param listenerMethods listenerMethod列表
+     */
+    public void registerListenerMethod(ListenerMethod... listenerMethods){
+        for (ListenerMethod lm : listenerMethods) {
+            listenerMethodSet.add(lm);
+        }
+    }
+
+    /**
+     * 注册额外的ListenerMethod
+     * @param listenerMethods listenerMethod列表
+     */
+    public void registerListenerMethod(Collection<ListenerMethod> listenerMethods){
+        listenerMethodSet.addAll(listenerMethods);
     }
 
 
