@@ -70,7 +70,7 @@ public class MethodUtil {
             try {
                 return invoke(obj, args, m);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new MethodUtilException(e);
             }
         }
 
@@ -201,6 +201,29 @@ public class MethodUtil {
     }
 
 
+    /**
+     * 此工具类的异常
+     */
+    public static final class MethodUtilException extends RuntimeException {
+        public MethodUtilException() {
+        }
+
+        public MethodUtilException(String message) {
+            super(message);
+        }
+
+        public MethodUtilException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public MethodUtilException(Throwable cause) {
+            super(cause);
+        }
+
+        public MethodUtilException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+            super(message, cause, enableSuppression, writableStackTrace);
+        }
+    }
 
 }
 

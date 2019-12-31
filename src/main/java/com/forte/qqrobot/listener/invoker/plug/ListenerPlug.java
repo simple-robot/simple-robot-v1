@@ -4,6 +4,7 @@ import com.forte.qqrobot.anno.Block;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
+import com.forte.qqrobot.log.QQLog;
 import com.forte.utils.collections.Maputer;
 
 import java.util.*;
@@ -237,7 +238,7 @@ public class ListenerPlug implements Plug {
         try {
             onGlobalBlock(listenerMethod, 0);
         } catch (NoSuchBlockNameException e) {
-            e.printStackTrace();
+            QQLog.error(e.getMessage(), e);
         }
     }
 

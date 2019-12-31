@@ -15,7 +15,7 @@
 
     <!-- 版本号 -->
     <!-- 下次部署需要大于1.5.0 2019/12/27 -->
-    <version>1.5.0-TEST</version>
+    <version>1.5.0</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>
@@ -332,7 +332,7 @@
         <dependency>
             <groupId>io.gitee.ForteScarlet.plusutils</groupId>
             <artifactId>console-plus</artifactId>
-            <version>1.2</version>
+            <version>1.2.1</version>
         </dependency>
 
 

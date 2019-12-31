@@ -963,7 +963,7 @@ public class FieldUtils {
             try {
                 getField = getField(tClass, firstField);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new FieldUtilsException(e);
             }
             //如果获取失败，直接返回false
             if (getField == null) {
@@ -2250,8 +2250,8 @@ public class FieldUtils {
                         return getThisLevelField().getGetter().invoke(upperInvoke);
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         // 出现异常，展示异常并返回一个null
-                        e.printStackTrace();
-                        return null;
+                        throw new FieldUtilsException(e);
+//                        return null;
                     }
                 } else {
                     //如果上层返回值为null，则直接返回null
@@ -2311,7 +2311,7 @@ public class FieldUtils {
                             return false;
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+//                        throw new FieldUtilsException(e);
                         //若是出现异常，则说明上层对象无法赋值
                         //没有上层对象则无法为本层对象赋值，直接返回false
                         return false;
@@ -2324,7 +2324,7 @@ public class FieldUtils {
                         return true;
                     } catch (Exception e) {
                         //如果出现异常，则说明赋值出现错误，返回false
-                        e.printStackTrace();
+//                        throw new FieldUtilsException(e);
                         return false;
                     }
                 }
@@ -2484,4 +2484,34 @@ public class FieldUtils {
     private FieldUtils() {
     }
 
+
+    /**
+     * 类异常
+     */
+    public static final class FieldUtilsException extends RuntimeException {
+        public FieldUtilsException() {
+        }
+
+        public FieldUtilsException(String message) {
+            super(message);
+        }
+
+        public FieldUtilsException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public FieldUtilsException(Throwable cause) {
+            super(cause);
+        }
+
+        public FieldUtilsException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+            super(message, cause, enableSuppression, writableStackTrace);
+        }
+    }
+    
+    
+    
+    
+    
+    
 }

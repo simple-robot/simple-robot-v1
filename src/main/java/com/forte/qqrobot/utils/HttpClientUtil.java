@@ -102,7 +102,7 @@ public class HttpClientUtil {
 
             //System.out.println("初始化HttpClientTest~~~结束");
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            e.printStackTrace();
+            throw new HttpClientUtilException(e);
         }
 
 
@@ -173,11 +173,11 @@ public class HttpClientUtil {
             fileout.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
             //出现异常，删除文件
             if (file != null) {
                 file.deleteOnExit();
             }
+            throw new HttpClientUtilException(e);
         }
         return null;
     }
@@ -215,7 +215,7 @@ public class HttpClientUtil {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new HttpClientUtilException(e);
         } finally {
             try {
                 // 释放资源
@@ -223,7 +223,7 @@ public class HttpClientUtil {
                     response.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new HttpClientUtilException(e);
             }
         }
         return responseContent;
@@ -251,154 +251,6 @@ public class HttpClientUtil {
         HttpGet httpGet = new HttpGet(httpUrl);
         return sendHttpRequest(httpGet);
     }
-
-//    /**
-//     * 赛风代理 - get
-//     * @return
-//     */
-//    public static String getProxy(String httpUrl){
-//        //设置代理
-//        HttpHost proxy = new HttpHost("localhost", SAIFENG_PORT, "HTTP");
-//
-//        // 响应内容
-//        String responseContent = null;
-//
-//        // 设置请求超时时间
-//        int timeout = 10000;
-//
-//        RequestConfig config = RequestConfig.custom()
-//                .setProxy(proxy)
-//                .setSocketTimeout(timeout)
-//                .setConnectTimeout(timeout)
-//                .setConnectionRequestTimeout(timeout)
-//                .build();
-//
-//        //实例化CloseableHttpClient对象
-//        CloseableHttpClient httpclient = HttpClients.custom()
-//                .setDefaultCookieStore(cookieStore)
-//                .setDefaultRequestConfig(config)
-//                .build();
-//
-//        //访问地址
-//        HttpGet get = new HttpGet(httpUrl);
-//
-//        //响应
-//        CloseableHttpResponse response = null;
-//        //请求返回
-//        try {
-//            response = httpclient.execute(get);
-//
-//            // 得到响应实例
-//            HttpEntity entity = response.getEntity();
-//
-//            // 判断响应状态
-//            if (response.getStatusLine().getStatusCode() >= 300) {
-//                System.err.println("[ WARNING ]HTTP Request is not success, Response code is " + response.getStatusLine().getStatusCode());
-//            }
-//
-//            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
-//                responseContent = EntityUtils.toString(entity, CHARSET_UTF_8);
-//                EntityUtils.consume(entity);
-//            }
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                // 释放资源
-//                if (response != null) {
-//                    response.close();
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        return responseContent;
-//
-//    }
-
-
-//    /**
-//     * 赛风代理 - post
-//     * @return
-//     */
-//    public static String sendHttpPostProxy(String httpUrl, Map<String, String> maps){
-//        //处理参数
-//        String params = convertStringParamter(maps);
-//
-//        //设置代理
-//        HttpHost proxy = new HttpHost("localhost", SAIFENG_PORT, "HTTP");
-//
-//        // 响应内容
-//        String responseContent = null;
-//
-//        // 设置请求超时时间
-//        int timeout = 10000;
-//
-//        RequestConfig config = RequestConfig.custom()
-//                .setProxy(proxy)
-//                .setSocketTimeout(timeout)
-//                .setConnectTimeout(timeout)
-//                .setConnectionRequestTimeout(timeout)
-//                .build();
-//
-//        //实例化CloseableHttpClient对象
-//        CloseableHttpClient httpclient = HttpClients.custom()
-//                .setDefaultCookieStore(cookieStore)
-//                .setDefaultRequestConfig(config)
-//                .build();
-//
-//        //访问地址
-//        HttpPost post = new HttpPost(httpUrl);
-//
-//        // 设置参数
-//        if (params != null && params.trim().length() > 0) {
-//            StringEntity stringEntity = new StringEntity(params, "UTF-8");
-//            stringEntity.setContentType(CONTENT_TYPE_FORM_URL);
-//            post.setEntity(stringEntity);
-//        }
-//
-//        //响应
-//        CloseableHttpResponse response = null;
-//        //请求返回
-//        try {
-//            response = httpclient.execute(post);
-//
-//
-//            // 得到响应实例
-//            HttpEntity entity = response.getEntity();
-//
-//
-//            // 判断响应状态
-//            if (response.getStatusLine().getStatusCode() >= 300) {
-//                System.err.println("[ WARNING ]HTTP Request is not success, Response code is " + response.getStatusLine().getStatusCode());
-//            }
-//
-//
-//
-//            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
-//                responseContent = EntityUtils.toString(entity, CHARSET_UTF_8);
-//                EntityUtils.consume(entity);
-//            }
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                // 释放资源
-//                if (response != null) {
-//                    response.close();
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        return responseContent;
-//
-//    }
-
 
     /**
      * 发送option请求
@@ -455,7 +307,7 @@ public class HttpClientUtil {
                 httpPost.setEntity(stringEntity);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new HttpClientUtilException(e);
         }
         return sendHttpRequest(httpPost);
     }
@@ -487,7 +339,7 @@ public class HttpClientUtil {
                 httpPost.setEntity(stringEntity);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new HttpClientUtilException(e);
         }
         return sendHttpRequest(httpPost);
     }
@@ -508,7 +360,7 @@ public class HttpClientUtil {
                 httpPost.setEntity(stringEntity);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new HttpClientUtilException(e);
         }
         return sendHttpRequest(httpPost);
     }
@@ -542,5 +394,29 @@ public class HttpClientUtil {
         return parameterBuffer.toString();
     }
 
+
+    /**
+     * 异常
+     */
+    public static final class HttpClientUtilException extends RuntimeException {
+        public HttpClientUtilException() {
+        }
+
+        public HttpClientUtilException(String message) {
+            super(message);
+        }
+
+        public HttpClientUtilException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public HttpClientUtilException(Throwable cause) {
+            super(cause);
+        }
+
+        public HttpClientUtilException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+            super(message, cause, enableSuppression, writableStackTrace);
+        }
+    }
 
 }

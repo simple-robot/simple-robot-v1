@@ -1,5 +1,7 @@
 package com.forte.qqrobot.scanner;
 
+import com.forte.qqrobot.log.QQLog;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -109,7 +111,7 @@ public class FileScanner {
                 try {
                     clazz = classLoader.loadClass(packName + "." + chiFile.getName().replace(".class", ""));
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    QQLog.error("包扫描出现异常", e);
                 }
                 if (clazz != null && classFilter.test(clazz)) {
                     set.add(clazz);
@@ -161,7 +163,7 @@ public class FileScanner {
                     try {
                         clazz = classLoader.loadClass(jarEntry.getName().replace("/", ".").replace(".class", ""));
                     } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
+                        QQLog.error("包扫描出现异常", e);
                     }
                     //判断，如果符合，添加
                     if (clazz != null && classFilter.test(clazz)) {

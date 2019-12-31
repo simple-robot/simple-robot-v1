@@ -34,6 +34,7 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
 |LEMOC支持组件框架|         ForteScarlet| 基于simple-robot, 针对于酷Q插件 LEMOC 的对接组件 | https://github.com/ForteScarlet/simple-robot-component-lemoc |
 |HTTP API支持组件框架|      ForteScarlet| 基于simple-robot, 针对于酷Q插件 HTTP API的对接组件 | https://github.com/ForteScarlet/simple-robot-component-httpapi |
 |CoolQ HTTP API支持组件框架|ForteScarlet| 基于simple-robot, 针对于酷Q插件 CQ HTTP API的对接组件 | https://github.com/ForteScarlet/simple-robot-component-coolHttpApi |
+|崩坏学园2小助手 - 萌萌新  |瑶光天枢| 崩坏学园2的在线群聊，查询装备，模拟扭蛋，查询up记录，来份色图的机器人 | https://github.com/LiChen233/simple-robot |
 
 
 
