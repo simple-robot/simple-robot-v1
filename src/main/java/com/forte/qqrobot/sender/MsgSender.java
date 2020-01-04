@@ -9,11 +9,11 @@ import com.forte.qqrobot.beans.messages.result.StrangerInfo;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
+import com.forte.qqrobot.sender.intercept.SenderGetIntercept;
+import com.forte.qqrobot.sender.intercept.SenderInterceptFactory;
+import com.forte.qqrobot.sender.intercept.SenderSendIntercept;
+import com.forte.qqrobot.sender.intercept.SenderSetIntercept;
 import com.forte.qqrobot.sender.senderlist.*;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 /**
  * 送信器

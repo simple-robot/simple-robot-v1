@@ -8,7 +8,7 @@ import com.forte.qqrobot.beans.messages.msgget.GroupFileUpload;
 import com.forte.qqrobot.beans.messages.result.*;
 import com.forte.qqrobot.beans.types.CacheTypes;
 import com.forte.qqrobot.sender.CacheGetterFactory;
-import com.forte.qqrobot.sender.InterceptValue;
+import com.forte.qqrobot.sender.intercept.InterceptValue;
 
 import java.time.LocalDateTime;
 

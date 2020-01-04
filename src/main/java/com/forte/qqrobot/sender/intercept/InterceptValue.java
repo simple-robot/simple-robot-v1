@@ -1,4 +1,4 @@
-package com.forte.qqrobot.sender;
+package com.forte.qqrobot.sender.intercept;
 
 import java.lang.annotation.*;
 

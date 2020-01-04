@@ -1,4 +1,4 @@
-package com.forte.qqrobot.sender;
+package com.forte.qqrobot.sender.intercept;
 
 import com.forte.qqrobot.intercept.Interceptor;
 import com.forte.qqrobot.sender.senderlist.SenderList;
@@ -18,5 +18,5 @@ import com.forte.qqrobot.sender.senderlist.SenderList;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-interface SenderIntercept<S extends SenderList, C extends SenderContext<S>> extends Interceptor<S, C> {
+public interface SenderIntercept<S extends SenderList, C extends SenderContext<S>> extends Interceptor<S, C> {
 }

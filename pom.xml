@@ -15,7 +15,7 @@
 
     <!-- 版本号 -->
     <!-- 下次部署需要大于1.5.0 2019/12/27 -->
-    <version>1.6.0-TEST</version>
+    <version>1.6.0</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>

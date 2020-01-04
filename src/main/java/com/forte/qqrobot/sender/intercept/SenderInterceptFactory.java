@@ -1,7 +1,6 @@
-package com.forte.qqrobot.sender;
+package com.forte.qqrobot.sender.intercept;
 
 import com.forte.qqrobot.anno.Ignore;
-import com.forte.qqrobot.intercept.Intercept;
 import com.forte.qqrobot.intercept.Interceptor;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;

@@ -3,7 +3,7 @@ package com.forte.qqrobot.sender.senderlist;
 import com.forte.qqrobot.beans.messages.CodesAble;
 import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
-import com.forte.qqrobot.sender.InterceptValue;
+import com.forte.qqrobot.sender.intercept.InterceptValue;
 
 /**
  * SENDER 送信方法

@@ -1,4 +1,4 @@
-package com.forte.qqrobot.sender;
+package com.forte.qqrobot.sender.intercept;
 
 import com.forte.qqrobot.exception.RobotRuntimeException;
 

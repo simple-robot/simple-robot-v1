@@ -7,7 +7,7 @@ import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.msgget.FriendAddRequest;
 import com.forte.qqrobot.beans.messages.msgget.GroupAddRequest;
 import com.forte.qqrobot.beans.messages.types.GroupAddRequestType;
-import com.forte.qqrobot.sender.InterceptValue;
+import com.forte.qqrobot.sender.intercept.InterceptValue;
 
 /**
  * set相关方法接口
