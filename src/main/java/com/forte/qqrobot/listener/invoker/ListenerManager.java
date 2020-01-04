@@ -20,6 +20,7 @@ import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -60,7 +61,16 @@ public class ListenerManager implements MsgReceiver {
      */
     private MsgIntercept[] intercepts;
 
-
+    /**
+     * 每一个manager对象内部维护一个用于msg上下文对象的全局map对象，用于初始化MsgContext
+     * <br>
+     * 由于全局Map可能会出现线程问题，故此使用线程安全的Map
+     */
+    private final Map<String, Object> msgContextGlobalMap = new ConcurrentHashMap<>(4);
+    
+    /**
+     * 空的监听回执列表
+     */
     private static final ListenResult[] EMPTY_RESULT = new ListenResult[0];
 
 
@@ -71,7 +81,7 @@ public class ListenerManager implements MsgReceiver {
     public ListenResult[] onMsg(MsgGet msgget, SenderSendList sender, SenderSetList setter, SenderGetList getter){
         // 消息拦截
         // 构建上下文对象
-        MsgGetContext msgContext = new MsgGetContext(msgget, sender, setter, getter);
+        MsgGetContext msgContext = new MsgGetContext(msgget, sender, setter, getter, msgContextGlobalMap);
         // 遍历所有的消息拦截器
         for (MsgIntercept intercept : intercepts) {
             if(!intercept.intercept(msgContext)){

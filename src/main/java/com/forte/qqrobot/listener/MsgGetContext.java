@@ -7,6 +7,8 @@ import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
 
+import java.util.Map;
+
 /**
  *
  * 消息拦截器上下文对象
@@ -51,8 +53,8 @@ public class MsgGetContext extends BaseContext<MsgGet> {
         this.types = types;
     }
 
-    public MsgGetContext(MsgGet msgGet, SenderSendList sender, SenderSetList setter, SenderGetList getter){
-        super(msgGet);
+    public MsgGetContext(MsgGet msgGet, SenderSendList sender, SenderSetList setter, SenderGetList getter, Map<String, Object> globalContextMap){
+        super(msgGet, globalContextMap);
         this.types = MsgGetTypes.getByType(msgGet);
         this.SENDER = sender;
         this.SETTER = setter;

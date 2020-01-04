@@ -3,6 +3,8 @@ package com.forte.qqrobot.sender.intercept;
 import com.forte.qqrobot.intercept.BaseContext;
 import com.forte.qqrobot.sender.senderlist.SenderList;
 
+import java.util.Map;
+
 /**
  *
  * 送信拦截器所使用的父类上下文对象
@@ -19,8 +21,8 @@ public abstract class SenderContext<T extends SenderList> extends BaseContext<T>
      */
     private Object[] params;
 
-    public SenderContext(T value, Object... params) {
-        super(value);
+    public SenderContext(T value, Map<String, Object> globalContextMap, Object... params) {
+        super(value, globalContextMap);
         this.params = params;
     }
 

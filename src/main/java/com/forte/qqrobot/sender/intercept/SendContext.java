@@ -2,6 +2,9 @@ package com.forte.qqrobot.sender.intercept;
 
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  *
  * 提供一个sender对象
@@ -12,8 +15,11 @@ import com.forte.qqrobot.sender.senderlist.SenderSendList;
 public class SendContext extends SenderContext<SenderSendList> {
     public final SenderSendList SENDER;
 
+    /** send所使用的全局Map */
+    private static final Map<String, Object> GLOBAL_CONTEXT_MAP = new ConcurrentHashMap<>(4);
+
     public SendContext(SenderSendList value, Object... params) {
-        super(value, params);
+        super(value, GLOBAL_CONTEXT_MAP, params);
         SENDER = value;
     }
 }

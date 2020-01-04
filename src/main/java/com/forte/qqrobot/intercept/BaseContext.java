@@ -16,7 +16,11 @@ public abstract class BaseContext<T> {
 
     private T value;
 
+    /** 当前上下文参数 */
     private Map<String, Object> contextMap;
+
+    /** 全局上下文参数 */
+    private final Map<String, Object> globalContextMap;
 
     public T getValue(){
         return value;
@@ -35,12 +39,42 @@ public abstract class BaseContext<T> {
         return contextMap;
     }
 
+    /**
+     * 获取全局Map
+     */
+    private Map<String, Object> getGlobalContextMap(){
+        return globalContextMap;
+    }
+
+    /**
+     * 获取一个当前上下文参数
+     * @param key key
+     * @return 当前上下文参数
+     */
     public Object get(String key){
         return getContextMap().get(key);
     }
 
+    /**
+     * 记录一个当前上下文参数
+     * @param key key
+     * @param value value
+     */
     public Object set(String key, Object value){
         return getContextMap().put(key, value);
+    }
+
+    /**
+     * 获取一个全局上下文参数
+     * @param key key
+     * @return key
+     */
+    public Object getGlobal(String key){
+        return getGlobalContextMap().get(key);
+    }
+
+    public Object setGlobal(String key, Object value){
+        return getGlobalContextMap().put(key, value);
     }
 
     public void clear(){
@@ -49,8 +83,9 @@ public abstract class BaseContext<T> {
 
 
     /** 构造 */
-    public BaseContext(T value){
+    public BaseContext(T value, Map<String, Object> globalContextMap){
         this.value = value;
+        this.globalContextMap = globalContextMap;
     }
 
 }
