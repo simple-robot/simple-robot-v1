@@ -6,8 +6,8 @@ import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.exception.RobotRuntimeException;
-import com.forte.qqrobot.listener.intercept.MsgIntercept;
-import com.forte.qqrobot.listener.intercept.MsgGetContext;
+import com.forte.qqrobot.listener.MsgIntercept;
+import com.forte.qqrobot.listener.MsgGetContext;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.listener.result.ListenResult;
 import com.forte.qqrobot.listener.result.ListenResultImpl;
@@ -59,6 +59,7 @@ public class ListenerManager implements MsgReceiver {
      * 拦截器列表
      */
     private MsgIntercept[] intercepts;
+
 
     private static final ListenResult[] EMPTY_RESULT = new ListenResult[0];
 
@@ -392,10 +393,15 @@ public class ListenerManager implements MsgReceiver {
      * @param methods 函数集合
      * @param intercepts 消息拦截器数组
      */
-    public ListenerManager(Collection<ListenerMethod> methods, MsgIntercept... intercepts){
-        // 先排序并构建拦截器
-        Arrays.sort(intercepts);
-        this.intercepts = intercepts;
+    public ListenerManager(Collection<ListenerMethod> methods, MsgIntercept[] intercepts){
+        // 排序并构建消息拦截器
+        if(intercepts != null){
+            MsgIntercept[] msgInterceptsCopy = Arrays.copyOf(intercepts, intercepts.length);
+            Arrays.sort(msgInterceptsCopy);
+            this.intercepts = msgInterceptsCopy;
+        }else{
+            this.intercepts = new MsgIntercept[0];
+        }
 
 
         /*

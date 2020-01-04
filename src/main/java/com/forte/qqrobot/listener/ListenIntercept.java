@@ -1,4 +1,4 @@
-package com.forte.qqrobot.listener.intercept;
+package com.forte.qqrobot.listener;
 
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 
@@ -10,7 +10,7 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface ListenIntercepts {
+public interface ListenIntercept {
 
     /**
      * 监听函数准备进行执行的时候。

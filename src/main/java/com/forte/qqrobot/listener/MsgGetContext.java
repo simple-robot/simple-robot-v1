@@ -1,7 +1,8 @@
-package com.forte.qqrobot.listener.intercept;
+package com.forte.qqrobot.listener;
 
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.intercept.BaseContext;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;

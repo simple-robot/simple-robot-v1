@@ -6,13 +6,12 @@ import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.depend.DependGetter;
-import com.forte.qqrobot.listener.intercept.MsgIntercept;
+import com.forte.qqrobot.listener.MsgIntercept;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.listener.result.BodyResultParser;
 import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.MethodUtil;
-import com.forte.utils.regex.RegexUtil;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -227,7 +226,7 @@ public class ListenerMethodScanner {
      * 构建监听函数管理器实例
      * @return 监听函数管理器实例
      */
-    public ListenerManager buildManager(MsgIntercept... intercepts){
+    public ListenerManager buildManager(MsgIntercept[] intercepts){
         return new ListenerManager(listenerMethodSet, intercepts);
     }
 

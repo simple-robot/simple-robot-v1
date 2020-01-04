@@ -8,30 +8,26 @@ import com.forte.qqrobot.anno.depend.AllBeans;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.RobotRuntimeException;
-import com.forte.qqrobot.listener.intercept.MsgIntercept;
+import com.forte.qqrobot.listener.MsgIntercept;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.log.QQLogBack;
-import com.forte.qqrobot.safe.PoliceStation;
 import com.forte.qqrobot.scanner.FileScanner;
 import com.forte.qqrobot.scanner.Register;
 import com.forte.qqrobot.scanner.ScannerManager;
-import com.forte.qqrobot.sender.MsgSender;
+import com.forte.qqrobot.sender.*;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.*;
-import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.Closeable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -90,6 +86,14 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
     /** 依赖获取器，赋值在配置后 */
     private DependGetter dependGetter;
+
+    /** 消息拦截器 */
+    private MsgIntercept[] msgIntercepts;
+
+    /** 送信拦截器 */
+    private SenderSendIntercept[] senderSendIntercepts;
+    private SenderSetIntercept[]  senderSetIntercepts;
+    private SenderGetIntercept[]  senderGetIntercepts;
 
     /**
      * 线程工厂初始化
@@ -221,7 +225,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     /** 服务启动前 */
     protected void beforeStart(){ }
 
-    /** 服务启动后 */
+    /** 服务启动后, 构建无参数送信器之前 */
     protected void afterStart(){ }
 
     /**  监听函数注册之前，可以执行重写并进行额外的监听注入 */
@@ -267,6 +271,100 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //构建监听扫描器
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
 
+        // 扫描并获取依赖中心
+        DependCenter dependCenter = scanAndInject(config, app);
+
+        // 注册监听函数
+        registerListener(config, app, scanner, dependCenter);
+
+        //根据配置类的扫描结果来构建监听器管理器和阻断器
+        // 准备获取消息拦截器
+        QQLog.debug("准备消息拦截器");
+        MsgIntercept[] msgIntercepts = register.performingTasks(
+                c -> FieldUtils.isChild(c, MsgIntercept.class),
+                (Class<?>[] cs) -> Arrays.stream(cs)
+                        .peek(c -> QQLog.debug("加载消息拦截器: " + c))
+                        .map(dependCenter::get).toArray(MsgIntercept[]::new)
+        );
+        this.msgIntercepts = msgIntercepts;
+
+        // 构建管理中心
+        ListenerManager manager = scanner.buildManager(msgIntercepts);
+        // 构建阻断器
+        Plug plug = scanner.buildPlug();
+
+        //保存
+        ResourceDispatchCenter.saveListenerManager(manager);
+        ResourceDispatchCenter.savePlug(plug);
+
+
+        //准备截器
+        QQLog.debug("准备送信拦截器");
+        SenderSendIntercept[] senderSendIntercepts = register.performingTasks(
+                c -> FieldUtils.isChild(c, SenderSendIntercept.class),
+                (Class<?>[] cs) -> Arrays.stream(cs)
+                        .peek(c -> QQLog.debug("加载送信拦截器: " + c))
+                        .map(dependCenter::get).toArray(SenderSendIntercept[]::new)
+        );
+        this.senderSendIntercepts = senderSendIntercepts;
+        //********************************//
+
+        SenderSetIntercept[] senderSetIntercepts = register.performingTasks(
+                c -> FieldUtils.isChild(c, SenderSetIntercept.class),
+                (Class<?>[] cs) -> Arrays.stream(cs)
+                        .peek(c -> QQLog.debug("加载送信拦截器: " + c))
+                        .map(dependCenter::get).toArray(SenderSetIntercept[]::new)
+        );
+        this.senderSetIntercepts = senderSetIntercepts;
+        //********************************//
+
+        SenderGetIntercept[] senderGetIntercepts = register.performingTasks(
+                c -> FieldUtils.isChild(c, SenderGetIntercept.class),
+                (Class<?>[] cs) -> Arrays.stream(cs)
+                        .peek(c -> QQLog.debug("加载送信拦截器: " + c))
+                        .map(dependCenter::get).toArray(SenderGetIntercept[]::new)
+        );
+        this.senderGetIntercepts = senderGetIntercepts;
+
+        // 送信拦截器直接变更MsgSender的实例化过程
+        MsgSender.setSenderSendIntercepts(senderSendIntercepts);
+        MsgSender.setSenderSetIntercepts(senderSetIntercepts);
+        MsgSender.setSenderGetIntercepts(senderGetIntercepts);
+
+
+        //返回依赖管理器
+        return dependCenter;
+    }
+
+    /**
+     * 注册监听函数
+     * @param config        配置类
+     * @param app           启动器接口实现类
+     * @param scanner       扫描器
+     * @param dependCenter  依赖中心
+     */
+    private void registerListener(CONFIG config, Application<CONFIG> app, ListenerMethodScanner scanner, DependCenter dependCenter){
+
+        // > 监听函数注册之前
+        beforeRegisterListener(config, app, scanner, dependCenter);
+
+        //直接注册监听函数
+        this.register.registerListener(scanner);
+
+        // > 监听函数注册之后
+        Consumer<Class<?>[]>[] afterListenerConsumer = afterListener(config, app);
+        if(afterListenerConsumer != null){
+            for (Consumer<Class<?>[]> c : afterListenerConsumer) {
+                register.performingTasks(c);
+            }
+        }
+    }
+
+    /**
+     * 进行依赖扫描与注入
+     * @return 依赖中心
+     */
+    private DependCenter scanAndInject(CONFIG config, Application<CONFIG> app){
         //包路径
         String appPackage = app.getClass().getPackage().getName();
         Set<String> scanAllPackage = new HashSet<>();
@@ -313,20 +411,20 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
                             (FieldUtils.notInterfaceAndAbstract(c)) && (FieldUtils.isChild(c, DependGetter.class)),
                     //看看有没有，如果有，赋值。
                     cs -> {
-                if(cs.length == 1){
-                    //找到一个，尝试实例化
-                    Class<?> c = cs[0];
-                    try {
-                        return (DependGetter) BeansUtils.getInstance(c);
-                    } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
-                        return null;
-                    }
-                }else if(cs.length == 0){
-                    return null;
-                }else{
-                    throw new RobotRuntimeException("扫描到多个" + DependGetter.class + "的实现类。");
-                }
-            });
+                        if(cs.length == 1){
+                            //找到一个，尝试实例化
+                            Class<?> c = cs[0];
+                            try {
+                                return (DependGetter) BeansUtils.getInstance(c);
+                            } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
+                                return null;
+                            }
+                        }else if(cs.length == 0){
+                            return null;
+                        }else{
+                            throw new RobotRuntimeException("扫描到多个" + DependGetter.class + "的实现类。");
+                        }
+                    });
         }
 
         // > 依赖扫描之前
@@ -351,8 +449,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         dependCenter.loadIgnoreThrow(config);
 
 
-
-
         //如果有全局注入，先扫描并注入全局注入
         if(annotation != null){
             //获取扫描器
@@ -375,42 +471,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         // > 依赖注入之后
         afterDepend(config, app, this.register, dependCenter);
 
-        // > 监听函数注册之前
-        beforeRegisterListener(config, app, scanner, dependCenter);
-
-        //直接注册监听函数
-        this.register.registerListener(scanner);
-
-
-        // > 监听函数注册之后
-        Consumer<Class<?>[]>[] afterListenerConsumer = afterListener(config, app);
-        if(afterListenerConsumer != null){
-            for (Consumer<Class<?>[]> c : afterListenerConsumer) {
-                register.performingTasks(c);
-            }
-        }
-
-
-        //根据配置类的扫描结果来构建监听器管理器和阻断器
-        // 准备获取消息拦截器
-        MsgIntercept[] msgIntercepts = register.performingTasks(
-                c -> FieldUtils.isChild(c, MsgIntercept.class),
-                (Class<?>[] cs) -> Arrays.stream(cs).map(dependCenter::get).toArray(MsgIntercept[]::new)
-        );
-
-
-
-        // 构建管理中心
-        ListenerManager manager = scanner.buildManager(msgIntercepts);
-        // 构建阻断器
-        Plug plug = scanner.buildPlug();
-
-        //保存
-        ResourceDispatchCenter.saveListenerManager(manager);
-        ResourceDispatchCenter.savePlug(plug);
-
-
-        //返回依赖管理器
         return dependCenter;
     }
 
@@ -499,6 +559,12 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         return this.NO_METHOD_SENDER;
     }
 
+    /**
+     * 获取消息拦截器接口。数组会copy，所以请注意性能
+     */
+    public MsgIntercept[] getMsgIntercepts() {
+        return msgIntercepts;
+    }
 
     //**************** 构造 ****************//
     /** 无参构造 */

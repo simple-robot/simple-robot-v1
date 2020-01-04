@@ -9,34 +9,64 @@ import com.forte.qqrobot.beans.messages.result.StrangerInfo;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
-import com.forte.qqrobot.sender.senderlist.SenderGetList;
-import com.forte.qqrobot.sender.senderlist.SenderList;
-import com.forte.qqrobot.sender.senderlist.SenderSendList;
-import com.forte.qqrobot.sender.senderlist.SenderSetList;
+import com.forte.qqrobot.sender.senderlist.*;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * 送信器
+ *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class MsgSender implements Sender{
+public class MsgSender implements Sender {
 
     /**
      * 使用此连接管理器的是哪个监听方法
      */
     private final ListenerMethod LISTENER_METHOD;
 
-    /** 消息发送器-send */
+    /**
+     * 消息发送器-send
+     */
     public final SenderSendList SENDER;
 
-    /** 消息发送器-set */
+    /**
+     * 消息发送器-set
+     */
     public final SenderSetList SETTER;
 
-    /** 消息发送器-get */
+    /**
+     * 消息发送器-get
+     */
     public final SenderGetList GETTER;
 
-    /** 送信器与监听函数都是空的常量对象 */
+    /**
+     * 送信器与监听函数都是空的常量对象
+     */
     private static final MsgSender EMPTY_SENDER = new MsgSender(null, null);
+
+
+    private static SenderSendIntercept[] senderSendIntercepts =  new SenderSendIntercept[0];
+    private static SenderSetIntercept[]  senderSetIntercepts =   new SenderSetIntercept[0];
+    private static SenderGetIntercept[]  senderGetIntercepts =   new SenderGetIntercept[0];
+
+    //**************** 送信器的拦截代理 ****************//
+    /** 设置send送信器拦截 */
+    public static void setSenderSendIntercepts(SenderSendIntercept... senderSendIntercepts){
+        MsgSender.senderSendIntercepts = senderSendIntercepts;
+    }
+    /** 设置set送信器拦截 */
+    public static void setSenderSetIntercepts(SenderSetIntercept... senderSetIntercepts){
+        MsgSender.senderSetIntercepts = senderSetIntercepts;
+    }
+    /** 设置get送信器拦截 */
+    public static void setSenderGetIntercepts(SenderGetIntercept... senderGetIntercepts){
+        MsgSender.senderGetIntercepts = senderGetIntercepts;
+    }
+
 
     //**************** 判断相关 ****************//
 
@@ -50,22 +80,23 @@ public class MsgSender implements Sender{
     /**
      * 是否存在send消息器
      */
-    public boolean isSendAble(){
+    public boolean isSendAble() {
         return SENDER != null;
     }
 
     /**
      * 是否存在set消息器
      */
-    public boolean isSetAble(){
+    public boolean isSetAble() {
         return SETTER != null;
     }
 
     /**
      * 是否存在Get消息器
+     *
      * @return
      */
-    public boolean isGetAble(){
+    public boolean isGetAble() {
         return GETTER != null;
     }
 
@@ -74,21 +105,21 @@ public class MsgSender implements Sender{
     /**
      * 获取阻断器
      */
-    private Plug getPlug(){
+    private Plug getPlug() {
         return ResourceDispatchCenter.getPlug();
     }
 
     /**
      * 获取空阻断器
      */
-    private Plug getEmptyPlug(){
+    private Plug getEmptyPlug() {
         return Plug.EmptyPlug.build();
     }
 
     /**
      * 根据是否存在监听函数来获取阻断器
      */
-    private Plug getPlugByMethod(){
+    private Plug getPlugByMethod() {
         return hasMethod() ? getPlug() : getEmptyPlug();
     }
 
@@ -275,48 +306,52 @@ public class MsgSender implements Sender{
 
     /**
      * 通过QQ号获取陌生人信息
-     * @param code  qq号
-     * @return      qq号的信息
+     *
+     * @param code qq号
+     * @return qq号的信息
      */
-    public StrangerInfo getPersonInfoByCode(String code){
+    public StrangerInfo getPersonInfoByCode(String code) {
         return GETTER.getStrangerInfo(code);
     }
 
     /**
      * 通过携带QQ号信息的对象来获取信息
-     * @param codeAble  携带QQ号信息的对象
+     *
+     * @param codeAble 携带QQ号信息的对象
      * @return
      */
-    public StrangerInfo getPersonInfo(QQCodeAble codeAble){
+    public StrangerInfo getPersonInfo(QQCodeAble codeAble) {
         return getPersonInfoByCode(codeAble.getQQCode());
     }
 
     /**
      * 通过群号获取群详细信息
+     *
      * @param groupCode 群号
-     * @return  群详细信息
+     * @return 群详细信息
      */
-    public GroupInfo getGroupInfoByCode(String groupCode){
+    public GroupInfo getGroupInfoByCode(String groupCode) {
         return GETTER.getGroupInfo(groupCode);
     }
 
     /**
-     *  通过携带群号的对象获取群详细信息
+     * 通过携带群号的对象获取群详细信息
+     *
      * @param groupCodeAble 携带群号的对象
-     * @return  群详细信息
+     * @return 群详细信息
      */
-    public GroupInfo getGroupInfo(GroupCodeAble groupCodeAble){
+    public GroupInfo getGroupInfo(GroupCodeAble groupCodeAble) {
         return getGroupInfoByCode(groupCodeAble.getGroupCode());
     }
 
     /**
      * 获取酷q上的qq信息
+     *
      * @return qq信息
      */
-    public LoginQQInfo getLoginInfo(){
+    public LoginQQInfo getLoginInfo() {
         return GETTER.getLoginQQInfo();
     }
-
 
 
     //**************************************
@@ -327,7 +362,7 @@ public class MsgSender implements Sender{
     /**
      * 是所有工厂方法的汇总方法之一
      */
-    public static MsgSender build(SenderList senderList, ListenerMethod listenerMethod){
+    public static MsgSender build(SenderList senderList, ListenerMethod listenerMethod) {
         return (senderList == null && listenerMethod == null) ? buildEmpty()
                 :
                 (listenerMethod == null ?
@@ -342,8 +377,8 @@ public class MsgSender implements Sender{
     /**
      * 是所有工厂方法的汇总方法之一
      */
-    public static MsgSender build(SenderSendList sender, SenderSetList setter, SenderGetList getter, ListenerMethod listenerMethod){
-        return  (sender == null && setter == null && getter == null && listenerMethod == null) ?
+    public static MsgSender build(SenderSendList sender, SenderSetList setter, SenderGetList getter, ListenerMethod listenerMethod) {
+        return (sender == null && setter == null && getter == null && listenerMethod == null) ?
                 buildEmpty()
                 :
                 (listenerMethod == null ?
@@ -358,87 +393,95 @@ public class MsgSender implements Sender{
 
     //**************** 成对儿 ****************//
 
-    public static MsgSender build(SenderSetList setter, SenderGetList getter, ListenerMethod listenerMethod){
+    public static MsgSender build(SenderSetList setter, SenderGetList getter, ListenerMethod listenerMethod) {
         return build(null, setter, getter, listenerMethod);
     }
-    public static MsgSender build(SenderSendList sender, SenderSetList setter, ListenerMethod listenerMethod){
+
+    public static MsgSender build(SenderSendList sender, SenderSetList setter, ListenerMethod listenerMethod) {
         return build(sender, setter, null, listenerMethod);
     }
-    public static MsgSender build(SenderSendList sender, SenderGetList getter, ListenerMethod listenerMethod){
+
+    public static MsgSender build(SenderSendList sender, SenderGetList getter, ListenerMethod listenerMethod) {
         return build(sender, null, getter, listenerMethod);
     }
 
     //**************** 单个 ****************//
 
-    public static MsgSender build(SenderSendList sender, ListenerMethod listenerMethod){
+    public static MsgSender build(SenderSendList sender, ListenerMethod listenerMethod) {
         return build(sender, null, null, listenerMethod);
     }
-    public static MsgSender build(SenderSetList setter, ListenerMethod listenerMethod){
+
+    public static MsgSender build(SenderSetList setter, ListenerMethod listenerMethod) {
         return build(null, setter, null, listenerMethod);
     }
-    public static MsgSender build(SenderGetList getter, ListenerMethod listenerMethod){
+
+    public static MsgSender build(SenderGetList getter, ListenerMethod listenerMethod) {
         return build(null, null, getter, listenerMethod);
     }
 
     //**************** 没有listenerMethod ****************//
 
-    public static MsgSender build(SenderList senderList){
+    public static MsgSender build(SenderList senderList) {
         return build(senderList, null);
     }
 
     //**************** 全 ****************//
 
-    public static MsgSender build(SenderSendList sender, SenderSetList setter, SenderGetList getter){
+    public static MsgSender build(SenderSendList sender, SenderSetList setter, SenderGetList getter) {
         return build(sender, setter, getter, null);
     }
 
     //**************** 成对儿 ****************//
 
-    public static MsgSender build(SenderSetList setter, SenderGetList getter){
+    public static MsgSender build(SenderSetList setter, SenderGetList getter) {
         return build(null, setter, getter, null);
     }
-    public static MsgSender build(SenderSendList sender, SenderSetList setter){
+
+    public static MsgSender build(SenderSendList sender, SenderSetList setter) {
         return build(sender, setter, null, null);
     }
-    public static MsgSender build(SenderSendList sender, SenderGetList getter){
+
+    public static MsgSender build(SenderSendList sender, SenderGetList getter) {
         return build(sender, null, getter, null);
     }
 
     //**************** 单个 ****************//
 
-    public static MsgSender buildOnlySender(SenderSendList sender){
+    public static MsgSender buildOnlySender(SenderSendList sender) {
         return build(sender, null, null, null);
     }
-    public static MsgSender buildOnlySetter(SenderSetList setter){
+
+    public static MsgSender buildOnlySetter(SenderSetList setter) {
         return build(null, setter, null, null);
     }
-    public static MsgSender buildOnlyGetter(SenderGetList getter){
+
+    public static MsgSender buildOnlyGetter(SenderGetList getter) {
         return build(null, null, getter, null);
     }
 
 
     //**************** 空 ****************//
 
-    public static MsgSender buildEmpty(){
+    public static MsgSender buildEmpty() {
         return EMPTY_SENDER;
     }
-
-
 
 
     //**************** 构造 ****************//
 
 
-    /** 构造 */
-    private MsgSender(SenderList senderList, ListenerMethod listenerMethod){
+    /**
+     * 构造
+     */
+    private MsgSender(SenderList senderList, ListenerMethod listenerMethod) {
         //如果为空，直接赋值为null
-        if(senderList == null){
+        if (senderList == null) {
             this.SENDER = null;
             this.SETTER = null;
             this.GETTER = null;
-        }else{
+        } else {
             //构建SENDER
-            this.SENDER = senderList.isSenderList() ? (SenderSendList)senderList : null;
+            this.SENDER = senderList.isSenderList() ? (SenderSendList) senderList : null;
             this.SETTER = senderList.isSetterList() ? (SenderSetList) senderList : null;
             this.GETTER = senderList.isGetterList() ? (SenderGetList) senderList : null;
         }
@@ -448,12 +491,27 @@ public class MsgSender implements Sender{
     }
 
 
-    /** 构造 */
-    private MsgSender(SenderSendList sender, SenderSetList setter, SenderGetList getter, ListenerMethod listenerMethod){
-            //构建SENDER
+    /**
+     * 构造
+     */
+    private MsgSender(SenderSendList sender, SenderSetList setter, SenderGetList getter, ListenerMethod listenerMethod) {
+        //构建SENDER, 如果存在拦截器，则构建代理
+        if(senderSendIntercepts.length > 0){
+            this.SENDER = SenderInterceptFactory.doSenderIntercept(sender, senderSendIntercepts);
+        }else{
             this.SENDER = sender;
+        }
+        if(senderSetIntercepts.length > 0){
+            this.SETTER = SenderInterceptFactory.doSetterIntercept(setter, senderSetIntercepts);
+        }else{
             this.SETTER = setter;
+        }
+        if(senderGetIntercepts.length > 0){
+            this.GETTER = SenderInterceptFactory.doGetterIntercept(getter, senderGetIntercepts);
+        }else{
             this.GETTER = getter;
+        }
+
         //为listenerMethod赋值
         this.LISTENER_METHOD = listenerMethod;
     }

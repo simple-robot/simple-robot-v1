@@ -3,6 +3,7 @@ package com.forte.qqrobot.sender.senderlist;
 import com.forte.qqrobot.beans.messages.CodesAble;
 import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
+import com.forte.qqrobot.sender.InterceptValue;
 
 /**
  * SENDER 送信方法
@@ -21,6 +22,7 @@ public interface SenderSendList extends SenderList {
      * @param group 群号
      * @param msg   消息内容
      */
+    @InterceptValue("false")
     boolean sendDiscussMsg(String group, String msg);
 
     /**
@@ -37,6 +39,7 @@ public interface SenderSendList extends SenderList {
      * @param group 群号
      * @param msg   消息内容
      */
+    @InterceptValue("false")
     boolean sendGroupMsg(String group, String msg);
 
 
@@ -56,6 +59,7 @@ public interface SenderSendList extends SenderList {
      * @param QQ    QQ号
      * @param msg   消息内容
      */
+    @InterceptValue("false")
     boolean sendPrivateMsg(String QQ, String msg);
 
 
@@ -73,6 +77,7 @@ public interface SenderSendList extends SenderList {
      * @param group 群号
      * @param QQ    QQ号
      */
+    @InterceptValue("false")
     boolean sendFlower(String group, String QQ);
 
     /**
@@ -96,6 +101,7 @@ public interface SenderSendList extends SenderList {
      * @param QQ    QQ号
      * @param times 次数
      */
+    @InterceptValue("false")
     boolean sendLike(String QQ, int times);
 
     /**

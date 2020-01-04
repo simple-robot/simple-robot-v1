@@ -1,4 +1,4 @@
-package com.forte.qqrobot.listener.intercept;
+package com.forte.qqrobot.intercept;
 
 import com.forte.qqrobot.anno.depend.Beans;
 

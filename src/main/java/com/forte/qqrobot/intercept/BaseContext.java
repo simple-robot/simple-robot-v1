@@ -1,4 +1,4 @@
-package com.forte.qqrobot.listener.intercept;
+package com.forte.qqrobot.intercept;
 
 import java.util.HashMap;
 import java.util.Map;

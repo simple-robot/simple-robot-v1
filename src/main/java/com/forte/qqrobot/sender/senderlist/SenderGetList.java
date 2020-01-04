@@ -8,6 +8,7 @@ import com.forte.qqrobot.beans.messages.msgget.GroupFileUpload;
 import com.forte.qqrobot.beans.messages.result.*;
 import com.forte.qqrobot.beans.types.CacheTypes;
 import com.forte.qqrobot.sender.CacheGetterFactory;
+import com.forte.qqrobot.sender.InterceptValue;
 
 import java.time.LocalDateTime;
 
@@ -33,6 +34,7 @@ public interface SenderGetList extends SenderList {
      * 一般是使用匿名标识来获取
      * @return 匿名成员信息
      */
+    @InterceptValue
     AnonInfo getAnonInfo(String flag);
 
 
@@ -41,6 +43,7 @@ public interface SenderGetList extends SenderList {
      * 一般不需要参数
      * @return 权限信息
      */
+    @InterceptValue
     AuthInfo getAuthInfo();
 
     /**
@@ -48,6 +51,7 @@ public interface SenderGetList extends SenderList {
      * @param group 群号
      * @return 封禁列表
      */
+    @InterceptValue
     BanList getBanList(String group);
 
     /**
@@ -64,6 +68,7 @@ public interface SenderGetList extends SenderList {
      * @param flag 文件标识
      * @return 群文件信息
      */
+    @InterceptValue
     FileInfo getFileInfo(String flag);
 
     /**
@@ -79,6 +84,7 @@ public interface SenderGetList extends SenderList {
      * 获取好友列表
      * @return 好友列表
      */
+    @InterceptValue
     FriendList getFriendList();
 
     /**
@@ -105,6 +111,7 @@ public interface SenderGetList extends SenderList {
      * @param number 获取数量
      * @return 群作业列表
      */
+    @InterceptValue
     GroupHomeworkList getGroupHomeworkList(String group, int number);
 
     /**
@@ -140,6 +147,7 @@ public interface SenderGetList extends SenderList {
      * @param cache 是否使用缓存
      * @return 群信息
      */
+    @InterceptValue
     GroupInfo getGroupInfo(String group, boolean cache);
 
     /**
@@ -177,6 +185,7 @@ public interface SenderGetList extends SenderList {
      * @param number 获取数量
      * @return  群链接
      */
+    @InterceptValue
     GroupLinkList getGroupLinkList(String group, int number);
 
     /**
@@ -193,6 +202,7 @@ public interface SenderGetList extends SenderList {
      * 取群列表
      * @return 群列表
      */
+    @InterceptValue
     GroupList getGroupList();
 
     /**
@@ -231,6 +241,7 @@ public interface SenderGetList extends SenderList {
      * @param cache 是否使用缓存
      * @return 群成员信息
      */
+    @InterceptValue
     GroupMemberInfo getGroupMemberInfo(String group, String QQ, boolean cache);
 
 
@@ -258,6 +269,7 @@ public interface SenderGetList extends SenderList {
      * @param group 群号
      * @return  成员列表
      */
+    @InterceptValue
     GroupMemberList getGroupMemberList(String group);
 
     /**
@@ -293,6 +305,7 @@ public interface SenderGetList extends SenderList {
      * @param number 数量
      * @return  群公告列表
      */
+    @InterceptValue
     GroupNoteList getGroupNoteList(String group, int number);
 
     /**
@@ -311,6 +324,7 @@ public interface SenderGetList extends SenderList {
      * @param group 群号
      * @return  置顶群公告
      */
+    @InterceptValue
     GroupTopNote getGroupTopNote(String group);
 
     /**
@@ -327,6 +341,7 @@ public interface SenderGetList extends SenderList {
      * @param flag  图片文件名或标识
      * @return  图片信息
      */
+    @InterceptValue
     ImageInfo getImageInfo(String flag);
 
     /**
@@ -342,12 +357,14 @@ public interface SenderGetList extends SenderList {
      * 获取登录的QQ的信息
      * @return 登录QQ的信息
      */
+    @InterceptValue
     LoginQQInfo getLoginQQInfo();
 
     /**
      * 获取群共享文件列表
      * @return 共享文件列表
      */
+    @InterceptValue
     ShareList getShareList(String group);
 
     /**
@@ -383,6 +400,7 @@ public interface SenderGetList extends SenderList {
      * @param cache 是否使用缓存
      * @return
      */
+    @InterceptValue
     StrangerInfo getStrangerInfo(String QQ, boolean cache);
 
     /**
@@ -401,8 +419,10 @@ public interface SenderGetList extends SenderList {
 
     /**
      * 获取默认的缓存器，默认缓存器数据缓存1小时
+     * @deprecated  目前缓存使用动态代理以及localThread进行缓存，会很影响效率，所以在此标记过时，以待优化。
      */
     @CacheGetterFactory.NoCache
+    @Deprecated
     default SenderGetList cache(){
         return CacheGetterFactory.toCacheableGetter(this);
     }
@@ -410,8 +430,10 @@ public interface SenderGetList extends SenderList {
     /**
      * 转化为缓存getter
      * @param time 缓存保存的秒时长
+     * @deprecated  目前缓存使用动态代理以及localThread进行缓存，会很影响效率，所以在此标记过时，以待优化。
      */
     @CacheGetterFactory.NoCache
+    @Deprecated
     default SenderGetList cache(long time){
         return CacheGetterFactory.toCacheableGetter(this, time);
     }
@@ -420,8 +442,10 @@ public interface SenderGetList extends SenderList {
      * 转化为缓存getter
      * @param time          时长
      * @param cacheTypes    时间对应的增量类型
+     * @deprecated  目前缓存使用动态代理以及localThread进行缓存，会很影响效率，所以在此标记过时，以待优化。
      */
     @CacheGetterFactory.NoCache
+    @Deprecated
     default SenderGetList cache(long time, CacheTypes cacheTypes){
         return CacheGetterFactory.toCacheableGetter(this, time, cacheTypes);
     }
@@ -429,8 +453,10 @@ public interface SenderGetList extends SenderList {
     /**
      * 指定过期时间
      * @param to    到某个指定的时间过期
+     * @deprecated  目前缓存使用动态代理以及localThread进行缓存，会很影响效率，所以在此标记过时，以待优化。
      */
     @CacheGetterFactory.NoCache
+    @Deprecated
     default SenderGetList cache(LocalDateTime to){
         return CacheGetterFactory.toCacheableGetter(this, to);
     }
@@ -438,8 +464,10 @@ public interface SenderGetList extends SenderList {
 
     /**
      * 取消缓存状态
+     * @deprecated  目前缓存使用动态代理以及localThread进行缓存，会很影响效率，所以在此标记过时，以待优化。
      */
     @CacheGetterFactory.NoCache
+    @Deprecated
     default SenderGetList dontCache(){
         SenderGetList originalGetter = CacheGetterFactory.getOriginalGetter();
         //如果没有，则认为自己就是原本的。
