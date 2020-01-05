@@ -76,6 +76,29 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
             <td>主要做上面两个版本机器人的控制面板（web端）	</td>
             <td>https://gitee.com/yaozhenyong/Qqrobotwar</td>
         </tr>
+        <tr>
+            <td>Robot-Spring</td>
+            <td>千年老妖(1571650839)</td>
+            <td>
+                <p>功能:</p>
+                <p>COC跑团基础功能++斗图,聊天,群管等乱七八糟的功能</p>
+                <p>框架:</p>
+                <p>SpringBoot-Mybatis-CoolHttpApI</p>
+                <p>描述:</p> 
+                <p>基于酷Q的，使用Java语言开发的，面向COC的骰子机器人组件</p>
+                <p>缺点:</p>
+                <p>
+                单人开发(用来讨好对象的+顺带写一下工作之外的业务逻辑,防止大脑僵化)
+                  	单群使用,没有辣么多受众,开发初衷就是单群使用,高并发可能不会太好
+                </p>
+                <p>优点: </p>
+                <p>
+                按照公司开发规范写的,想找工作的童鞋可以参考一下
+                标准的Controller+service+dao层模式,通俗易懂,易上手,易扩展
+                </p>
+            </td>
+            <td>https://github.com/17336324331/Robot-Spring.git</td>
+        </tr>
 </tbody>
 </table>  
 
