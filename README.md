@@ -22,7 +22,6 @@ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/simple-
 
 CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/simple-robot-component-coolHttpApi
 
-
 <br>
 <br>
 <br>
@@ -40,7 +39,11 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
     <tbody>
         <tr>
         	<td>LEMOC支持组件框架</td>
-            <th rowspan='3'>ForteScarlet</th>
+            <th rowspan='3'>
+            	<a href="https://github.com/ForteScarlet" target="_blank">
+                	ForteScarlet
+                </a>
+            </th>
             <td>基于simple-robot, 针对于酷Q插件 LEMOC 的对接组件</td>
             <td>https://github.com/ForteScarlet/simple-robot-component-lemoc</td>
         </tr>
