@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 /**
  * <p>
  * 字段操作工具，提供丰富的方法，以反射的方式从对象中获取值或赋值。<br>
- *  说是字段操作工具，但是不止操作字段
+ * 说是字段操作工具，但是不止操作字段
  * 其中:<br>
  * - objectGetter方法可以允许使用多级字段，例如"user.child.name"<br>
  * - getExcelNum方法可以获取Excel中列的数字坐标，例如:"AA" => 27<br>
@@ -62,7 +62,6 @@ import java.util.stream.Stream;
  * @author ForteScarlet
  */
 public class FieldUtils {
-
 
 
     //静态代码块加载
@@ -853,66 +852,74 @@ public class FieldUtils {
 
     /**
      * 获取类中全部的字段
+     *
      * @param type      Class对象
      * @param withSuper 是否获取父类中的全部
      * @return
      */
-    public static Field[] getFields(Class type, boolean withSuper){
+    public static Field[] getFields(Class type, boolean withSuper) {
         return getFieldsStream(type, withSuper).toArray(Field[]::new);
     }
 
     /**
      * 获取类中全部的字段，转化为list
+     *
      * @param type      Class对象
      * @param withSuper 是否获取父类中的全部
      */
-    public static List<Field> getFieldsList(Class type, boolean withSuper){
+    public static List<Field> getFieldsList(Class type, boolean withSuper) {
         return getFields(type, withSuper, Collectors.toList());
-    };
+    }
+
+    ;
 
     /**
      * 获取类中全部的字段，转化为set
+     *
      * @param type      Class对象
      * @param withSuper 是否获取父类中的全部
      */
-    public static Set<Field> getFieldsSet(Class type, boolean withSuper){
+    public static Set<Field> getFieldsSet(Class type, boolean withSuper) {
         return getFields(type, withSuper, Collectors.toSet());
     }
 
     /**
      * 获取类中的全部字段，并根据字段名分组
      */
-    public static Map<String, List<Field>> getFieldsGroupByName(Class type, boolean withSuper){
+    public static Map<String, List<Field>> getFieldsGroupByName(Class type, boolean withSuper) {
         return getFields(type, withSuper, Collectors.groupingBy(Field::getName, Collectors.toList()));
     }
 
     /**
      * 自定义流转化
+     *
      * @param type      Class对象
      * @param withSuper 是否获取父类中的全部
      * @param collector Stream流转化函数
      */
-    public static <A, R> R getFields(Class type, boolean withSuper, Collector<? super Field, A, R> collector){
+    public static <A, R> R getFields(Class type, boolean withSuper, Collector<? super Field, A, R> collector) {
         return getFieldsStream(type, withSuper).collect(collector);
     }
 
     /**
      * 自定义流转化
-     * @param type          Class对象
-     * @param withSuper     是否获取父类中的全部
-     * @param supplier      Stream流转化函数
-     * @param accumulator   Stream流转化函数
-     * @param combiner      Stream流转化函数
+     *
+     * @param type        Class对象
+     * @param withSuper   是否获取父类中的全部
+     * @param supplier    Stream流转化函数
+     * @param accumulator Stream流转化函数
+     * @param combiner    Stream流转化函数
      */
     public static <A, R> R getFields(Class type, boolean withSuper,
                                      Supplier<R> supplier,
                                      BiConsumer<R, ? super Field> accumulator,
-                                     BiConsumer<R, R> combiner){
+                                     BiConsumer<R, R> combiner) {
         return getFieldsStream(type, withSuper).collect(supplier, accumulator, combiner);
     }
 
     /**
      * 获取类中全部的字段
+     *
      * @param type      Class对象
      * @param withSuper 是否获取父类中的全部
      * @return 获取到的全部字段
@@ -1190,21 +1197,22 @@ public class FieldUtils {
 
     /**
      * 判断类型是否为基础数据类型或封装类
+     *
      * @param type
      * @return
      */
-    public static boolean isBasic(Class type){
-        if(type == null){
+    public static boolean isBasic(Class type) {
+        if (type == null) {
             return false;
         }
         for (Class basic : BASIS_TYPE_ARRAY) {
-            if(type.equals(basic)){
+            if (type.equals(basic)) {
                 return true;
             }
         }
 
         for (Class basic : BASIS_PACKAGE_TYPE_ARRAY) {
-            if(type.equals(basic)){
+            if (type.equals(basic)) {
                 return true;
             }
         }
@@ -1215,7 +1223,7 @@ public class FieldUtils {
     /**
      * 将基础数据类型封装为其对应的封装类
      */
-    public static  Class basicToBox(Class type){
+    public static Class basicToBox(Class type) {
         return BASIS_TYPES_MAP.getOrDefault(type, type);
     }
 
@@ -1240,11 +1248,11 @@ public class FieldUtils {
      * @author ForteScarlet
      */
     public static String headUpper(String str) {
-        if(str != null && str.length() > 0){
+        if (str != null && str.length() > 0) {
             char[] chars = str.toCharArray();
             chars[0] = Character.toUpperCase(chars[0]);
             return String.valueOf(chars);
-        }else{
+        } else {
             return str;
         }
     }
@@ -1268,11 +1276,11 @@ public class FieldUtils {
      * @author ForteScarlet
      */
     public static String headLower(String str) {
-        if(str != null && str.length() > 0){
+        if (str != null && str.length() > 0) {
             char[] chars = str.toCharArray();
             chars[0] = Character.toLowerCase(chars[0]);
             return String.valueOf(chars);
-        }else{
+        } else {
             return str;
         }
     }
@@ -1321,7 +1329,7 @@ public class FieldUtils {
     /**
      * 判断一个类是不是不是抽象类也不是接口
      */
-    public static boolean notInterfaceAndAbstract(Class<?> clazz){
+    public static boolean notInterfaceAndAbstract(Class<?> clazz) {
         return (!clazz.isInterface()) && (!Modifier.isAbstract(clazz.getModifiers()));
     }
 
@@ -2508,10 +2516,6 @@ public class FieldUtils {
             super(message, cause, enableSuppression, writableStackTrace);
         }
     }
-    
-    
-    
-    
-    
-    
+
+
 }

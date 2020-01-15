@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 随机值获取工具类
@@ -12,6 +13,13 @@ import java.util.UUID;
 public class RandomUtil {
 
     /* ——————————————————————— getNumber : 获取随机长度字母(仅数字，尽量不要超过int的最大数上限长度) ——————————————————————————— */
+
+    /** 唯一一个random */
+    public static Random RANDOM = ThreadLocalRandom.current();
+
+    public static Random getRandom(){
+        return RANDOM;
+    }
 
     /**
      * 获取长度为4的随机数
@@ -34,9 +42,9 @@ public class RandomUtil {
         double pow = Math.pow(10, length);
         if (length >= 1) {
             //参照算法：random.nextInt(9000)+1000;
-            return (int) (new Random().nextInt((int) (9 * pow)) + pow);
+            return (int) (getRandom().nextInt((int) (9 * pow)) + pow);
         } else {
-            return new Random().nextInt(10);
+            return getRandom().nextInt(10);
         }
     }
 
@@ -55,7 +63,7 @@ public class RandomUtil {
      * @return
      */
     public static int getNumber(int a, int b) {
-        return new Random().nextInt(b - a) + a;
+        return getRandom().nextInt(b - a) + a;
     }
 
 
@@ -69,7 +77,7 @@ public class RandomUtil {
     public static int getNumber$right(int a, int b) {
         //计算差值
         int bound = a > b ? a - b : b - a;
-        return new Random().nextInt(bound + 1) + a;
+        return getRandom().nextInt(bound + 1) + a;
     }
 
 
@@ -85,12 +93,12 @@ public class RandomUtil {
     public static String getCode(int length) {
         StringBuilder s = new StringBuilder();
         for (int i = 1; i <= length; i++) {
-            if (new Random().nextBoolean()) {
+            if (getRandom().nextBoolean()) {
                 //0.5的概率为0-9的数字
-                s.append(new Random().nextInt());
+                s.append(getRandom().nextInt());
             } else {
                 //0.5的概率为字母，其中大写0.25，小写0.25
-                if (new Random().nextBoolean()) {
+                if (getRandom().nextBoolean()) {
                     //小写
                     s.append(getRandomChar());
                 } else {
@@ -133,7 +141,7 @@ public class RandomUtil {
      * @return
      */
     public static char getRandomChar() {
-        return (char) (new Random().nextInt(26) + 97);
+        return (char) (getRandom().nextInt(26) + 97);
     }
 
 
@@ -153,7 +161,7 @@ public class RandomUtil {
             //如果开启了随机大写，则有概率将字符转为大写 1/2
 
             if (randomCase) {
-                crr[i] = new Random().nextBoolean() ? randomChar : Character.toUpperCase(randomChar);
+                crr[i] = getRandom().nextBoolean() ? randomChar : Character.toUpperCase(randomChar);
             } else {
                 crr[i] = randomChar;
             }
@@ -235,9 +243,9 @@ public class RandomUtil {
      */
     public static int[] randomColor$intArr() {
         final int[] arr = new int[3];
-        arr[0] = new Random().nextInt(256);
-        arr[1] = new Random().nextInt(256);
-        arr[2] = new Random().nextInt(256);
+        arr[0] = getRandom().nextInt(256);
+        arr[1] = getRandom().nextInt(256);
+        arr[2] = getRandom().nextInt(256);
         return arr;
     }
 
@@ -274,7 +282,7 @@ public class RandomUtil {
      * @return
      */
     public static Boolean getProbability(double probL, double probR) {
-        double v = new Random().nextDouble();
+        double v = getRandom().nextDouble();
         if (v >= probL && v <= probR) {
             return true;
         }
@@ -302,7 +310,7 @@ public class RandomUtil {
      * @return
      */
     public static <T> T getRandomElement(T[] trr) {
-        return trr[new Random().nextInt(trr.length)];
+        return trr[getRandom().nextInt(trr.length)];
     }
 
     /**
@@ -313,7 +321,7 @@ public class RandomUtil {
      * @return
      */
     public static <T> T getRandomElement(List<T> trr) {
-        return trr.get(new Random().nextInt(trr.size()));
+        return trr.get(getRandom().nextInt(trr.size()));
     }
 
 
