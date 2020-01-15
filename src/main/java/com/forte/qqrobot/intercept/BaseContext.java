@@ -82,7 +82,11 @@ public abstract class BaseContext<T> {
     }
 
 
-    /** 构造 */
+    /**
+     * 构造
+     * @param value 上下文所对应的值
+     * @param globalContextMap 全局上下文值。
+     * */
     public BaseContext(T value, Map<String, Object> globalContextMap){
         this.value = value;
         this.globalContextMap = globalContextMap;
