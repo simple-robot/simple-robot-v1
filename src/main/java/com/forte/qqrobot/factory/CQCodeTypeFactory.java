@@ -1,7 +1,10 @@
 package com.forte.qqrobot.factory;
 
 import com.forte.qqrobot.beans.types.CQCodeTypes;
+import com.forte.qqrobot.exception.EnumInstantiationException;
+import com.forte.qqrobot.exception.EnumInstantiationRequireException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
+import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.ObjectsPlus;
 
 import java.util.Arrays;
@@ -48,7 +51,7 @@ public class CQCodeTypeFactory extends BaseFactory<CQCodeTypes> {
 
     /**
      * 注册一个新的CQCodeType实例
-     * CQCodeType机制特殊，需要保证线程安全性。且所有的参数均不可为null
+     * CQCodeType机制特殊，需要保证线程安全性。且所有的参数均不可为null。
      * @param name           枚举名称
      * @param function       CQ码function类型
      * @param keys           CQ码全部参数列表。<br>
@@ -73,17 +76,34 @@ public class CQCodeTypeFactory extends BaseFactory<CQCodeTypes> {
      * @return
      */
     public synchronized CQCodeTypes register(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort){
-
-        try {
             // 创建实例
-            CQCodeTypes cqCodeTypes = super.registerEnum(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
+        CQCodeTypes cqCodeTypes = null;
+        try {
+            cqCodeTypes = registerOrThrow(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
             // 通过CQCodeTypes本身注册新实例
             CQCodeTypes.register(cqCodeTypes);
             return cqCodeTypes;
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            // 抛出新异常
-            throw new RobotRuntimeException(e);
+        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
+            // 如果出现了异常，使用日志抛出
+            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.CQCodeTypes ]实例[ "+ name +" ]构建失败", e);
+            return null;
         }
+    }
+
+    /**
+     * {@link #register(String, String, String[], String[], String[], int)}
+     * 但是不会处理异常
+     * @see #register(String, String, String[], String[], String[], int)
+     * @return 新枚举实例
+     * @throws EnumInstantiationRequireException 参数权限验证失败
+     * @throws EnumInstantiationException        实例对象构建失败
+     */
+    public synchronized CQCodeTypes registerOrThrow(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort) throws EnumInstantiationRequireException, EnumInstantiationException {
+        // 创建实例
+        CQCodeTypes cqCodeTypes = super.registerEnum(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
+            // 通过CQCodeTypes本身注册新实例
+            CQCodeTypes.register(cqCodeTypes);
+            return cqCodeTypes;
     }
 
     /**
@@ -118,6 +138,9 @@ public class CQCodeTypeFactory extends BaseFactory<CQCodeTypes> {
      */
     public static CQCodeTypes registerType(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort){
         return getInstance().register(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
+    }
+    public static CQCodeTypes registerTypeOrThrow(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort) throws EnumInstantiationRequireException, EnumInstantiationException {
+        return getInstance().registerOrThrow(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.forte.qqrobot.beans.types;
 
-import com.forte.utils.reflect.EnumUtils;
+import com.forte.qqrobot.utils.EnumValues;
 import com.forte.utils.regex.RegexUtil;
 
 import java.util.*;
@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- *
  * 此枚举保存全部的CQCode类型。<br>
  * 且提供了一个{@link com.forte.qqrobot.factory.CQCodeTypeFactory}来支持动态扩展此枚举。<br>
  * 请不要使用任何非工厂创建的形式（例如自己通过反射或者其他工具）创建此类的实例对象。此类中维护一个function映射，
@@ -18,6 +17,7 @@ import java.util.stream.Collectors;
  * 假如您使用了其他手段自己创建了一个额外的实例，可能会导致valueOf所取值与内部的function映射值不相符、参数冲突等一系列问题。
  * <br>
  * <br>
+ *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/8 14:55
  * @since JDK1.8
@@ -26,12 +26,12 @@ public enum CQCodeTypes {
 
     /**
      * 默认的未知类型，当无法获取或解析的时候将会使用此类型
-     * */
-    defaultType("", new String[0], new String[0], new String[0] , -99),
+     */
+    defaultType("", new String[0], new String[0], new String[0], -99),
 
     /**
-     *  [CQ:face,id={1}] - QQ表情
-     *  {1} 为≥0的数字
+     * [CQ:face,id={1}] - QQ表情
+     * {1} 为≥0的数字
      * 举例：[CQ:emoji,id=128513]（发送一个大笑的emoji表情）
      */
     face("face",
@@ -64,10 +64,8 @@ public enum CQCodeTypes {
      * [CQ:image,file={1}] - 发送自定义图片
      * {1}为图片文件名称，图片存放在酷Q目录的data\image\下
      * 举例：[CQ:image,file=1.jpg]（发送data\image\1.jpg）
-     *
+     * <p>
      * 部分插件也支持网络类型或者本地文件类型，所以添加路径格式
-     *
-     *
      */
     image("image",
             new String[]{"file"},
@@ -86,7 +84,7 @@ public enum CQCodeTypes {
     record("record",
             new String[]{"file", "magic"},
             new String[]{"magic"},
-            new String[]{".+" , "(true|TRUE|false|FALSE)"},
+            new String[]{".+", "(true|TRUE|false|FALSE)"},
             5),
 
     /**
@@ -162,7 +160,7 @@ public enum CQCodeTypes {
     music("music",
             new String[]{"type", "id", "style"},
             new String[]{"style"},
-            new String[]{".+" , ".+", ".+"},
+            new String[]{".+", ".+", ".+"},
             11),
 
     /**
@@ -177,7 +175,7 @@ public enum CQCodeTypes {
     music_custom("music",
             new String[]{"type", "url", "audio", "title", "content", "image"},
             new String[]{"content", "image"},
-            new String[]{"custom" , ".+" , ".+" , ".+" , ".+",  ".+"},
+            new String[]{"custom", ".+", ".+", ".+", ".+", ".+"},
             12),
 
     /**
@@ -191,7 +189,7 @@ public enum CQCodeTypes {
     share("share",
             new String[]{"url", "title", "content", "image"},
             new String[]{"content", "image"},
-            new String[]{".+", ".+" , ".+" , ".+"},
+            new String[]{".+", ".+", ".+", ".+"},
             13),
 
     /**
@@ -234,24 +232,21 @@ public enum CQCodeTypes {
             16),
 
 
-
-
-
     ;
 
 
     /**
      * 根据function名(即[CQ:后面的名字)获取CQCodeTypes对象实例
      * 已经过时，需要额外通过参数列表进行匹配
+     *
      * @param function 名称
      * @return CQCodeTypes实例对象
      * @see #getTypeByFunctionAndParams(String, String...)
      */
     @Deprecated
-    public static CQCodeTypes getTypeByFunction(String function){
-//        for (CQCodeTypes type : values()) {
-        for (CQCodeTypes type : EnumUtils.values(CQCodeTypes.class, CQCodeTypes[]::new)) {
-            if(type.function.equals(function)){
+    public static CQCodeTypes getTypeByFunction(String function) {
+        for (CQCodeTypes type : EnumValues.values(CQCodeTypes.class, CQCodeTypes[]::new)) {
+            if (type.function.equals(function)) {
                 return type;
             }
         }
@@ -260,22 +255,23 @@ public enum CQCodeTypes {
 
     /**
      * 根据类型和参数名称列表来获取一个具体的枚举类型对象实例
+     *
      * @param function   function 值, 即类型，例如"image"或者"share"之类的
      * @param paramNames 参数列表值，需要保证顺序
      * @return CQCodeTypes实例对象, 如果没有则会返回defaultType
      */
-    public static CQCodeTypes getTypeByFunctionAndParams(String function, String... paramNames){
+    public static CQCodeTypes getTypeByFunctionAndParams(String function, String... paramNames) {
         // 获取对应function的values
         CQCodeTypes[] cqCodeTypes = AllCQCodeTypeMap.get(function);
-        if(cqCodeTypes == null || cqCodeTypes.length == 0){
+        if (cqCodeTypes == null || cqCodeTypes.length == 0) {
             return defaultType;
-        }else{
+        } else {
             // 筛选paramNames
 
             // 如果不为null，则遍历并匹配参数match
             for (CQCodeTypes type : cqCodeTypes) {
                 // 根据type筛选params并匹配
-                if(type.matchKeys(type.selectNeed(paramNames))){
+                if (type.matchKeys(type.selectNeed(paramNames))) {
                     return type;
                 }
             }
@@ -287,25 +283,39 @@ public enum CQCodeTypes {
     //**************** 普通常量 ****************//
 
 
-    /** 类型名 */
+    /**
+     * 类型名
+     */
     private final String function;
-    /** 参数列表 */
+    /**
+     * 参数列表
+     */
     private final String[] keys;
-    /** 按照索引对应着每个参数的数据类型匹配规则，正则 */
+    /**
+     * 按照索引对应着每个参数的数据类型匹配规则，正则
+     */
     private final String[] valuesRegex;
-    /** 可以被忽略的参数列表 */
+    /**
+     * 可以被忽略的参数列表
+     */
     private final Set<String> ignoreAbleKeys;
-    /** 对此CQ码进行匹配的正则表达式 */
+    /**
+     * 对此CQ码进行匹配的正则表达式
+     */
     private final String matchRegex;
-    /** 此CQ码进行匹配的正则表达式的对象 */
+    /**
+     * 此CQ码进行匹配的正则表达式的对象
+     */
     private final Pattern matchRegexPattern;
-    /** 排序用的值 */
+    /**
+     * 排序用的值
+     */
     private final int sort;
     /**
      * 用来判断参数是否匹配的
      * 有时候相同的function可能有不同的两套参数列表，例如music
      * 所以在转化的时候还需要考虑一下参数列表
-     * */
+     */
     private final String paramMatch;
 
     /**
@@ -320,11 +330,17 @@ public enum CQCodeTypes {
 
     //**************** 静态常量 ****************//
 
-    /** CQ码匹配的开头，从function开始拼接 */
+    /**
+     * CQ码匹配的开头，从function开始拼接
+     */
     private static final String CQ_REGEX_HEAD = "\\[CQ:((?!(\\[CQ:))";
-    /** CQ码匹配的结尾，在最后一个参数后 */
+    /**
+     * CQ码匹配的结尾，在最后一个参数后
+     */
     private static final String CQ_REGEX_END = ")\\]";
-    /** 用于从字符串中提取CQCode码字符串的正则表达式 */
+    /**
+     * 用于从字符串中提取CQCode码字符串的正则表达式
+     */
 //    private static final String CQCODE_EXTRACT_REGEX = "\\[CQ:((?!(\\[CQ:)).)+\\]";
     private static final String CQCODE_EXTRACT_REGEX = "\\[CQ:((?!(\\[CQ:))\\w)+\\,((?!(\\[CQ:)).)+\\]";
 
@@ -344,38 +360,50 @@ public enum CQCodeTypes {
         }
     }
 
-    /** 获取方法类型名称 */
-    public String getFunction(){
+    /**
+     * 获取方法类型名称
+     */
+    public String getFunction() {
         return function;
     }
 
-    /** 获取参数列表 */
-    public String[] getKeys(){
+    /**
+     * 获取参数列表
+     */
+    public String[] getKeys() {
         return keys;
     }
 
-    /** 获取可以忽略的key集合 */
-    public Set<String> getIgnoreAbleKeys(){
+    /**
+     * 获取可以忽略的key集合
+     */
+    public Set<String> getIgnoreAbleKeys() {
         return ignoreAbleKeys;
     }
 
-    /** 获取CQ码全匹配正则 */
-    public static String getCqcodeExtractRegex(){
+    /**
+     * 获取CQ码全匹配正则
+     */
+    public static String getCqcodeExtractRegex() {
         return CQCODE_EXTRACT_REGEX;
     }
 
-    /** 获取排序值 */
-    public int getSort(){
+    /**
+     * 获取排序值
+     */
+    public int getSort() {
         return sort;
     }
 
-    /** 获取某个指定的key的匹配规则 */
-    public String getKeyRegex(String key){
-        if(key == null) return null;
+    /**
+     * 获取某个指定的key的匹配规则
+     */
+    public String getKeyRegex(String key) {
+        if (key == null) return null;
 
         //遍历key
         for (int i = 0; i < this.keys.length; i++) {
-            if(this.keys[i].equals(key)){
+            if (this.keys[i].equals(key)) {
                 return this.valuesRegex[i];
             }
         }
@@ -385,76 +413,84 @@ public enum CQCodeTypes {
 
     /**
      * 从参数列表中筛选出来非多余的参数
+     *
      * @param params 参数列表
      * @return 非多余的列表
      */
-    public String[] selectNeed(String... params){
+    public String[] selectNeed(String... params) {
         // 如果存在key列表且param也不为空
-        if((keys.length > 0) && (params.length > 0)){
+        if ((keys.length > 0) && (params.length > 0)) {
             int count = 0;
             String[] value = new String[keys.length];
             // 遍历所有的params，看看他们是不是在keys的列表里
             for (String param : params) {
                 for (String key : keys) {
-                    if(param.equals(key)){
+                    if (param.equals(key)) {
                         value[count++] = param;
                         break;
                     }
                 }
             }
             return Arrays.copyOf(value, count);
-        }else{
+        } else {
             // 否则直接返回空
             return new String[0];
         }
     }
 
-    public String[] paramSort(String... params){
+    public String[] paramSort(String... params) {
         return paramSort.apply(params);
     }
 
     /**
      * 排序后使用,拼接，用于对参数进行匹配
+     *
      * @param params
      * @return
      */
-    public String toParamMatch(String... params){
-        return String.join(",",paramSort(params));
+    public String toParamMatch(String... params) {
+        return String.join(",", paramSort(params));
     }
 
     /**
      * 判断参数列表是否符合匹配规则
+     *
      * @param keys 参数列表，即key的列表，例如["name", "id"]
      * @return
      */
-    public boolean matchKeys(String... keys){
+    public boolean matchKeys(String... keys) {
         return toParamMatch(keys).matches(paramMatch);
     }
 
 
-    /** 获取匹配字符串 */
-    public String getMatchRegex(){
+    /**
+     * 获取匹配字符串
+     */
+    public String getMatchRegex() {
         return this.matchRegex;
     }
 
-    /** 查看某个字符串是否为此类型的CQ码 */
-    public boolean match(String text){
+    /**
+     * 查看某个字符串是否为此类型的CQ码
+     */
+    public boolean match(String text) {
         return text.matches(this.matchRegex);
     }
 
     /**
      * 查看某个字符串中是否存在此类型的CQ码
      */
-    public boolean contains(String text){
+    public boolean contains(String text) {
 //        return text.matches(".*" + this.matchRegex + ".*");
         return matchRegexPattern.matcher(text).find();
     }
 
     /**
      * 注册一个CQCodeTypes
+     *
      * @param newType CQ码类型
      */
-    public static synchronized CQCodeTypes register(CQCodeTypes newType){
+    public static synchronized CQCodeTypes register(CQCodeTypes newType) {
         // non null
         Objects.requireNonNull(newType);
 
@@ -462,18 +498,18 @@ public enum CQCodeTypes {
         String function = newType.function;
         // 获取他的参数列表
         CQCodeTypes[] cqCodeTypesWithFunction = AllCQCodeTypeMap.get(function);
-        if(cqCodeTypesWithFunction == null){
+        if (cqCodeTypesWithFunction == null) {
             // 如果没用这个function的CQ类型，直接保存一个
             AllCQCodeTypeMap.put(newType.function, new CQCodeTypes[]{newType});
-        }else{
+        } else {
             // 如果存在，判断是否有相同ID
             for (CQCodeTypes ct : cqCodeTypesWithFunction) {
-                if(ct.equalsID(newType)){
+                if (ct.equalsID(newType)) {
                     // 如果是等值的，抛出异常
                     throw new IllegalArgumentException(
                             "已经存在此CQ码！\n"
-                            + "function: " + ct.function + '\n'
-                            + "keys:     " + Arrays.toString(ct.keys)
+                                    + "function: " + ct.function + '\n'
+                                    + "keys:     " + Arrays.toString(ct.keys)
                     );
 
                 }
@@ -491,9 +527,10 @@ public enum CQCodeTypes {
 
     /**
      * 返回某个function下的全部CQCodeTypes
-     * @param function  function类型
+     *
+     * @param function function类型
      */
-    public static CQCodeTypes[] getCQCodeTypesByFunction(String function){
+    public static CQCodeTypes[] getCQCodeTypesByFunction(String function) {
         CQCodeTypes[] cqCodeTypes = AllCQCodeTypeMap.get(function);
         return Arrays.copyOf(cqCodeTypes, cqCodeTypes.length);
     }
@@ -501,22 +538,23 @@ public enum CQCodeTypes {
     /**
      * 判断是否为两个等值的CQ码
      */
-    public boolean equalsID(Object o){
-        if(o instanceof CQCodeTypes){
+    public boolean equalsID(Object o) {
+        if (o instanceof CQCodeTypes) {
             return equalsID.equals(((CQCodeTypes) o).equalsID);
-        }else{
+        } else {
             return false;
         }
     }
 
     /**
      * 判断是否存在某个equalsID
+     *
      * @param id equalsID
      */
-    public boolean containsID(String id){
+    public boolean containsID(String id) {
         // 遍历values值
-        for (CQCodeTypes value : EnumUtils.values(CQCodeTypes.class, CQCodeTypes[]::new)) {
-            if(value.equalsID.equals(id)){
+        for (CQCodeTypes value : EnumValues.values(CQCodeTypes.class, CQCodeTypes[]::new)) {
+            if (value.equalsID.equals(id)) {
                 return true;
             }
         }
@@ -525,19 +563,20 @@ public enum CQCodeTypes {
 
     /**
      * 判断是否存在某个equalsID
-     * @param function  function值
-     * @param keys      keys列表
+     *
+     * @param function function值
+     * @param keys     keys列表
      */
-    public static boolean containsID(String function, String... keys){
+    public static boolean containsID(String function, String... keys) {
         // 不同于另一个方法，此方法通过AllCQCodeTypeMap判断
         CQCodeTypes[] cqCodeTypes = AllCQCodeTypeMap.get(function);
-        if(cqCodeTypes == null || cqCodeTypes.length == 0){
+        if (cqCodeTypes == null || cqCodeTypes.length == 0) {
             return false;
-        }else{
+        } else {
             String ID = toEqualsID(function, keys);
             // 查看有没有
             for (CQCodeTypes cqCodeType : cqCodeTypes) {
-                if(cqCodeType.equalsID.equals(ID)){
+                if (cqCodeType.equalsID.equals(ID)) {
                     return true;
                 }
             }
@@ -548,22 +587,24 @@ public enum CQCodeTypes {
 
     /**
      * 根据function和keys构建一个equalsID
-     * @param function  function
-     * @param keys      key数组
+     *
+     * @param function function
+     * @param keys     key数组
      */
-    private static String toEqualsID(String function, String[] keys){
+    private static String toEqualsID(String function, String[] keys) {
         return function + ":" + Arrays.stream(keys).sorted().collect(Collectors.joining());
     }
 
 
     /**
      * 构造方法
-     * @param function          cq码类型
-     * @param keys              参数列表
-     * @param ignoreAbleKeys    可以忽略的参数列表
-     * @param valuesRegex       对应参数的参数值匹配正则
+     *
+     * @param function       cq码类型
+     * @param keys           参数列表
+     * @param ignoreAbleKeys 可以忽略的参数列表
+     * @param valuesRegex    对应参数的参数值匹配正则
      */
-    CQCodeTypes(String function, String[] keys, String[] ignoreAbleKeys , String[] valuesRegex , int sort){
+    CQCodeTypes(String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort) {
         this.function = function;
         this.keys = keys;
         this.ignoreAbleKeys = Arrays.stream(ignoreAbleKeys).collect(Collectors.toSet());
@@ -573,7 +614,7 @@ public enum CQCodeTypes {
         this.equalsID = toEqualsID(function, keys);
 
         //生成匹配正则表达式
-        StringJoiner joiner = new StringJoiner("" , CQ_REGEX_HEAD + this.function , CQ_REGEX_END);
+        StringJoiner joiner = new StringJoiner("", CQ_REGEX_HEAD + this.function, CQ_REGEX_END);
         //遍历keys
         for (int i = 0; i < keys.length; i++) {
             String key = this.keys[i];
@@ -581,7 +622,7 @@ public enum CQCodeTypes {
             boolean ignoreAble = this.ignoreAbleKeys.contains(key);
             //如果可忽略，使用括号括住并在最后加上?
             String in = "," + key + "=" + regex;
-            if(ignoreAble)
+            if (ignoreAble)
                 in = ("(" + in + ")?");
 
             joiner.add(in);
@@ -600,17 +641,17 @@ public enum CQCodeTypes {
         for (String key : keys) {
             // 判断是否可以忽略
             boolean ignore = this.ignoreAbleKeys.contains(key);
-            if(ignore){
+            if (ignore) {
                 // 可以省略
                 paramMatchBuilder.append("(");
-                if(!first){
+                if (!first) {
                     paramMatchBuilder.append(",");
                 }
                 paramMatchBuilder.append(key);
                 paramMatchBuilder.append(")?");
-            }else{
+            } else {
                 // 不可省略, 则不带括号
-                if(!first){
+                if (!first) {
                     paramMatchBuilder.append(",");
                 }
                 paramMatchBuilder.append(key);

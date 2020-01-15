@@ -1,6 +1,9 @@
 package com.forte.qqrobot.factory;
 
 import com.forte.qqrobot.beans.types.BreakType;
+import com.forte.qqrobot.exception.EnumInstantiationException;
+import com.forte.qqrobot.exception.EnumInstantiationRequireException;
+import com.forte.qqrobot.log.QQLog;
 
 import java.util.Objects;
 import java.util.function.IntFunction;
@@ -20,21 +23,48 @@ public class BreakTypeFactory extends BaseFactory<BreakType> {
     private static final BreakTypeFactory SINGLE = new BreakTypeFactory();
     private BreakTypeFactory(){ }
 
+    /** 获取实例对象 */
     public static BreakTypeFactory getInstance(){
         return SINGLE;
     }
 
-
+    /**
+     * 普通的注冊，在注冊的時候如果出現异常会使用log打印日志
+     * @param name 枚举名称
+     * @param test 枚举构造所需参数 :
+     *              根据一个返回值的结果判断是否需要进行截断。
+     *              永远不会接收到ListenResult类型的结果。
+     * @return  新的枚举对象
+     */
     public BreakType register(String name, Predicate<Object> test){
         try {
-            return super.registerEnum(name, test);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+            return registerOrThrow(name, test);
+        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
+            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.BreakType ]实例[ "+ name +" ]构建失败", e);
+            return null;
         }
     }
 
+    /**
+     * 注册枚举类型，如果出现异常则会抛出
+     * @param name  枚举名称
+     * @param test  枚举构造所需参数 :
+     *  根据一个返回值的结果判断是否需要进行截断。
+     *  永远不会接收到ListenResult类型的结果。
+     * @return  新的枚举对象
+     * @throws EnumInstantiationRequireException    参数权限验证失败
+     * @throws EnumInstantiationException           枚举实例构建失败
+     */
+    public BreakType registerOrThrow(String name, Predicate<Object> test) throws EnumInstantiationRequireException, EnumInstantiationException {
+        return super.registerEnum(name, test);
+    }
+
+
     public static BreakType registerType(String name, Predicate<Object> test){
         return getInstance().register(name, test);
+    }
+    public static BreakType registerTypeOrThrow(String name, Predicate<Object> test) throws EnumInstantiationRequireException, EnumInstantiationException {
+        return getInstance().registerOrThrow(name, test);
     }
 
 

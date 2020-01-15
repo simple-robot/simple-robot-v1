@@ -2,6 +2,9 @@ package com.forte.qqrobot.factory;
 
 import com.forte.qqrobot.beans.function.MostTypeFilter;
 import com.forte.qqrobot.beans.types.MostType;
+import com.forte.qqrobot.exception.EnumInstantiationException;
+import com.forte.qqrobot.exception.EnumInstantiationRequireException;
+import com.forte.qqrobot.log.QQLog;
 
 import java.util.function.IntFunction;
 
@@ -33,20 +36,37 @@ public class MostTypeFactory extends BaseFactory<MostType> {
 
     /**
      * 注册一个新的mostType类型枚举
+     * 会对异常进行捕获
      * @param name              name
      * @param mostTypeFilter    枚举所需构造
-     * @return
+     * @return 新实例
      */
     public MostType register(String name, MostTypeFilter mostTypeFilter){
         try {
-            return super.registerEnum(name, mostTypeFilter);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+            return registerOrThrow(name, mostTypeFilter);
+        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
+            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.MostType ]实例[ "+ name +" ]构建失败", e);
+            return null;
         }
+    }
+
+    /**
+     * 注册一个新的mostType类型枚举
+     * @param name              name
+     * @param mostTypeFilter    枚举所需构造
+     * @return 新实例
+     * @throws EnumInstantiationRequireException 参数权限认证失败
+     * @throws EnumInstantiationException        实例构建失败
+     */
+    public MostType registerOrThrow(String name, MostTypeFilter mostTypeFilter) throws EnumInstantiationRequireException, EnumInstantiationException {
+            return super.registerEnum(name, mostTypeFilter);
     }
 
     public static MostType registerType(String name, MostTypeFilter mostTypeFilter){
         return getInstance().register(name, mostTypeFilter);
+    }
+    public static MostType registerTypeOrThrow(String name, MostTypeFilter mostTypeFilter) throws EnumInstantiationRequireException, EnumInstantiationException {
+        return getInstance().registerOrThrow(name, mostTypeFilter);
     }
 
 

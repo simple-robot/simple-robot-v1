@@ -2,7 +2,10 @@ package com.forte.qqrobot.factory;
 
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.exception.EnumInstantiationException;
+import com.forte.qqrobot.exception.EnumInstantiationRequireException;
 import com.forte.qqrobot.exception.RobotDevException;
+import com.forte.qqrobot.log.QQLog;
 
 import java.util.Arrays;
 import java.util.function.IntFunction;
@@ -15,23 +18,31 @@ import java.util.function.IntFunction;
  **/
 public class MsgGetTypeFactory extends BaseFactory<MsgGetTypes> {
 
-    /** 构造所需要的参数类型列表 */
-    private static final Class<?>[] CONSTRUCTOR_TYPES = { Class.class };
+    /**
+     * 构造所需要的参数类型列表
+     */
+    private static final Class<?>[] CONSTRUCTOR_TYPES = {Class.class};
 
-    /** {@link MsgGetTypes} 的class对象 */
+    /**
+     * {@link MsgGetTypes} 的class对象
+     */
     private static final Class<MsgGetTypes> ENUM_TYPE = MsgGetTypes.class;
 
-    /** 数组构建器 */
+    /**
+     * 数组构建器
+     */
     private static final IntFunction<MsgGetTypes[]> TO_ARRAY_FUNCTION = MsgGetTypes[]::new;
 
-    /** 单例，唯一实例 */
+    /**
+     * 单例，唯一实例
+     */
     private static final MsgGetTypeFactory FACTORY = new MsgGetTypeFactory();
 
     /**
      * 一个禁止被使用的构造
      */
-    private MsgGetTypeFactory(){
-        if(FACTORY != null)
+    private MsgGetTypeFactory() {
+        if (FACTORY != null)
             throw new RuntimeException("no,nonononono,You don't need more examples");
     }
 
@@ -58,39 +69,32 @@ public class MsgGetTypeFactory extends BaseFactory<MsgGetTypes> {
     }
 
     /**
-     * 参数权限判断
-     * @param name          名称
-     * @param params        参数列表
-     */
-    @Override
-    protected void requireCanUse(String name, Object[] params) {
-        // 参数只可能存在一个，即class<? extends MsgGet>
-        Class<? extends MsgGet> listenType = (Class<? extends MsgGet>) params[0];
-
-        // 2.类型不可以是MsgGet本身。
-        if(listenType.equals(MsgGet.class)){
-            throw new RobotDevException("监听类型不可以是MsgGet本身。");
-        }
-
-        // 3.类型也没有冲突
-        boolean listenTypeExist = Arrays.stream(values()).filter(t -> t.getBeanClass() != null).anyMatch(t -> t.getBeanClass().equals(listenType));
-        if(listenTypeExist){
-            throw new RobotDevException("已经存在对类型 "+ listenType +" 进行监听的MsgGetType类型值。");
-        }
-
-    }
-
-
-    /**
      * 获取一个MsgGetType的新枚举
+     *
+     * @param name       枚举名称
+     * @param listenType 监听类型
      */
     public MsgGetTypes register(String name, Class<? extends MsgGet> listenType) {
         // 执行父类中的注册方法
         try {
-            return super.registerEnum(name, listenType);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+            return registerOrThrow(name, listenType);
+        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
+            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.MsgGetTypes ]实例[ " + name + " ]构建失败", e);
+            return null;
         }
+    }
+
+    /**
+     * @param name       枚举名称
+     * @param listenType 监听类型
+     * @return 实例对象
+     * @throws EnumInstantiationRequireException 参数权限认证失败
+     * @throws EnumInstantiationException        实例构建失败
+     * @see #register(String, Class)
+     */
+    public MsgGetTypes registerOrThrow(String name, Class<? extends MsgGet> listenType) throws EnumInstantiationRequireException, EnumInstantiationException {
+        // 执行父类中的注册方法
+        return super.registerEnum(name, listenType);
     }
 
     /**
@@ -100,5 +104,33 @@ public class MsgGetTypeFactory extends BaseFactory<MsgGetTypes> {
         return getInstance().register(name, listenType);
     }
 
+    public static MsgGetTypes registerTypeOrThrow(String name, Class<? extends MsgGet> listenType) throws EnumInstantiationRequireException, EnumInstantiationException {
+        return getInstance().registerOrThrow(name, listenType);
+    }
+
+
+    /**
+     * 参数权限判断
+     *
+     * @param name   名称
+     * @param params 参数列表
+     */
+    @Override
+    protected void requireCanUse(String name, Object[] params) {
+        // 参数只可能存在一个，即class<? extends MsgGet>
+        Class<? extends MsgGet> listenType = (Class<? extends MsgGet>) params[0];
+
+        // 2.类型不可以是MsgGet本身。
+        if (listenType.equals(MsgGet.class)) {
+            throw new RobotDevException("监听类型不可以是MsgGet本身。");
+        }
+
+        // 3.类型也没有冲突
+        boolean listenTypeExist = Arrays.stream(values()).filter(t -> t.getBeanClass() != null).anyMatch(t -> t.getBeanClass().equals(listenType));
+        if (listenTypeExist) {
+            throw new RobotDevException("已经存在对类型 " + listenType + " 进行监听的MsgGetType类型值。");
+        }
+
+    }
 
 }

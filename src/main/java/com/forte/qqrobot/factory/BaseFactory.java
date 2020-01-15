@@ -4,6 +4,7 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.exception.EnumInstantiationException;
 import com.forte.qqrobot.exception.EnumInstantiationRequireException;
 import com.forte.qqrobot.exception.RobotDevException;
+import com.forte.qqrobot.utils.EnumValues;
 import com.forte.utils.reflect.EnumUtils;
 
 import java.util.Arrays;
@@ -55,12 +56,12 @@ public abstract class BaseFactory<E extends Enum<E>> {
      * @param params            参数列表
      * @return 新建的枚举实例对象
      */
-    protected E registerEnum(String name, Object... params) throws NoSuchMethodException, IllegalAccessException {
+    protected E registerEnum(String name, Object... params) throws EnumInstantiationRequireException, EnumInstantiationException {
         // 判断是否可以新增
         Class<E> eType = enumType();
         try {
             throwOrPass(name, params);
-        }catch (Exception e){
+        }catch (Throwable e){
             // 如果有异常，使用此异常统一抛出
             throw new EnumInstantiationRequireException(eType, e);
         }
@@ -68,7 +69,7 @@ public abstract class BaseFactory<E extends Enum<E>> {
         // 实例化
         try {
             return EnumUtils.newEnum(eType, name, constructorTypes(), params);
-        }catch (Exception e){
+        }catch (Throwable e){
             // 实例化过程如果出现异常，统一使用此异常抛出
             throw new EnumInstantiationException(eType, e);
         }
@@ -79,7 +80,7 @@ public abstract class BaseFactory<E extends Enum<E>> {
      * @return  MsgGetTypes的全部value值。包括额外添加的
      */
     public E[] values(){
-        return EnumUtils.values(enumType(), toArrayFunction());
+        return EnumValues.values(enumType(), toArrayFunction());
     }
 
     /**

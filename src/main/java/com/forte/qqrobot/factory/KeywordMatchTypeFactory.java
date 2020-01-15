@@ -1,6 +1,9 @@
 package com.forte.qqrobot.factory;
 
 import com.forte.qqrobot.beans.types.KeywordMatchType;
+import com.forte.qqrobot.exception.EnumInstantiationException;
+import com.forte.qqrobot.exception.EnumInstantiationRequireException;
+import com.forte.qqrobot.log.QQLog;
 
 import java.util.function.BiPredicate;
 import java.util.function.IntFunction;
@@ -29,7 +32,7 @@ public class KeywordMatchTypeFactory extends BaseFactory<KeywordMatchType> {
 
     private KeywordMatchTypeFactory(){
         if(FACTORY != null){
-            throw new RuntimeException("no! you know, You don't need more examples.");
+            throw new RuntimeException("No! You don't need more examples.");
         }
     }
 
@@ -39,30 +42,52 @@ public class KeywordMatchTypeFactory extends BaseFactory<KeywordMatchType> {
 
     /**
      * 注册一个新的 {@link KeywordMatchType} 实例
+     * 会对异常进行捕获并通过{@link QQLog#error(Object, Throwable)}打印
      * @param name      枚举名称
      * @param filter    字符串过滤规则
-     * @return
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
+     * @return 枚举实例
      */
     public KeywordMatchType register(String name, BiPredicate<String, String> filter) {
         try {
-            return super.registerEnum(name, filter);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+            return registerOrThrow(name, filter);
+        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
+            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.KeywordMatchType ]实例[ "+ name +" ]构建失败", e);
+            return null;
         }
     }
+
+    /**
+     * 注册一个新的 {@link KeywordMatchType} 实例
+     * @see #register(String, BiPredicate)
+     * @param name      枚举名称
+     * @param filter    字符串过滤规则
+     * @return 枚举实例
+     * @throws EnumInstantiationRequireException 参数权限验证失败
+     * @throws EnumInstantiationException        实例化异常
+     */
+    public KeywordMatchType registerOrThrow(String name, BiPredicate<String, String> filter) throws EnumInstantiationRequireException, EnumInstantiationException {
+            return super.registerEnum(name, filter);
+    }
+
+
 
     /**
      * 注册一个新的 {@link KeywordMatchType} 实例 - 静态窗口
      * @param name      枚举名称
      * @param filter    字符串过滤规则
      * @return
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
      */
     public static KeywordMatchType registerType(String name, BiPredicate<String, String> filter) {
         return getInstance().register(name, filter);
+    }
+    /**
+     * 注册一个新的 {@link KeywordMatchType} 实例 - 静态窗口
+     * @param name      枚举名称
+     * @param filter    字符串过滤规则
+     * @return
+     */
+    public static KeywordMatchType registerTypeOrThrow(String name, BiPredicate<String, String> filter) throws EnumInstantiationRequireException, EnumInstantiationException {
+        return getInstance().registerOrThrow(name, filter);
     }
 
 

@@ -33,4 +33,13 @@ public class ListenerMethodHelper {
         return result;
     }
 
+    /**
+     * 构建一个新的监听函数
+     * （尚未完成）
+     */
+    @Deprecated
+    public static <T> ListenerMethod<T> newListener(){
+        return null;
+    }
+
 }
