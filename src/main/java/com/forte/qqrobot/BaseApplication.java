@@ -55,8 +55,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
     //java版本检测
     static{
-        //初始化警察局
-//        PoliceStation.getInstance();
         try{
             //获取java版本
             String javaVersion = System.getProperties().getProperty("java.version");

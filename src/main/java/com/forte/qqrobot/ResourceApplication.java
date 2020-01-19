@@ -5,8 +5,7 @@ import com.forte.config.InjectableConfig;
 import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.log.QQLog;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -29,6 +28,14 @@ public interface ResourceApplication<CONFIG extends BaseConfiguration> extends A
      */
     InputStream getStream();
 
+    /**
+     * 获取Reader对象。
+     * Properties在读取的时候，使用字节流无法读取中文，因此可以考虑使用getReader来进行转化。
+     * @return 配置文件Reader对象
+     */
+    default Reader getReader(){
+        return new BufferedReader(new InputStreamReader(getStream()));
+    };
 
     /**
      * default方法默认实现此方法, 请不要再实现此方法了。
@@ -40,8 +47,8 @@ public interface ResourceApplication<CONFIG extends BaseConfiguration> extends A
         Properties configProperties = new Properties();
 
         // 获取流并自动关闭
-        try (InputStream stream = getStream()) {
-            configProperties.load(stream);
+        try (Reader reader = getReader()) {
+            configProperties.load(reader);
         } catch (IOException e) {
             throw new ConfigurationException("properties 配置流读取错误: ", e);
         } catch (NullPointerException e) {
