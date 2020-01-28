@@ -407,6 +407,7 @@ public class ListenerManager implements MsgReceiver {
         // 排序并构建消息拦截器
         if(intercepts != null){
             MsgIntercept[] msgInterceptsCopy = Arrays.copyOf(intercepts, intercepts.length);
+
             Arrays.sort(msgInterceptsCopy);
             this.intercepts = msgInterceptsCopy;
         }else{
