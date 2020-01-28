@@ -7,14 +7,14 @@ package com.forte.qqrobot.log;
  **/
 public enum LogLevel {
 
-    /** debug级 */
-    DEBUG(0),
-    /** info级 */
-    INFO(1),
+    /** error级 */
+    ERROR(3),
     /** warning级 */
     WARNING(2),
-    /** error级 */
-    ERROR(3)
+    /** info级 */
+    INFO(1),
+    /** debug级 */
+    DEBUG(0)
     ;
 
     /** 日志级别 */
