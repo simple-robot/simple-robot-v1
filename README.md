@@ -3,7 +3,7 @@
 > 项目对应GITHUB地址: https://github.com/ForteScarlet/simple-robot-core
 
 **文档请见文档地址：**
-https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1049734
+https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 <br>
 
 **在线javadoc文档(由码云平台生成)：**
