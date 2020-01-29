@@ -107,7 +107,7 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
         <tr>
         	<td>LEMOC支持组件框架</td>
             <th rowspan='3'>
-            	<a href="https://github.com/ForteScarlet" target="_blank">
+            	<a href="https://gitee.com/ForteScarlet" target="_blank">
                 	ForteScarlet
                 </a>
             </th>
