@@ -79,10 +79,10 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
 
 > 如果你根据核心开发了组件框架，可以告知我，我会更新在此处与下文处。
 
-> 如果你只是想开发一个QQ机器人，而不在乎使用什么平台，可以去试试酷Q应用下的CQ HTTP API插件，并结合对应的组件框架使用。
-> 酷Q应用社区：https://cqp.cc/forum.php
-> CQ HTTP API插件GITHUB：https://github.com/richardchien/coolq-http-api
-> CQ HTTP API组件(即文档地址)：https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
+> 如果你只是想开发一个QQ机器人，而不在乎使用什么平台，可以去试试酷Q应用下的CQ HTTP API插件，并结合对应的组件框架使用。<br>
+> 酷Q应用社区：https://cqp.cc/forum.php <br>
+> CQ HTTP API插件GITHUB：https://github.com/richardchien/coolq-http-api <br>
+> CQ HTTP API组件(即文档地址)：https://www.kancloud.cn/forte-scarlet/simple-coolq-doc <br>
 
 
 ## 看的有点蒙，但是想试试
