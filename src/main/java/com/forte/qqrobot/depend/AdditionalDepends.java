@@ -81,8 +81,8 @@ public class AdditionalDepends implements DependGetter {
 
         //遍历
         //普通依赖
-        Map<Class, Object> typeMap = new HashMap<>();
-        Map<String, Object> nameMap = new HashMap<>();
+        Map<Class, Object> typeMap = new HashMap<>(4);
+        Map<String, Object> nameMap = new HashMap<>(4);
 
         nameObjMap.forEach((k, v) -> {
             //只有当不是基础类型的时候才根据类型添加
@@ -110,7 +110,7 @@ public class AdditionalDepends implements DependGetter {
             Class[] classes = this.type.keySet().stream().filter(t -> FieldUtils.isChild(t, type)).toArray(Class[]::new);
             if (classes.length > 1) {
                 //不止1个，但是对于额外参数来讲可能性不大
-                throw new DependResourceException("存在不止一个[" + type + "]类型的子类型：" + Arrays.toString(classes) + ",请尝试使用名称获取。");
+                throw new DependResourceException("moreChildType", type, Arrays.toString(classes));
             } else if (classes.length == 0) {
                 //没有，返回null
                 return null;
@@ -162,10 +162,14 @@ public class AdditionalDepends implements DependGetter {
      */
     private static <V> BiFunction<? super V, ? super V, ? extends V> typeMapMergeThrows(Class<?> type){
         return (old, val) -> {
-            throw new RobotDevException("动态参数类型出现重复！" +
-                    "\t\r\nkey(type): \t\t" + type +
-                    "\t\r\nvalue-old: " + old +
+            throw new RobotDevException("dynamicParamTypeRepeat",
+                    "\t\r\nkey(type): " + type,
+                    "\t\r\nvalue-old: " + old,
                     "\t\r\nvalue-new: " + val);
+//            throw new RobotDevException("动态参数类型出现重复！" +
+//                    "\t\r\nkey(type): \t\t" + type +
+//                    "\t\r\nvalue-old: " + old +
+//                    "\t\r\nvalue-new: " + val);
         };
     }
 
@@ -176,9 +180,9 @@ public class AdditionalDepends implements DependGetter {
      */
     private static <V> BiFunction<? super V, ? super V, ? extends V> nameMapMergeThrows(String key){
         return (old, val) -> {
-            throw new RobotDevException("动态参数名称出现重复！" +
-                    "\t\r\nkey(name): \t\t" + key +
-                    "\t\r\nvalue-old: " + old +
+            throw new RobotDevException("dynamicParamNameRepeat",
+                    "\t\r\nkey(name): " + key,
+                    "\t\r\nvalue-old: " + old,
                     "\t\r\nvalue-new: " + val);
         };
     }

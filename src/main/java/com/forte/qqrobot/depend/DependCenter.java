@@ -1,5 +1,6 @@
 package com.forte.qqrobot.depend;
 
+import com.forte.lang.Language;
 import com.forte.qqrobot.depend.parameter.ParamGetterManager;
 import com.forte.qqrobot.depend.parameter.ParamNameGetter;
 import com.forte.qqrobot.depend.util.DependUtil;
@@ -262,21 +263,23 @@ public class DependCenter implements DependGetter, DependInjector {
         String name = depend.getName();
         if(contains(name)){
             //如果存在，直接抛出异常
-            throw new DependResourceException("已经存在名称为["+ depend +"]的依赖");
+            throw new DependResourceException("dependExistByName", depend);
         }
 
-        QQLog.info("load Depend >> " + depend);
+//        QQLog.info("load Depend >> " + depend);
+        QQLog.info("run.depend.load", depend);
 
         //判断类型，如果是基础数据类型，保存到基础，否则保存至其他
         if (BasicResourceWarehouse.isBasicType(depend.getType())) {
             if (basicResourceWarehouse.put(depend.getName(), depend.getInstance()) != null) {
-                throw new DependResourceException("已存在常量依赖：" + depend.getName());
+                // 存在常量依赖名称
+                throw new DependResourceException("basicDependExistByName", depend.getName());
             }
         } else {
             //非常量数据，保存
             //先根据名称保存
             if (nameResourceWarehouse.put(depend.getName(), depend) != null) {
-                throw new DependResourceException("已存在依赖：" + depend.getName());
+                throw new DependResourceException("dependExistByName", depend.getName());
             }
 
             classResourceWareHouse.merge(depend.getType(), new ArrayList<Depend>(2) {{
@@ -305,8 +308,8 @@ public class DependCenter implements DependGetter, DependInjector {
             Supplier<?> paramSupplier;
             //先判断是否为常量类型
             if (BasicResourceWarehouse.isBasicType(nameTypeEntry.getValue())) {
-                //是常量类型
-                Objects.requireNonNull(nameTypeEntry.getKey(), "常量类型的name不可为空！");
+                //是常量类型, 验证空指针
+                Objects.requireNonNull(nameTypeEntry.getKey(), Language.format("exception.nullPointer.basicNameCannotEmpty"));
                 //获取常量类型
                 paramSupplier = () -> constant(nameTypeEntry.getKey());
             } else {
@@ -338,7 +341,6 @@ public class DependCenter implements DependGetter, DependInjector {
                 .filter(f -> beans.getBeans().allDepend() || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
-//                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
                     com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
                     if((beans.getBeans().allDepend()) && (dependAnnotation == null)){
                         dependAnnotation = beans.getBeans().depend();
@@ -371,7 +373,7 @@ public class DependCenter implements DependGetter, DependInjector {
                     try {
                         canInjFunction = DependUtil.canInj(type, f, dependAnnotation);
                     } catch (NoSuchMethodException e) {
-                        throw new DependResourceException("字段值获取函数构建异常！", e);
+                        throw new DependResourceException("fieldGetterFuncFailed", e);
                     }
 
                     //赋值函数
@@ -379,7 +381,7 @@ public class DependCenter implements DependGetter, DependInjector {
                     try {
                         setterConsumer = DependUtil.doInj(type, f, dependAnnotation, fieldGetter);
                     } catch (NoSuchMethodException e) {
-                        throw new DependResourceException("字段值赋值函数构建异常！", e);
+                        throw new DependResourceException("fieldSetterFuncFailed", e);
                     }
 
                     //赋值函数
@@ -410,12 +412,10 @@ public class DependCenter implements DependGetter, DependInjector {
         Class<T> type = beans.getType();
         //获取全部字段, 根据注解获取(或全部注入), 转化为字段值注入函数
         BiConsumer<T, DependGetter>[] consumerArray = Arrays.stream(FieldUtils.getFields(type, true))
-//                .filter(f -> beans.getBeans().allDepend() || f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class) != null)
                 .filter(f -> beans.getBeans().allDepend() || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
                     //获取字段注解
-//                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
                     com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
                     //如果没有注解且allDepend为true，获取默认注解
                     if((beans.getBeans().allDepend()) && (dependAnnotation == null)){
@@ -466,7 +466,7 @@ public class DependCenter implements DependGetter, DependInjector {
                     try {
                         canInjFunction = DependUtil.canInj(type, f, dependAnnotation);
                     } catch (NoSuchMethodException e) {
-                        throw new DependResourceException("字段值获取函数构建异常！", e);
+                        throw new DependResourceException("fieldGetterFuncFailed", e);
                     }
 
                     //赋值函数
@@ -474,7 +474,7 @@ public class DependCenter implements DependGetter, DependInjector {
                     try {
                         setterConsumer = DependUtil.doInj(type, f, dependAnnotation, fieldGetterFunction);
                     } catch (NoSuchMethodException e) {
-                        throw new DependResourceException("字段值赋值函数构建异常！", e);
+                        throw new DependResourceException("fieldSetterFuncFailed", e);
                     }
 
                     //赋值函数
@@ -643,7 +643,8 @@ public class DependCenter implements DependGetter, DependInjector {
                 depends = null;
             }else if(classes.length > 1){
                 //不止1个，抛出异常
-                throw new DependResourceException("存在不止一个[" + type + "]类型的子类型："+ Arrays.toString(classes) +",请尝试使用名称获取。");
+//                throw new DependResourceException("存在不止一个[" + type + "]类型的子类型："+ Arrays.toString(classes) +",请尝试使用名称获取。");
+                throw new DependResourceException("moreChildType", type, Arrays.toString(classes));
             }else{
                 depends = classResourceWareHouse.get(classes[0]);
                 // 需要标记为重新保存
@@ -656,8 +657,8 @@ public class DependCenter implements DependGetter, DependInjector {
             //如果还是没有，返回null
             return null;
         }else if (depends.size() > 1) {
-            //多于一个
-            throw new DependResourceException("存在不止一个[" + type + "]类型的依赖，请尝试使用名称获取。");
+            //多于一个, 一般情况下是使用父类类型获取的时候会存在的情况
+            throw new DependResourceException("moreDepend", type);
         } else {
             // 只有唯一的一个
             Depend single = depends.get(0);
@@ -889,7 +890,7 @@ public class DependCenter implements DependGetter, DependInjector {
         }
 
         if(BasicResourceWarehouse.isBasicType(type)){
-            throw new DependResourceException("常量类型["+ type +"]只能通过指定名称获取！");
+            throw new DependResourceException("basicGet", type);
         }else{
             return getDependInstance(type);
         }

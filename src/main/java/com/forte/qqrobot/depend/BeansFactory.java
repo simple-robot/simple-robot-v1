@@ -1,5 +1,6 @@
 package com.forte.qqrobot.depend;
 
+import com.forte.lang.Language;
 import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.depend.parameter.ParamGetterManager;
@@ -60,8 +61,9 @@ public class BeansFactory {
                         //出现重复的Beans，查询并获取之前的此名称的Beans
                         Beans equalsBeans = beansList.stream().filter(be -> be.getName().equals(b.getName())).findAny().orElse(null);
                         //抛出异常
-                        throw new DependResourceException("不可出现重复的name：["+ b.getName() +"]:\n" +
-                                b + "\n" + equalsBeans);
+//                        throw new DependResourceException("不可出现重复的name：["+ b.getName() +"]:\n" +
+//                                b + "\n" + equalsBeans);
+                        throw new DependResourceException("sameName", b.getName(), b, equalsBeans);
                     }
                     //没有抛出异常，保存对应信息
                     beansList.add(b);
@@ -137,18 +139,22 @@ public class BeansFactory {
                     try {
                         return (T)constructor.newInstance(args);
                     } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        throw new DependResourceException("["+ clazz +"]实例化错误", e);
+                        throw new DependResourceException("initFailed", e, clazz);
                     }
                 };
 
             } catch (NoSuchMethodException e) {
-                String message = "无法获取["+ clazz +"]";
+                String messageParam1 = clazz.toString();
+
+//                String message = "无法获取["+ clazz +"]";
+                String messageParam2;
                 if(constructorParams.length == 0){
-                    message += "的无参构造";
+                    messageParam2 = "无参构造";
                 }else{
-                    message += "的构造函数：" + Arrays.toString(constructorParams);
+                    messageParam2 = "构造函数：" + Arrays.toString(constructorParams);
                 }
-                NoSuchMethodException firstNoSuchMethodEx = new NoSuchMethodException(message);
+                String messageTag = "exception.noSuchMethod.noGet";
+                NoSuchMethodException firstNoSuchMethodEx = new NoSuchMethodException(Language.format(messageTag, new Object[]{ messageParam1, messageParam2}));
                 //如果指定的为无参构造，且如果获取不到指定构造函数，查看此类全部的构造，假如只有一个构造，则使用此构造，否则抛出异常
                 if(constructorParams.length == 0){
                     Constructor<?>[] constructors = clazz.getConstructors();
@@ -163,12 +169,12 @@ public class BeansFactory {
                             try {
                                 return (T)findConstructor.newInstance(args);
                             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e2) {
-                                throw new DependResourceException("["+ clazz +"]实例化错误", e2);
+                                throw new DependResourceException("initFailed", e2, clazz);
                             }
                         };
 
                     }else{
-                        throw new DependResourceException("存在不止一个构造函数，无法定位", firstNoSuchMethodEx);
+                        throw new DependResourceException("moreConstructor", firstNoSuchMethodEx);
                     }
                 }
             }
@@ -184,7 +190,7 @@ public class BeansFactory {
                     constrMethod.setAccessible(false);
                     return invoke;
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new DependResourceException(name + " ["+ clazz +"]实例化错误", e);
+                    throw new DependResourceException("initFailed", e, name + "("+ clazz +")");
                 }
             };
 
@@ -233,7 +239,7 @@ public class BeansFactory {
         );
 
         //是否为单例
-        boolean single = true;
+//        boolean single = true;
 
         //是否全部字段标注@Depend
         boolean allDepend = beansData.allDepend();
@@ -249,7 +255,7 @@ public class BeansFactory {
         Beans[] children = getChildren(beanType, name);
 
 
-        return new Beans<>(name, (Class<T>) beanType, single, allDepend, instanceNeed, getInstanceFunction, children, beansData);
+        return new Beans<>(name, (Class<T>) beanType, true, allDepend, instanceNeed, getInstanceFunction, children, beansData);
     }
 
 
@@ -367,7 +373,7 @@ public class BeansFactory {
                 try {
                     return m.invoke(father, params);
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new DependResourceException(name + " ["+ type +"]实例化错误", e);
+                    throw new DependResourceException("initFailed", e, name + "("+ type +")");
                 }
             };
 

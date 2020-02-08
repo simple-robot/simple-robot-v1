@@ -9,15 +9,20 @@ package com.forte.qqrobot.exception;
  * @since JDK1.8
  **/
 public class EnumFactoryException extends RobotException {
+
+    /*
+        一般在配置之前被触发，所以不进行语言化
+     */
+
     public EnumFactoryException() {
     }
 
     public EnumFactoryException(String message) {
-        super(message);
+        super(1, message);
     }
 
     public EnumFactoryException(String message, Throwable cause) {
-        super(message, cause);
+        super(1, message, cause);
     }
 
     public EnumFactoryException(Throwable cause) {
@@ -25,6 +30,6 @@ public class EnumFactoryException extends RobotException {
     }
 
     public EnumFactoryException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(1, message, cause, enableSuppression, writableStackTrace);
     }
 }

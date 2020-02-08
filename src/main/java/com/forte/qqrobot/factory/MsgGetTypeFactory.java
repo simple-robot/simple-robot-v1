@@ -2,9 +2,9 @@ package com.forte.qqrobot.factory;
 
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.exception.EnumFactoryException;
 import com.forte.qqrobot.exception.EnumInstantiationException;
 import com.forte.qqrobot.exception.EnumInstantiationRequireException;
-import com.forte.qqrobot.exception.RobotDevException;
 import com.forte.qqrobot.log.QQLog;
 
 import java.util.Arrays;
@@ -116,19 +116,19 @@ public class MsgGetTypeFactory extends BaseFactory<MsgGetTypes> {
      * @param params 参数列表
      */
     @Override
-    protected void requireCanUse(String name, Object[] params) {
+    protected void requireCanUse(String name, Object[] params) throws EnumFactoryException {
         // 参数只可能存在一个，即class<? extends MsgGet>
         Class<? extends MsgGet> listenType = (Class<? extends MsgGet>) params[0];
 
         // 2.类型不可以是MsgGet本身。
         if (listenType.equals(MsgGet.class)) {
-            throw new RobotDevException("监听类型不可以是MsgGet本身。");
+            throw new EnumFactoryException("监听类型不可以是MsgGet本身。");
         }
 
         // 3.类型也没有冲突
         boolean listenTypeExist = Arrays.stream(values()).filter(t -> t.getBeanClass() != null).anyMatch(t -> t.getBeanClass().equals(listenType));
         if (listenTypeExist) {
-            throw new RobotDevException("已经存在对类型 " + listenType + " 进行监听的MsgGetType类型值。");
+            throw new EnumFactoryException("已经存在对类型 " + listenType + " 进行监听的MsgGetType类型值。");
         }
 
     }

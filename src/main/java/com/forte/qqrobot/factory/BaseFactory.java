@@ -1,6 +1,7 @@
 package com.forte.qqrobot.factory;
 
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.exception.EnumFactoryException;
 import com.forte.qqrobot.exception.EnumInstantiationException;
 import com.forte.qqrobot.exception.EnumInstantiationRequireException;
 import com.forte.qqrobot.exception.RobotDevException;
@@ -110,7 +111,7 @@ public abstract class BaseFactory<E extends Enum<E>> {
      * @param name      枚举名称
      * @param params    参数列表
      */
-    protected void throwOrPass(String name, Object[] params){
+    protected void throwOrPass(String name, Object[] params) throws Exception {
         // not null
         Objects.requireNonNull(name);
         Objects.requireNonNull(params);
@@ -118,7 +119,7 @@ public abstract class BaseFactory<E extends Enum<E>> {
         // 1.判断name是否已经存在
         try{
             MsgGetTypes.valueOf(name);
-            throw new RobotDevException("can not create new "+ enumType() +" for '"+ name +"': has already existed.");
+            throw new RobotDevException(1, "can not create new "+ enumType() +" for '"+ name +"': has already existed.");
         }catch (IllegalArgumentException ignore){
             // 如果出现这个异常，一般来讲代表不存在这个值，则说明不存在此值，可以添加。
         }
@@ -133,7 +134,7 @@ public abstract class BaseFactory<E extends Enum<E>> {
      * @param name          名称
      * @param params        参数列表
      */
-    protected abstract void requireCanUse(String name, Object[] params);
+    protected abstract void requireCanUse(String name, Object[] params) throws Exception;
 
 
 

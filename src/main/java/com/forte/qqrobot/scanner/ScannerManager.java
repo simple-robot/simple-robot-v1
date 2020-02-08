@@ -110,7 +110,7 @@ public class ScannerManager implements Register {
         try {
             timeTaskManager.start();
         } catch (SchedulerException e) {
-            throw new TimeTaskException("定时任务启动失败！", e);
+            throw new TimeTaskException("startFailed", e);
         }
     }
 
@@ -129,7 +129,7 @@ public class ScannerManager implements Register {
         try {
             timeTaskManager.start();
         } catch (SchedulerException e) {
-            throw new TimeTaskException("定时任务启动失败！", e);
+            throw new TimeTaskException("startFailed", e);
         }
     }
 

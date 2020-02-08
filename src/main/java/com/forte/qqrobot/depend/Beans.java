@@ -1,5 +1,6 @@
 package com.forte.qqrobot.depend;
 
+import com.forte.lang.Language;
 import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.utils.AnnotationUtils;
@@ -107,12 +108,14 @@ public class Beans<T> {
                     try {
                         return (U) constructor.newInstance(args);
                     } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        throw new DependResourceException("["+ type +"]实例化错误", e);
+//                        throw new DependResourceException("["+ type +"]实例化错误", e);
+                        throw new DependResourceException("initFailed", e, type);
                     }
                 };
 
             } catch (NoSuchMethodException e) {
-                String message = "无法获取["+ type +"]的无参构造";
+//                String message = "无法获取["+ type +"]的无参构造";
+                String message = Language.format("exception.noSuchMethod.noSuchNoParamConstructor", type);
                 NoSuchMethodException firstNoSuchMethodEx = new NoSuchMethodException(message);
                 //如果指定的为无参构造，且如果获取不到指定构造函数，查看此类全部的构造，假如只有一个构造，则使用此构造，否则抛出异常
                     Constructor<?>[] constructors = type.getConstructors();
@@ -125,12 +128,12 @@ public class Beans<T> {
                             try {
                                 return (U)findConstructor.newInstance(args);
                             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e2) {
-                                throw new DependResourceException("["+ type +"]实例化错误", e2);
+                                throw new DependResourceException("initFailed", e2, type);
                             }
                         };
 
                     }else{
-                        throw new DependResourceException("存在不止一个构造函数，无法定位", firstNoSuchMethodEx);
+                        throw new DependResourceException("moreConstructor", firstNoSuchMethodEx);
                     }
             }
         }else{
@@ -145,7 +148,7 @@ public class Beans<T> {
                     constrMethod.setAccessible(false);
                     return invoke;
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new DependResourceException(name + " ["+ type +"]实例化错误", e);
+                    throw new DependResourceException("initFailed", e, name + "("+ type +")");
                 }
             };
 

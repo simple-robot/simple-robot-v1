@@ -1,5 +1,6 @@
 package com.forte.qqrobot.timetask;
 
+import com.forte.lang.Language;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.anno.timetask.CronTask;
 import com.forte.qqrobot.anno.timetask.FixedRateTask;
@@ -98,7 +99,7 @@ public class TimeTaskManager {
             scheduler = ResourceDispatchCenter.getStdSchedulerFactory().getScheduler();
             scheduler.start();
         } catch (SchedulerException e) {
-            throw new TimeTaskException("定时任务调度器实例获取失败！", e);
+            throw new TimeTaskException("schedulerInitFailed", e);
         }
 
         //创建一个jobDetail的实例，将该实例与HelloJob Class绑定
@@ -153,13 +154,16 @@ public class TimeTaskManager {
 
 
                 scheduler.scheduleJob(jobDetail, trigger);
-                QQLog.info("加载定时任务[ "+ name +" ]成功！");
+                QQLog.info("run.timeTask.loadSuccess", name);
             } catch (SchedulerException e) {
-                throw new TimeTaskException("定时任务["+ name +"]注册失败！", e);
+                throw new TimeTaskException("registerFailed", e, name);
             }
         }else{
-            String why = jobDetail == null ? (JobDetail.class + "实例创建失败！") : (Trigger.class + "实例创建失败！");
-            throw new TimeTaskException("定时任务["+ name +"]注册失败: " + why);
+            String why = jobDetail == null ?
+                    Language.format("exception.dependResource.initFailed", JobDetail.class)
+                    :
+                    Language.format("exception.dependResource.initFailed", Trigger.class);
+            throw new TimeTaskException("registerWhyFailed", name, why);
         }
 
     }

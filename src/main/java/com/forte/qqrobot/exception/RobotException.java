@@ -61,4 +61,42 @@ public class RobotException extends Exception {
     public RobotException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
         super(getMessage(message, format), cause, enableSuppression, writableStackTrace);
     }
+    //**************************************
+    //*  提供一部分不会经过消息转化的方法
+    //*  这部分方法的第一个参数存在一个int类型的参数，此参数无意义，仅用于标记用以区分其他方法
+    //**************************************
+
+
+    /**
+     * 不进行语言国际化转化的构造方法
+     * @param pointless 无意义参数，填任意值 pointless param
+     * @param message   信息正文
+     */
+    public RobotException(int pointless, String message) {
+        super(message);
+    }
+
+    /**
+     * 不进行语言国际化转化的构造方法
+     * @param pointless 无意义参数，填任意值 pointless param
+     * @param message   信息正文
+     * @param cause     异常
+     */
+    public RobotException(int pointless, String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * 不进行语言国际化转化的构造方法
+     * @param pointless             无意义参数，填任意值 pointless param
+     * @param message               信息正文
+     * @param cause                 异常
+     * @param enableSuppression     whether or not suppression is enabled
+     *                                or disabled
+     * @param writableStackTrace    whether or not the stack trace should
+     *                                 be writable
+     */
+    public RobotException(int pointless, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

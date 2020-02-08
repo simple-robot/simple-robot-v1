@@ -34,7 +34,7 @@ public class DependUtil {
                     //没有指定，直接获取getter，不涉及多层级，直接获取
                     getter = FieldUtils.getFieldGetter(type, field);
                     if(getter == null){
-                        throw new DependResourceException("无法获取类["+ type +"]的字段["+field+"]的getter方法");
+                        throw new DependResourceException("noFieldGetter", type, field);
                     }
                 }else{
                     //指定了getter方法，获取此方法
@@ -45,7 +45,7 @@ public class DependUtil {
                     try {
                         return getter.invoke(bean) == null;
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new DependResourceException("无法通过getter["+ getter +"]获取类["+ type +"]的字段值["+ field +"]", e);
+                        throw new DependResourceException("cannotGetValue", e , getter, type, field);
                     }
                 };
             }else{
@@ -58,7 +58,7 @@ public class DependUtil {
                     try {
                         isNull = field.get(bean) == null;
                     } catch (IllegalAccessException e) {
-                        throw new DependResourceException("类["+ type +"]的字段["+ field +"]值获取异常！", e);
+                        throw new DependResourceException("fieldValueGetFailed", e, type, field);
                     }
                     field.setAccessible(false);
                     return isNull;
@@ -88,7 +88,7 @@ public class DependUtil {
                 //没有指定setter的方法名，则获取setter
                 setter = FieldUtils.getFieldSetter(type, field);
                 if(setter == null){
-                    throw new DependResourceException("无法获取类["+ type +"]的字段["+ field +"]的setter方法");
+                    throw new DependResourceException("noFieldSetter", type, field);
                 }
             }else{
                 //否则，按照给定的方法名获取
@@ -108,7 +108,7 @@ public class DependUtil {
                     }
 
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new DependResourceException("无法通过setter["+ setter +"]为类["+ type +"]的字段["+ field +"]赋值！", e);
+                    throw new DependResourceException("CannotSetValue", e, setter, type, field);
                 }
             };
         }else{
@@ -126,7 +126,7 @@ public class DependUtil {
                     }
 
                 } catch (IllegalAccessException e) {
-                    throw new DependResourceException("类["+ type +"]的字段["+ field +"]值赋值异常！", e);
+                    throw new DependResourceException("fieldValueSetFailed", e, type, field);
                 }
                 field.setAccessible(false);
             };
@@ -152,7 +152,7 @@ public class DependUtil {
                 //没有指定setter的方法名，则获取setter
                 setter = FieldUtils.getFieldSetter(type, field);
                 if(setter == null){
-                    throw new DependResourceException("无法获取类["+ type +"]的字段["+ field +"]的setter方法");
+                    throw new DependResourceException("noFieldSetter", type, field);
                 }
             }else{
                 //否则，按照给定的方法名获取
@@ -173,7 +173,7 @@ public class DependUtil {
                     }
 
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new DependResourceException("无法通过setter["+ setter +"]为类["+ type +"]的字段["+ field +"]赋值！", e);
+                    throw new DependResourceException("CannotSetValue", e, setter, type, field);
                 }
             };
         }else{
@@ -192,7 +192,7 @@ public class DependUtil {
                     }
 
                 } catch (IllegalAccessException e) {
-                    throw new DependResourceException("类["+ type +"]的字段["+ field +"]值赋值异常！", e);
+                    throw new DependResourceException("fieldValueSetFailed", e, type, field);
                 }
                 field.setAccessible(false);
             };

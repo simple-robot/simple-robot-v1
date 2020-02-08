@@ -1,5 +1,6 @@
 package com.forte.qqrobot.depend;
 
+import com.forte.lang.Language;
 import com.forte.qqrobot.exception.DependResourceException;
 
 import java.util.*;
@@ -216,7 +217,9 @@ public class BasicResourceWarehouse implements Map<String, Object> {
         if (isBasicType(value)) {
             return warehouse.put(key, value);
         } else {
-            throw new DependResourceException("[key(" + key + "):value(" + value + ")]的值类型[" + value.getClass() + "]并非为String或8大基本数据类型(或其封装类)");
+            // 不是8大基础数据类型
+            // [key({0}):value({1})]的值类型[{2}]并非为String或8大基本数据类型(或其封装类)
+            throw new DependResourceException("notBasic", key, value, value.getClass());
         }
     }
 
@@ -228,7 +231,7 @@ public class BasicResourceWarehouse implements Map<String, Object> {
         Objects.requireNonNull(parseType);
         Object value = warehouse.get(key);
         if (!isBasicType(parseType)) {
-            throw new DependResourceException("[" + parseType + "]不是可以转化的数据类型。可以使用的类型有：" + Arrays.toString(BasicDataTypes));
+            throw new DependResourceException("notParseType", parseType, Arrays.toString(BasicDataTypes));
         }
         if (value == null) {
             return null;
@@ -241,7 +244,7 @@ public class BasicResourceWarehouse implements Map<String, Object> {
             try {
                 result = basicToBasic(strValue, parseType);
             } catch (Exception e) {
-                throw new DependResourceException("无法将[key:" + key + "]的值类型[" + value.getClass() + "]转化为[" + parseType + "]");
+                throw new DependResourceException("cannotParse", e, key, value.getClass(), parseType);
             }
             return result;
 
@@ -251,7 +254,7 @@ public class BasicResourceWarehouse implements Map<String, Object> {
             try {
                 result = basicToBasic(value, parseType);
             } catch (Exception e) {
-                throw new DependResourceException("无法将[key:" + key + "]的值类型[" + value.getClass() + "]转化为[" + parseType + "]");
+                throw new DependResourceException("cannotParse", e, key, value.getClass(), parseType);
             }
             return result;
         }
@@ -282,14 +285,14 @@ public class BasicResourceWarehouse implements Map<String, Object> {
             if (str.length() == 1) {
                 return (T) (Character) str.charAt(0);
             } else {
-                throw new NumberFormatException(str + "无法转化为" + type + "类型");
+                throw new NumberFormatException(Language.format("exception.numberFormat.cannotParse", new Object[]{str, type}));
             }
         } else if (boolean.class.equals(type) || Boolean.class.equals(type)) {
             return (T) (Boolean) Boolean.parseBoolean(str);
         } else if (String.class.equals(type)) {
             return (T) str;
         } else {
-            throw new NumberFormatException(str + "没有对应[" + type + "]的转化类型");
+            throw new NumberFormatException(Language.format("exception.numberFormat.noCorrespondingType", new Object[]{str, type}));
         }
     }
 
@@ -325,12 +328,12 @@ public class BasicResourceWarehouse implements Map<String, Object> {
                     if (str.length() == 1) {
                         return (T) (Character) str.charAt(0);
                     } else {
-                        throw new NumberFormatException(number + "无法转化为" + type);
+                        throw new NumberFormatException(Language.format("exception.numberFormat.cannotParse", number, type));
                     }
                 } else if (boolean.class.equals(type) || Boolean.class.equals(type)) {
                     return (T) (Boolean) (number.intValue() == 0);
                 } else {
-                    throw new NumberFormatException(number + "无法转化为" + type);
+                    throw new NumberFormatException(Language.format("exception.numberFormat.cannotParse", number, type));
                 }
             } else {
                 //值不是number类型
@@ -354,7 +357,7 @@ public class BasicResourceWarehouse implements Map<String, Object> {
                     } else if (boolean.class.equals(type) || Boolean.class.equals(type)) {
                         return (T) (Boolean) (Integer.parseInt(String.valueOf(charValue)) == 0);
                     } else {
-                        throw new NumberFormatException(charValue + "无法转化为" + type);
+                        throw new NumberFormatException(Language.format("exception.numberFormat.cannotParse", charValue, type));
                     }
                 } else if (basic instanceof Boolean || basic.getClass().equals(boolean.class)) {
                     boolean booValue = (boolean) basic;
@@ -362,10 +365,10 @@ public class BasicResourceWarehouse implements Map<String, Object> {
                     if (type.equals(boolean.class) || type.equals(Boolean.class)) {
                         return (T) (Boolean) booValue;
                     } else {
-                        throw new NumberFormatException("无法将" + basic + "转化为[" + type + "]类型");
+                        throw new NumberFormatException(Language.format("exception.numberFormat.cannotParse", basic, type));
                     }
                 } else {
-                    throw new RuntimeException("无法将[" + basic + "]转化为[" + type + "]类型");
+                    throw new RuntimeException(Language.format("exception.numberFormat.cannotParse", basic, type));
                 }
 
             }

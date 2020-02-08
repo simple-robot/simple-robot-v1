@@ -19,7 +19,62 @@ exception.CQParams.paramMismatch=CQ码类型[{0}]的参数[{1}]应当符合正�
 # CQParseException相关
 exception.CQParse.cannotParse=[{0}] 无法解析为CQ码对象。
 exception.CQParse.cannotToImage=无法将[{0}]类型的CQ码对象转化为ImageCQCode类型
-exception.CQParse.redundant=请使用转义消息文本: 重复的CQ码标识 ''{0}''. 索引位于: {1}
+exception.CQParse.redundant=请使用转义消息文本: 重复的CQ码标识 "{0}". 索引位于: {1}
+
+# DependResourceException相关
+## BasicResourceWarehouse中
+### 不止一个子类型
+exception.dependResource.moreChildType=存在不止一个[{0}]类型的子类型：[{1}],请尝试使用名称获取。
+### 不是基础数据类型
+exception.dependResource.notBasic=[key({0}):value({1})]的值类型[{2}]并非为String或8大基本数据类型(或其封装类)
+### 不是可转化的数据类型
+exception.dependResource.notParseType=[{0}] 不是可以转化的数据类型。可以使用的类型有：{1}
+### 无法转化
+exception.dependResource.cannotParse=无法将[key:"{0}"]的值类型[{1}]转化为[{2}]
+
+## Beans中
+### 实例化出现错误
+exception.dependResource.initFailed=[{0}] 实例化错误
+### 构造无法定位
+exception.dependResource.moreConstructor=存在不止一个构造函数, 无法定位
+
+## BeansFactory中
+### 出现了重复的name值
+exception.dependResource.sameName="不可出现重复的name: [{0}]: [{1}] AND [{2}]
+
+## DependCenter中
+### 依赖已经存在
+exception.dependResource.dependExistByName=已经存在依赖: {0}
+exception.dependResource.basicDependExistByName=已存在常量依赖: {0}
+exception.dependResource.fieldGetterFuncFailed=字段值获取函数构建异常!
+exception.dependResource.fieldSetterFuncFailed=字段值赋值函数构建异常!
+### 有多个此类型的依赖对象存在, 一般情况下是使用父类类型获取的时候会存在的情况
+exception.dependResource.moreDepend=存在不止一个[{0}]类型的依赖，请尝试使用名称获取。
+exception.dependResource.basicGet=常量类型[{0}]只能通过指定名称获取!
+
+## DependUtil中
+exception.dependResource.noFieldGetter=无法获取类[{0}]的字段[{1}]的getter方法
+exception.dependResource.cannotGetValue=无法通过getter[{0}]获取类[{1}]的字段值[{2}]
+exception.dependResource.fieldValueGetFailed=类[{0}]的字段[{1}]值获取异常!
+
+exception.dependResource.noFieldSetter=无法获取类[{0}]的字段[{1}]的setter方法
+exception.dependResource.CannotSetValue=无法通过setter[{0}]为类[{1}]的字段[{2}]赋值!
+exception.dependResource.fieldValueSetFailed=类[{0}]的字段[{1}]值赋值异常!
+
+# RobotDevException异常
+### dynamicParamRepeat: 动态参数类型出现重复!
+### key(type): class com.forte.Test1,
+### value-old: old,
+### value-new: new
+exception.dev.dynamicParamTypeRepeat=动态参数类型出现重复! {0}, {1}, {2}
+exception.dev.dynamicParamNameRepeat=动态参数名称出现重复! {0}, {1}, {2}
+
+# TimeTaskException相关
+exception.timeTask.startFailed=定时任务启动失败!
+exception.timeTask.schedulerInitFailed=定时任务调度器实例获取失败!
+exception.timeTask.registerFailed=定时任务[{0}]注册失败!
+exception.timeTask.registerWhyFailed=定时任务[{0}]注册失败: {1}
+exception.timeTask.
 
 #exception.
 #exception.
@@ -32,9 +87,20 @@ exception.CQParse.redundant=请使用转义消息文本: 重复的CQ码标识 ''
 #exception.
 #exception.
 #exception.
-#exception.
-#exception.
 
+# 其他异常
+
+# 数字转化异常 NumberFormatException，出现在BasicResourceWarehouse类中
+exception.numberFormat.cannotParse="{0}"无法转化为{1}类型
+exception.numberFormat.noCorrespondingType="{0}"没有对应[{1}]的转化类型
+
+# 无方法异常 NoSuchMethodException，出现在Beans类中
+exception.noSuchMethod.noSuchNoParamConstructor=无法获取[{0}]的无参构造
+exception.noSuchMethod.noGet=无法获取[{0}]的{1}
+
+# 空指针异常
+## 常量name不可为null, 使用在DependCenter中
+exception.nullPointer.basicNameCannotEmpty=常量类型的name不可为空!
 # 工具类中相关的内容
 #utils.
 #utils.
@@ -43,8 +109,16 @@ exception.CQParse.redundant=请使用转义消息文本: 重复的CQ码标识 ''
 #utils.
 #utils.
 
+# 其他一些运行期间，或者启动期间的参数
 
 # 启动时候的系统类型展示，用于debug吧
-os.system.name=系统名称: {0}
-os.system.version=系统版本: {0}
-os.system.type=系统: {0}
+run.os.name=系统名称: {0}
+run.os.version=系统版本: {0}
+run.os.type=系统: {0}
+
+run.depend.load=加载依赖 >> {0}
+
+run.timeTask.loadSuccess=加载定时任务[ {0} ]成功!
+
+
+
