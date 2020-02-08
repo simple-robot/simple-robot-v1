@@ -1,0 +1,50 @@
+lang.init.finished=语言已初始化完毕。
+
+# 异常相关
+# AnnotationException相关，其中包括AnnotationUtils中出现的格式化参数
+exception.annotation.class=类[{0}]不应当使用[{1}]注解: {2}
+exception.annotation.method=类[{0}]的方法[{1}]不应当使用[{2}]注解: {3}
+exception.annotation.notStatic=不是静态
+exception.annotation.needReturn=需要返回值
+exception.annotation.returnTypeWrong=返回值非该类或该类的子类类型
+
+# BlockException相关
+exception.block.indexOut=超出索引!
+
+# CQParamsException相关
+exception.CQParams.noParam=无法获取参数[{0}]
+exception.CQParams.paramCannotIgnore=CQ码类型[{0}]的参数[{1}]不可忽略。
+exception.CQParams.paramMismatch=CQ码类型[{0}]的参数[{1}]应当符合正则匹配：{2}, 而不是：{3}
+
+# CQParseException相关
+exception.CQParse.cannotParse=[{0}] 无法解析为CQ码对象。
+exception.CQParse.cannotToImage=无法将[{0}]类型的CQ码对象转化为ImageCQCode类型
+exception.CQParse.redundant=请使用转义消息文本: 重复的CQ码标识 ''{0}''. 索引位于: {1}
+
+#exception.
+#exception.
+#exception.
+#exception.
+#exception.
+#exception.
+#exception.
+#exception.
+#exception.
+#exception.
+#exception.
+#exception.
+#exception.
+
+# 工具类中相关的内容
+#utils.
+#utils.
+#utils.
+#utils.
+#utils.
+#utils.
+
+
+# 启动时候的系统类型展示，用于debug吧
+os.system.name=系统名称: {0}
+os.system.version=系统版本: {0}
+os.system.type=系统: {0}

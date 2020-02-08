@@ -94,7 +94,7 @@ public class CQCode
             System.arraycopy(arr, 1, paramArr, 0, paramArr.length);
             return CQCode.of(arr[0], paramArr);
         }else{
-            throw new CQParseException("["+ cqStr +"] 无法解析为CQ码对象。");
+            throw new CQParseException("cannotParse", cqStr);
         }
     }
 
@@ -232,13 +232,13 @@ public class CQCode
         for (String key : keys) {
             String getParams = params.get(key);
             if(getParams == null && (!ignoreAbleKeys.contains(key))){
-                throw new CQParamsException("CQ码类型["+ cqCodeTypes +"]的参数["+ key +"]不可忽略。");
+                throw new CQParamsException("paramCannotIgnore", cqCodeTypes, key);
             }
 
             if(getParams != null){
                 String keyRegex = cqCodeTypes.getKeyRegex(key);
                 if(keyRegex != null && !getParams.matches(keyRegex)){
-                    throw new CQParamsException("CQ码类型["+ cqCodeTypes +"]的参数["+ key +"]应当符合正则匹配：" + keyRegex + ", 而不是：" + getParams);
+                    throw new CQParamsException("paramMismatch", cqCodeTypes, key, keyRegex, getParams);
                 }
 
             }

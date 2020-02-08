@@ -1,4 +1,2 @@
-/**
- * 此包下异常均为与安全有关系的异常
- */
+@Deprecated
 package com.forte.qqrobot.exception.safe;

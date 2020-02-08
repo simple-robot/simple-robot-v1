@@ -1,5 +1,6 @@
 package com.forte.qqrobot.utils;
 
+import com.forte.lang.Language;
 import com.forte.qqrobot.anno.*;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.exception.AnnotationException;
@@ -31,6 +32,20 @@ public class AnnotationUtils {
      *
      */
     private static final Map<AnnotatedElement, Set<Annotation>> ANNOTATION_CACHE = new ConcurrentHashMap<>(32);
+
+    /**
+     * 此工具类中使用到的异常的语言前缀
+     */
+    private static final String LANG_EX_TAG_HEAD = "exception.annotation";
+
+    /**
+     * 获取语言结果字符串
+     * @param tag       tag
+     * @param format    格式化参数
+     */
+    private static String getLang(String tag, Object... format){
+        return Language.format(LANG_EX_TAG_HEAD, tag, format);
+    }
 
 
    /**
@@ -228,21 +243,27 @@ public class AnnotationUtils {
      * @return 可能存在@Constr注解的静态方法
      * @throws AnnotationException 如果不是静态方法、没有返回值、返回值不是这个类型或者这个类型的字类类型却使用了@Constr注解
      *                             便会抛出此异常
+     *                             see lang:
+     *                             <ul>
+     *                              <li>exception.annotation.notStatic</li>
+     *                              <li>exception.annotation.needReturn</li>
+     *                              <li>exception.annotation.returnTypeWrong</li>
+     *                             </ul>
      */
     public static Method getConstrMethod(Class clz) {
         return Arrays.stream(clz.getDeclaredMethods()).filter(m -> {
             Constr constr = getAnnotation(m, Constr.class);
             if (constr != null) {
                 if (!Modifier.isStatic(m.getModifiers())) {
-                    throw new AnnotationException(clz, m, Constr.class, "不是静态");
+                    throw new AnnotationException(clz, m, Constr.class, getLang("notStatic"));
                 }
 
                 if (m.getReturnType().equals(void.class)) {
-                    throw new AnnotationException(clz, m, Constr.class, "需要返回值");
+                    throw new AnnotationException(clz, m, Constr.class, getLang("needReturn"));
                 }
 
                 if (!FieldUtils.isChild(m.getReturnType(), clz)) {
-                    throw new AnnotationException(clz, m, Constr.class, "返回值非该类或该类的子类类型");
+                    throw new AnnotationException(clz, m, Constr.class, getLang("returnTypeWrong"));
                 }
 
                 return true;
@@ -251,7 +272,6 @@ public class AnnotationUtils {
             }
         }).findAny().orElse(null);
     }
-
 
     /**
      * 从缓存中获取缓存注解

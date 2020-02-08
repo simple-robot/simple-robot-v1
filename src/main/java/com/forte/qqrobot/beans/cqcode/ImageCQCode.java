@@ -54,7 +54,7 @@ public class ImageCQCode extends CQCode {
         //获取文件md5参数
         String fileId = params.get("file");
         if(fileId == null){
-            throw new CQParamsException("无法获取参数[file]");
+            throw new CQParamsException("noParam", "file");
         }
         //解析参数以获取图片地址
         this.IMAGE_FILE = CQUtils.getImageFile(fileId);
@@ -83,7 +83,7 @@ public class ImageCQCode extends CQCode {
         MD5 = properties.getProperty("md5");
         WIDTH = Double.parseDouble(properties.getProperty("width"));
         HEIGHT = Double.parseDouble(properties.getProperty("height"));
-        SIZE = Long.valueOf(properties.getProperty("size"));
+        SIZE = Long.parseLong(properties.getProperty("size"));
         URL = properties.getProperty("url");
         ADD_TIME = Long.parseLong(properties.getProperty("addtime"));
     }
@@ -95,7 +95,7 @@ public class ImageCQCode extends CQCode {
      */
     public static ImageCQCode of(CQCode cqCode) throws IOException {
         if(!cqCode.getCQCodeTypes().equals(CQ_CODE_TYPE)){
-            throw new CQParseException("无法将["+ cqCode.getCQCodeTypes() +"]类型的CQ码对象转化为ImageCQCode类型");
+            throw new CQParseException("cannotToImage", cqCode.getCQCodeTypes());
         }
         //如果本身就是ImageCQCode对象，直接转化
         if(cqCode instanceof ImageCQCode){

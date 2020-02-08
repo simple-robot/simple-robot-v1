@@ -1,5 +1,6 @@
 package com.forte.qqrobot.log;
 
+import com.forte.lang.Language;
 import com.forte.plusutils.consoleplus.FortePlusPrintStream;
 import com.forte.plusutils.consoleplus.console.Colors;
 import com.forte.plusutils.consoleplus.console.ColorsBuilder;
@@ -25,9 +26,9 @@ public class QQLog extends ColorSystem {
     private static final PrintStream warning;
 
     /**
-     * 全局日志级别，先优先使用此日志级别进行筛选，默认debug
+     * 全局日志级别，先优先使用此日志级别进行筛选，默认info
      */
-    private static LogLevel globalLevel = LogLevel.DEBUG;
+    private static int globalLevel = LogLevel.INFO.getLevel();
 
     /**
      * 日志的连接信息
@@ -48,7 +49,8 @@ public class QQLog extends ColorSystem {
                         .add("WARN", Colors.FONT.YELLOW)
                         .add("]", Colors.FONT.BLUE)
                         .build();
-                return timeColors + " " + typeColors + " " + obj;
+                Colors msgColors = Colors.builder().add(obj, Colors.FONT.YELLOW).build();
+                return timeColors + " " + typeColors + " " + msgColors;
             });
         } catch (IllegalAccessException | UnsupportedEncodingException e) {
             warningPrintStream = null;
@@ -107,16 +109,24 @@ public class QQLog extends ColorSystem {
      * @param logLevel 日志级别
      */
     private static boolean ifCan(LogLevel logLevel){
-        return logLevel.getLevel() >= globalLevel.getLevel();
+        return ifCan(logLevel.getLevel());
+    }
+
+    /**
+     * 判定日志级别是否可以输出
+     * @param logLevel 日志级别
+     */
+    private static boolean ifCan(int logLevel){
+        return logLevel >= globalLevel;
     }
 
 
-    public static LogLevel getGlobalLevel() {
+    public static int getGlobalLevel() {
         return globalLevel;
     }
 
     public static void setGlobalLevel(LogLevel globalLevel) {
-        QQLog.globalLevel = globalLevel;
+        QQLog.globalLevel = globalLevel.getLevel();
     }
 
     /**
@@ -126,10 +136,13 @@ public class QQLog extends ColorSystem {
      * @param logStream 输出流
      * @param e 异常，可以为null
      */
-    public static void log(Object msg, LogLevel level, PrintStream logStream, Throwable e){
+    public static void log(Object msg, LogLevel level, PrintStream logStream, Throwable e, Object... formatArgs){
+        String msgStr = msg.toString();
+        // 判断语言是否已经初始化完成
+        msgStr = Language.format(msgStr, formatArgs);
         if(ifCan(level)){
-            if(qqLogBack.onLog(msg, level)){
-                logStream.println(msg);
+            if(qqLogBack.onLog(msgStr, level)){
+                logStream.println(msgStr);
                 if(e != null){
                     e.printStackTrace(logStream);
                 }
@@ -143,40 +156,40 @@ public class QQLog extends ColorSystem {
      * @param level 日志等级
      * @param logStream 输出流
      */
-    public static void log(Object msg, LogLevel level, PrintStream logStream){
-        log(msg, level, logStream, null);
+    public static void log(Object msg, LogLevel level, PrintStream logStream, Object... format){
+        log(msg, level, logStream, null, format);
     }
 
-    public static void info(Object msg) {
-        log(msg, LogLevel.INFO, info);
+    public static void info(Object msg, Object... format) {
+        log(msg, LogLevel.INFO, info, null, format);
     }
 
-    public static void info(Object msg, Throwable e) {
-        log(msg, LogLevel.INFO, info, e);
+    public static void info(Object msg, Throwable e, Object... format) {
+        log(msg, LogLevel.INFO, info, e, format);
     }
 
-    public static void debug(Object msg) {
-        log(msg, LogLevel.DEBUG, debug);
+    public static void debug(Object msg, Object... format) {
+        log(msg, LogLevel.DEBUG, debug, null, format);
     }
 
-    public static void debug(Object msg, Throwable e) {
-        log(msg, LogLevel.DEBUG, debug, e);
+    public static void debug(Object msg, Throwable e, Object... format) {
+        log(msg, LogLevel.DEBUG, debug, e, format);
     }
 
-    public static void warning(Object msg) {
-        log(msg, LogLevel.WARNING, warning);
+    public static void warning(Object msg, Object... format) {
+        log(msg, LogLevel.WARNING, warning, null, format);
     }
 
-    public static void warning(Object msg, Throwable e) {
-        log(msg, LogLevel.WARNING, warning, e);
+    public static void warning(Object msg, Throwable e, Object... format) {
+        log(msg, LogLevel.WARNING, warning, e, format);
     }
 
-    public static void error(Object msg) {
-        log(msg, LogLevel.ERROR, err);
+    public static void error(Object msg, Object... format) {
+        log(msg, LogLevel.ERROR, err, null, format);
     }
 
-    public static void error(Object msg, Throwable e) {
-        log(msg, LogLevel.ERROR, err, e);
+    public static void error(Object msg, Throwable e, Object... format) {
+        log(msg, LogLevel.ERROR, err, e, format);
     }
 
 

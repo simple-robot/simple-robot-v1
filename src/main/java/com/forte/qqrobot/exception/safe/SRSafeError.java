@@ -5,6 +5,7 @@ package com.forte.qqrobot.exception.safe;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+@Deprecated
 public class SRSafeError extends Error {
 
     /**

@@ -14,7 +14,7 @@ public interface QQLogBack {
      * @param e     如果存在异常，此为异常
      * @return      是否输出此日志
      */
-    boolean onLog(Object msg, LogLevel level, Throwable e);
+    boolean onLog(String msg, LogLevel level, Throwable e);
 
     /**
      * 没有异常的拦截，默认直接使用null
@@ -22,7 +22,7 @@ public interface QQLogBack {
      * @param logLevel  日志界别
      * @return          是否输出此日志
      */
-    default boolean onLog(Object msg, LogLevel logLevel){
+    default boolean onLog(String msg, LogLevel logLevel){
         return onLog(msg, logLevel, null);
     }
 }

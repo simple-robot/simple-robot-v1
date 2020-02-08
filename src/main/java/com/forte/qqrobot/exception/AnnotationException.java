@@ -12,32 +12,31 @@ public class AnnotationException extends RobotRuntimeException {
 
     //****************  不应当使用注解+why  ****************//
 
-
     public AnnotationException(Class clz, Class<? extends Annotation> annotationType, String why) {
-        super("类["+ clz +"]不应当使用["+ annotationType +"]注解：" + why);
+        super("annotation.class", clz, annotationType,  why);
     }
 
     public AnnotationException(Class clz, Method method, Class<? extends Annotation> annotationType, String why) {
-        super("类["+ clz +"]的方法["+ method +"]不应当使用["+ annotationType +"]注解：" + why);
+        super("annotation.method", clz, method, annotationType, why);
     }
 
     public AnnotationException() {
     }
 
 
-    public AnnotationException(String message) {
-        super(message);
+    public AnnotationException(String message, Object... format) {
+        super(message, format);
     }
 
-    public AnnotationException(String message, Throwable cause) {
-        super(message, cause);
+    public AnnotationException(String message, Throwable cause, Object... format) {
+        super(message, cause, format);
     }
 
     public AnnotationException(Throwable cause) {
         super(cause);
     }
 
-    public AnnotationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public AnnotationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
+        super(message, cause, enableSuppression, writableStackTrace, format);
     }
 }

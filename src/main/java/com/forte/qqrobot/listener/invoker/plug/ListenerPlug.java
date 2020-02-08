@@ -225,7 +225,7 @@ public class ListenerPlug implements Plug {
             String blockName = getBlockNames(listenerMethod)[blockNameIndex];
             onGlobalBlock(blockName);
         }catch (IndexOutOfBoundsException e){
-            throw new NoSuchBlockNameException("超出索引！");
+            throw new NoSuchBlockNameException("indexOut");
         }
     }
 

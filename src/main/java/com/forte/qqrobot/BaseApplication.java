@@ -1,6 +1,7 @@
 package com.forte.qqrobot;
 
 import com.alibaba.fastjson.util.TypeUtils;
+import com.forte.lang.Language;
 import com.forte.plusutils.consoleplus.console.Colors;
 import com.forte.qqrobot.anno.Config;
 import com.forte.qqrobot.anno.CoreVersion;
@@ -136,9 +137,25 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 //        ResourceDispatchCenter.saveStdSchedulerFactory(new StdSchedulerFactory());
     }
 
-    // 设置日志输出等级
+    /**
+     * 日志初始化
+     * @param config 配置类
+     */
     private void logInit(CONFIG config) {
+        // 设置日志输出等级
         QQLog.setGlobalLevel(config.getLogLevel());
+    }
+
+    /**
+     * 语言初始化
+     * @param app    启动器接口实现类
+     * @param config 配置类
+     */
+    private void languageInit(Application<CONFIG> app, CONFIG config){
+        ClassLoader classLoader = app.getClass().getClassLoader();
+        Locale language = config.getLanguage();
+        // 语言初始化
+        Language.init(classLoader, language);
     }
 
     /**
@@ -259,7 +276,11 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     /**
      * 初始化
      */
-    private void init(CONFIG config) {
+    private void init(Application<CONFIG> app, CONFIG config) {
+        //日志初始化
+        logInit(config);
+        // 语言初始化
+        languageInit(app, config);
         //配置fastJson
         fastJsonInit();
         //公共资源初始化
@@ -270,8 +291,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         timeTaskInit();
         //资源初始化
         resourceInit(config);
-        //日志初始化
-        logInit(config);
     }
 
     /**
@@ -506,8 +525,10 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
     /**
      * 执行的主程序
+     * @param app 启动器接口的实现类
+     * @param args 可能会有用的额外指令参数，一般是main方法的参数
      */
-    public void run(Application<CONFIG> app) {
+    public void run(Application<CONFIG> app, String... args) {
         //无配置资源初始化
         resourceInit();
 
@@ -518,7 +539,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         app.before(configuration);
 
         //初始化
-        init(configuration);
+        init(app, configuration);
 
         //配置结束, 获取依赖管理器
         DependCenter dependCenter = afterConfig(configuration, app);

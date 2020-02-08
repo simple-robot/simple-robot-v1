@@ -1,0 +1,6 @@
+lang.init.finished=言語が初期化されました.
+
+# 启动时候的系统类型展示，用于debug吧
+os.system.name=システム名: {0}
+os.system.version=システムバージョン: {0}
+os.system.type=システム: {0}

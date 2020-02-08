@@ -1,7 +1,7 @@
 package com.forte.qqrobot.safe;
 
-import com.forte.qqrobot.exception.safe.SRSafeError;
 
+import com.forte.qqrobot.exception.safe.SRSafeError;
 
 /**
  * 弃置类

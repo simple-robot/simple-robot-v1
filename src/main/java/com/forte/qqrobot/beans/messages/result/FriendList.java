@@ -2,6 +2,8 @@ package com.forte.qqrobot.beans.messages.result;
 
 import com.forte.qqrobot.beans.messages.result.inner.Friend;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,5 +22,23 @@ public interface FriendList extends InfoResult {
 
     /** 通过某个分组获取其中的好友列表 */
     Friend[] getFirendList(String group);
+
+    /**
+     * 获取所有好友列表
+     * @return
+     */
+    default Friend[] getAllFriends(){
+        Map<String, Friend[]> friendList = getFriendList();
+        // size * 4
+        List<Friend> friends = new ArrayList<>(friendList.size() << 2);
+        friendList.forEach((k, v) -> {
+            if(v != null){
+                for (Friend f : v) {
+                    friends.add(f);
+                }
+            }
+        });
+        return friends.toArray(new Friend[0]);
+    }
 
 }

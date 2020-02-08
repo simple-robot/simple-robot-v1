@@ -1,10 +1,19 @@
 package com.forte.qqrobot.exception;
 
 /**
+ *
+ * CQ码参数相关
+ *
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
 public class CQParamsException extends RobotRuntimeException {
+
+    /**
+     * 此异常使用的语言中间Tag，即exception.CQParams.xxxx
+     */
+    private static final String LANG_TAG_HEAD = "CQParams";
+
     /**
      * Constructs a new runtime exception with {@code null} as its
      * detail message.  The cause is not initialized, and may subsequently be
@@ -21,8 +30,12 @@ public class CQParamsException extends RobotRuntimeException {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
+    public CQParamsException(String message, Object... format) {
+        super(LANG_TAG_HEAD + '.' + message, format);
+    }
+
     public CQParamsException(String message) {
-        super(message);
+        super(LANG_TAG_HEAD + '.' + message);
     }
 
     /**
@@ -39,8 +52,12 @@ public class CQParamsException extends RobotRuntimeException {
      *                unknown.)
      * @since 1.4
      */
+    public CQParamsException(String message, Throwable cause, Object... format) {
+        super(LANG_TAG_HEAD + '.' + message, cause, format);
+    }
+
     public CQParamsException(String message, Throwable cause) {
-        super(message, cause);
+        super(LANG_TAG_HEAD + '.' + message, cause);
     }
 
     /**
@@ -75,6 +92,10 @@ public class CQParamsException extends RobotRuntimeException {
      * @since 1.7
      */
     public CQParamsException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(LANG_TAG_HEAD + '.' + message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public CQParamsException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
+        super(LANG_TAG_HEAD + '.' + message, cause, enableSuppression, writableStackTrace, format);
     }
 }

@@ -1,0 +1,7 @@
+lang.init.finished=language has already init finished.
+
+# system type，for debug
+os.system.name=System name: {0}
+os.system.version=System version: {0}
+os.system.type=System: {0}
+

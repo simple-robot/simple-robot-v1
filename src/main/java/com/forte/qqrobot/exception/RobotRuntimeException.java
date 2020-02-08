@@ -1,5 +1,8 @@
 package com.forte.qqrobot.exception;
 
+import com.forte.lang.Language;
+import com.forte.qqrobot.log.QQLog;
+
 /**
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/4/2 15:56
@@ -8,75 +11,95 @@ package com.forte.qqrobot.exception;
 public class RobotRuntimeException extends RuntimeException {
 
     /**
-     * Constructs a new runtime exception with {@code null} as its
-     * detail message.  The cause is not initialized, and may subsequently be
-     * initialized by a call to {@link #initCause}.
+     * 对于异常类，所有的lang均以exception.开头
      */
+    private static final String RUNTIME_ERROR_HEAD = "exception";
+
+
+    /**
+     * 异常会通过QQLog.err抛出而不是System.err
+     * 实验性质功能
+     */
+    @Override
+    public void printStackTrace() {
+        printStackTrace(QQLog.err);
+    }
+
+
+    private static String getMessage(String message, Object... format){
+        return Language.format(RUNTIME_ERROR_HEAD , message, format);
+    }
+
     public RobotRuntimeException() {
     }
 
-    /**
-     * Constructs a new runtime exception with the specified detail message.
-     * The cause is not initialized, and may subsequently be initialized by a
-     * call to {@link #initCause}.
-     *
-     * @param message the detail message. The detail message is saved for
-     *                later retrieval by the {@link #getMessage()} method.
-     */
+    public RobotRuntimeException(String message, Object... format) {
+        super(getMessage(message, format));
+    }
+
     public RobotRuntimeException(String message) {
-        super(message);
+        super(getMessage(message));
     }
 
-    /**
-     * Constructs a new runtime exception with the specified detail message and
-     * cause.  <p>Note that the detail message associated with
-     * {@code cause} is <i>not</i> automatically incorporated in
-     * this runtime exception's detail message.
-     *
-     * @param message the detail message (which is saved for later retrieval
-     *                by the {@link #getMessage()} method).
-     * @param cause   the cause (which is saved for later retrieval by the
-     *                {@link #getCause()} method).  (A <tt>null</tt> value is
-     *                permitted, and indicates that the cause is nonexistent or
-     *                unknown.)
-     * @since 1.4
-     */
+    public RobotRuntimeException(String message, Throwable cause, Object... format) {
+        super(getMessage(message, format), cause);
+    }
+
     public RobotRuntimeException(String message, Throwable cause) {
-        super(message, cause);
+        super(getMessage(message), cause);
     }
 
-    /**
-     * Constructs a new runtime exception with the specified cause and a
-     * detail message of <tt>(cause==null ? null : cause.toString())</tt>
-     * (which typically contains the class and detail message of
-     * <tt>cause</tt>).  This constructor is useful for runtime exceptions
-     * that are little more than wrappers for other throwables.
-     *
-     * @param cause the cause (which is saved for later retrieval by the
-     *              {@link #getCause()} method).  (A <tt>null</tt> value is
-     *              permitted, and indicates that the cause is nonexistent or
-     *              unknown.)
-     * @since 1.4
-     */
     public RobotRuntimeException(Throwable cause) {
         super(cause);
     }
 
-    /**
-     * Constructs a new runtime exception with the specified detail
-     * message, cause, suppression enabled or disabled, and writable
-     * stack trace enabled or disabled.
-     *
-     * @param message            the detail message.
-     * @param cause              the cause.  (A {@code null} value is permitted,
-     *                           and indicates that the cause is nonexistent or unknown.)
-     * @param enableSuppression  whether or not suppression is enabled
-     *                           or disabled
-     * @param writableStackTrace whether or not the stack trace should
-     *                           be writable
-     * @since 1.7
-     */
     public RobotRuntimeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(getMessage(message), cause, enableSuppression, writableStackTrace);
+    }
+
+    public RobotRuntimeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
+        super(getMessage(message, format), cause, enableSuppression, writableStackTrace);
+    }
+
+
+    //**************************************
+    //*  提供一部分不会经过消息转化的方法
+    //*  这部分方法的第一个参数存在一个int类型的参数，此参数无意义，仅用于标记用以区分其他方法
+    //**************************************
+
+
+    /**
+     * 不进行语言国际化转化的构造方法
+     * @param pointless 无意义参数，填任意值 pointless param
+     * @param message   信息正文
+     */
+    public RobotRuntimeException(int pointless, String message) {
+        super(message);
+    }
+
+    /**
+     * 不进行语言国际化转化的构造方法
+     * @param pointless 无意义参数，填任意值 pointless param
+     * @param message   信息正文
+     * @param cause     异常
+     */
+    public RobotRuntimeException(int pointless, String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * 不进行语言国际化转化的构造方法
+     * @param pointless             无意义参数，填任意值 pointless param
+     * @param message               信息正文
+     * @param cause                 异常
+     * @param enableSuppression     whether or not suppression is enabled
+     *                                or disabled
+     * @param writableStackTrace    whether or not the stack trace should
+     *                                 be writable
+     */
+    public RobotRuntimeException(int pointless, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
+
+
 }

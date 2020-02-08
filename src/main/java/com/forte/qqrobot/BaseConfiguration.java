@@ -1,6 +1,7 @@
 package com.forte.qqrobot;
 
 import com.forte.config.Conf;
+import com.forte.lang.Language;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 import com.forte.qqrobot.beans.types.ResultSelectType;
@@ -14,6 +15,7 @@ import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.BlockingQueue;
@@ -32,6 +34,9 @@ import java.util.stream.Stream;
 // 从这里的话..idea配置不高亮啊........所以就先把完整的写在字段上吧
 @Conf("")
 public class BaseConfiguration<T extends BaseConfiguration> {
+    /*
+        此类是在language初始化之前使用的，故此不使用语言化
+     */
 
     //**************************************
     //*          config params
@@ -43,13 +48,6 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         this.configuration = (T) this;
     }
 
-    /*
-        干脆都换成static得了
-
-     */
-
-    /** 是否扫描了初始化监听器 */
-//    private boolean scannedInitListener = false;
 
     /**
      * 服务器ip，默认为127.0.0.1
@@ -89,7 +87,6 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 需要进行的包扫描路径，默认为空
      */
-//    private Set<String> scannerPackage = new HashSet<>();
     @Conf("simple.robot.conf.scannerPackage")
     private String[] scannerPackage = {};
 
@@ -181,6 +178,12 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         this.logLevel = LogLevel.valueOf(name);
     }
 
+
+    @Conf(value = "simple.robot.conf.language", setterName = "setLanguageByTag", setterParameterType = String.class)
+    private Locale language = Locale.getDefault();
+    public void setLanguageByTag(String tag){
+        language = Language.getLocaleByTag(tag);
+    }
 
     //**************************************
     //*             function area
@@ -446,10 +449,12 @@ public class BaseConfiguration<T extends BaseConfiguration> {
                 // 是ip的格式，验证IP是不是都在0~255范围内
                 // 切割并验证
                 for (String s : ip.split("\\.")) {
-                    int number = Integer.parseInt(s);
-                    if (number < 0 || number > 255) {
-                        throw new ConfigurationException("ip number can not use '" + s + "'");
-                    }
+                    try {
+                        int number = Integer.parseInt(s);
+                        if (number < 0 || number > 255) {
+                            throw new ConfigurationException("ip number can not use '" + s + "'");
+                        }
+                    }catch (NumberFormatException ignored ){ }
                 }
             }
         }
@@ -589,24 +594,34 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         this.logLevel = logLevel;
     }
 
-    @Override
-    public String toString() {
-        return "BaseConfiguration{" +
-                ", ip='" + ip + '\'' +
-                ", localQQCode='" + localQQCode + '\'' +
-                ", localQQNick='" + localQQNick + '\'' +
-                ", encode='" + encode + '\'' +
-                ", cqPath='" + cqPath + '\'' +
-                ", scannerPackage=" + Arrays.toString(scannerPackage) +
-                ", corePoolSize=" + corePoolSize +
-                ", maximumPoolSize=" + maximumPoolSize +
-                ", keepAliveTime=" + keepAliveTime +
-                ", timeUnit=" + timeUnit +
-                ", workQueueFrom='" + workQueueFrom + '\'' +
-                ", workQueue=" + workQueue +
-                ", defaultThreadFactory=" + defaultThreadFactory +
-                ", localServerEnable=" + localServerEnable +
-                ", localServerPort=" + localServerPort +
-                '}';
+    public Locale getLanguage() {
+        return language;
     }
+
+    public void setLanguage(Locale language) {
+        this.language = language;
+    }
+
+
+    /**
+     * toString变为动态的，会更加消耗资源，效率变低。
+     */
+    @Override
+    public String toString(){
+        return Arrays.stream(getClass().getDeclaredFields())
+                .filter(f -> f.getAnnotation(Conf.class) != null)
+                .map(f -> {
+                    f.setAccessible(true);
+                    Conf conf = f.getAnnotation(Conf.class);
+                    try {
+                        return conf.value() + "\t=\t" + f.get(this);
+                    } catch (IllegalAccessException ignored) {
+                        return conf.value() + "= ?";
+                    }
+                }).collect(Collectors.joining("\r\n"));
+
+    }
+
+
+
 }

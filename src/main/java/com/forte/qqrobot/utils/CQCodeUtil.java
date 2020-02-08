@@ -719,7 +719,7 @@ public class CQCodeUtil {
             if(c == '['){
                 // 如果在CQ码读取期间又碰到了一个开头，则抛出异常
                 if(onCQ.get()){
-                    throw new CQParseException("请使用转义消息文本: 重复的CQ码头标识 '['. error index: " + index);
+                    throw new CQParseException("redundant", '[', index);
                 }else{
                     // 开启CQ码读取并输出之前的读取
                     onCQ.set(true);
@@ -734,7 +734,7 @@ public class CQCodeUtil {
             }else if(c == ']'){
                 // 如果是结尾, 但是之前并没有处于CQ读取状态，则抛出异常
                 if(!onCQ.get()){
-                    throw new CQParseException("请使用转义消息文本：重复的CQ码尾标识 ']'. error index: " + index);
+                    throw new CQParseException("redundant", ']', index);
                 }else{
                     // 结束CQ码的读取并输出之前的读取
                     onCQ.set(false);
