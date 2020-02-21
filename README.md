@@ -97,6 +97,12 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
 
 首先建议进群交流，毕竟其他两个我并不经常看(●ˇ∀ˇ●)
 
+## 赞助一下？
+
+那真的真的太感谢了，你可以参考 [文档/捐助]( https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1115825 ) 或者去 [爱发电](https://afdian.net/@ForteScarlet) 逛逛~
+
+
+
 ## 大家的成果
 <table>
     <thead>
@@ -160,14 +166,10 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
             <td>Robot-Spring</td>
             <th>千年老妖(1571650839)</th>
             <td>
-                <p>描述:</p> 
                 <p>基于酷Q的，使用Java语言开发的，面向COC的骰子机器人组件, 
                 使用架构为SpringBoot-Mybatis-CoolHttpApI。主要功能：COC跑团基础功能+斗图,聊天,群管等乱七八糟的功能</p>
-                <p>缺点: 单人开发(用来讨好对象的+顺带写一下工作之外的业务逻辑,防止大脑僵化)
-                  	单群使用,没有辣么多受众,开发初衷就是单群使用,高并发可能不会太好
-                </p>
-                <p>优点: 按照公司开发规范写的,想找工作的童鞋可以参考一下
-                标准的Controller+service+dao层模式,通俗易懂,易上手,易扩展
+                <p>
+                    主体为对于上述提到的<b>SinaNya项目 <sub>by 斯塔尼亚</sub></b>的二次封装.
                 </p>
             </td>
             <td>https://github.com/17336324331/Robot-Spring.git</td>
