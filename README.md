@@ -2,6 +2,10 @@
 
 > 项目对应GITHUB地址: https://github.com/ForteScarlet/simple-robot-core
 
+**首先，点击项目右上角的`star`以开启隐藏链接。**
+
+<br>
+
 **文档请见文档地址：**
 https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 <br>
@@ -60,7 +64,7 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
 - 高度接口化，可扩展性强
 - 有虽然没完全写完但是已经很全面了的中文文档
 - 已上传Maven中央仓库，支持Maven、gradle等        
-    
+  
     
 ### 缺点
 - 目前来讲，我个人没有接触过酷Q以外的机器人应用，所以没有我所开发的酷Q以外的组件（当然，组件依旧支持第三方开发，只是说我所开发的没有而已）    
@@ -123,6 +127,12 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
             <td>CQ HTTP API支持组件框架</td>
             <td>CoolQ HTTP API支持组件框架ForteScarlet基于simple-robot, 针对于酷Q插件 CQ HTTP API的对接组件</td>
             <td>https://github.com/ForteScarlet/simple-robot-component-coolHttpApi</td>
+        </tr>
+        <tr>
+        	<td>SinaNya</td>
+            <th>斯塔尼亚</th>
+            <td>为COC/DND等TRPG准备的骰点机器人</td>
+            <td>https://sinanya.com/</td>
         </tr>
         <tr>
             <td>崩坏学园2小助手 - 萌萌新</td>
