@@ -136,4 +136,46 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
         </tr>
         <tr>
         	<td>SinaNya</td>
-        
+            <th>斯塔尼亚</th>
+            <td>为COC/DND等TRPG准备的骰点机器人</td>
+            <td>https://sinanya.com/</td>
+        </tr>
+        <tr>
+            <td>崩坏学园2小助手 - 萌萌新</td>
+            <th>瑶光天枢</th>
+            <td>崩坏学园2的在线群聊，查询装备，模拟扭蛋，查询up记录，来份色图的机器人</td>
+            <td>https://github.com/LiChen233/simple-robot</td>
+        </tr>
+        <tr>
+            <td>群管机器人</td>
+            <th rowspan='3'>会跑的仓鼠</th>
+            <td>基于simple开发的群机器人</td>
+            <td>https://gitee.com/yaozhenyong/cqrobotjar2</td>
+        </tr>
+        <tr>
+            <td>游戏查询机器人</td>
+            <td>基于simple开发的娱乐性机器人</td>
+            <td>https://gitee.com/yaozhenyong/cqrobotIndependent</td>
+        </tr>
+        <tr>
+            <td>云端控制面板</td>
+            <td>主要做上面两个版本机器人的控制面板（web端）	</td>
+            <td>https://gitee.com/yaozhenyong/Qqrobotwar</td>
+        </tr>
+        <tr>
+            <td>Robot-Spring</td>
+            <th>千年老妖(1571650839)</th>
+            <td>
+                <p>基于酷Q的，使用Java语言开发的，面向COC的骰子机器人组件, 
+                使用架构为SpringBoot-Mybatis-CoolHttpApI。主要功能：COC跑团基础功能+斗图,聊天,群管等乱七八糟的功能</p>
+                <p>
+                    主体为对于上述提到的<b>SinaNya项目 <sub>by 斯塔尼亚</sub></b>的二次封装.
+                </p>
+            </td>
+            <td>https://github.com/17336324331/Robot-Spring.git</td>
+        </tr>
+</tbody>
+</table>  
+
+
+
