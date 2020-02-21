@@ -97,6 +97,12 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
 
 首先建议进群交流，毕竟其他两个我并不经常看(●ˇ∀ˇ●)
 
+## 赞助一下？
+
+那真的真的太感谢了，你可以参考 [文档/捐助]( https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1115825 ) 或者去 [爱发电](https://afdian.net/@ForteScarlet) 逛逛~
+
+
+
 ## 大家的成果
 <table>
     <thead>
@@ -130,50 +136,4 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
         </tr>
         <tr>
         	<td>SinaNya</td>
-            <th>斯塔尼亚</th>
-            <td>为COC/DND等TRPG准备的骰点机器人</td>
-            <td>https://sinanya.com/</td>
-        </tr>
-        <tr>
-            <td>崩坏学园2小助手 - 萌萌新</td>
-            <th>瑶光天枢</th>
-            <td>崩坏学园2的在线群聊，查询装备，模拟扭蛋，查询up记录，来份色图的机器人</td>
-            <td>https://github.com/LiChen233/simple-robot</td>
-        </tr>
-        <tr>
-            <td>群管机器人</td>
-            <th rowspan='3'>会跑的仓鼠</th>
-            <td>基于simple开发的群机器人</td>
-            <td>https://gitee.com/yaozhenyong/cqrobotjar2</td>
-        </tr>
-        <tr>
-            <td>游戏查询机器人</td>
-            <td>基于simple开发的娱乐性机器人</td>
-            <td>https://gitee.com/yaozhenyong/cqrobotIndependent</td>
-        </tr>
-        <tr>
-            <td>云端控制面板</td>
-            <td>主要做上面两个版本机器人的控制面板（web端）	</td>
-            <td>https://gitee.com/yaozhenyong/Qqrobotwar</td>
-        </tr>
-        <tr>
-            <td>Robot-Spring</td>
-            <th>千年老妖(1571650839)</th>
-            <td>
-                <p>描述:</p> 
-                <p>基于酷Q的，使用Java语言开发的，面向COC的骰子机器人组件, 
-                使用架构为SpringBoot-Mybatis-CoolHttpApI。主要功能：COC跑团基础功能+斗图,聊天,群管等乱七八糟的功能</p>
-                <p>缺点: 单人开发(用来讨好对象的+顺带写一下工作之外的业务逻辑,防止大脑僵化)
-                  	单群使用,没有辣么多受众,开发初衷就是单群使用,高并发可能不会太好
-                </p>
-                <p>优点: 按照公司开发规范写的,想找工作的童鞋可以参考一下
-                标准的Controller+service+dao层模式,通俗易懂,易上手,易扩展
-                </p>
-            </td>
-            <td>https://github.com/17336324331/Robot-Spring.git</td>
-        </tr>
-</tbody>
-</table>  
-
-
-
+        
