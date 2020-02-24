@@ -16,7 +16,7 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.nar
 *.ear
@@ -28,6 +28,7 @@
 hs_err_pid*
 ### Maven template
 target/
+target/**
 ### 恢复上传pom文件
 ### pom.xml
 pom.xml.tag

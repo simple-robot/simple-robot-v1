@@ -6,6 +6,7 @@ import com.forte.qqrobot.beans.messages.RootBean;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.function.Function;
 
 /**
  * 消息接收类型接口，定义一个获取接收到的消息的方法. <br>
@@ -33,6 +34,14 @@ public interface MsgGet extends OriginalAble, RootBean {
      */
     void setMsg(String newMsg);
 
+    /**
+     * 根据当前的msg来更新msg信息。
+     * oldMsg -> newMsg
+      * @param updateMsg msg更新函数
+     */
+    default void setMsg(Function<String, String> updateMsg){
+        setMsg(updateMsg.apply(getMsg()));
+    }
 
     /** 获取消息的字体 */
     String getFont();
