@@ -13,7 +13,7 @@ import java.time.ZoneId;
  * 有些插件支持在某些接收消息的时候返回一些特定的消息来达到快捷响应的目的，考虑支持此方式。
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/4/18 10:30
- * @since JDK1.8
+ * @version 1.0
  **/
 public interface MsgGet extends OriginalAble, RootBean {
 
@@ -26,8 +26,17 @@ public interface MsgGet extends OriginalAble, RootBean {
      */
     String getMsg();
 
+    /**
+     * 重新设置消息
+     * @param newMsg msg
+     * @since 1.7.x
+     */
+    void setMsg(String newMsg);
+
+
     /** 获取消息的字体 */
     String getFont();
+
 
     /** 获取到的时间, 代表某一时间的秒值。一般情况下是秒值。如果类型不对请自行转化 */
     Long getTime();

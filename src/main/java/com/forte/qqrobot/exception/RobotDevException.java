@@ -9,35 +9,38 @@ package com.forte.qqrobot.exception;
  **/
 public class RobotDevException extends RobotRuntimeException {
 
-    private static final String LANG_TAG_HEAD = "dev";
+    @Override
+    public String getExceptionTag(){
+        return "dev";
+    }
 
     public RobotDevException() {
     }
 
     public RobotDevException(Throwable cause) {
-        super(LANG_TAG_HEAD + '.' + cause);
+        super(cause);
     }
     public RobotDevException(String message) {
-        super(LANG_TAG_HEAD + '.' + message);
+        super(message);
     }
 
     public RobotDevException(String message, Throwable cause) {
-        super(LANG_TAG_HEAD + '.' + message, cause);
+        super(message, cause);
     }
 
     public RobotDevException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(LANG_TAG_HEAD + '.' + message, cause, enableSuppression, writableStackTrace);
+        super(message, cause, enableSuppression, writableStackTrace);
     }
     public RobotDevException(String message, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, format);
+        super(message, format);
     }
 
     public RobotDevException(String message, Throwable cause, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, cause, format);
+        super(message, cause, format);
     }
 
     public RobotDevException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, cause, enableSuppression, writableStackTrace, format);
+        super(message, cause, enableSuppression, writableStackTrace, format);
     }
 
     //********************************//

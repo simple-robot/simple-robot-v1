@@ -1,0 +1,2 @@
+The files in this folder are used to provide the language for the core. You can override them in the same path format, or modify them directly.
+此文件夹中的文件用于为核心(core)提供语言翻译。您可以使用相同的路径格式覆盖它们，或直接修改它们。

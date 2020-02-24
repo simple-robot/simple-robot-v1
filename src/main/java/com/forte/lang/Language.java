@@ -1,25 +1,14 @@
 package com.forte.lang;
 
 
-import com.forte.qqrobot.anno.Listen;
-import com.forte.qqrobot.beans.cqcode.CQCode;
-import com.forte.qqrobot.beans.cqcode.ImageCQCode;
-import com.forte.qqrobot.exception.AnnotationException;
-import com.forte.qqrobot.exception.CQParamsException;
-import com.forte.qqrobot.exception.CQParseException;
-import com.forte.qqrobot.exception.NoSuchBlockNameException;
-import com.forte.qqrobot.log.LogLevel;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.ReaderProperties;
-import com.forte.utils.time.Stopwatch;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.text.Format;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.concurrent.locks.StampedLock;
 import java.util.function.Function;
 
 /**
@@ -203,9 +192,30 @@ public class Language {
      * 自动获取系统时区的初始化
      *
      * @param loader 类加载器
+     * @see #init(ClassLoader, Locale)
      */
     public static void init(ClassLoader loader) {
         init(loader, SYSTEM_DEFAULT_LOCALE);
+    }
+
+    /**
+     * 自动获取系统时区的初始化
+     *
+     * @param locale 加载的语言
+     * @see #init(ClassLoader, Locale)
+     */
+    public static void init(Locale locale) {
+        init(ClassLoader.getSystemClassLoader(), locale);
+    }
+
+    /**
+     * 自动获取系统时区的初始化
+     * 使用系统默认的类加载器，一般来讲就是AppClassLoader
+     * @see #init(ClassLoader)
+     * @see #init(ClassLoader, Locale)
+     */
+    public static void init() {
+        init(ClassLoader.getSystemClassLoader(), SYSTEM_DEFAULT_LOCALE);
     }
 
     /**
@@ -431,41 +441,5 @@ public class Language {
      */
     public static void registerLang(ClassLoader loader, String langName) throws Exception {
         registerLang(loader, langName, SYSTEM_DEFAULT_LOCALE);
-    }
-
-
-    public static void main(String[] args) throws IOException {
-
-
-        Language.init(Language.class.getClassLoader());
-
-
-        System.out.println(new CQParseException("redundant", '[', 2).getMessage());
-
-//        System.out.println(new CQParamsException("noParam", "file").getMessage());
-
-
-//        System.out.println(format("exception" + '.' + "annotation.class", 11, 22, 33));
-//        System.out.println(format("exception", "annotation.class", 11, 22, 33));
-
-        // 2640
-//        Stopwatch.difference();
-//        for (int i = 0; i < 1000000; i++) {
-//            format("exception.annotation.class", 11, 22, 33);
-//        }
-//        System.out.println("time: " + Stopwatch.difference());
-
-//        long s2 = System.currentTimeMillis();
-//        for (int i = 0; i < 1000000; i++) {
-//            format("exception" + '.' + "annotation.class", 11, 22, 33);
-//        }
-//        System.out.println("plus time: " + (System.currentTimeMillis() - s2));
-
-//        long s1 = System.currentTimeMillis();
-//        for (int i = 0; i < 1000000; i++) {
-//            format("exception", "annotation.class", 11, 22, 33);
-//        }
-//        System.out.println("char time: " + (System.currentTimeMillis() - s1));
-
     }
 }

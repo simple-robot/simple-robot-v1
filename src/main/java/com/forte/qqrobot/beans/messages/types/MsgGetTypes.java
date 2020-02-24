@@ -8,7 +8,7 @@ import com.forte.qqrobot.utils.EnumValues;
 import com.forte.qqrobot.utils.FieldUtils;
 
 /**
- * 枚举类型，定义全部的消息接收类型
+ * 枚举类型，定义全部的消息接收类型,或者说监听类型
  *
  * @author ForteScarlet
  **/
@@ -88,9 +88,36 @@ public enum MsgGetTypes {
         }
     },
 
+    //**************** 1.7.0增加，一些期望中可能存在的监听API ****************//
+
+    /**
+     * 群消息撤回事件
+      */
+    @Deprecated
+    groupMsgDeleted(null),
+
+    /**
+     * 私信消息撤回事件
+     */
+    @Deprecated
+    privateMsgDeleted(null),
+
+
+//
+//    MsgDeleted(null),
+//    MsgDeleted(null),
+//    MsgDeleted(null),
+//    MsgDeleted(null),
+//    MsgDeleted(null),
+//    MsgDeleted(null),
+
+
+
+
     ;
 
 
+    /** 对应的Bean类型 */
     private Class<? extends MsgGet> beanClass;
 
     /**

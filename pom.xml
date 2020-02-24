@@ -14,8 +14,8 @@
     <artifactId>simple-robot-core</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署需要大于1.6.3 2020/1/28 -->
-    <version>1.6.3</version>
+    <!-- 下次部署需要大于1.7.0 2020/1/28 -->
+    <version>1.7.0</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>
@@ -107,7 +107,7 @@
                 </executions>
             </plugin>
 
-            <!-- （2）sonatype的staging插件 -->
+            <!-- （2）sonatype的staging插件, 应该是自动发布插件 -->
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -141,6 +141,8 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <checkModificationExcludes>
                         <checkModificationExclude>.idea/</checkModificationExclude>
+                        <checkModificationExclude>lib</checkModificationExclude>
+                        <checkModificationExclude>lib/*</checkModificationExclude>
                         <checkModificationExclude>.idea/*</checkModificationExclude>
                         <checkModificationExclude>test/</checkModificationExclude>
                         <checkModificationExclude>test/*</checkModificationExclude>
@@ -149,12 +151,10 @@
                         <checkModificationExclude>release-pom.xml</checkModificationExclude>
 
                         <checkModificationExclude>jdonframework.iml</checkModificationExclude>
-                        <checkModificationExclude>JdonAccessory/jdon-hibernate3x/jdon-hibernate3x.iml
-                        </checkModificationExclude>
+                        <checkModificationExclude>JdonAccessory/jdon-hibernate3x/jdon-hibernate3x.iml</checkModificationExclude>
                         <checkModificationExclude>JdonAccessory/jdon-jdbc/jdon-jdbc.iml</checkModificationExclude>
                         <checkModificationExclude>JdonAccessory/jdon-remote/jdon-remote.iml</checkModificationExclude>
-                        <checkModificationExclude>JdonAccessory/jdon-struts1x/jdon-struts1x.iml
-                        </checkModificationExclude>
+                        <checkModificationExclude>JdonAccessory/jdon-struts1x/jdon-struts1x.iml</checkModificationExclude>
                     </checkModificationExcludes>
                 </configuration>
                 <dependencies>
@@ -259,24 +259,9 @@
     <!-- 开发者信息 -->
     <developers>
         <developer>
-            <!-- SCM里项目开发者的唯一标识符 -->
-            <!--<id> HELLO WORLD </id>-->
-            <!-- 项目开发者的主页的URL -->
-            <!--<url></url>-->
-            <!-- 项目开发者在项目中扮演的角色，角色元素描述了各种角色 -->
             <roles>
                 <role>a single programmer</role>
             </roles>
-            <!-- 项目开发者所属组织 -->
-            <!--<organization> demo </organization>-->
-            <!-- 项目开发者所属组织的URL -->
-            <!--<organizationUrl> http://hi.baidu.com/xxx </organizationUrl>-->
-            <!-- 项目开发者属性，如即时消息如何处理等 -->
-            <!--<properties>-->
-            <!--<dept> No </dept>-->
-            <!--</properties>-->
-            <!-- 项目开发者所在时区， -11到12范围内的整数。 -->
-            <!--<timezone> -5 </timezone>-->
             <!-- 项目开发者的全名 -->
             <name>ForteScarlet</name>
             <!-- 项目开发者的email -->

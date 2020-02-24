@@ -10,11 +10,12 @@ import java.lang.annotation.*;
  **/
 @Retention(RetentionPolicy.RUNTIME)	//注解会在class字节码文件中存在，在运行时可以通过反射获取到
 @Target({ElementType.METHOD}) //接口、类、枚举、注解、方法
-@Inherited
 public @interface InterceptValue {
     /**
      * 当API被拦截后的默认失败返回值
      */
     String value() default "";
+
+
 
 }

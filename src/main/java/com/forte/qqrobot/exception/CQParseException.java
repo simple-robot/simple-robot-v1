@@ -7,10 +7,10 @@ package com.forte.qqrobot.exception;
  **/
 public class CQParseException extends RobotRuntimeException {
 
-    /**
-     * lang使用的中间tag, 即exception.CQParse.xxxx
-     * */
-    private static final String LANG_TAG_HEAD = "CQParse";
+//    /**
+//     * lang使用的中间tag, 即exception.CQParse.xxxx
+//     * */
+//    private static final String LANG_TAG_HEAD = "CQParse";
 
     /**
      * Constructs a new runtime exception with {@code null} as its
@@ -29,10 +29,10 @@ public class CQParseException extends RobotRuntimeException {
      *                later retrieval by the {@link #getMessage()} method.
      */
     public CQParseException(String message, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, format);
+        super(message, format);
     }
     public CQParseException(String message) {
-        super(LANG_TAG_HEAD + '.' + message);
+        super(message);
     }
 
     /**
@@ -50,10 +50,10 @@ public class CQParseException extends RobotRuntimeException {
      * @since 1.4
      */
     public CQParseException(String message, Throwable cause, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, cause, format);
+        super(message, cause, format);
     }
     public CQParseException(String message, Throwable cause) {
-        super(LANG_TAG_HEAD + '.' + message, cause);
+        super(message, cause);
     }
 
     /**
@@ -88,9 +88,9 @@ public class CQParseException extends RobotRuntimeException {
      * @since 1.7
      */
     public CQParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, cause, enableSuppression, writableStackTrace, format);
+        super(message, cause, enableSuppression, writableStackTrace, format);
     }
     public CQParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(LANG_TAG_HEAD + '.' + message, cause, enableSuppression, writableStackTrace);
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

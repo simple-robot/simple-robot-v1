@@ -24,10 +24,6 @@ import java.lang.annotation.Target;
  *         <li>数值类型小于0代表执行未成功。</li>
  *     </ul>
  *
- *
- *
- *
- *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/26 10:29
  * @since JDK1.8
@@ -49,7 +45,7 @@ public @interface Listen {
 
     /**
      * 假如出现了多个监听器处理同一个消息，使用此参数对其进行排序，默认值为1
-     * TODO 2020/1/28 修改为100
+     * 2020/1/28  ver1.6.3  修改为100
      */
     int sort() default 100;
 
@@ -57,6 +53,9 @@ public @interface Listen {
      * 相当于一个ID，此参数为空的时候会自动根据包、类、方法名、参数列表生成一个唯一ID
      */
     String name() default "";
+
+
+
 
     /**
      * 通过额外注册的监听类型进行监听器注册，最终会转化为{@link Listen}

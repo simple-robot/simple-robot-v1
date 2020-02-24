@@ -10,11 +10,6 @@ package com.forte.qqrobot.exception;
 public class BlockException extends RobotException {
 
     /**
-     * 此异常下的中间语言tag，即exception.block.xxx
-     */
-    private static final String LANG_TAG_HEAD = "block";
-
-    /**
      * Constructs a new runtime exception with {@code null} as its
      * detail message.  The cause is not initialized, and may subsequently be
      * initialized by a call to {@link #initCause}.
@@ -31,6 +26,6 @@ public class BlockException extends RobotException {
      *                later retrieval by the {@link #getMessage()} method.
      */
     public BlockException(String message) {
-        super(LANG_TAG_HEAD + '.' + message);
+        super(message);
     }
 }

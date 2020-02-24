@@ -12,6 +12,7 @@ import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.log.LogLevel;
 import com.forte.qqrobot.log.QQLog;
+import com.forte.qqrobot.system.CoreSystem;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 
 import java.util.Arrays;
@@ -52,7 +53,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 服务器ip，默认为127.0.0.1
      */
-    @Conf("simple.robot.conf.ip")
+    @Conf("core.ip")
     private String ip = "127.0.0.1";
 
     /**
@@ -63,31 +64,31 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 本机QQ号, 一般唯一
      */
-    @Conf("simple.robot.conf.localQQCode")
+    @Conf("core.localQQCode")
     private String localQQCode = "";
 
     /**
      * 本机QQ的昵称, 一般唯一
      */
-    @Conf("simple.robot.conf.localQQNick")
+    @Conf("core.localQQNick")
     private String localQQNick = "";
 
     /**
      * 使用的编码格式，默认为UTF-8
      */
-    @Conf("simple.robot.conf.encode")
+    @Conf("core.encode")
     private String encode = "UTF-8";
 
     /**
      * 酷Q根路径的配置，默认为null, 路径一般不会有多个
      */
-    @Conf("simple.robot.conf.cqPath")
+    @Conf("core.cqPath")
     private String cqPath;
 
     /**
      * 需要进行的包扫描路径，默认为空
      */
-    @Conf("simple.robot.conf.scannerPackage")
+    @Conf("core.scannerPackage")
     private String[] scannerPackage = {};
 
     /**
@@ -117,12 +118,28 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /** 如果这个不是null，则优先使用此配置 */
     private BaseLocalThreadPool.PoolConfig poolConfig = null;
 
-    /** 核心池的大小 */
-    @Conf("simple.robot.conf.threadPool.corePoolSize")
-    private Integer corePoolSize = 4;
-    /** 线程池最大线程数，这个参数也是一个非常重要的参数，它表示在线程池中最多能创建多少个线程； */
-    @Conf("simple.robot.conf.threadPool.maximumPoolSize")
-    private Integer maximumPoolSize = 512;
+    /** 
+     * 核心池的大小 
+     * 默认为null，当为null的时候，默认使用最佳线程数量
+     */
+    @Conf("core.threadPool.corePoolSize")
+    private Integer corePoolSize = null;
+
+    /**
+     * 线程池初始化的阻塞系数，用来决定最终的线程池线程数量。
+     * 默认为0.2， 即认为你的每个监听器在执行的时候，有20%的时间是处于线程等待状态。
+     * @see CoreSystem#getBestPoolSize(double)
+     * @see <a href='https://www.cnblogs.com/jpfss/p/11016180.html'>参考文章</a>
+     */
+    @Conf("core.threadPool.blockingFactor")
+    private Double blockingFactor = 0.2;
+    
+    /**
+     * 线程池最大线程数，这个参数也是一个非常重要的参数，它表示在线程池中最多能创建多少个线程；
+     * 默认为null，当为null的时候，默认为{@link #corePoolSize}的2倍
+     */
+    @Conf("core.threadPool.maximumPoolSize")
+    private Integer maximumPoolSize = null;
     /**
      * 表示线程没有任务执行时最多保持多久时间会终止。
      * 默认情况下，只有当线程池中的线程数大于corePoolSize时，keepAliveTime才会起作用，
@@ -131,7 +148,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * 但是如果调用了allowCoreThreadTimeOut(boolean)方法，在线程池中的线程数不大于corePoolSize时，keepAliveTime参数也会起作用，
      * 直到线程池中的线程数为0；
      */
-    @Conf("simple.robot.conf.threadPool.keepAliveTime")
+    @Conf("core.threadPool.keepAliveTime")
     private Long keepAliveTime = 5L;
 
     /**
@@ -157,8 +174,8 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * ArrayBlockingQueue和PriorityBlockingQueue使用较少，一般使用LinkedBlockingQueue和Synchronous。
      * 线程池的排队策略与BlockingQueue有关。
      */
-    @Conf("simple.robot.conf.threadPool.workQueue")
-    private String workQueueFrom = "java.util.concurrent.SynchronousQueue";
+    @Conf("core.threadPool.workQueue")
+    private String workQueueFrom = "java.util.concurrent.LinkedBlockingQueue";
 
     /**
      * 当此参数为null的时候，通过workQueueFrom参数来反射获取实例
@@ -229,6 +246,20 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         if(this.poolConfig != null){
             return this.poolConfig;
         }else{
+            // 如果为null，根据参数获取。
+            // 阻塞系数
+            if(this.blockingFactor == null){
+                this.blockingFactor = 0.0;
+            }
+            // 核心线程数量
+            if(this.corePoolSize == null){
+                this.corePoolSize = CoreSystem.getBestPoolSize(this.blockingFactor);
+            }
+            // 最大线程数量, 默认为corePoolSize的2倍。
+            if(this.maximumPoolSize == null){
+                this.maximumPoolSize = this.corePoolSize << 1;
+            }
+
             BaseLocalThreadPool.PoolConfig config = new BaseLocalThreadPool.PoolConfig();
             config.setTimeUnit(this.timeUnit);
             config.setKeepAliveTime(this.keepAliveTime);
@@ -247,13 +278,13 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 是否启用本地服务器，默认启动
      */
-    @Conf("simple.robot.conf.localServerEnable")
+    @Conf("core.localServerEnable")
     private boolean localServerEnable = true;
 
     /**
      * 本地服务器使用的端口号，默认为8808
      */
-    @Conf("simple.robot.conf.localServerPort")
+    @Conf("core.localServerPort")
     private int localServerPort = 8808;
 
 
@@ -263,9 +294,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
 
 
     /**
-     * 注册监听器
-     *
-     * @param listeners 监听器列表
+     * deprecated
      */
     @Deprecated
     public T registerListeners(Object... listeners) {
@@ -277,23 +306,20 @@ public class BaseConfiguration<T extends BaseConfiguration> {
                 //扫描
                 Set<ListenerMethod> scanSet = scanner.scanner(listener);
                 if (scanSet.size() > 0) {
-                    QQLog.info("加载[" + listener.getClass() + "]的监听函数成功：");
+                    QQLog.info("load[" + listener.getClass() + "]'s listen method success: ");
                     StringJoiner joiner = new StringJoiner("]\r\n\t>>>", "\t>>>", "");
                     scanSet.forEach(lm -> joiner.add(lm.getMethodToString()));
                     QQLog.info(joiner.toString());
                 }
             } catch (Exception e) {
-                QQLog.error("加载[" + listener.getClass() + "]的监听函数出现异常！", e);
+                QQLog.error("load[" + listener.getClass() + "]'s listen method failed! ", e);
             }
         }
         return configuration;
     }
 
     /**
-     * 注册监听器
-     * 2019-06-05
-     *
-     * @param listeners 监听器列表
+     * deprecated
      */
     @Deprecated
     public T registerListeners(Class<?>... listeners) {
@@ -306,13 +332,13 @@ public class BaseConfiguration<T extends BaseConfiguration> {
                 //扫描
                 Set<ListenerMethod> scanSet = scanner.scanner(listener);
                 if (scanSet.size() > 0) {
-                    QQLog.info("加载[" + listener + "]的监听函数成功：");
+                    QQLog.info("load[" + listener + "]'s listen method success: ");
                     StringJoiner joiner = new StringJoiner("]\r\n\t>>>", "\t>>>", "");
                     scanSet.forEach(lm -> joiner.add(lm.getMethodToString()));
                     QQLog.info(joiner.toString());
                 }
             } catch (Exception e) {
-                QQLog.error("加载[" + listener + "]的监听函数出现异常！", e);
+                QQLog.error("load[" + listener + "]'s listen method failed! ", e);
             }
         }
         return configuration;
@@ -558,6 +584,14 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         return workQueueFrom;
     }
 
+    public Double getBlockingFactor() {
+        return blockingFactor;
+    }
+
+    public void setBlockingFactor(Double blockingFactor) {
+        this.blockingFactor = blockingFactor;
+    }
+
     public void setWorkQueueFrom(String workQueueFrom) {
         this.workQueueFrom = workQueueFrom;
     }
@@ -603,24 +637,14 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     }
 
 
-    /**
-     * toString变为动态的，会更加消耗资源，效率变低。
-     */
-    @Override
-    public String toString(){
-        return Arrays.stream(getClass().getDeclaredFields())
-                .filter(f -> f.getAnnotation(Conf.class) != null)
-                .map(f -> {
-                    f.setAccessible(true);
-                    Conf conf = f.getAnnotation(Conf.class);
-                    try {
-                        return conf.value() + "\t=\t" + f.get(this);
-                    } catch (IllegalAccessException ignored) {
-                        return conf.value() + "= ?";
-                    }
-                }).collect(Collectors.joining("\r\n"));
-
-    }
+//    /**
+//     * toString
+//     * 不再重写toString方法。
+//     */
+//    @Override
+//    public String toString(){
+//
+//    }
 
 
 

@@ -1,7 +1,6 @@
 package com.forte.qqrobot.utils;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.CookieStore;
@@ -111,7 +110,6 @@ public class HttpClientUtil {
         requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout)
                 .setConnectionRequestTimeout(timeout).build();
     }
-
 
     public static CloseableHttpClient getHttpClient() {
 

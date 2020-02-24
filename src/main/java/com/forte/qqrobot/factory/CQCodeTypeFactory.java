@@ -49,6 +49,21 @@ public class CQCodeTypeFactory extends BaseFactory<CQCodeTypes> {
         return TO_ARRAY_FUNCTION;
     }
 
+//    public synchronized CQCodeTypes register(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort){
+//            // 创建实例
+//        CQCodeTypes cqCodeTypes = null;
+//        try {
+//            cqCodeTypes = registerOrThrow(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
+//            // 通过CQCodeTypes本身注册新实例
+//            CQCodeTypes.register(cqCodeTypes);
+//            return cqCodeTypes;
+//        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
+//            // 如果出现了异常，使用日志抛出
+//            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.CQCodeTypes ]实例[ "+ name +" ]构建失败", e);
+//            return null;
+//        }
+//    }
+
     /**
      * 注册一个新的CQCodeType实例
      * CQCodeType机制特殊，需要保证线程安全性。且所有的参数均不可为null。
@@ -75,30 +90,7 @@ public class CQCodeTypeFactory extends BaseFactory<CQCodeTypes> {
      * @param sort          各个类型的排序序号，没什么硬性规则，主要用于实现排序接口
      * @return
      */
-    public synchronized CQCodeTypes register(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort){
-            // 创建实例
-        CQCodeTypes cqCodeTypes = null;
-        try {
-            cqCodeTypes = registerOrThrow(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
-            // 通过CQCodeTypes本身注册新实例
-            CQCodeTypes.register(cqCodeTypes);
-            return cqCodeTypes;
-        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
-            // 如果出现了异常，使用日志抛出
-            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.CQCodeTypes ]实例[ "+ name +" ]构建失败", e);
-            return null;
-        }
-    }
-
-    /**
-     * {@link #register(String, String, String[], String[], String[], int)}
-     * 但是不会处理异常
-     * @see #register(String, String, String[], String[], String[], int)
-     * @return 新枚举实例
-     * @throws EnumInstantiationRequireException 参数权限验证失败
-     * @throws EnumInstantiationException        实例对象构建失败
-     */
-    public synchronized CQCodeTypes registerOrThrow(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort) throws EnumInstantiationRequireException, EnumInstantiationException {
+    public synchronized CQCodeTypes register(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort) throws EnumInstantiationRequireException, EnumInstantiationException {
         // 创建实例
         CQCodeTypes cqCodeTypes = super.registerEnum(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
             // 通过CQCodeTypes本身注册新实例
@@ -136,12 +128,12 @@ public class CQCodeTypeFactory extends BaseFactory<CQCodeTypes> {
      * @param sort          各个类型的排序序号，没什么硬性规则，主要用于实现排序接口
      * @return
      */
-    public static CQCodeTypes registerType(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort){
+    public static CQCodeTypes registerType(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort) throws EnumInstantiationRequireException, EnumInstantiationException {
         return getInstance().register(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
     }
-    public static CQCodeTypes registerTypeOrThrow(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort) throws EnumInstantiationRequireException, EnumInstantiationException {
-        return getInstance().registerOrThrow(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
-    }
+//    public static CQCodeTypes registerTypeOrThrow(String name, String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort) throws EnumInstantiationRequireException, EnumInstantiationException {
+//        return getInstance().registerOrThrow(name, function, keys, ignoreAbleKeys, valuesRegex, sort);
+//    }
 
     /**
      * 参数权限判断

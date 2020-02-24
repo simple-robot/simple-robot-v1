@@ -32,22 +32,22 @@ public class TimeTaskTemplateFactory extends BaseFactory<TimeTaskTemplate> {
         return SINGLE;
     }
 
-    /**
-     * 构建一个新的定时任务模板类型
-     * 异常将会被处理
-     *
-     * @param name           枚举名称
-     * @param triggerCreator 定时任务构建函数
-     * @return 枚举实例
-     */
-    public TimeTaskTemplate register(String name, Function<String, Trigger> triggerCreator) {
-        try {
-            return registerOrThrow(name, triggerCreator);
-        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
-            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.TimeTaskTemplate ]实例[ " + name + " ]构建失败", e);
-            return null;
-        }
-    }
+//    /**
+//     * 构建一个新的定时任务模板类型
+//     * 异常将会被处理
+//     *
+//     * @param name           枚举名称
+//     * @param triggerCreator 定时任务构建函数
+//     * @return 枚举实例
+//     */
+//    public TimeTaskTemplate register(String name, Function<String, Trigger> triggerCreator) {
+//        try {
+//            return registerOrThrow(name, triggerCreator);
+//        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
+//            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.TimeTaskTemplate ]实例[ " + name + " ]构建失败", e);
+//            return null;
+//        }
+//    }
 
     /**
      * 构建一个新的定时任务模板类型
@@ -56,17 +56,17 @@ public class TimeTaskTemplateFactory extends BaseFactory<TimeTaskTemplate> {
      * @param triggerCreator 定时任务构建函数
      * @return 枚举实例
      */
-    public TimeTaskTemplate registerOrThrow(String name, Function<String, Trigger> triggerCreator) throws EnumInstantiationRequireException, EnumInstantiationException {
+    public TimeTaskTemplate register(String name, Function<String, Trigger> triggerCreator) throws EnumInstantiationRequireException, EnumInstantiationException {
         return super.registerEnum(name, triggerCreator);
     }
 
-    public static TimeTaskTemplate registerType(String name, Function<String, Trigger> triggerCreator) {
+    public static TimeTaskTemplate registerType(String name, Function<String, Trigger> triggerCreator) throws EnumInstantiationRequireException, EnumInstantiationException {
         return getInstance().register(name, triggerCreator);
     }
 
-    public static TimeTaskTemplate registerTypeOrThrow(String name, Function<String, Trigger> triggerCreator) throws EnumInstantiationRequireException, EnumInstantiationException {
-        return getInstance().registerOrThrow(name, triggerCreator);
-    }
+//    public static TimeTaskTemplate registerTypeOrThrow(String name, Function<String, Trigger> triggerCreator) throws EnumInstantiationRequireException, EnumInstantiationException {
+//        return getInstance().registerOrThrow(name, triggerCreator);
+//    }
 
     @Override
     protected Class<TimeTaskTemplate> enumType() {

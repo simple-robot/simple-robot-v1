@@ -401,7 +401,7 @@ public class ListenerManager implements MsgReceiver {
     /**
      * 构造方法，对函数进行分组保存
      * @param methods 函数集合
-     * @param intercepts 消息拦截器数组
+     * @param intercepts 消息拦截器数组 nullable
      */
     public ListenerManager(Collection<ListenerMethod> methods, MsgIntercept[] intercepts){
         // 排序并构建消息拦截器

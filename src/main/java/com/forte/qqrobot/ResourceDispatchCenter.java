@@ -22,6 +22,7 @@ import java.util.concurrent.Executor;
  * <br>获取前需要保证在初始化方法 Application 中已经储存过
  * <br>用户一般使用的是依赖资源: {@link com.forte.qqrobot.depend.DependCenter}
  * 所有的资源几乎都在这里
+ * 后期打算取代这个类
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/9 14:42
  * @since JDK1.8

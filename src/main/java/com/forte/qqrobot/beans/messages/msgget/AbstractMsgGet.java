@@ -46,6 +46,7 @@ public abstract class AbstractMsgGet implements MsgGet {
         return msg;
     }
 
+    @Override
     public void setMsg(String msg) {
         this.msg = msg;
     }

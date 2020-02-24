@@ -3,11 +3,16 @@ package com.forte.qqrobot;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.forte.lang.Language;
 import com.forte.plusutils.consoleplus.console.Colors;
+import com.forte.plusutils.consoleplus.console.ColorsBuilder;
+import com.forte.plusutils.consoleplus.console.colors.BackGroundColorTypes;
+import com.forte.plusutils.consoleplus.console.colors.ColorTypes;
+import com.forte.plusutils.consoleplus.console.colors.FontColorTypes;
 import com.forte.qqrobot.anno.Config;
 import com.forte.qqrobot.anno.CoreVersion;
 import com.forte.qqrobot.anno.depend.AllBeans;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
+import com.forte.qqrobot.exception.RobotRunException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.MsgIntercept;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
@@ -16,6 +21,7 @@ import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.log.QQLogBack;
+import com.forte.qqrobot.log.QQLogLang;
 import com.forte.qqrobot.scanner.FileScanner;
 import com.forte.qqrobot.scanner.Register;
 import com.forte.qqrobot.scanner.ScannerManager;
@@ -55,30 +61,72 @@ import java.util.stream.Collectors;
 )
 public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> implements Closeable {
 
-    //java版本检测
-    static {
-        try {
-            //获取java版本
-            String javaVersion = System.getProperties().getProperty("java.version");
-            final int needVersion = 8;
-            boolean largerThan8 = Integer.parseInt(javaVersion.split("_")[0].split("\\.")[1]) >= needVersion;
-            if (!largerThan8) {
-                Colors colors = Colors.builder()
-                        .addNoColor("检测到您的版本号为 ")
-                        .add(javaVersion, Colors.FONT.RED)
-                        .addNoColor(", 小于")
-                        .add(" 1.8 ", Colors.FONT.BLUE)
-                        .add("版本。")
-                        .add("本框架基于1.8实现，推荐您切换为1.8或以上版本。")
-                        .build();
-                QQLog.warning(colors);
-                QQLog.warning("假如您的版本在1.8或以上，请忽略这两条信息。");
-            }
-        } catch (Exception e) {
-            QQLog.warning("java版本号检测失败, 请尽可能确保您的java版本在1.8以上");
-        }
+//    private static final String LOG_TAG_HEAD_CHAR = "run";
+
+    protected static final QQLogLang RUN_LOG = new QQLogLang("run");
+
+    /**
+     * 获取日志对象
+     */
+    protected QQLogLang getLog(){
+        return RUN_LOG;
     }
 
+//    /**
+//     * <pre> 启动器中使用的日志，tag会有一个前缀：run
+//     * <pre> 即例如： {@code "tag1.name" -> "run.tag1.name"}
+//     * @param tag tag
+//     */
+//    protected String runLogTag(String tag){
+//        return LOG_TAG_HEAD_CHAR + '.' + tag;
+//    }
+
+    /**
+     * 是否已经检测过java的版本
+     */
+    @Deprecated
+    private static boolean JAVA_VERSION_DETECTED = false;
+
+    /** 为Java的版本检测提供一把锁 */
+    @Deprecated
+    private static final byte[] JAVA_VERSION_DETECTION_LOCK = new byte[0];
+
+    /**
+     * Java版本检测，只检测一次
+     * 突然发现，这么检测没什么意义
+     */
+    @Deprecated
+    private void javaVersionDetection(){
+        // 如果尚未检测，尝试获取锁
+        if(!JAVA_VERSION_DETECTED){
+            synchronized (JAVA_VERSION_DETECTION_LOCK){
+                // 获取锁后，如果尚未检测，检测版本
+                if(!JAVA_VERSION_DETECTED){
+                    try {
+                        //获取java版本
+                        String javaVersion = System.getProperties().getProperty("java.version");
+                        final int needVersion = 8;
+                        boolean largerThan8 = Integer.parseInt(javaVersion.split("_")[0].split("\\.")[1]) >= needVersion;
+                        if (!largerThan8) {
+                            Colors colors = Colors.builder()
+                                    .addNoColor("检测到您的版本号为 ")
+                                    .add(javaVersion, Colors.FONT.RED)
+                                    .addNoColor(", 小于")
+                                    .add(" 1.8 ", Colors.FONT.BLUE)
+                                    .add("版本。")
+                                    .add("本框架基于1.8实现，推荐您切换为1.8或以上版本。")
+                                    .build();
+                            QQLog.warning(colors);
+                            QQLog.warning("假如您的版本在1.8或以上，请忽略这两条信息。");
+                        }
+                    } catch (Exception e) {
+                        QQLog.warning("java版本号检测失败, 请尽可能确保您的java版本在1.8以上");
+                    }
+                    JAVA_VERSION_DETECTED = true;
+                }
+            }
+        }
+    }
 
     /**
      * 没有监听函数的送信器
@@ -95,17 +143,17 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      */
     private DependGetter dependGetter;
 
-    /**
-     * 消息拦截器
-     */
-    private MsgIntercept[] msgIntercepts;
+//    /**
+//     * 消息拦截器
+//     */
+//    private MsgIntercept[] msgIntercepts;
 
-    /**
-     * 送信拦截器
-     */
-    private SenderSendIntercept[] senderSendIntercepts;
-    private SenderSetIntercept[] senderSetIntercepts;
-    private SenderGetIntercept[] senderGetIntercepts;
+//    /**
+//     * 送信拦截器
+//     */
+//    private SenderSendIntercept[] senderSendIntercepts = {};
+//    private SenderSetIntercept[]  senderSetIntercepts  = {};
+//    private SenderGetIntercept[]  senderGetIntercepts  = {};
 
     /**
      * 线程工厂初始化
@@ -144,6 +192,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     private void logInit(CONFIG config) {
         // 设置日志输出等级
         QQLog.setGlobalLevel(config.getLogLevel());
+        _hello$();
     }
 
     /**
@@ -317,15 +366,19 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
         //根据配置类的扫描结果来构建监听器管理器和阻断器
         // 准备获取消息拦截器
-        QQLog.debug("准备消息拦截器");
+
+        RUN_LOG.debug("intercept.msg.prepare");
         MsgIntercept[] msgIntercepts = register.performingTasks(
                 c -> FieldUtils.isChild(c, MsgIntercept.class),
                 (Class<?>[] cs) -> Arrays.stream(cs)
-                        .peek(c -> QQLog.debug("加载消息拦截器: " + c))
+//                        .peek(c -> QQLog.debug("加载消息拦截器: " + c))
+                        .peek(c -> RUN_LOG.info("intercept.msg.load", c))
                         .map(dependCenter::get).filter(Objects::nonNull)
                         .toArray(MsgIntercept[]::new)
         );
-        this.msgIntercepts = msgIntercepts;
+        if(msgIntercepts == null || msgIntercepts.length == 0){
+            RUN_LOG.debug("intercept.msg.empty");
+        }
 
         // 构建管理中心
         ListenerManager manager = scanner.buildManager(msgIntercepts);
@@ -338,38 +391,53 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
 
         //准备截器
-        QQLog.debug("准备送信拦截器");
+        RUN_LOG.debug("intercept.sender.prepare");
         SenderSendIntercept[] senderSendIntercepts = register.performingTasks(
                 c -> FieldUtils.isChild(c, SenderSendIntercept.class),
                 (Class<?>[] cs) -> Arrays.stream(cs)
-                        .peek(c -> QQLog.debug("加载送信拦截器: " + c))
-                        .map(dependCenter::get).filter(Objects::nonNull).toArray(SenderSendIntercept[]::new)
+                        .peek(c -> RUN_LOG.debug("intercept.sender.load", c))
+                        .map(dependCenter::get).filter(Objects::nonNull)
+                        .toArray(SenderSendIntercept[]::new)
         );
-        this.senderSendIntercepts = senderSendIntercepts;
+        if(senderSendIntercepts == null || senderSendIntercepts.length == 0){
+            RUN_LOG.debug("intercept.sender.empty");
+        }
         //********************************//
 
+        RUN_LOG.debug("intercept.setter.prepare");
         SenderSetIntercept[] senderSetIntercepts = register.performingTasks(
                 c -> FieldUtils.isChild(c, SenderSetIntercept.class),
                 (Class<?>[] cs) -> Arrays.stream(cs)
-                        .peek(c -> QQLog.debug("加载送信拦截器: " + c))
-                        .map(dependCenter::get).filter(Objects::nonNull).toArray(SenderSetIntercept[]::new)
+                        .peek(c -> RUN_LOG.debug("intercept.setter.load", c))
+                        .map(dependCenter::get).filter(Objects::nonNull)
+                        .toArray(SenderSetIntercept[]::new)
         );
-        this.senderSetIntercepts = senderSetIntercepts;
+        if(senderSetIntercepts == null || senderSetIntercepts.length == 0){
+            RUN_LOG.debug("intercept.setter.empty");
+        }
         //********************************//
 
+        RUN_LOG.debug("intercept.getter.prepare");
         SenderGetIntercept[] senderGetIntercepts = register.performingTasks(
                 c -> FieldUtils.isChild(c, SenderGetIntercept.class),
                 (Class<?>[] cs) -> Arrays.stream(cs)
-                        .peek(c -> QQLog.debug("加载送信拦截器: " + c))
-                        .map(dependCenter::get).filter(Objects::nonNull).toArray(SenderGetIntercept[]::new)
+                        .peek(c -> RUN_LOG.debug("intercept.getter.load", c))
+                        .map(dependCenter::get).filter(Objects::nonNull)
+                        .toArray(SenderGetIntercept[]::new)
         );
-        this.senderGetIntercepts = senderGetIntercepts;
+        if(senderGetIntercepts == null || senderGetIntercepts.length == 0){
+            RUN_LOG.debug("intercept.getter.empty");
+        }
+        //*******************************//
+
+        senderSendIntercepts = senderSendIntercepts == null ? new SenderSendIntercept[0] : senderSendIntercepts;
+        senderSetIntercepts  = senderSetIntercepts  == null ? new SenderSetIntercept [0] : senderSetIntercepts ;
+        senderGetIntercepts  = senderGetIntercepts  == null ? new SenderGetIntercept [0] : senderGetIntercepts ;
 
         // 送信拦截器直接变更MsgSender的实例化过程
         MsgSender.setSenderSendIntercepts(senderSendIntercepts);
         MsgSender.setSenderSetIntercepts(senderSetIntercepts);
         MsgSender.setSenderGetIntercepts(senderGetIntercepts);
-
 
         //返回依赖管理器
         return dependCenter;
@@ -463,7 +531,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
                         } else if (cs.length == 0) {
                             return null;
                         } else {
-                            throw new RobotRuntimeException("扫描到多个" + DependGetter.class + "的实现类。");
+                            throw new RobotRunException("moreDepends", DependGetter.class);
                         }
                     });
         }
@@ -524,6 +592,23 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     }
 
     /**
+     * 展示系统信息
+     */
+    private void showSystemInfo(CONFIG config){
+        //# 启动时候的系统类型展示
+        //run.os.name=系统名称: {0}
+        //run.os.version=系统版本: {0}
+        RUN_LOG.info("os.name", System.getProperty("os.name"));
+        RUN_LOG.info("os.version", System.getProperty("os.version"));
+        // 线程池信息
+        BaseLocalThreadPool.PoolConfig poolConfig = config.getPoolConfig();
+        RUN_LOG.info("thread.blockingFactor", config.getBlockingFactor());
+        RUN_LOG.info("thread.size", poolConfig.getCorePoolSize());
+        RUN_LOG.info("thread.maxSize", poolConfig.getMaximumPoolSize());
+
+    }
+
+    /**
      * 执行的主程序
      * @param app 启动器接口的实现类
      * @param args 可能会有用的额外指令参数，一般是main方法的参数
@@ -540,6 +625,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
         //初始化
         init(app, configuration);
+
+        // 展示系统信息
+        showSystemInfo(configuration);
 
         //配置结束, 获取依赖管理器
         DependCenter dependCenter = afterConfig(configuration, app);
@@ -558,8 +646,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         String name = start(dependCenter, manager);
 
         long e = System.currentTimeMillis();
-        String msg = name + "启动成功,耗时(" + (e - s) + "ms)";
-        QQLog.info(Colors.builder().add(msg, Colors.FONT.DARK_GREEN).build());
+//        String msg = name + "启动成功,耗时(" + (e - s) + "ms)";
+        String msg = "start.success";
+        RUN_LOG.info(msg, Colors.builder().add(name, Colors.FONT.DARK_GREEN).build(), e - s);
 
 
         // > 启动之后
@@ -598,12 +687,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         return this.NO_METHOD_SENDER;
     }
 
-    /**
-     * 获取消息拦截器接口。数组会copy，所以请注意性能
-     */
-    public MsgIntercept[] getMsgIntercepts() {
-        return msgIntercepts;
-    }
 
     //**************** 构造 ****************//
 
@@ -621,4 +704,41 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     }
 
 
+    /**
+     * <pre> 使得这个方法可以被覆盖。
+     * <pre> 别吐槽里面的变量名了。
+     * @since  1.7.x
+     */
+    protected void _hello$(){
+
+        String sp1 = Colors.builder().add(' ', wowThatIsRainbowToo$()).add(' ', wowThatIsRainbowToo$()).build().toString();
+        String sp2 = Colors.builder().add(' ', wowThatIsRainbowToo$()).add(' ', wowThatIsRainbowToo$()).build().toString();
+
+        String oh_hi_is_me = "_(^w^)L~~ by simple-robot@ForteScarlet ~~";
+        int length = oh_hi_is_me.length() + 4;
+        char line = ' ';
+        /* QQLog初始化的时候输出个东西~ */
+        ColorsBuilder hi_i_am_builder_HEAD = Colors.builder();
+        for (int i = 0; i < length; i++) {
+            hi_i_am_builder_HEAD.add(line, wowThatIsRainbowToo$());
+        }
+
+        System.out.println(hi_i_am_builder_HEAD.build().toString());
+
+        ColorsBuilder hi_i_am_builder = Colors.builder();
+        oh_hi_is_me.chars().forEach(ic -> hi_i_am_builder.add((char) ic, wowThatIsRainbow$()));
+        System.out.println(sp1 + hi_i_am_builder.build().toString() + sp2);
+        ColorsBuilder hi_i_am_builder_END = Colors.builder();
+        for (int i = 0; i < length; i++) {
+            hi_i_am_builder_END.add(line, wowThatIsRainbowToo$());
+        }
+
+        System.out.println(hi_i_am_builder_END.build().toString());
+    }
+    private ColorTypes wowThatIsRainbow$(){
+        return RandomUtil.getRandomElement(FontColorTypes.values());
+    }
+    private ColorTypes wowThatIsRainbowToo$(){
+        return RandomUtil.getRandomElement(BackGroundColorTypes.values());
+    }
 }

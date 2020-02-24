@@ -7,6 +7,7 @@ package com.forte.qqrobot.exception;
  * @since JDK1.8
  **/
 public class NoSuchBlockNameException extends BlockException {
+
     /**
      * Constructs a new runtime exception with {@code null} as its
      * detail message.  The cause is not initialized, and may subsequently be

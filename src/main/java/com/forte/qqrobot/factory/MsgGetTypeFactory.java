@@ -43,7 +43,7 @@ public class MsgGetTypeFactory extends BaseFactory<MsgGetTypes> {
      */
     private MsgGetTypeFactory() {
         if (FACTORY != null)
-            throw new RuntimeException("no,nonononono,You don't need more examples");
+            throw new RuntimeException("no,no no no no no,You don't need more examples");
     }
 
     /**
@@ -74,38 +74,17 @@ public class MsgGetTypeFactory extends BaseFactory<MsgGetTypes> {
      * @param name       枚举名称
      * @param listenType 监听类型
      */
-    public MsgGetTypes register(String name, Class<? extends MsgGet> listenType) {
-        // 执行父类中的注册方法
-        try {
-            return registerOrThrow(name, listenType);
-        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
-            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.MsgGetTypes ]实例[ " + name + " ]构建失败", e);
-            return null;
-        }
-    }
-
-    /**
-     * @param name       枚举名称
-     * @param listenType 监听类型
-     * @return 实例对象
-     * @throws EnumInstantiationRequireException 参数权限认证失败
-     * @throws EnumInstantiationException        实例构建失败
-     * @see #register(String, Class)
-     */
-    public MsgGetTypes registerOrThrow(String name, Class<? extends MsgGet> listenType) throws EnumInstantiationRequireException, EnumInstantiationException {
+    public MsgGetTypes register(String name, Class<? extends MsgGet> listenType) throws EnumInstantiationRequireException, EnumInstantiationException {
         // 执行父类中的注册方法
         return super.registerEnum(name, listenType);
     }
 
+
     /**
      * 获取一个MsgGetType的新枚举 - 静态窗口
      */
-    public static MsgGetTypes registerType(String name, Class<? extends MsgGet> listenType) {
+    public static MsgGetTypes registerType(String name, Class<? extends MsgGet> listenType) throws EnumInstantiationRequireException, EnumInstantiationException {
         return getInstance().register(name, listenType);
-    }
-
-    public static MsgGetTypes registerTypeOrThrow(String name, Class<? extends MsgGet> listenType) throws EnumInstantiationRequireException, EnumInstantiationException {
-        return getInstance().registerOrThrow(name, listenType);
     }
 
 

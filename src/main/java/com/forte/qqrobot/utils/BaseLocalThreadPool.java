@@ -363,12 +363,12 @@ public abstract class BaseLocalThreadPool {
         /**
          * 核心池的大小
          */
-        private int corePoolSize = 0;
+        private int corePoolSize = 4;
 
         /**
          * 线程池最大线程数，这个参数也是一个非常重要的参数，它表示在线程池中最多能创建多少个线程；
          */
-        private int maximumPoolSize = 500;
+        private int maximumPoolSize = 8;
 
         /**
          * 表示线程没有任务执行时最多保持多久时间会终止。
@@ -401,8 +401,7 @@ public abstract class BaseLocalThreadPool {
          * ArrayBlockingQueue和PriorityBlockingQueue使用较少，一般使用LinkedBlockingQueue和Synchronous。
          * 线程池的排队策略与BlockingQueue有关。
          */
-        private BlockingQueue<Runnable> workQueue = new SynchronousQueue();
-
+        private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 
 
         /**
@@ -479,7 +478,7 @@ public abstract class BaseLocalThreadPool {
                     ", maximumPoolSize=" + maximumPoolSize +
                     ", keepAliveTime=" + keepAliveTime +
                     ", timeUnit=" + timeUnit +
-                    ", workQueue=" + workQueue +
+                    ", workQueue=" + workQueue.getClass() +
                     ", defaultThreadFactory=" + defaultThreadFactory +
                     '}';
         }

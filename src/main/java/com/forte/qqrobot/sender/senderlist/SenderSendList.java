@@ -22,7 +22,7 @@ public interface SenderSendList extends SenderList {
      * @param group 群号
      * @param msg   消息内容
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean sendDiscussMsg(String group, String msg);
 
     /**
@@ -39,7 +39,7 @@ public interface SenderSendList extends SenderList {
      * @param group 群号
      * @param msg   消息内容
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean sendGroupMsg(String group, String msg);
 
 
@@ -59,7 +59,7 @@ public interface SenderSendList extends SenderList {
      * @param QQ    QQ号
      * @param msg   消息内容
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean sendPrivateMsg(String QQ, String msg);
 
 
@@ -77,7 +77,7 @@ public interface SenderSendList extends SenderList {
      * @param group 群号
      * @param QQ    QQ号
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean sendFlower(String group, String QQ);
 
     /**
@@ -101,7 +101,7 @@ public interface SenderSendList extends SenderList {
      * @param QQ    QQ号
      * @param times 次数
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean sendLike(String QQ, int times);
 
     /**

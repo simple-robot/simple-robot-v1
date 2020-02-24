@@ -49,9 +49,9 @@ public class MsgSender implements Sender {
     private static final MsgSender EMPTY_SENDER = new MsgSender(null, null);
 
 
-    private static SenderSendIntercept[] senderSendIntercepts =  new SenderSendIntercept[0];
-    private static SenderSetIntercept[]  senderSetIntercepts =   new SenderSetIntercept[0];
-    private static SenderGetIntercept[]  senderGetIntercepts =   new SenderGetIntercept[0];
+    private static SenderSendIntercept[] senderSendIntercepts =  {};
+    private static SenderSetIntercept[]  senderSetIntercepts =   {};
+    private static SenderGetIntercept[]  senderGetIntercepts =   {};
 
     //**************** 送信器的拦截代理 ****************//
     /** 设置send送信器拦截 */
@@ -481,13 +481,13 @@ public class MsgSender implements Sender {
             this.GETTER = null;
         } else {
             //构建SENDER
-            this.SENDER = senderList.isSenderList() ? (SenderSendList) senderList : null;
-            this.SETTER = senderList.isSetterList() ? (SenderSetList) senderList : null;
-            this.GETTER = senderList.isGetterList() ? (SenderGetList) senderList : null;
+            this.SENDER = senderList.isSenderList() ? initSender((SenderSendList) senderList) : null;
+            this.SETTER = senderList.isSetterList() ? initSetter((SenderSetList) senderList ) : null;
+            this.GETTER = senderList.isGetterList() ? initGetter((SenderGetList) senderList ) : null;
         }
 
         //为listenerMethod赋值
-        this.LISTENER_METHOD = listenerMethod;
+        this.LISTENER_METHOD = initListener(listenerMethod);
     }
 
 
@@ -496,25 +496,43 @@ public class MsgSender implements Sender {
      */
     private MsgSender(SenderSendList sender, SenderSetList setter, SenderGetList getter, ListenerMethod listenerMethod) {
         //构建SENDER, 如果存在拦截器，则构建代理
-        if(senderSendIntercepts.length > 0){
-            this.SENDER = SenderInterceptFactory.doSenderIntercept(sender, senderSendIntercepts);
-        }else{
-            this.SENDER = sender;
-        }
-        if(senderSetIntercepts.length > 0){
-            this.SETTER = SenderInterceptFactory.doSetterIntercept(setter, senderSetIntercepts);
-        }else{
-            this.SETTER = setter;
-        }
-        if(senderGetIntercepts.length > 0){
-            this.GETTER = SenderInterceptFactory.doGetterIntercept(getter, senderGetIntercepts);
-        }else{
-            this.GETTER = getter;
-        }
+        this.SENDER = initSender(sender);
+        this.SETTER = initSetter(setter);
+        this.GETTER = initGetter(getter);
 
         //为listenerMethod赋值
-        this.LISTENER_METHOD = listenerMethod;
+        this.LISTENER_METHOD = initListener(listenerMethod);
     }
+
+    /** 初始化sender */
+    private SenderSendList initSender(SenderSendList sender){
+        if(senderSendIntercepts != null && senderSendIntercepts.length > 0){
+            return SenderInterceptFactory.doSenderIntercept(sender, senderSendIntercepts);
+        }else{
+            return sender;
+        }
+    }
+    /** 初始化setter */
+    private SenderSetList initSetter(SenderSetList setter){
+        if(senderSetIntercepts != null && senderSetIntercepts.length > 0){
+            return SenderInterceptFactory.doSetterIntercept(setter, senderSetIntercepts);
+        }else{
+            return setter;
+        }
+    }
+    /** 初始化setter */
+    private SenderGetList initGetter(SenderGetList getter){
+        if(senderGetIntercepts != null && senderGetIntercepts.length > 0){
+            return SenderInterceptFactory.doGetterIntercept(getter, senderGetIntercepts);
+        }else{
+            return getter;
+        }
+    }
+    /** 初始化所在监听函数 */
+    private ListenerMethod initListener(ListenerMethod method){
+        return method;
+    }
+
 
     /**
      * 无监听函数的送信器, 便于区分

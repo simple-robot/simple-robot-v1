@@ -101,7 +101,6 @@ public class ListenerMethodScanner {
         Block classBlock = AnnotationUtils.getAnnotation(clazz, Block.class);
         ListenBody classBody = AnnotationUtils.getAnnotation(clazz, ListenBody.class);
 
-
         //提前准备方法获取过滤器
         Predicate<Method> getFilter;
         int sortClass;
@@ -160,7 +159,24 @@ public class ListenerMethodScanner {
             int sort = Optional.ofNullable(methodListen).map(Listen::sort).orElse(sortClass);
             // id, 如果存在类上的id且也存在方法上的，拼接上下两id，否则使用类级别
             // 类上的id默认是空字符
-            String id = Optional.ofNullable(methodListen).map(l -> nameClass + l.name()).orElse(nameClass);
+//            String id = Optional.ofNullable(methodListen).map(l -> nameClass + "." + l.name()).orElse(nameClass + "." + method.getName());
+            String id = null;
+            // 没有方法上的Listen注解
+            if(methodListen == null){
+                // 类上有
+                if(nameClass.length() > 0){
+                    // 有类上的name
+                    id = nameClass + '#' + method.getName();
+                }
+            }else{
+                String methodLisName = methodListen.name();
+                // 方法上有注解
+                // 类上有name
+                id = ( nameClass.length() > 0 ? nameClass : clazz.getTypeName())
+                        + "#" +
+                     ( methodLisName.trim().length() == 0 ? method.getName() : methodLisName );
+            }
+//            String id = Optional.ofNullable(methodListen).map(Listen::name).orElse();
 
             // 是否为阻断函数
             ListenBreak listenBreak = AnnotationUtils.getAnnotation(method, ListenBreak.class);

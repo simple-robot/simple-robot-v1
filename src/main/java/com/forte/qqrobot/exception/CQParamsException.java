@@ -9,10 +9,10 @@ package com.forte.qqrobot.exception;
  **/
 public class CQParamsException extends RobotRuntimeException {
 
-    /**
-     * 此异常使用的语言中间Tag，即exception.CQParams.xxxx
-     */
-    private static final String LANG_TAG_HEAD = "CQParams";
+//    /**
+//     * 此异常使用的语言中间Tag，即exception.CQParams.xxxx
+//     */
+//    private static final String LANG_TAG_HEAD = "CQParams";
 
     /**
      * Constructs a new runtime exception with {@code null} as its
@@ -31,11 +31,11 @@ public class CQParamsException extends RobotRuntimeException {
      *                later retrieval by the {@link #getMessage()} method.
      */
     public CQParamsException(String message, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, format);
+        super(message, format);
     }
 
     public CQParamsException(String message) {
-        super(LANG_TAG_HEAD + '.' + message);
+        super(message);
     }
 
     /**
@@ -53,11 +53,11 @@ public class CQParamsException extends RobotRuntimeException {
      * @since 1.4
      */
     public CQParamsException(String message, Throwable cause, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, cause, format);
+        super(message, cause, format);
     }
 
     public CQParamsException(String message, Throwable cause) {
-        super(LANG_TAG_HEAD + '.' + message, cause);
+        super(message, cause);
     }
 
     /**
@@ -92,10 +92,10 @@ public class CQParamsException extends RobotRuntimeException {
      * @since 1.7
      */
     public CQParamsException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(LANG_TAG_HEAD + '.' + message, cause, enableSuppression, writableStackTrace);
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 
     public CQParamsException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, cause, enableSuppression, writableStackTrace, format);
+        super(message, cause, enableSuppression, writableStackTrace, format);
     }
 }

@@ -13,11 +13,11 @@ public class AnnotationException extends RobotRuntimeException {
     //****************  不应当使用注解+why  ****************//
 
     public AnnotationException(Class clz, Class<? extends Annotation> annotationType, String why) {
-        super("annotation.class", clz, annotationType,  why);
+        super("class", clz, annotationType,  why);
     }
 
     public AnnotationException(Class clz, Method method, Class<? extends Annotation> annotationType, String why) {
-        super("annotation.method", clz, method, annotationType, why);
+        super("method", clz, method, annotationType, why);
     }
 
     public AnnotationException() {

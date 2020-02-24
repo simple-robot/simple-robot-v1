@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
  **/
 public class QQLog extends ColorSystem {
 
-    private static final PrintStream warning;
+    public static final PrintStream warning;
 
     /**
      * 全局日志级别，先优先使用此日志级别进行筛选，默认info
@@ -56,38 +56,8 @@ public class QQLog extends ColorSystem {
             warningPrintStream = null;
         }
         warning = warningPrintStream;
-
-        String sp1 = Colors.builder().add(' ', wowThatIsRainbowToo$()).add(' ', wowThatIsRainbowToo$()).build().toString();
-        String sp2 = Colors.builder().add(' ', wowThatIsRainbowToo$()).add(' ', wowThatIsRainbowToo$()).build().toString();
-
-        String oh_hi_is_me = "_(^w^)L~~ by simple-robot@ForteScarlet ~~";
-        int length = oh_hi_is_me.length() + 4;
-        char line = ' ';
-        /* QQLog初始化的时候输出个东西~ */
-        ColorsBuilder hi_i_am_builder_HEAD = Colors.builder();
-        for (int i = 0; i < length; i++) {
-            hi_i_am_builder_HEAD.add(line, wowThatIsRainbowToo$());
-        }
-
-        System.out.println(hi_i_am_builder_HEAD.build().toString());
-
-        ColorsBuilder hi_i_am_builder = Colors.builder();
-        oh_hi_is_me.chars().forEach(ic -> hi_i_am_builder.add((char) ic, wowThatIsRainbow$()));
-        System.out.println(sp1 + hi_i_am_builder.build().toString() + sp2);
-        ColorsBuilder hi_i_am_builder_END = Colors.builder();
-        for (int i = 0; i < length; i++) {
-            hi_i_am_builder_END.add(line, wowThatIsRainbowToo$());
-        }
-
-        System.out.println(hi_i_am_builder_END.build().toString());
     }
 
-    private static ColorTypes wowThatIsRainbow$(){
-        return RandomUtil.getRandomElement(FontColorTypes.values());
-    }
-    private static ColorTypes wowThatIsRainbowToo$(){
-        return RandomUtil.getRandomElement(BackGroundColorTypes.values());
-    }
 
     /**
      * 更换日志阻断，同{@link #setLogBack(QQLogBack)}
@@ -108,7 +78,7 @@ public class QQLog extends ColorSystem {
      * 判定日志级别是否可以输出
      * @param logLevel 日志级别
      */
-    private static boolean ifCan(LogLevel logLevel){
+    public static boolean ifCan(LogLevel logLevel){
         return ifCan(logLevel.getLevel());
     }
 
@@ -116,7 +86,7 @@ public class QQLog extends ColorSystem {
      * 判定日志级别是否可以输出
      * @param logLevel 日志级别
      */
-    private static boolean ifCan(int logLevel){
+    public static boolean ifCan(int logLevel){
         return logLevel >= globalLevel;
     }
 
@@ -191,6 +161,9 @@ public class QQLog extends ColorSystem {
     public static void error(Object msg, Throwable e, Object... format) {
         log(msg, LogLevel.ERROR, err, e, format);
     }
+
+
+
 
 
 

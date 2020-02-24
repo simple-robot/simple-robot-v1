@@ -1,6 +1,10 @@
 lang.init.finished=语言已初始化完毕。
 
 # 异常相关
+
+# RobotRunException相关
+exception.run.moreDepends=扫描到多个[ {0} ]的实现类。
+
 # AnnotationException相关，其中包括AnnotationUtils中出现的格式化参数
 exception.annotation.class=类[{0}]不应当使用[{1}]注解: {2}
 exception.annotation.method=类[{0}]的方法[{1}]不应当使用[{2}]注解: {3}
@@ -8,8 +12,9 @@ exception.annotation.notStatic=不是静态
 exception.annotation.needReturn=需要返回值
 exception.annotation.returnTypeWrong=返回值非该类或该类的子类类型
 
-# BlockException相关
+# BlockException及其子类相关
 exception.block.indexOut=超出索引!
+exception.noSuchBlockName.indexOut=超出索引!
 
 # CQParamsException相关
 exception.CQParams.noParam=无法获取参数[{0}]
@@ -74,19 +79,9 @@ exception.timeTask.startFailed=定时任务启动失败!
 exception.timeTask.schedulerInitFailed=定时任务调度器实例获取失败!
 exception.timeTask.registerFailed=定时任务[{0}]注册失败!
 exception.timeTask.registerWhyFailed=定时任务[{0}]注册失败: {1}
-exception.timeTask.
 
-#exception.
-#exception.
-#exception.
-#exception.
-#exception.
-#exception.
-#exception.
-#exception.
-#exception.
-#exception.
-#exception.
+# RobotApiException相关
+exception.api.notSupport=组件所不支持的API类型：[ {0} ]
 
 # 其他异常
 
@@ -111,14 +106,40 @@ exception.nullPointer.basicNameCannotEmpty=常量类型的name不可为空!
 
 # 其他一些运行期间，或者启动期间的参数
 
-# 启动时候的系统类型展示，用于debug吧
+# 启动时候的系统类型展示
 run.os.name=系统名称: {0}
 run.os.version=系统版本: {0}
-run.os.type=系统: {0}
+run.thread.blockingFactor=线程阻塞系数：{0}
+run.thread.size=线程池核心大小：{0}
+run.thread.maxSize=线程池最大大小：{0}
 
+
+run.start.success={0}启动成功, 耗时 {1} ms
 run.depend.load=加载依赖 >> {0}
-
+run.listen.load.success=监听函数加载成功！[{0}]
 run.timeTask.loadSuccess=加载定时任务[ {0} ]成功!
 
+# 拦截器的各种准备
+# msg
+run.intercept.msg.prepare=准备消息拦截器...
+run.intercept.msg.empty=无消息拦截器
+run.intercept.msg.load=加载消息拦截器: {0}
+# sender
+run.intercept.sender.prepare=准备sender送信拦截器...
+run.intercept.sender.empty=无sender送信拦截器
+run.intercept.sender.load=加载sender送信拦截器: {0}
+# setter
+run.intercept.setter.prepare=准备setter送信拦截器...
+run.intercept.setter.empty=无setter送信拦截器
+run.intercept.setter.load=加载setter送信拦截器: {0}
+# getter
+run.intercept.getter.prepare=准备getter送信拦截器...
+run.intercept.getter.empty=无getter送信拦截器
+run.intercept.getter.load=加载getter送信拦截器: {0}
+
+
+# 送信拦截器
+## 当某个API被拦截器阻止，或者说拦截的时候的消息
+intercept.block=API[{0}]已被阻止
 
 

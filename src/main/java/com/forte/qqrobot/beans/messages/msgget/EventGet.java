@@ -13,7 +13,8 @@ public interface EventGet extends MsgGet {
     default String getMsg(){
         return null;
     }
-    default void setMsg(String msg){}
+    @Override
+    default void setMsg(String msg){  }
 
     /**
      * 事件中字体的获取默认为空
@@ -22,7 +23,7 @@ public interface EventGet extends MsgGet {
     default String getFont(){
         return null;
     }
-    default void setFont(String font){}
+    default void setFont(String font){  }
 
 
 }

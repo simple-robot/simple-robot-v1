@@ -187,7 +187,7 @@ public class TimeTaskManager {
         long time = fixedRateTask.value();
         TimeType timeType = fixedRateTask.timeType();
         int repeatCount = fixedRateTask.RepeatCount();
-        repeatCount = repeatCount < -1 ? -1 : repeatCount;
+        repeatCount = Math.max(repeatCount, -1);
         String identity = getTriggerName(name);
 
         //获取Builder

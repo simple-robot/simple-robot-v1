@@ -34,21 +34,21 @@ public class MostTypeFactory extends BaseFactory<MostType> {
         return SINGLE;
     }
 
-    /**
-     * 注册一个新的mostType类型枚举
-     * 会对异常进行捕获
-     * @param name              name
-     * @param mostTypeFilter    枚举所需构造
-     * @return 新实例
-     */
-    public MostType register(String name, MostTypeFilter mostTypeFilter){
-        try {
-            return registerOrThrow(name, mostTypeFilter);
-        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
-            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.MostType ]实例[ "+ name +" ]构建失败", e);
-            return null;
-        }
-    }
+//    /**
+//     * 注册一个新的mostType类型枚举
+//     * 会对异常进行捕获
+//     * @param name              name
+//     * @param mostTypeFilter    枚举所需构造
+//     * @return 新实例
+//     */
+//    public MostType register(String name, MostTypeFilter mostTypeFilter){
+//        try {
+//            return registerOrThrow(name, mostTypeFilter);
+//        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
+//            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.MostType ]实例[ "+ name +" ]构建失败", e);
+//            return null;
+//        }
+//    }
 
     /**
      * 注册一个新的mostType类型枚举
@@ -58,15 +58,12 @@ public class MostTypeFactory extends BaseFactory<MostType> {
      * @throws EnumInstantiationRequireException 参数权限认证失败
      * @throws EnumInstantiationException        实例构建失败
      */
-    public MostType registerOrThrow(String name, MostTypeFilter mostTypeFilter) throws EnumInstantiationRequireException, EnumInstantiationException {
+    public MostType register(String name, MostTypeFilter mostTypeFilter) throws EnumInstantiationRequireException, EnumInstantiationException {
             return super.registerEnum(name, mostTypeFilter);
     }
 
-    public static MostType registerType(String name, MostTypeFilter mostTypeFilter){
+    public static MostType registerType(String name, MostTypeFilter mostTypeFilter) throws EnumInstantiationRequireException, EnumInstantiationException {
         return getInstance().register(name, mostTypeFilter);
-    }
-    public static MostType registerTypeOrThrow(String name, MostTypeFilter mostTypeFilter) throws EnumInstantiationRequireException, EnumInstantiationException {
-        return getInstance().registerOrThrow(name, mostTypeFilter);
     }
 
 

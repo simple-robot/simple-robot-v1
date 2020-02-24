@@ -148,7 +148,8 @@ public class SenderInterceptFactory {
                     return m.invoke(sender, args);
                 }else{
                     // 如果不允许执行，则日志中打印一个警告信息并返回null
-                    QQLog.warning("API["+ m.getName() +"]已被阻止");
+//                    QQLog.debug("API["+ m.getName() +"]已被阻止");
+                    QQLog.debug("intercept.block", m.getName());
                     // 先尝试获取@InterceptValue注解
                     InterceptValue deValue = m.getAnnotation(InterceptValue.class);
                     Class<?> returnType = m.getReturnType();

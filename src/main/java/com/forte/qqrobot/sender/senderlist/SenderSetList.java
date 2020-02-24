@@ -23,7 +23,7 @@ public interface SenderSetList extends SenderList {
      * @param friendName    如果通过，则此参数为好友备注
      * @param agree 是否通过
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setFriendAddRequest(String flag, String friendName, boolean agree);
 
     /**
@@ -77,7 +77,7 @@ public interface SenderSetList extends SenderList {
      * @param agree 是否同意
      * @param why   如果拒绝，则此处为拒绝理由
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupAddRequest(String flag, GroupAddRequestType requestType, boolean agree, String why);
 
     /**
@@ -130,7 +130,7 @@ public interface SenderSetList extends SenderList {
      * @param QQ    qq号
      * @param set   是否设置为管理员
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupAdmin(String group, String QQ, boolean set);
 
 
@@ -159,7 +159,7 @@ public interface SenderSetList extends SenderList {
      * @param group 群号
      * @param agree 是否允许
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupAnonymous(String group, boolean agree);
 
     /**
@@ -177,7 +177,7 @@ public interface SenderSetList extends SenderList {
      * @param flag  匿名成员标识
      * @param time  时长，一般是以分钟为单位
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupAnonymousBan(String group, String flag, long time);
 
     /**
@@ -186,7 +186,7 @@ public interface SenderSetList extends SenderList {
      * @param QQ    QQ号
      * @param time  时长，一般是以秒为单位
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupBan(String group, String QQ, long time);
 
     /**
@@ -214,7 +214,7 @@ public interface SenderSetList extends SenderList {
      * @param QQ    QQ号
      * @param card  名片
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupCard(String group, String QQ, String card);
 
     /**
@@ -242,7 +242,7 @@ public interface SenderSetList extends SenderList {
      * @param group 群号
      * @param flag  一般应该会有个标识
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupFileDelete(String group, String flag);
 
     /**
@@ -258,7 +258,7 @@ public interface SenderSetList extends SenderList {
      * 退出讨论组
      * @param group 讨论组号
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setDiscussLeave(String group);
 
     /**
@@ -273,7 +273,7 @@ public interface SenderSetList extends SenderList {
      * 退出群
      * @param group 群号
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupLeave(String group);
 
     /**
@@ -290,7 +290,7 @@ public interface SenderSetList extends SenderList {
      * @param QQ    QQ号
      * @param dontBack  是否拒绝再次申请
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupMemberKick(String group, String QQ, boolean dontBack);
 
     /**
@@ -317,7 +317,7 @@ public interface SenderSetList extends SenderList {
      * 群签到
      * @param group 群号
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupSign(String group);
 
 
@@ -336,7 +336,7 @@ public interface SenderSetList extends SenderList {
      * @param title 头衔
      * @param time  有效时长，一般为分钟吧
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupExclusiveTitle(String group, String QQ, String title, long time);
 
 
@@ -367,7 +367,7 @@ public interface SenderSetList extends SenderList {
      * @param group 群号
      * @param in    是否开启全群禁言
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setGroupWholeBan(String group, boolean in);
 
     /**
@@ -384,7 +384,7 @@ public interface SenderSetList extends SenderList {
      * 需要pro
      * @param flag  消息标识
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setMsgRecall(String flag);
 
     /**
@@ -399,7 +399,7 @@ public interface SenderSetList extends SenderList {
     /**
      * 打卡
      */
-    @InterceptValue("false")
+    @InterceptValue(value = "false")
     boolean setSign();
 
 

@@ -7,7 +7,7 @@ package com.forte.qqrobot.exception;
  **/
 public class DependResourceException extends RobotRuntimeException {
 
-    private static final String LANG_TAG_HEAD = "dependResource";
+//    private static final String LANG_TAG_HEAD = "dependResource";
 
     public DependResourceException(Throwable cause) {
         super(cause);
@@ -16,21 +16,21 @@ public class DependResourceException extends RobotRuntimeException {
     public DependResourceException() {
     }
     public DependResourceException(String message) {
-        super(LANG_TAG_HEAD + '.' + message);
+        super(message);
     }
     public DependResourceException(String message, Throwable cause) {
-        super(LANG_TAG_HEAD + '.' + message, cause);
+        super(message, cause);
     }
     public DependResourceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(LANG_TAG_HEAD + '.' + message, cause, enableSuppression, writableStackTrace);
+        super(message, cause, enableSuppression, writableStackTrace);
     }
     public DependResourceException(String message, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, format);
+        super(message, format);
     }
     public DependResourceException(String message, Throwable cause, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, cause, format);
+        super(message, cause, format);
     }
     public DependResourceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
-        super(LANG_TAG_HEAD + '.' + message, cause, enableSuppression, writableStackTrace, format);
+        super(message, cause, enableSuppression, writableStackTrace, format);
     }
 }

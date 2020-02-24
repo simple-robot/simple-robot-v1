@@ -13,6 +13,7 @@ import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.listener.result.BasicResultParser;
 import com.forte.qqrobot.listener.result.ListenResult;
 import com.forte.qqrobot.listener.result.ListenResultParser;
+import com.forte.utils.basis.MD5Utils;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -119,7 +120,8 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         if(name == null || name.trim().length() == 0){
             String s1 = Arrays.toString(method.getParameterTypes());
             String s = s1.substring(1, s1.length() - 1);
-            id = method.getDeclaringClass().getTypeName() + "#" + method.getName() + "("+ s +")";
+            String fromID = method.getDeclaringClass().getTypeName() + "#" + method.getName() + "("+ s +")";
+            id = method.getName() + "#" + MD5Utils.toMD5(fromID);
         }else{
             id = name;
         }

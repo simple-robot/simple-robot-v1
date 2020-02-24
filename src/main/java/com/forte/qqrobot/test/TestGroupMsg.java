@@ -66,6 +66,7 @@ public class TestGroupMsg implements GroupMsg {
         return msg;
     }
 
+    @Override
     public void setMsg(String msg) {
         this.msg = msg;
     }

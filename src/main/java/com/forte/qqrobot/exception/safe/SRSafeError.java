@@ -2,6 +2,7 @@ package com.forte.qqrobot.exception.safe;
 
 /**
  * 安全错误
+ * 弃用
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
