@@ -1,7 +1,8 @@
 ## 版本更新记录
 
+- ##### (now)
 
-- ##### (now maybe 1.7.0)
+- ##### 1.7.0
     - FriendList接口增加：`getAllFriends()`
     - QQLog的warning字体更换为黄色
     - config中增加locale相关配置
