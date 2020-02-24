@@ -21,6 +21,20 @@ public interface MsgGet extends OriginalAble, RootBean {
     /** 获取ID, 一般用于消息类型判断 */
     String getId();
 
+
+
+    /**
+     * 此消息获取的时候，代表的是哪个账号获取到的消息。
+     * @return 接收到此消息的账号。
+     */
+    String getThisCode();
+
+    /**
+     * 允许重新定义Code以实现在存在多个机器人的时候切换处理。
+     * @param code code
+     */
+    void setThisCode(String code);
+
     /**
      * 一般来讲，监听到的消息大部分都会有个“消息内容”。定义此方法获取消息内容。
      * 如果不存在，则为null。（旧版本推荐为空字符串，现在不了。我变卦了）

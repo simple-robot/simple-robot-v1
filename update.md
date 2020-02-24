@@ -16,7 +16,9 @@
     - BaseConfiguration类不再重写toString方法
     - 增加了一个异常类 `RobotRunException` 
     - 在`MsgGet`类型的监听消息中（基本上属于所有的监听消息）开放接口：
-        - `setMsg`
+        - `setMsg` , 用来重新设置msg消息内容。
+        - `getThisCode`，用来获取“接收到这条消息的账号是哪一个”。
+        
         > [warning]  这会使得 `1.7.x` 无法向下兼容。
         
         ​    

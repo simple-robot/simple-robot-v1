@@ -1,6 +1,141 @@
-lang.init.finished=language has already init finished.
+lang.init.finished=language has already init finished. All non-Chinese languages are from Google Translate.
 
+
+# 异常相关
+
+# RobotRunException相关
+exception.run.moreDepends=Scan to multiple [{0}] implementation classes.
+
+# AnnotationException相关，其中包括AnnotationUtils中出现的格式化参数
+exception.annotation.class=class [{0}] should not use annotation [{1}] : {2}
+exception.annotation.method=the method [{1}] in class [{0}] should not use annotation [{2}]: {3}
+exception.annotation.notStatic=not static
+exception.annotation.needReturn=Need return value
+exception.annotation.returnTypeWrong=the return value's type is not instanceof this class type.
+
+# BlockException及其子类相关
+exception.block.indexOut=out of index!
+exception.noSuchBlockName.indexOut=Out of index!
+
+# CQParamsException相关
+exception.CQParams.noParam=cannot get param[{0}]
+exception.CQParams.paramCannotIgnore=the param[{1}] in CQ code type[{0}] cannot be ignore;
+exception.CQParams.paramMismatch=the param[{1}] in CQ code type [{0}] should match a regular match: {2} , not: {3}
+
+# CQParseException相关
+exception.CQParse.cannotParse=[{0}] Cannot resolve to CQ code.
+exception.CQParse.cannotToImage=Cannot convert [{0}] type CQ code to ImageCQCode type.
+exception.CQParse.redundant=Please use escaped message text: Duplicate CQ code identification "{0}" Index of: {1}
+
+# DependResourceException相关
+## BasicResourceWarehouse中
+### 不止一个子类型
+exception.dependResource.moreChildType=There is more than one subtype of [{0}] type: [{1}],Try to get by name
+### 不是基础数据类型
+exception.dependResource.notBasic=[key({0}):value({1})], the 'value' [{2}]is not String type or basic data type
+### 不是可转化的数据类型
+exception.dependResource.notParseType=[{0}] Not a convertible data type. The types that can be used are: {1}
+### 无法转化
+exception.dependResource.cannotParse=Could not convert value type [{1}] of [key: "{0}"] to [{2}]
+
+## Beans中
+### 实例化出现错误
+exception.dependResource.initFailed=[{0}] Instantiation error
+### 构造无法定位
+exception.dependResource.moreConstructor=More than one constructor exists, cannot be located
+
+## BeansFactory中
+### 出现了重复的name值
+exception.dependResource.sameName="Must not have duplicate names: [{0}]: [{1}] AND [{2}]
+
+## DependCenter中
+### 依赖已经存在
+exception.dependResource.dependExistByName=Dependency already exists: {0}
+exception.dependResource.basicDependExistByName=Constant dependencies already exist:{0}
+exception.dependResource.fieldGetterFuncFailed=Field value get function build exception!
+exception.dependResource.fieldSetterFuncFailed=Field value assignment function builds abnormally!
+### 有多个此类型的依赖对象存在, 一般情况下是使用父类类型获取的时候会存在的情况
+exception.dependResource.moreDepend=There is more than one [{0}] type dependency, try to get it by name.
+exception.dependResource.basicGet=The constant type [{0}] can only be obtained by specifying the name!
+
+## DependUtil中
+exception.dependResource.noFieldGetter=Could not get getter method for field [{1}] of class [{0}]
+exception.dependResource.cannotGetValue=Failed to get field value [{2}] of class [{1}] via getter [{0}]
+exception.dependResource.fieldValueGetFailed=Field [{1}] value of class [{0}] gets exception!
+
+exception.dependResource.noFieldSetter=Could not get setter method for field [{1}] of class [{0}]
+exception.dependResource.CannotSetValue=Unable to assign value to field [{2}] of class [{1}] via setter [{0}]!
+exception.dependResource.fieldValueSetFailed=Field [{1}] value assignment of class [{0}] is abnormal!
+
+# RobotDevException异常
+### dynamicParamRepeat: 动态参数类型出现重复!
+### key(type): class com.forte.Test1,
+### value-old: old,
+### value-new: new
+exception.dev.dynamicParamTypeRepeat=The dynamic parameter type is duplicated! {0}, {1}, {2}
+exception.dev.dynamicParamNameRepeat=Duplicate dynamic parameter names! {0}, {1}, {2}
+
+# TimeTaskException相关
+exception.timeTask.startFailed=Scheduled task failed to start!
+exception.timeTask.schedulerInitFailed=Timed task scheduler instance acquisition failed!
+exception.timeTask.registerFailed=Scheduled task [{0}] registration failed!
+exception.timeTask.registerWhyFailed=Scheduled task [{0}] registration failed: {1}
+
+# RobotApiException相关
+exception.api.notSupport=API types not supported by the component: [{0}]
+
+# 其他异常
+
+# 数字转化异常 NumberFormatException，出现在BasicResourceWarehouse类中
+exception.numberFormat.cannotParse="{0}" cannot be converted to type {1}
+exception.numberFormat.noCorrespondingType="{0}" has no conversion type for [{1}]
+
+# 无方法异常 NoSuchMethodException，出现在Beans类中
+exception.noSuchMethod.noSuchNoParamConstructor=Failed to get the parameterless structure of [{0}]
+exception.noSuchMethod.noGet=Could not get {1} for [{0}]
+
+# 空指针异常
+## 常量name不可为null, 使用在DependCenter中
+exception.nullPointer.basicNameCannotEmpty=The name of the constant type cannot be empty!
+
+
+# 其他一些运行期间，或者启动期间的参数
+
+# 启动时候的系统类型展示
 # system type，for debug
-os.system.name=System name: {0}
-os.system.version=System version: {0}
+run.os.name=System name: {0}
+run.os.version=System version: {0}
+run.thread.blockingFactor=Thread blocking factor: {0}
+run.thread.size=Thread pool core size: {0}
+run.thread.maxSize=Maximum thread pool size: {0}
+
+
+run.start.success={0} successfully started, took {1} ms
+run.depend.load=Loading dependencies >> {0}
+run.listen.load.success=listener loaded successfully! [{0}]
+run.timeTask.loadSuccess=Loading scheduled tasks successfully! [ {0} ]
+
+# 拦截器的各种准备
+# msg
+run.intercept.msg.prepare=Prepare the message interceptor...
+run.intercept.msg.empty=No message interceptor
+run.intercept.msg.load=Load message interceptor: {0}
+# sender
+run.intercept.sender.prepare=Prepare sender interceptor...
+run.intercept.sender.empty=No sender interceptor
+run.intercept.sender.load=Load sender interceptor: {0}
+# setter
+run.intercept.setter.prepare=Prepare setter interceptor...
+run.intercept.setter.empty=No setter interceptor
+run.intercept.setter.load=Load setter interceptor: {0}
+# getter
+run.intercept.getter.prepare=Prepare getter interceptor...
+run.intercept.getter.empty=No getter interceptor
+run.intercept.getter.load=Load getter interceptor: {0}
+
+
+# 送信拦截器
+## 当某个API被拦截器阻止，或者说拦截的时候的消息
+intercept.block=API [{0}] has been blocked.
+
 

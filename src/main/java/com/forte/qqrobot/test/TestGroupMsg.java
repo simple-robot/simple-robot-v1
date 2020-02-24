@@ -57,6 +57,27 @@ public class TestGroupMsg implements GroupMsg {
         return id;
     }
 
+    /**
+     * 此消息获取的时候，代表的是哪个账号获取到的消息。
+     *
+     * @return 接收到此消息的账号。
+     */
+    @Override
+    public String getThisCode() {
+        return null;
+    }
+
+    /**
+     * 允许重新定义Code以实现在存在多个机器人的时候切换处理。
+     *
+     * @param code code
+     */
+    @Override
+    public void setThisCode(String code) {
+
+    }
+
+
     public void setId(String id) {
         this.id = id;
     }

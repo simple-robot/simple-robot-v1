@@ -94,7 +94,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 监听函数返回值的选择器，默认为选择第一个出现的Break监听。
      */
-    @Conf(value = "simple.robot.conf.resultSelectType", setterName = "setResultSelectTypeByName", setterParameterType = String.class)
+    @Conf(value = "core.resultSelectType", setterName = "setResultSelectTypeByName", setterParameterType = String.class)
     private ResultSelectType resultSelectType = ResultSelectType.FIRST_BREAK;
 
     public void setResultSelectTypeByName(String name){
@@ -161,7 +161,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * TimeUnit.MICROSECONDS;      //微妙
      * TimeUnit.NANOSECONDS;       //纳秒
      */
-    @Conf(value = "simple.robot.conf.threadPool.timeUnit", setterName = "setTimeUnitByName", setterParameterType = String.class)
+    @Conf(value = "core.threadPool.timeUnit", setterName = "setTimeUnitByName", setterParameterType = String.class)
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
     /**
@@ -189,14 +189,14 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 日志等级, 默认为info级别
      */
-    @Conf(value = "simple.robot.conf.logLevel", setterName = "setLogLevelByName", setterParameterType = String.class)
+    @Conf(value = "core.logLevel", setterName = "setLogLevelByName", setterParameterType = String.class)
     private LogLevel logLevel = LogLevel.INFO ;
     public void setLogLevelByName(String name){
         this.logLevel = LogLevel.valueOf(name);
     }
 
 
-    @Conf(value = "simple.robot.conf.language", setterName = "setLanguageByTag", setterParameterType = String.class)
+    @Conf(value = "core.language", setterName = "setLanguageByTag", setterParameterType = String.class)
     private Locale language = Locale.getDefault();
     public void setLanguageByTag(String tag){
         language = Language.getLocaleByTag(tag);

@@ -58,6 +58,16 @@ public class AbstractGroupBan extends AbstractEventGet implements GroupBan {
         this.beOperatedQQ = beOperatedQQ;
     }
 
+    /**
+     * 此消息获取的时候，代表的是哪个账号获取到的消息。
+     *
+     * @return 接收到此消息的账号。
+     */
+    @Override
+    public String getThisCode() {
+        return null;
+    }
+
     @Override
     public Long getTime() {
         return time;

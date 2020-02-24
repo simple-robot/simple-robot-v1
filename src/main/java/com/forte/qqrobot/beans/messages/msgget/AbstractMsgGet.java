@@ -13,7 +13,10 @@ public abstract class AbstractMsgGet implements MsgGet {
      * 原始数据字符串
      */
     private String originalData;
-
+    /**
+     * 收到消息的机器人账号
+     */
+    private String thisCode;
     /** 消息ID */
     private String id;
     /** 消息文本 */
@@ -67,6 +70,16 @@ public abstract class AbstractMsgGet implements MsgGet {
 
     public void setTime(Long time) {
         this.time = time;
+    }
+
+    @Override
+    public void setThisCode(String code){
+        this.thisCode = code;
+    }
+
+    @Override
+    public String getThisCode(){
+        return this.thisCode;
     }
 
     @Override

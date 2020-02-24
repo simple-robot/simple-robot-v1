@@ -117,7 +117,7 @@ run.thread.maxSize=线程池最大大小：{0}
 run.start.success={0}启动成功, 耗时 {1} ms
 run.depend.load=加载依赖 >> {0}
 run.listen.load.success=监听函数加载成功！[{0}]
-run.timeTask.loadSuccess=加载定时任务[ {0} ]成功!
+run.timeTask.loadSuccess=加载定时任务成功！[{0}]
 
 # 拦截器的各种准备
 # msg

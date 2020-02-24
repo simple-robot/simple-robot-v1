@@ -20,7 +20,7 @@ import java.util.function.Function;
  *         一般来讲，参数已经根据sort参数进行排序。
  *     </li>
  *     <li>
- *         一般来讲，返回值可以为null。
+ *         一般来讲，不可以返回null，除非没有触发任何监听，否则至少需要一个响应值。
  *     </li>
  * </ul>
  *
@@ -34,34 +34,30 @@ public enum ResultSelectType {
     /**
      * 默认取第一个返回值
      */
-    FIRST(rs -> rs[0]),
+    FIRST(rs -> rs.length <= 0 ? null : rs[0]),
 
     /**
      * 默认寻找第一个截断返回值.
      * 一般来讲，我们认为数组的最后一个即为截断返回值。
+     *
      */
-    FIRST_BREAK(rs -> {
-        // 获取最后一个
-        ListenResult last = rs[rs.length - 1];
-        if(last.isToBreak()){
-            return last;
-        }else{
-            return null;
-        }
-    }),
+    FIRST_BREAK(rs -> rs.length <= 0 ? null : rs[rs.length - 1]),
 
     /**
      * 获取第一个插件截断的返回值
      */
     FIRST_BREAK_PLUGIN(rs -> {
+        if(rs.length <= 0){
+            return null;
+        }
         for (ListenResult r : rs) {
             if(r.isToBreakPlugin()){
                 return r;
             }
         }
-        return null;
+        // 如果没有，返回最后一个
+        return rs[rs.length - 1];
     })
-
 
     ;
     /**

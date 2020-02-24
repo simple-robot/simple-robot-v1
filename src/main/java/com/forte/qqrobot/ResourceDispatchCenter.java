@@ -28,7 +28,6 @@ import java.util.concurrent.Executor;
  * @since JDK1.8
  **/
 public abstract class ResourceDispatchCenter {
-
     /** 资源调度中心使用的单例工厂 */
     private static final SingleFactory resourceSingleFactory = SingleFactory.build(ResourceDispatchCenter.class);
 

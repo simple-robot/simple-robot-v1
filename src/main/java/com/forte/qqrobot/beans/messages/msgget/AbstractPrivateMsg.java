@@ -11,8 +11,8 @@ import com.forte.qqrobot.beans.messages.types.PrivateMsgType;
 public class AbstractPrivateMsg extends AbstractMsgGet implements PrivateMsg {
 
     private String qq;
-
     private PrivateMsgType type;
+    private String thisCode;
 
 
     public String getQq() {
@@ -46,5 +46,15 @@ public class AbstractPrivateMsg extends AbstractMsgGet implements PrivateMsg {
                 "qq='" + getQQ() + '\'' +
                 ", type=" + getType() +
                 "} " + super.toString();
+    }
+
+    /**
+     * 此消息获取的时候，代表的是哪个账号获取到的消息。
+     *
+     * @return 接收到此消息的账号。
+     */
+    @Override
+    public String getThisCode() {
+        return thisCode;
     }
 }
