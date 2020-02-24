@@ -4,6 +4,10 @@
 
 **首先，点击项目右上角的`star`以开启隐藏链接。**
 
+核心版本：![](https://img.shields.io/maven-central/v/io.github.ForteScarlet/simple-robot-core)
+
+
+
 <br>
 
 **文档请见文档地址：**
@@ -24,7 +28,6 @@ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/simple-
 
 CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/simple-robot-component-coolHttpApi
 
-<br>
 <br>
 <br>
 
