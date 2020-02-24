@@ -30,6 +30,7 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
 
 <br>
 <br>
+<br>
 
 ## 这是什么？
 这是一个基于网络通讯接口的QQ机器人开发框架，可以对接例如酷Q机器人等一系列QQ机器人应用。
@@ -55,9 +56,6 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
 ## 有何优劣？
 ### 优点
 - 有着极高的扩展性。任何人都可以根据核心框架，并针对某一个应用或者接口来开发组件框架，并投入使用。
-
-- 功能丰富，使用便利。
-
 - 核心提供了极其丰富的功能，例如
     - 注解开发风格
     - 丰富的过滤规则
@@ -65,17 +63,12 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
     - 依赖注入(IOC)
     - 拦截器(AOP)
     - 理论上支持与Spring(boot(+MyBatis))、Dubbo其他框架的整合
-    
 - 持续更新的代码
-
 - 好说话的作者（欢迎入群与群主交流催更😏
-
 - 高度接口化，可扩展性强
-
 - 有虽然没完全写完但是已经很全面了的中文文档
-
-- 已上传至Maven中央仓库，支持Maven、gradle等        
-  
+- 已上传Maven中央仓库，支持Maven、gradle等        
+    
     
 ### 缺点
 - 功能丰富，使用便利，但是解释起来却并不容易。
