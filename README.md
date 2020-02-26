@@ -105,7 +105,6 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
 ## Maven
 
 ```xml
-<!-- https://mvnrepository.com/artifact/io.github.ForteScarlet/simple-robot-core -->
 <dependency>
     <groupId>io.github.ForteScarlet</groupId>
     <artifactId>simple-robot-core</artifactId>
@@ -117,12 +116,12 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
 
 ```
 // https://mvnrepository.com/artifact/io.github.ForteScarlet/simple-robot-core
-compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '1.6.3'
+compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>${version}'
 ```
 
 
 
-如果你不选择使用自动部署的方式，你可以直接 [下载Jar](https://repo1.maven.org/maven2/io/github/ForteScarlet/simple-robot-core/1.6.3/simple-robot-core-1.6.3.jar) 包。
+如果你不选择使用自动部署的方式，你可以直接前往 [Maven下载Jar](https://mvnrepository.com/artifact/io.github.ForteScarlet/simple-robot-core) 包或者碰碰运气，看看[releases](https://github.com/ForteScarlet/simple-robot-core/releases)有没有最新的Jar包。
 
 注意，当你选择下载jar包的时候，请同时下载项目中`lib`文件夹下的依赖包。
 
