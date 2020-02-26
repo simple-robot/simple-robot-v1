@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  * @since JDK1.8
  **/
 // 从这里的话..idea配置不高亮啊........所以就先把完整的写在字段上吧
-@Conf("")
+@Conf(value = "", comment = "核心中的基础配置类")
 public class BaseConfiguration<T extends BaseConfiguration> {
     /*
         此类是在language初始化之前使用的，故此不使用语言化
@@ -53,7 +53,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 服务器ip，默认为127.0.0.1
      */
-    @Conf("core.ip")
+    @Conf(value = "core.ip",comment = "服务器的IP地址，一般代表为上报地址")
     private String ip = "127.0.0.1";
 
     /**
@@ -64,37 +64,38 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 本机QQ号, 一般唯一
      */
-    @Conf("core.localQQCode")
+    @Conf(value = "core.localQQCode",comment = "本机的QQ号，是否需要配置与组件相关。")
     private String localQQCode = "";
 
     /**
      * 本机QQ的昵称, 一般唯一
      */
-    @Conf("core.localQQNick")
+    @Conf(value = "core.localQQNick", comment = "本机的QQ昵称，是否需要配置与组件相关。")
     private String localQQNick = "";
 
     /**
      * 使用的编码格式，默认为UTF-8
      */
-    @Conf("core.encode")
+    @Conf(value = "core.encode", comment = "使用的编码格式，默认为UTF-8")
     private String encode = "UTF-8";
 
     /**
-     * 酷Q根路径的配置，默认为null, 路径一般不会有多个
+     * 酷Q根路径的配置，默认为null
      */
-    @Conf("core.cqPath")
+    @Conf(value = "core.cqPath", comment = "酷Q根路径的配置，默认为null。")
     private String cqPath;
 
     /**
-     * 需要进行的包扫描路径，默认为空
+     * 需要进行的包扫描路径，默认为空，即扫描启动器根路径
      */
-    @Conf("core.scannerPackage")
+    @Conf(value = "core.scannerPackage", comment = "需要进行的包扫描路径，默认为空，即扫描启动器根路径")
     private String[] scannerPackage = {};
 
     /**
      * 监听函数返回值的选择器，默认为选择第一个出现的Break监听。
      */
-    @Conf(value = "core.resultSelectType", setterName = "setResultSelectTypeByName", setterParameterType = String.class)
+    @Conf(value = "core.resultSelectType", setterName = "setResultSelectTypeByName", setterParameterType = String.class,
+    comment = "监听函数返回值的选择器，默认为选择第一个出现的Break监听。")
     private ResultSelectType resultSelectType = ResultSelectType.FIRST_BREAK;
 
     public void setResultSelectTypeByName(String name){
@@ -119,26 +120,26 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     private BaseLocalThreadPool.PoolConfig poolConfig = null;
 
     /** 
-     * 核心池的大小 
+     * 核心池的大小
      * 默认为null，当为null的时候，默认使用最佳线程数量
      */
-    @Conf("core.threadPool.corePoolSize")
+    @Conf(value = "core.threadPool.corePoolSize", comment = "核心池的大小。默认根据CPU核心数计算最佳线程数量")
     private Integer corePoolSize = null;
 
     /**
      * 线程池初始化的阻塞系数，用来决定最终的线程池线程数量。
-     * 默认为0.2， 即认为你的每个监听器在执行的时候，有20%的时间是处于线程等待状态。
+     * 默认为0.2， 即认为你的每个监听器在执行的时候，有20%的时间是处于线程阻塞状态。
      * @see CoreSystem#getBestPoolSize(double)
      * @see <a href='https://www.cnblogs.com/jpfss/p/11016180.html'>参考文章</a>
      */
-    @Conf("core.threadPool.blockingFactor")
+    @Conf(value = "core.threadPool.blockingFactor", comment = "线程池初始化的阻塞系数，用来在未手动配置的情况下决定最终的线程池线程数量。")
     private Double blockingFactor = 0.2;
     
     /**
      * 线程池最大线程数，这个参数也是一个非常重要的参数，它表示在线程池中最多能创建多少个线程；
      * 默认为null，当为null的时候，默认为{@link #corePoolSize}的2倍
      */
-    @Conf("core.threadPool.maximumPoolSize")
+    @Conf(value = "core.threadPool.maximumPoolSize", comment = "线程池最大线程数, 默认为corePoolSize的2倍")
     private Integer maximumPoolSize = null;
     /**
      * 表示线程没有任务执行时最多保持多久时间会终止。
@@ -148,7 +149,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * 但是如果调用了allowCoreThreadTimeOut(boolean)方法，在线程池中的线程数不大于corePoolSize时，keepAliveTime参数也会起作用，
      * 直到线程池中的线程数为0；
      */
-    @Conf("core.threadPool.keepAliveTime")
+    @Conf(value = "core.threadPool.keepAliveTime", comment = "表示线程没有任务执行时最多保持多久时间会终止。")
     private Long keepAliveTime = 5L;
 
     /**
@@ -161,7 +162,8 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * TimeUnit.MICROSECONDS;      //微妙
      * TimeUnit.NANOSECONDS;       //纳秒
      */
-    @Conf(value = "core.threadPool.timeUnit", setterName = "setTimeUnitByName", setterParameterType = String.class)
+    @Conf(value = "core.threadPool.timeUnit", setterName = "setTimeUnitByName", setterParameterType = String.class,
+    comment = "参数keepAliveTime的时间单位")
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
     /**
@@ -174,7 +176,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * ArrayBlockingQueue和PriorityBlockingQueue使用较少，一般使用LinkedBlockingQueue和Synchronous。
      * 线程池的排队策略与BlockingQueue有关。
      */
-    @Conf("core.threadPool.workQueue")
+    @Conf(value = "core.threadPool.workQueue", comment = "一个阻塞队列，用来存储等待执行的任务。")
     private String workQueueFrom = "java.util.concurrent.LinkedBlockingQueue";
 
     /**
@@ -189,14 +191,19 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 日志等级, 默认为info级别
      */
-    @Conf(value = "core.logLevel", setterName = "setLogLevelByName", setterParameterType = String.class)
+    @Conf(value = "core.logLevel", setterName = "setLogLevelByName", setterParameterType = String.class,
+    comment = "志等级, 默认为info级别")
     private LogLevel logLevel = LogLevel.INFO ;
     public void setLogLevelByName(String name){
         this.logLevel = LogLevel.valueOf(name);
     }
 
 
-    @Conf(value = "core.language", setterName = "setLanguageByTag", setterParameterType = String.class)
+    /**
+     * 设置日志默认语言
+     */
+    @Conf(value = "core.language", setterName = "setLanguageByTag", setterParameterType = String.class,
+    comment = "使用的信息语言。默认为系统当前语言。")
     private Locale language = Locale.getDefault();
     public void setLanguageByTag(String tag){
         language = Language.getLocaleByTag(tag);
@@ -278,13 +285,13 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 是否启用本地服务器，默认启动
      */
-    @Conf("core.localServerEnable")
+    @Conf(value = "core.localServerEnable", comment = "尚未实装配置，可无视。> 是否启用本地服务器，默认为true")
     private boolean localServerEnable = true;
 
     /**
      * 本地服务器使用的端口号，默认为8808
      */
-    @Conf("core.localServerPort")
+    @Conf(value = "core.localServerPort", comment = "尚未实装配置，可无视。> 本地服务器使用的端口号，默认为8808")
     private int localServerPort = 8808;
 
 

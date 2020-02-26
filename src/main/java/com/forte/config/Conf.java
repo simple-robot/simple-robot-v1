@@ -38,4 +38,7 @@ public @interface Conf {
     /** setter方法的参数类型是什么。如果是Object类型则默认认为是与字段相同。 */
     Class<?> setterParameterType() default Object.class;
 
+    /** the comment of this conf */
+    String comment() default "";
+
 }
