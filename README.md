@@ -105,7 +105,7 @@ https://apidoc.gitee.com/ForteScarlet/simple-coolQ
 
 版本参考：[![img](https://camo.githubusercontent.com/f8464f5d605886b8369ab6daf28d7130a72fd80e/68747470733a2f2f696d672e736869656c64732e696f2f6d6176656e2d63656e7472616c2f762f696f2e6769746875622e466f727465536361726c65742f73696d706c652d726f626f742d636f7265)](https://search.maven.org/artifact/io.github.ForteScarlet/simple-robot-core)
 
-## Maven
+## Maven 
 
 ```xml
 <dependency>
@@ -138,6 +138,16 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
 - GITEE或者GITHUB留言
 
 首先建议进群交流，毕竟其他两个我并不经常看(●ˇ∀ˇ●)
+
+
+## 建议、意见、bug反馈
+- 你可以使用`issue`向我反馈bug或者提出建议意见。
+- 你可以加入QQ群聊`782930037`向我反馈bug或者提出建议意见。
+- 你可以通过联系邮箱`ForteScarlet@163.com`向我反馈bug或者提出建议意见（可能会处理不及时）。
+
+## 更新计划
+对于未来的更新计划可以从github的project中或者[更新计划.md](更新计划.md)中看到。一般想到什么的话会优先更新`更新计划.md`。
+
 
 ## 赞助一下？
 
