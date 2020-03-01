@@ -1,5 +1,5 @@
 # 基于网络接口的酷Q机器人java开发框架核心
-[![](https://img.shields.io/badge/simple--robot-core-green)](https://github.com/ForteScarlet/simple-robot-core)  [![img](https://camo.githubusercontent.com/f8464f5d605886b8369ab6daf28d7130a72fd80e/68747470733a2f2f696d672e736869656c64732e696f2f6d6176656e2d63656e7472616c2f762f696f2e6769746875622e466f727465536361726c65742f73696d706c652d726f626f742d636f7265)](https://search.maven.org/artifact/io.github.ForteScarlet/simple-robot-core)  [![](https://img.shields.io/badge/%E7%9C%8B%E4%BA%91%E6%96%87%E6%A1%A3-doc-green)](https://www.kancloud.cn/forte-scarlet/simple-coolq-doc)  [![](https://img.shields.io/badge/QQ%E7%BE%A4-782930037-blue)](https://jq.qq.com/?_wv=1027&k=57ynqB1)   [![](https://img.shields.io/badge/QQ%E7%BE%A4-782930037-blue)](https://jq.qq.com/?_wv=1027&k=57ynqB1) 
+[![](https://img.shields.io/badge/simple--robot-core-green)](https://github.com/ForteScarlet/simple-robot-core)  [![img](https://camo.githubusercontent.com/f8464f5d605886b8369ab6daf28d7130a72fd80e/68747470733a2f2f696d672e736869656c64732e696f2f6d6176656e2d63656e7472616c2f762f696f2e6769746875622e466f727465536361726c65742f73696d706c652d726f626f742d636f7265)](https://search.maven.org/artifact/io.github.ForteScarlet/simple-robot-core)  [![](https://img.shields.io/badge/%E7%9C%8B%E4%BA%91%E6%96%87%E6%A1%A3-doc-green)](https://www.kancloud.cn/forte-scarlet/simple-coolq-doc)  [![](https://img.shields.io/badge/QQ%E7%BE%A4-782930037-blue)](https://jq.qq.com/?_wv=1027&k=57ynqB1)  
 
 
 > 项目对应GITHUB地址: https://github.com/ForteScarlet/simple-robot-core
@@ -7,7 +7,6 @@
 **首先，点击项目右上角的`star`以开启隐藏链接。**
 
 核心版本：[![img](https://camo.githubusercontent.com/f8464f5d605886b8369ab6daf28d7130a72fd80e/68747470733a2f2f696d672e736869656c64732e696f2f6d6176656e2d63656e7472616c2f762f696f2e6769746875622e466f727465536361726c65742f73696d706c652d726f626f742d636f7265)](https://search.maven.org/artifact/io.github.ForteScarlet/simple-robot-core)
-
 
 
 <br>
@@ -20,15 +19,17 @@ https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 https://apidoc.gitee.com/ForteScarlet/simple-coolQ
 
 由于目前核心部分与组件部分相互分离，所以核心与组件的github地址也相互分离了。
-所有组件均依赖于核心框架，支持maven坐标，具体坐标请见**文档**或**入群咨询**
+所有组件均依赖于此**核心框架**，支持maven坐标，具体坐标请见**文档下文**或**入群咨询**
 
-qq群号：**782930037**
+点击`star`后即可申请加入QQ群聊，QQ群号：**782930037**
 
-LEMOC支持组件框架GITHUB地址：https://github.com/ForteScarlet/simple-robot-component-lemoc
+已经存在的组件框架：
 
-HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/simple-robot-component-httpapi 
-
-CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/simple-robot-component-coolHttpApi
+| 平台 |      依赖       |                           项目地址                           |
+| :--: | :-------------: | :----------------------------------------------------------: |
+| 酷Q  |    LEMOC插件    | https://github.com/ForteScarlet/simple-robot-component-lemoc |
+| 酷Q  | HTTP TO CQ插件  | https://github.com/ForteScarlet/simple-robot-component-httpapi |
+| 酷Q  | CQ HTTP API插件 | https://github.com/ForteScarlet/simple-robot-component-coolHttpApi |
 
 <br>
 <br>
@@ -70,7 +71,7 @@ CoolQ HTTP API支持组件框架GITHUB地址：https://github.com/ForteScarlet/s
 - 高度接口化，可扩展性强
 - 有虽然没完全写完但是已经很全面了的中文文档
 - 已上传Maven中央仓库，支持Maven、gradle等        
-    
+  
     
 ### 缺点
 - 功能丰富，使用便利，但是解释起来却并不容易。

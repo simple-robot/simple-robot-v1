@@ -20,6 +20,7 @@
     <packaging>jar</packaging>
     <name>simple-robot</name>
     <url>https://github.com/ForteScarlet/simple-robot-core</url>
+    <!--  An SDK for robot, like QQRobot  -->
     <description>simple robot for coolQ</description>
 
     <scm>
