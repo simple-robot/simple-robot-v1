@@ -73,6 +73,8 @@ exception.dependResource.fieldValueSetFailed=类[{0}]的字段[{1}]值赋值异�
 ### value-new: new
 exception.dev.dynamicParamTypeRepeat=动态参数类型出现重复! {0}, {1}, {2}
 exception.dev.dynamicParamNameRepeat=动态参数名称出现重复! {0}, {1}, {2}
+exception.dev.configClone=配置类clone失败！
+
 
 # TimeTaskException相关
 exception.timeTask.startFailed=定时任务启动失败!
@@ -136,6 +138,12 @@ run.intercept.setter.load=加载setter送信拦截器: {0}
 run.intercept.getter.prepare=准备getter送信拦截器...
 run.intercept.getter.empty=无getter送信拦截器
 run.intercept.getter.load=加载getter送信拦截器: {0}
+
+# runtime
+runtime.bot.register=账号[{0}]注册成功！
+runtime.bot.register.failed=账号注册失败: {0}
+
+
 
 
 # 送信拦截器

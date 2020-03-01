@@ -5,6 +5,8 @@ import com.forte.lang.Language;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 import com.forte.qqrobot.beans.types.ResultSelectType;
+import com.forte.qqrobot.bot.BotInfo;
+import com.forte.qqrobot.bot.BotInfoImpl;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
@@ -15,10 +17,7 @@ import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.system.CoreSystem;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +33,18 @@ import java.util.stream.Stream;
  **/
 // 从这里的话..idea配置不高亮啊........所以就先把完整的写在字段上吧
 @Conf(value = "", comment = "核心中的基础配置类")
-public class BaseConfiguration<T extends BaseConfiguration> {
+public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable {
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    /**
+     * 用于对多账号进行注册，先是只保存部分信息
+     */
+    private final List<Map.Entry<String, BotInfo>> advanceBotInfo = new ArrayList<>();
+
     /*
         此类是在language初始化之前使用的，故此不使用语言化
      */
@@ -44,6 +54,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     //**************************************
 
     private final T configuration;
+
 
     public BaseConfiguration() {
         this.configuration = (T) this;
@@ -57,20 +68,23 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     private String ip = "127.0.0.1";
 
     /**
-     * 本机QQ信息, 一般唯一
+     * 弃用字段
      */
+    @Deprecated
     private LoginQQInfo loginQQInfo = null;
 
     /**
-     * 本机QQ号, 一般唯一
+     * 弃用字段
      */
-    @Conf(value = "core.localQQCode",comment = "本机的QQ号，是否需要配置与组件相关。")
+    @Conf(value = "core.localQQCode",comment = "本机的QQ号，是否需要配置与组件相关。1.8.x后弃用属性。")
+    @Deprecated
     private String localQQCode = "";
 
     /**
-     * 本机QQ的昵称, 一般唯一
+     * 弃用字段
      */
-    @Conf(value = "core.localQQNick", comment = "本机的QQ昵称，是否需要配置与组件相关。")
+    @Conf(value = "core.localQQNick", comment = "本机的QQ昵称，是否需要配置与组件相关。1.8.x后弃用属性。")
+    @Deprecated
     private String localQQNick = "";
 
     /**
@@ -82,7 +96,8 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 酷Q根路径的配置，默认为null
      */
-    @Conf(value = "core.cqPath", comment = "酷Q根路径的配置，默认为null。")
+    @Conf(value = "core.cqPath", comment = "酷Q根路径的配置，默认为null。目前此属性用处不大。")
+    @Deprecated
     private String cqPath;
 
     /**
@@ -209,12 +224,10 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         language = Language.getLocaleByTag(tag);
     }
 
+
     //**************************************
     //*             function area
     //**************************************
-
-
-
 
 
     /**
@@ -299,57 +312,50 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     //*             以下为方法
     //**************************************
 
-
     /**
-     * deprecated
+     * 注册一个机器人的信息。
+     * 有可能是bot账号+ip，或者bot账号+请求根路径，此处根据不同的插件结果不同。
+     * 由于不存在bot的详细信息，所以登录需要验证
+     * @param botCode bot账号
+     * @param path    上报地址，一般为一个ip或者请求路径
      */
-    @Deprecated
-    public T registerListeners(Object... listeners) {
-        //获取扫描器
-        ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
-        //遍历
-        for (Object listener : listeners) {
-            try {
-                //扫描
-                Set<ListenerMethod> scanSet = scanner.scanner(listener);
-                if (scanSet.size() > 0) {
-                    QQLog.info("load[" + listener.getClass() + "]'s listen method success: ");
-                    StringJoiner joiner = new StringJoiner("]\r\n\t>>>", "\t>>>", "");
-                    scanSet.forEach(lm -> joiner.add(lm.getMethodToString()));
-                    QQLog.info(joiner.toString());
-                }
-            } catch (Exception e) {
-                QQLog.error("load[" + listener.getClass() + "]'s listen method failed! ", e);
-            }
-        }
-        return configuration;
+    public void registerBot(String botCode, String path){
+        // 注册一个bot信息
+        advanceBotInfo.add(new AbstractMap.SimpleEntry<>(botCode, new BotInfoImpl(botCode, path, null)));
     }
 
     /**
-     * deprecated
+     * 仅仅注册一个路径信息，需要是一个完整路径，例如一个http路径或者一个ws的连接路径。
+     * 在启动后需要通过此路径来验证或者连接
+     * @param path 上报路径
      */
-    @Deprecated
-    public T registerListeners(Class<?>... listeners) {
-        //获取扫描器
-        ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
-
-        //遍历
-        for (Class listener : listeners) {
-            try {
-                //扫描
-                Set<ListenerMethod> scanSet = scanner.scanner(listener);
-                if (scanSet.size() > 0) {
-                    QQLog.info("load[" + listener + "]'s listen method success: ");
-                    StringJoiner joiner = new StringJoiner("]\r\n\t>>>", "\t>>>", "");
-                    scanSet.forEach(lm -> joiner.add(lm.getMethodToString()));
-                    QQLog.info(joiner.toString());
-                }
-            } catch (Exception e) {
-                QQLog.error("load[" + listener + "]'s listen method failed! ", e);
-            }
-        }
-        return configuration;
+    public void registerBot(String path){
+        advanceBotInfo.add(new AbstractMap.SimpleEntry<>(null, new BotInfoImpl(null, path, null)));
     }
+
+    /**
+     * <pre> 仅注册一个路径信息，信息分为ip、端口、一个可能存在的额外路径。
+     * <pre> 开发者如果需要实现对于ip、端口、额外路径的转化规则，尝试重写{@link #toPath(String, int, String)}方法。默认情况下为转化为http协议路径。
+     * @param ip    ip地址
+     * @param port  端口
+     * @param path nullable
+     */
+    public void registerBot(String ip, int port, String path){
+        // 转化为path
+        advanceBotInfo.add(new AbstractMap.SimpleEntry<>(null, new BotInfoImpl(null, toPath(ip, port, path), null)));
+    }
+
+
+    protected String toPath(String ip, int port, String path){
+        StringBuilder sb = new StringBuilder("http://");
+        sb.append(ip).append(':').append(port);
+        if(!path.startsWith("/")){
+            sb.append("/");
+        }
+        sb.append(path);
+        return sb.toString();
+    }
+
 
 
     /**
@@ -422,15 +428,19 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         return configuration;
     }
 
+    @Deprecated
     public String getLocalQQCode() {
         return this.localQQCode;
     }
 
+    @Deprecated
     public T setLocalQQCode(String localQQCode) {
         this.localQQCode = localQQCode;
         return configuration;
     }
 
+
+    @Deprecated
     public LoginQQInfo getLoginQQInfo() {
         return loginQQInfo;
     }
@@ -448,22 +458,21 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         return cqPath;
     }
 
+    @Deprecated
     public T setCqPath(String cqPath) {
         this.cqPath = cqPath;
         return configuration;
     }
 
+    @Deprecated
     public String getIp() {
         return ip;
     }
 
     /**
-     * 配置IP，默认为本地IP <code>127.0.0.1</code> <br>
-     * 一般情况下，此IP代表了酷Q端的IP。
-     *
-     * @param ip
-     * @return
+     * 不再进行单一ip地址配置
      */
+    @Deprecated
     public T setIp(String ip) {
         // 验证IP，首先假如上来就是个xxx.xxx.xxx.xxx，直接报错
         if (ip.equals("xxx.xxx.xxx.xxx")) {
@@ -499,8 +508,9 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     }
 
     /**
-     * 配置loginQQInfo信息
+     * 不再支持单一QQ信息配置，后期进行统一信息获取
      */
+    @Deprecated
     public T setLoginQQInfo(LoginQQInfo loginQQInfo) {
         this.loginQQInfo = loginQQInfo;
         this.localQQCode = loginQQInfo.getQQ();
@@ -643,15 +653,6 @@ public class BaseConfiguration<T extends BaseConfiguration> {
         this.language = language;
     }
 
-
-//    /**
-//     * toString
-//     * 不再重写toString方法。
-//     */
-//    @Override
-//    public String toString(){
-//
-//    }
 
 
 

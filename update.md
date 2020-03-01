@@ -1,6 +1,10 @@
 ## 版本更新记录
 
 - ##### (now)
+    - KeywordMatchType枚举中增加更多预设：
+    STARTS_WITH、TRIM_STARTS_WITH、RE_CQCODE_STARTS_WITH、RE_CQCODE_TRIM_STARTS_WITH、ENDS_WITH、TRIM_ENDS_WITH、RE_CQCODE_ENDS_WITH、RE_CQCODE_TRIM_ENDS_WITH
+    分别对应了startsWith与endsWith的4种情况
+
 
 - ##### 1.7.0
     - FriendList接口增加：`getAllFriends()`

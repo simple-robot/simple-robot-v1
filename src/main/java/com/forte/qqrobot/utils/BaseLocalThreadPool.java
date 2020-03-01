@@ -473,7 +473,7 @@ public abstract class BaseLocalThreadPool {
 
         @Override
         public String toString() {
-            return "PoolConfig{" +
+            return super.toString() + "{" +
                     "corePoolSize=" + corePoolSize +
                     ", maximumPoolSize=" + maximumPoolSize +
                     ", keepAliveTime=" + keepAliveTime +

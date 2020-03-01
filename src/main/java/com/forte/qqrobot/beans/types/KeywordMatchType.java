@@ -55,6 +55,29 @@ public enum KeywordMatchType {
     /** 移除掉所有CQ码并首尾去空后包含匹配 */
     RE_CQCODE_TRIM_CONTAINS((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim().contains(regex)),
 
+    //**************** 开头匹配 ****************//
+
+    /** 首部匹配 */
+    STARTS_WITH(String::startsWith),
+    /** 去空的首部匹配 */
+    TRIM_STARTS_WITH((msg, regex) -> msg.trim().startsWith(regex)),
+    /** 移除掉所有CQ码后首部匹配 */
+    RE_CQCODE_STARTS_WITH((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).startsWith(regex)),
+    /** 移除掉所有CQ码并首尾去空后首部匹配 */
+    RE_CQCODE_TRIM_STARTS_WITH((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim().startsWith(regex)),
+
+    //**************** 结尾匹配 ****************//
+
+    /** 尾部匹配 */
+    ENDS_WITH(String::endsWith),
+    /** 去空的尾部匹配 */
+    TRIM_ENDS_WITH((msg, regex) -> msg.trim().endsWith(regex)),
+    /** 移除掉所有CQ码后尾部匹配 */
+    RE_CQCODE_ENDS_WITH((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).endsWith(regex)),
+    /** 移除掉所有CQ码并首尾去空后尾部匹配 */
+    RE_CQCODE_TRIM_ENDS_WITH((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim().endsWith(regex)),
+
+
     ;
 
     /**

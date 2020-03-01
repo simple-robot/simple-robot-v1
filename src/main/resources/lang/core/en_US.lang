@@ -74,6 +74,7 @@ exception.dependResource.fieldValueSetFailed=Field [{1}] value assignment of cla
 ### value-new: new
 exception.dev.dynamicParamTypeRepeat=The dynamic parameter type is duplicated! {0}, {1}, {2}
 exception.dev.dynamicParamNameRepeat=Duplicate dynamic parameter names! {0}, {1}, {2}
+xception.dev.configClone=configuration clone failed!
 
 # TimeTaskException相关
 exception.timeTask.startFailed=Scheduled task failed to start!
