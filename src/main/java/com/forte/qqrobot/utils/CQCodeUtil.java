@@ -2,7 +2,7 @@ package com.forte.qqrobot.utils;
 
 import com.forte.qqrobot.beans.cqcode.AppendList;
 import com.forte.qqrobot.beans.cqcode.CQAppendList;
-import com.forte.qqrobot.beans.cqcode.CQCode;
+import com.forte.qqrobot.beans.cqcode.CatCode;
 import com.forte.qqrobot.beans.types.CQCodeTypes;
 import com.forte.qqrobot.exception.CQParseException;
 
@@ -147,7 +147,7 @@ public class CQCodeUtil {
         return joiner.toString();
     }
 
-    public CQCode getCQCode(CQCodeTypes type, String... params){
+    public CatCode getCQCode(CQCodeTypes type, String... params){
         Objects.requireNonNull(params);
         //获取参数列表
         String[] keys = type.getKeys();
@@ -166,7 +166,7 @@ public class CQCodeUtil {
                 realParams[i] = key;
             }
         }
-        return CQCode.of(type, realParams);
+        return CatCode.of(type, realParams);
     }
 
 
@@ -190,7 +190,7 @@ public class CQCodeUtil {
      * @param id  moji字符的unicode编号
      * @return    emoji的CQ码
      */
-    public CQCode getCQCode_Face(String id){
+    public CatCode getCQCode_Face(String id){
         return getCQCode(CQCodeTypes.face, id);
     }
 
@@ -211,7 +211,7 @@ public class CQCodeUtil {
      * @param id 原创表情的ID
      * @return  原创表情CQ
      */
-    public CQCode getCQCode_Bface(String id){
+    public CatCode getCQCode_Bface(String id){
         return getCQCode(CQCodeTypes.bface, id);
     }
 
@@ -232,7 +232,7 @@ public class CQCodeUtil {
      * @param id 小表情的ID
      * @return 小表情CQ
      */
-    public CQCode getCQCode_Sface(String id){
+    public CatCode getCQCode_Sface(String id){
         return getCQCode(CQCodeTypes.sface, id);
     }
 
@@ -253,7 +253,7 @@ public class CQCodeUtil {
      * @param file  图片文件名称
      * @return      自定义图片CQ
      */
-    public CQCode getCQCode_Image(String file){
+    public CatCode getCQCode_Image(String file){
         return getCQCode(CQCodeTypes.image, file);
     }
 
@@ -278,7 +278,7 @@ public class CQCodeUtil {
      * @param magic 是否为变声
      * @return  发送语音CQ
      */
-    public CQCode getCQCode_Record(String file, Boolean magic){
+    public CatCode getCQCode_Record(String file, Boolean magic){
         return getCQCode(CQCodeTypes.record, file, Optional.ofNullable(magic).map(Object::toString).orElse(null));
     }
 
@@ -299,7 +299,7 @@ public class CQCodeUtil {
      * @param file  音频文件名称
      * @return  发送语音CQ
      */
-    public CQCode getCQCode_Record(String file){
+    public CatCode getCQCode_Record(String file){
         return getCQCode(CQCodeTypes.record, file, null);
     }
 
@@ -321,7 +321,7 @@ public class CQCodeUtil {
      * @param qq qq号
      * @return  at CQcode
      */
-    public CQCode getCQCode_At(String qq){
+    public CatCode getCQCode_At(String qq){
         return getCQCode(CQCodeTypes.at, qq);
     }
 
@@ -340,7 +340,7 @@ public class CQCodeUtil {
      * at全体
      * @return  at CQcode
      */
-    public CQCode getCQCode_AtAll(){
+    public CatCode getCQCode_AtAll(){
         return getCQCode(CQCodeTypes.at, "all");
     }
 
@@ -362,7 +362,7 @@ public class CQCodeUtil {
      * @param type  为猜拳结果的类型，暂不支持发送时自定义。该参数可被忽略。
      * @return  猜拳魔法表情CQCode
      */
-    public CQCode getCQCode_Rps(String type){
+    public CatCode getCQCode_Rps(String type){
         return getCQCode(CQCodeTypes.rps, type);
     }
 
@@ -383,7 +383,7 @@ public class CQCodeUtil {
      * @param type 对应掷出的点数，暂不支持发送时自定义。该参数可被忽略。
      * @return  掷骰子魔法表情CQCode
      */
-    public CQCode getCQCode_Dice(String type){
+    public CatCode getCQCode_Dice(String type){
         return getCQCode(CQCodeTypes.dice, type);
     }
 
@@ -402,7 +402,7 @@ public class CQCodeUtil {
      * 戳一戳 仅支持好友消息使用
      * @return 戳一戳CQCode
      */
-    public CQCode getCQCode_Shake(){
+    public CatCode getCQCode_Shake(){
         return getCQCode(CQCodeTypes.shake);
     }
 
@@ -427,7 +427,7 @@ public class CQCodeUtil {
      *               当{1}为false或ignore参数被忽略时，代表强制使用匿名，如果匿名失败将取消该消息的发送。<br>
      * @return 匿名发消息
      */
-    public CQCode getCQCode_Anonymous(Boolean ignore){
+    public CatCode getCQCode_Anonymous(Boolean ignore){
         return getCQCode(CQCodeTypes.anonymous, Optional.ofNullable(ignore).map(Object::toString).orElse(null));
     }
 
@@ -450,7 +450,7 @@ public class CQCodeUtil {
      * 参数被忽略，代表强制使用匿名，如果匿名失败将取消该消息的发送。
      * @return 匿名发消息
      */
-    public CQCode getCQCode_Anonymous(){
+    public CatCode getCQCode_Anonymous(){
         return getCQCode(CQCodeTypes.anonymous, (String) null);
     }
 
@@ -476,7 +476,7 @@ public class CQCodeUtil {
      * @param id    为对应音乐平台的数字音乐id
      * @return 发送音乐
      */
-    public CQCode getCQCode_Music(String type, String id){
+    public CatCode getCQCode_Music(String type, String id){
         return getCQCode(CQCodeTypes.music, type, id);
     }
 
@@ -505,7 +505,7 @@ public class CQCodeUtil {
      * @param image     为音乐的封面图片链接。该参数可被忽略。若参数为空或被忽略，则显示默认图片。
      * @return  音乐自定义分享CQCode
      */
-    public CQCode getCQCode_Music_Custom(String url, String audio, String title, String content, String image){
+    public CatCode getCQCode_Music_Custom(String url, String audio, String title, String content, String image){
         return getCQCode(CQCodeTypes.music_custom,"custom", url, audio, title, content, image);
     }
 
@@ -534,7 +534,7 @@ public class CQCodeUtil {
      * @param image     为分享的图片链接。若参数为空或被忽略，则显示默认图片。
      * @return  链接分享CQCode
      */
-    public CQCode getCQCode_Share(String url, String title, String content, String image){
+    public CatCode getCQCode_Share(String url, String title, String content, String image){
         return getCQCode(CQCodeTypes.share, url, title, content, image);
     }
 
@@ -555,7 +555,7 @@ public class CQCodeUtil {
      * @param id    emoji的id
      * @return      emoji的CQCode
      */
-    public CQCode getCQCode_Emoji(String id){
+    public CatCode getCQCode_Emoji(String id){
         return getCQCode(CQCodeTypes.emoji, id);
     }
 
@@ -612,7 +612,7 @@ public class CQCodeUtil {
      * @param msg 信息字符串 如果为空则返回空字符串
      * @return 提取出CQCode码对象
      */
-    public List<CQCode> getCQCodeFromMsg(String msg){
+    public List<CatCode> getCQCodeFromMsg(String msg){
         if(msg == null || msg.trim().length() <= 0){
             return Collections.emptyList();
         }
@@ -625,7 +625,7 @@ public class CQCodeUtil {
                     //参数数组
                     String[] paramArr = new String[arr.length - 1];
                     System.arraycopy(arr, 1, paramArr, 0, paramArr.length);
-                    return CQCode.of(arr[0], paramArr);
+                    return CatCode.of(arr[0], paramArr);
                 }).collect(Collectors.toList());
     }
 
@@ -635,7 +635,7 @@ public class CQCodeUtil {
      * @param types 类型
      * @return      指定类型的CQ码类型
      */
-    public List<CQCode> getCQCodeFromMsgByType(String msg, CQCodeTypes types){
+    public List<CatCode> getCQCodeFromMsgByType(String msg, CQCodeTypes types){
         if(msg == null || msg.trim().length() <= 0){
             return Collections.emptyList();
         }
@@ -648,7 +648,7 @@ public class CQCodeUtil {
                     //参数数组
                     String[] paramArr = new String[arr.length - 1];
                     System.arraycopy(arr, 1, paramArr, 0, paramArr.length);
-                    return CQCode.of(arr[0], paramArr);
+                    return CatCode.of(arr[0], paramArr);
                 }).collect(Collectors.toList());
     }
 
@@ -690,8 +690,8 @@ public class CQCodeUtil {
      * @throws com.forte.qqrobot.exception.CQParseException
      *  当字符串无法转化为cq码对象的时候将会抛出此异常
      */
-    public CQCode toCQCode(String cq){
-        return CQCode.of(cq.trim());
+    public CatCode toCQCode(String cq){
+        return CatCode.of(cq.trim());
     }
 
 

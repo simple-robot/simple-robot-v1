@@ -10,7 +10,6 @@ import com.forte.qqrobot.listener.invoker.ListenerMethod;
 public class ListenMethodInfoFactory {
 
     public static ListenerInfo toInfo(ListenerMethod method){
-
         return null;
     }
 

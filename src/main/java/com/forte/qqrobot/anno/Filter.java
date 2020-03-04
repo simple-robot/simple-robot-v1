@@ -2,6 +2,7 @@ package com.forte.qqrobot.anno;
 
 import com.forte.qqrobot.beans.messages.types.PowerType;
 import com.forte.qqrobot.beans.types.KeywordMatchType;
+import com.forte.qqrobot.beans.types.MostDIYType;
 import com.forte.qqrobot.beans.types.MostType;
 
 import java.lang.annotation.ElementType;
@@ -96,6 +97,23 @@ public @interface Filter {
     @Deprecated
     MostType mostPermissionType() default MostType.ANY_MATCH;
 
+    //**************** 以下为1.8.0添加 ****************//
+
+    /**
+     * 自定义过滤器的名称列表
+     * @return 使用的自定义过滤器列表
+     */
+    String[] diyFilter() default {};
+
+    /**
+     * 当存在多个匹配规则的时候，则使用此参数来判断多个结果如果进行匹配。
+     * 默认为“只要有一个过滤器通过即可”
+     * @return 多个匹配规则的匹配规则
+     */
+    MostDIYType mostDIYType() default MostDIYType.ANY_MATCH;
+
+
+
 
     /**
      * 结构与{@link Filter}一致, 但是枚举类均替换为字符串类型
@@ -175,7 +193,20 @@ public @interface Filter {
         @ByNameField(MostType.class)
         String mostPermissionType() default "ANY_MATCH";
 
+        /**
+         * 自定义过滤器的名称列表
+         * @return 使用的自定义过滤器列表
+         */
+        String[] diyFilter() default {};
 
+
+        /**
+        * 当存在多个匹配规则的时候，则使用此参数来判断多个结果如果进行匹配。
+        * 默认为“只要有一个过滤器通过即可”
+        * @return 多个匹配规则的匹配规则
+        */
+        @ByNameField(MostDIYType.class)
+        String mostDIYType() default "ANY_MATCH";
     }
 
 }

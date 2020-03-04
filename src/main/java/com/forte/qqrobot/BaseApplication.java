@@ -9,11 +9,15 @@ import com.forte.plusutils.consoleplus.console.colors.ColorTypes;
 import com.forte.plusutils.consoleplus.console.colors.FontColorTypes;
 import com.forte.qqrobot.anno.Config;
 import com.forte.qqrobot.anno.CoreVersion;
+import com.forte.qqrobot.anno.DIYFilter;
 import com.forte.qqrobot.anno.depend.AllBeans;
+import com.forte.qqrobot.bot.BotInfo;
+import com.forte.qqrobot.bot.BotManager;
+import com.forte.qqrobot.bot.BotManagerImpl;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.RobotRunException;
-import com.forte.qqrobot.exception.RobotRuntimeException;
+import com.forte.qqrobot.listener.Filterable;
 import com.forte.qqrobot.listener.MsgIntercept;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
@@ -37,6 +41,7 @@ import com.forte.qqrobot.utils.*;
 
 import java.io.Closeable;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -61,8 +66,9 @@ import java.util.stream.Collectors;
 )
 public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> implements Closeable {
 
-//    private static final String LOG_TAG_HEAD_CHAR = "run";
-
+    /**
+     * 启动器使用的日志，前缀为“run”
+     */
     protected static final QQLogLang RUN_LOG = new QQLogLang("run");
 
     /**
@@ -72,61 +78,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         return RUN_LOG;
     }
 
-//    /**
-//     * <pre> 启动器中使用的日志，tag会有一个前缀：run
-//     * <pre> 即例如： {@code "tag1.name" -> "run.tag1.name"}
-//     * @param tag tag
-//     */
-//    protected String runLogTag(String tag){
-//        return LOG_TAG_HEAD_CHAR + '.' + tag;
-//    }
-
-    /**
-     * 是否已经检测过java的版本
-     */
-    @Deprecated
-    private static boolean JAVA_VERSION_DETECTED = false;
-
-    /** 为Java的版本检测提供一把锁 */
-    @Deprecated
-    private static final byte[] JAVA_VERSION_DETECTION_LOCK = new byte[0];
-
-    /**
-     * Java版本检测，只检测一次
-     * 突然发现，这么检测没什么意义
-     */
-    @Deprecated
-    private void javaVersionDetection(){
-        // 如果尚未检测，尝试获取锁
-        if(!JAVA_VERSION_DETECTED){
-            synchronized (JAVA_VERSION_DETECTION_LOCK){
-                // 获取锁后，如果尚未检测，检测版本
-                if(!JAVA_VERSION_DETECTED){
-                    try {
-                        //获取java版本
-                        String javaVersion = System.getProperties().getProperty("java.version");
-                        final int needVersion = 8;
-                        boolean largerThan8 = Integer.parseInt(javaVersion.split("_")[0].split("\\.")[1]) >= needVersion;
-                        if (!largerThan8) {
-                            Colors colors = Colors.builder()
-                                    .addNoColor("检测到您的版本号为 ")
-                                    .add(javaVersion, Colors.FONT.RED)
-                                    .addNoColor(", 小于")
-                                    .add(" 1.8 ", Colors.FONT.BLUE)
-                                    .add("版本。")
-                                    .add("本框架基于1.8实现，推荐您切换为1.8或以上版本。")
-                                    .build();
-                            QQLog.warning(colors);
-                            QQLog.warning("假如您的版本在1.8或以上，请忽略这两条信息。");
-                        }
-                    } catch (Exception e) {
-                        QQLog.warning("java版本号检测失败, 请尽可能确保您的java版本在1.8以上");
-                    }
-                    JAVA_VERSION_DETECTED = true;
-                }
-            }
-        }
-    }
 
     /**
      * 没有监听函数的送信器
@@ -139,21 +90,36 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     private Register register;
 
     /**
-     * 依赖获取器，赋值在配置后
+     * 依赖管理器，赋值在配置后
      */
-    private DependGetter dependGetter;
+    private DependCenter dependCenter;
 
-//    /**
-//     * 消息拦截器
-//     */
-//    private MsgIntercept[] msgIntercepts;
+    /**
+     * 执行一次run方法之后将会被初始化，此后的config对象将会存储于此，并使用{@link #getConf()} 方法获取
+     */
+    private CONFIG config;
 
-//    /**
-//     * 送信拦截器
-//     */
-//    private SenderSendIntercept[] senderSendIntercepts = {};
-//    private SenderSetIntercept[]  senderSetIntercepts  = {};
-//    private SenderGetIntercept[]  senderGetIntercepts  = {};
+    /**
+     * 执行参数，执行run方法后被初始化
+     */
+    private String[] args;
+
+    /**
+     * bot管理中心
+     */
+    private BotManager botManager;
+
+    /**
+     * 启动器所使用的上下文对象，可以使用它保存一些数据
+     */
+    private Map<String, Object> context = new HashMap<>(4);
+
+    protected Object getContext(String key){
+        return context.get(key);
+    }
+    protected void setContext(String key, Object value){
+        context.put(key, value);
+    }
 
     /**
      * 线程工厂初始化
@@ -181,8 +147,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     private void timeTaskInit() {
         //将定时任务类添加到资源调度中心
         ResourceDispatchCenter.saveTimeTaskManager(new TimeTaskManager());
-//        将定时任务工厂添加到资源调度中心
-//        ResourceDispatchCenter.saveStdSchedulerFactory(new StdSchedulerFactory());
     }
 
     /**
@@ -225,8 +189,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
     /**
      * 开发者实现的资源初始化
-     * 此方法将会在所有的初始化方法最后执行
-     * 这个没有参数的将会在配置之前执行，建议从此处配置配置类实例化
+     * 此方法将会在所有的无配置初始化方法最后执行
+     * 将会在用户配置之前执行
      */
     protected abstract void resourceInit();
 
@@ -248,6 +212,12 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     protected abstract SenderGetList getGetter();
 
     /**
+     * <pre> start之前，会先对账号进行验证。将会使用此方法对注册的bot账号信息进行验证。
+     * <pre> 鉴于机制的变更，最好在bot初始化的时候便将每个bot所对应的sender初始化结束。
+     */
+    protected abstract BotInfo[] verifyBots(Map<String, List<BotInfo>> confBotInfos);
+
+    /**
      * 获取特殊API对象
      */
     public abstract SP_API getSpecialApi();
@@ -265,11 +235,21 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     protected abstract String start(DependCenter dependCenter, ListenerManager manager);
 
     /**
-     * 开发者实现的获取Config对象的方法,对象请保证每次获取的时候都是唯一的
-     * 此方法将会最先被执行
+     * 开发者实现的获取Config对象实例的方法
+     * 此方法将会最先被执行，并会将值保存，使用时可使用{@link #getConf()} 方法获取
      */
     protected abstract CONFIG getConfiguration();
 
+    /**
+     * 获取Config对象。如果尚未初始化则会优先初始化
+     * @return
+     */
+    protected CONFIG getConf(){
+        if(config == null){
+            config = getConfiguration();
+        }
+        return config;
+    }
 
     //**************** 以下是一些不强制但是可以通过重写来拓展功能的方法 ****************//
 
@@ -290,6 +270,27 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * @return 所有的执行任务
      */
     protected void afterDepend(CONFIG config, Application<CONFIG> app, Register register, DependCenter dependCenter) {
+        // 初始化bot管理中心
+        initBotManager(dependCenter);
+
+    }
+
+    /**
+     * 初始化账号管理器BotManager
+     * @param dependCenter 依赖中心
+     */
+    private void initBotManager(DependCenter dependCenter){
+        // 初始化bot管理中心
+        // 尝试从依赖中获取，如果获取不到，使用默认的管理中心并存入依赖
+        getLog().debug("botmanager.get.depend");
+        BotManager botManager = dependCenter.get(BotManager.class);
+        if(botManager == null){
+            botManager = new BotManagerImpl();
+            dependCenter.load(botManager);
+            getLog().debug("botmanager.get.default", botManager);
+        }
+        this.botManager = botManager;
+        getLog().debug("botmanager.load", botManager);
     }
 
 
@@ -305,20 +306,37 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     /**
      * 服务启动前
      */
-    protected void beforeStart() {
+    protected void beforeStart(CONFIG config) {
     }
 
     /**
      * 服务启动后, 构建无参数送信器之前
      */
-    protected void afterStart() {
+    protected void afterStart(CONFIG config) {
+    }
+
+    /**
+     * 初始化Runtime对象
+     * @param config config配置
+     */
+    private void initRuntime(CONFIG config, BotInfo[] botInfos){
+        // 初始化BotRuntime
+        try {
+            BotRuntime botRuntime = BotRuntime.initRuntime(new ArrayList<>(), botInfos, config, this::getBotManager);
+            // 注入runtime
+            DependCenter dependCenter = getDependCenter();
+            dependCenter.load(botRuntime);
+            // 注入config
+            dependCenter.load(botRuntime.getConfiguration());
+        } catch (CloneNotSupportedException e) {
+            throw new RobotRunException("runtime.init.failed", e);
+        }
     }
 
     /**
      * 监听函数注册之前，可以执行重写并进行额外的监听注入
      */
     protected void beforeRegisterListener(CONFIG config, Application<CONFIG> app, ListenerMethodScanner scanner, DependCenter dependCenter) {
-
     }
 
 
@@ -340,7 +358,10 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         timeTaskInit();
         //资源初始化
         resourceInit(config);
+
     }
+
+
 
     /**
      * 进行扫描
@@ -354,7 +375,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 配置结束后的方法
      */
     private DependCenter afterConfig(CONFIG config, Application<CONFIG> app) {
-
         //构建监听扫描器
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
 
@@ -364,24 +384,20 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         // 注册监听函数
         registerListener(config, app, scanner, dependCenter);
 
+        // ** 依赖注入完毕 **
+
         //根据配置类的扫描结果来构建监听器管理器和阻断器
         // 准备获取消息拦截器
 
         RUN_LOG.debug("intercept.msg.prepare");
-        MsgIntercept[] msgIntercepts = register.performingTasks(
-                c -> FieldUtils.isChild(c, MsgIntercept.class),
-                (Class<?>[] cs) -> Arrays.stream(cs)
-//                        .peek(c -> QQLog.debug("加载消息拦截器: " + c))
-                        .peek(c -> RUN_LOG.info("intercept.msg.load", c))
-                        .map(dependCenter::get).filter(Objects::nonNull)
-                        .toArray(MsgIntercept[]::new)
-        );
+        MsgIntercept[] msgIntercepts = dependCenter.getByType(MsgIntercept.class, new MsgIntercept[0]);
         if(msgIntercepts == null || msgIntercepts.length == 0){
             RUN_LOG.debug("intercept.msg.empty");
         }
 
         // 构建管理中心
         ListenerManager manager = scanner.buildManager(msgIntercepts);
+
         // 构建阻断器
         Plug plug = scanner.buildPlug();
 
@@ -392,56 +408,59 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
         //准备截器
         RUN_LOG.debug("intercept.sender.prepare");
-        SenderSendIntercept[] senderSendIntercepts = register.performingTasks(
-                c -> FieldUtils.isChild(c, SenderSendIntercept.class),
-                (Class<?>[] cs) -> Arrays.stream(cs)
-                        .peek(c -> RUN_LOG.debug("intercept.sender.load", c))
-                        .map(dependCenter::get).filter(Objects::nonNull)
-                        .toArray(SenderSendIntercept[]::new)
-        );
+        SenderSendIntercept[] senderSendIntercepts = dependCenter.getByType(SenderSendIntercept.class, new SenderSendIntercept[0]);
         if(senderSendIntercepts == null || senderSendIntercepts.length == 0){
             RUN_LOG.debug("intercept.sender.empty");
         }
         //********************************//
 
         RUN_LOG.debug("intercept.setter.prepare");
-        SenderSetIntercept[] senderSetIntercepts = register.performingTasks(
-                c -> FieldUtils.isChild(c, SenderSetIntercept.class),
-                (Class<?>[] cs) -> Arrays.stream(cs)
-                        .peek(c -> RUN_LOG.debug("intercept.setter.load", c))
-                        .map(dependCenter::get).filter(Objects::nonNull)
-                        .toArray(SenderSetIntercept[]::new)
-        );
+        SenderSetIntercept[] senderSetIntercepts = dependCenter.getByType(SenderSetIntercept.class, new SenderSetIntercept[0]);
         if(senderSetIntercepts == null || senderSetIntercepts.length == 0){
             RUN_LOG.debug("intercept.setter.empty");
         }
         //********************************//
 
         RUN_LOG.debug("intercept.getter.prepare");
-        SenderGetIntercept[] senderGetIntercepts = register.performingTasks(
-                c -> FieldUtils.isChild(c, SenderGetIntercept.class),
-                (Class<?>[] cs) -> Arrays.stream(cs)
-                        .peek(c -> RUN_LOG.debug("intercept.getter.load", c))
-                        .map(dependCenter::get).filter(Objects::nonNull)
-                        .toArray(SenderGetIntercept[]::new)
-        );
+        SenderGetIntercept[] senderGetIntercepts = dependCenter.getByType(SenderGetIntercept.class, new SenderGetIntercept[0]);
         if(senderGetIntercepts == null || senderGetIntercepts.length == 0){
             RUN_LOG.debug("intercept.getter.empty");
         }
         //*******************************//
-
-        senderSendIntercepts = senderSendIntercepts == null ? new SenderSendIntercept[0] : senderSendIntercepts;
-        senderSetIntercepts  = senderSetIntercepts  == null ? new SenderSetIntercept [0] : senderSetIntercepts ;
-        senderGetIntercepts  = senderGetIntercepts  == null ? new SenderGetIntercept [0] : senderGetIntercepts ;
 
         // 送信拦截器直接变更MsgSender的实例化过程
         MsgSender.setSenderSendIntercepts(senderSendIntercepts);
         MsgSender.setSenderSetIntercepts(senderSetIntercepts);
         MsgSender.setSenderGetIntercepts(senderGetIntercepts);
 
+        //**************** 加载所有存在于依赖中的DIYFilter ****************//
+        loadDIYFilter(dependCenter);
+
         //返回依赖管理器
         return dependCenter;
     }
+
+    /**
+     * 加载所有的DIYFilter
+     */
+    private void loadDIYFilter(DependCenter dependCenter){
+        Filterable[] filterables = dependCenter.getByType(Filterable.class, new Filterable[0]);
+        for (Filterable filterable : filterables) {
+            Class<? extends Filterable> filterClass = filterable.getClass();
+            DIYFilter diyFilter = AnnotationUtils.getAnnotation(filterClass, DIYFilter.class);
+            String name = null;
+            if(diyFilter != null){
+                String value = diyFilter.value().trim();
+                if(value.length() > 0){
+                    name = value;
+                }
+            }
+            name = name == null ? FieldUtils.headLower(filterClass.getSimpleName()) : name;
+            ListenerFilter.registerFilter(name, filterable);
+        }
+
+    }
+
 
     /**
      * 注册监听函数
@@ -544,7 +563,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         ResourceDispatchCenter.saveDependCenter(dependCenter);
 
         //赋值
-        this.dependGetter = dependCenter;
+        this.dependCenter = dependCenter;
 
         // ***** 注入一些其他的东西且无视异常 ***** //
 
@@ -554,8 +573,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         dependCenter.loadIgnoreThrow(CQCodeUtil.build());
         // 注入当前这个启动器
         dependCenter.loadIgnoreThrow(this);
-        // 注入配置类
-        dependCenter.loadIgnoreThrow(config);
+        // 注入配置类 - 1.8.0 修改为Runtime初始化完成后再注入
+//        dependCenter.loadIgnoreThrow(config);
 
 
         //如果有全局注入，先扫描并注入全局注入
@@ -577,17 +596,19 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         this.register.registerDependCenter(dependCenter);
 
 
-        // > 依赖注入之后
-        afterDepend(config, app, this.register, dependCenter);
-
         return dependCenter;
     }
 
     /**
      * 有些事情需要连接之后才能做，例如加载定时任务，需要空函数送信器
      */
-    private void after() {
-        //注册监听函数
+    private void after(CONFIG config) {
+        // 注册定时任务
+        registerTimeTask();
+    }
+
+    private void registerTimeTask(){
+        //注册定时任务
         this.register.registerTimeTask(this.NO_METHOD_SENDER);
     }
 
@@ -598,7 +619,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //# 启动时候的系统类型展示
         //run.os.name=系统名称: {0}
         //run.os.version=系统版本: {0}
-        RUN_LOG.info("os.name", System.getProperty("os.name"));
+        RUN_LOG.info("os.name",    System.getProperty("os.name"));
         RUN_LOG.info("os.version", System.getProperty("os.version"));
         // 线程池信息
         BaseLocalThreadPool.PoolConfig poolConfig = config.getPoolConfig();
@@ -608,17 +629,65 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
     }
 
+
+    /**
+     * 使用一个Class来指定启动器。
+     * 如果这个类存在{@link SimpleRobotApplication}注解，则以注解信息为主。
+     * 如果不存在，则判断是否为{@link Application}接口的子类。如果是，尝试实例化，否则抛出异常。
+     * @param appClass 启动类
+     * @param args      参数
+     */
+    public void run(Class<?> appClass, String... args){
+        SimpleRobotApplication applicationAnno = AnnotationUtils.getAnnotation(appClass, SimpleRobotApplication.class);
+        if(applicationAnno == null){
+            int modifiers = appClass.getModifiers();
+            // interface or abstract
+            if(Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)){
+                throw new RobotRunException(1, appClass + "can not be a simple-robot-application: cannot found @SimpleRobotApplication, and is an interface class or an Abstract class.");
+            }
+            // is child ?
+            if(FieldUtils.isChild(appClass, Application.class)){
+                // yes, child.
+                try {
+                    Application<CONFIG> newInstance = (Application<CONFIG>) appClass.newInstance();
+                    run(newInstance, args);
+                } catch (Exception e) {
+                    throw new RobotRunException(1, appClass + "can not be a simple-robot-application: cannot get newInstance.", e);
+                }
+            }else{
+                throw new RobotRunException(1, appClass + "can not be a simple-robot-application: cannot found @SimpleRobotApplication, and not implement Application interface.");
+
+            }
+        }else{
+            // has annotation
+            SimpleRobotConfiguration configAnnotation = AnnotationUtils.getAnnotation(appClass, SimpleRobotConfiguration.class);
+            CONFIG conf = getConf();
+            Class<CONFIG> confClass = (Class<CONFIG>) conf.getClass();
+
+            AutoResourceApplication<CONFIG> autoResourceApplication = AutoResourceApplication.autoConfig(confClass, applicationAnno, configAnnotation);
+
+            // 正常启动
+            run(autoResourceApplication, args);
+        }
+
+    }
+
     /**
      * 执行的主程序
      * @param app 启动器接口的实现类
      * @param args 可能会有用的额外指令参数，一般是main方法的参数
      */
     public void run(Application<CONFIG> app, String... args) {
+        long s = System.currentTimeMillis();
+
+        // 记录执行参数
+        setArgs(args);
+
         //无配置资源初始化
         resourceInit();
 
         //获取配置对象
-        CONFIG configuration = getConfiguration();
+        CONFIG configuration = getConf();
 
         //用户进行配置
         app.before(configuration);
@@ -626,57 +695,85 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //初始化
         init(app, configuration);
 
-        // 展示系统信息
-        showSystemInfo(configuration);
-
         //配置结束, 获取依赖管理器
         DependCenter dependCenter = afterConfig(configuration, app);
+
+        // 依赖注入之后
+        afterDepend(config, app, this.register, dependCenter);
+
 
         //获取管理器
         ListenerManager manager = ResourceDispatchCenter.getListenerManager();
 
-
         // > 启动之前
-        beforeStart();
+        beforeStart(configuration);
 
-
-        //开始连接
-        long s = System.currentTimeMillis();
-
+        //开始验证账号并连接
+        // 验证账号
+        BotInfo[] botInfos = verifyBots(configuration.getAdvanceBotInfo());
+        getLog().debug("runtime.bot.verify");
+        // 初始化Runtime对象
+        initRuntime(config, botInfos);
+        getLog().debug("runtime.init");
+        // 连接/启动
         String name = start(dependCenter, manager);
-
-        long e = System.currentTimeMillis();
-//        String msg = name + "启动成功,耗时(" + (e - s) + "ms)";
-        String msg = "start.success";
-        RUN_LOG.info(msg, Colors.builder().add(name, Colors.FONT.DARK_GREEN).build(), e - s);
-
+        // 展示系统信息
+        showSystemInfo(configuration);
 
         // > 启动之后
-        afterStart();
-
+        afterStart(configuration);
 
         //获取CQCodeUtil实例
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
         //构建没有监听函数的送信器并保存
-        MsgSender sender = MsgSender.build(getSender(), getSetter(), getGetter());
+        MsgSender sender = MsgSender.build(getSender(), getSetter(), getGetter(), BotRuntime.getRuntime());
         this.NO_METHOD_SENDER = sender;
         // MsgSender存入依赖中心
         dependCenter.loadIgnoreThrow(sender);
 
-        after();
+        after(configuration);
+
+        long e = System.currentTimeMillis();
+        // 展示连接成功的信息
+        String msg = "start.success";
+        getLog().info(msg, Colors.builder().add(name, Colors.FONT.DARK_GREEN).build(), e - s);
 
         //连接之后
         app.after(cqCodeUtil, sender);
+    }
+
+    /**
+     * 设置执行参数
+     * @param args 执行参数数组
+     */
+    protected void setArgs(String[] args){
+        this.args = args;
+    }
+
+    /**
+     * 直接返回参数列表对象。
+     * @return 执行参数
+     */
+    protected String[] getArgs(){
+        return args;
     }
 
 
     //**************** 部分资源获取API ****************//
 
     /**
+     * 获取账号管理器，在dependCenter初始化完成被初始化
+     * @return 账号管理器实例
+     */
+    public BotManager getBotManager(){
+        return botManager;
+    }
+
+    /**
      * 获取依赖获取器
      */
-    public DependGetter getDependGetter() {
-        return this.dependGetter;
+    public DependCenter getDependCenter() {
+        return this.dependCenter;
     }
 
     /**
@@ -705,6 +802,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
 
     /**
+     * 打个招呼
      * <pre> 使得这个方法可以被覆盖。
      * <pre> 别吐槽里面的变量名了。
      * @since  1.7.x
@@ -714,7 +812,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         String sp1 = Colors.builder().add(' ', wowThatIsRainbowToo$()).add(' ', wowThatIsRainbowToo$()).build().toString();
         String sp2 = Colors.builder().add(' ', wowThatIsRainbowToo$()).add(' ', wowThatIsRainbowToo$()).build().toString();
 
-        String oh_hi_is_me = "_(^w^)L~~ by simple-robot@ForteScarlet ~~";
+        String oh_hi_is_me = getFace() + " by simple-robot@ForteScarlet ~~";
         int length = oh_hi_is_me.length() + 4;
         char line = ' ';
         /* QQLog初始化的时候输出个东西~ */
@@ -740,5 +838,23 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     }
     private ColorTypes wowThatIsRainbowToo$(){
         return RandomUtil.getRandomElement(BackGroundColorTypes.values());
+    }
+    private String getFace(){
+        String[] s = {
+                "O(∩_∩)O",
+                "o(*￣▽￣*)o",
+                "(～﹃～)~zZ",
+                "ε=ε=ε=(~￣▽￣)~",
+                "(oﾟvﾟ)ノ",
+                "(*^_^*)",
+                "(。・∀・)ノヾ",
+                "(≧▽≦*)o",
+                "q(≧▽≦q)",
+                "ψ(｀∇´)ψ",
+                "(～￣▽￣)～",
+                "╰(*°▽°*)╯",
+                "=￣ω￣=",
+        };
+        return RandomUtil.getRandomElement(s);
     }
 }

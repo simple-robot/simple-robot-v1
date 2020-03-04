@@ -11,6 +11,11 @@ import java.util.function.Supplier;
  */
 public class BotManagerImpl implements BotManager {
 
+    /**
+     * 默认bot，默认情况下为第一个被注册的bot
+     */
+    private String defaultBot;
+
     /** 数据储存用的Map */
     private Map<String, BotInfo> botMap;
 
@@ -28,6 +33,36 @@ public class BotManagerImpl implements BotManager {
 
 
     /**
+     * 大多数情况下，可能不一定必须指定一个bot，则此方法规定获取一个默认的bot
+     *
+     * @return 获取一个默认bot
+     */
+    @Override
+    public BotInfo defaultBot() {
+        if(defaultBot == null){
+            if(botMap.size() == 0){
+                return null;
+            }else{
+                BotInfo next = botMap.values().iterator().next();
+                defaultBot = next.getBotCode();
+                return next;
+            }
+        }else{
+            return getBot(defaultBot);
+        }
+    }
+
+    /**
+     * 设置默认bot的账号信息
+     *
+     * @param botCode 默认bot的账号信息
+     */
+    @Override
+    public void setDefaultBot(String botCode) {
+        defaultBot = botCode;
+    }
+
+    /**
      * 通过bot的code获取一个Bot的信息
      *
      * @param botCode 账号
@@ -36,6 +71,15 @@ public class BotManagerImpl implements BotManager {
     @Override
     public BotInfo getBot(String botCode) {
         return botMap.get(botCode);
+    }
+
+    /**
+     * 获取全部的bots信息
+     * @return bots
+     */
+    @Override
+    public BotInfo[] bots(){
+        return botMap.values().toArray(new BotInfo[0]);
     }
 
     /**
@@ -52,6 +96,9 @@ public class BotManagerImpl implements BotManager {
             BotInfo botInfo = botMap.get(key);
             if(botInfo == null){
                 botMap.put(key, info);
+                if(defaultBot == null){
+                    defaultBot = key;
+                }
                 return true;
             }else{
                 // 已经存在, 不放入

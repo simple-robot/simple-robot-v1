@@ -59,6 +59,9 @@ public interface ResourceApplication<CONFIG extends BaseConfiguration> extends A
         Class<CONFIG> configType = (Class<CONFIG>) configuration.getClass();
         InjectableConfig<CONFIG> injectableConfig = ConfigurationHelper.toInjectable(configType);
 
+        // 额外操作
+        plus(configProperties);
+
         // 注入配置
         injectableConfig.inject(configuration, configProperties);
 
@@ -67,6 +70,12 @@ public interface ResourceApplication<CONFIG extends BaseConfiguration> extends A
         // 执行之后的before
         before(configProperties, configuration);
     }
+
+    /**
+     * 如果在配置进行注入的时候有什么额外的操作，重写此方法，否则不要重写。
+     * @param configProperties config 参数列表
+     */
+    default void plus(Properties configProperties){}
 
     /**
      * 此方法将会在配置文件装配完成后执行.

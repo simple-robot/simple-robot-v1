@@ -4,6 +4,23 @@
     - KeywordMatchType枚举中增加更多预设：
     STARTS_WITH、TRIM_STARTS_WITH、RE_CQCODE_STARTS_WITH、RE_CQCODE_TRIM_STARTS_WITH、ENDS_WITH、TRIM_ENDS_WITH、RE_CQCODE_ENDS_WITH、RE_CQCODE_TRIM_ENDS_WITH
     分别对应了startsWith与endsWith的4种情况
+    - 实现支持多账号, 并修改配置类与文件配置，增加部分与多账号相关的配置。
+    - 增加针对多账户注册的文件配置信息: "core.bots"
+    - 增加`BotManager`类，以管理多账号。
+    - 增加`BotManagerImpl`类，以实现自定义BotManager, 例如切换Bot数据的获取形式为使用数据库或者redis等，使其可以适应分布式系统等其他复杂架构。
+    - 为`GroupMsg`类型增加了`PowerAble`的消息接口，以获取此消息的群员在群内的权限。
+    - 增加接口`Filterable`以支持使用者自定义过滤规则。
+    - 以上述的`Filterable`为前提，增加MostDIYType，用来当`@Filter`中出现了多个`Filterable`的时候的匹配规则。
+    - 在实现了`Filterable`接口的前提下，增加一个注解`@DIYFilter`以指定自定义filter的名称。(同时支持`@Beans`)
+    - `@Filter`中增加两个参数以使用上述的自定义Filter。
+    - 增加两个注解：`@SimpleRobotApplication` 和 `@SimpleRobotConfiguration`, 以支持注解形式的启动, 基本摒弃早期的代码配置。
+    - CQ码中增加：show、contact、rich、hb类型
+    - 增加一个BotRuntime类，其可在启动后通过静态代码获取。
+            
+※ 注①：此版本核心不向下兼容。
+※ 注②：多账号功能目前仍在测试，如果遇到BUG请及时反馈。 
+            
+        
 
 
 - ##### 1.7.0

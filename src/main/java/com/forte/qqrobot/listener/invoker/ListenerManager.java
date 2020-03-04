@@ -1,9 +1,11 @@
 package com.forte.qqrobot.listener.invoker;
 
 
+import com.forte.qqrobot.BotRuntime;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
+import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.MsgIntercept;
@@ -66,13 +68,31 @@ public class ListenerManager implements MsgReceiver {
      * <br>
      * 由于全局Map可能会出现线程问题，故此使用线程安全的Map
      */
-    private final Map<String, Object> msgContextGlobalMap = new ConcurrentHashMap<>(4);
+    private Map<String, Object> msgContextGlobalMap = new ConcurrentHashMap<>(4);
     
     /**
      * 空的监听回执列表
      */
     private static final ListenResult[] EMPTY_RESULT = new ListenResult[0];
 
+
+//    /**
+//     * 根据函数构建三大送信器
+//     * @param msgget     消息接收器
+//     * @param senderFunc 送信器sender获取函数
+//     * @param setterFunc 送信器setter获取函数
+//     * @param getterFunc 送信器getter获取函数
+//     * @return 相应结果列表
+//     */
+//    public ListenResult[] onMsg(MsgGet msgget,
+//                                Function<MsgGet, SenderSendList> senderFunc,
+//                                Function<MsgGet, SenderSetList> setterFunc,
+//                                Function<MsgGet, SenderGetList> getterFunc
+//                                ){
+//
+//        // 返回最终结果
+//        return onMsg(msgget, senderFunc.apply(msgget), setterFunc.apply(msgget), getterFunc.apply(msgget));
+//    }
 
     /**
      * 接收到了消息
@@ -102,27 +122,27 @@ public class ListenerManager implements MsgReceiver {
         return invoke(msgget, params, at, sender, setter, getter);
     }
 
-    /**
-     * 接收到了消息
-     */
-    @Override
-    public ListenResult[] onMsg(MsgGet msgget, SenderList sender){
-        return onMsg(msgget,
-                sender.isSenderList() ? (SenderSendList) sender : null,
-                sender.isSetterList() ? (SenderSetList) sender : null,
-                sender.isGetterList() ? (SenderGetList) sender : null);
-    }
-
-    /**
-     * 接收到了消息
-     */
-    @Override
-    public ListenResult[] onMsg(MsgGet msgget, MsgSender sender){
-        return onMsg(msgget,
-                sender == null ? null : sender.SENDER,
-                sender == null ? null : sender.SETTER,
-                sender == null ? null : sender.GETTER);
-    }
+//    /**
+//     * 接收到了消息
+//     */
+//    @Override
+//    public ListenResult[] onMsg(MsgGet msgget, SenderList sender){
+//        return onMsg(msgget,
+//                sender.isSenderList() ? (SenderSendList) sender : null,
+//                sender.isSetterList() ? (SenderSetList) sender : null,
+//                sender.isGetterList() ? (SenderGetList) sender : null);
+//    }
+//
+//    /**
+//     * 接收到了消息
+//     */
+//    @Override
+//    public ListenResult[] onMsg(MsgGet msgget, MsgSender sender){
+//        return onMsg(msgget,
+//                sender == null ? null : sender.SENDER,
+//                sender == null ? null : sender.SETTER,
+//                sender == null ? null : sender.GETTER);
+//    }
 
     /**
      * 接收到了消息响应
@@ -131,7 +151,8 @@ public class ListenerManager implements MsgReceiver {
      * @param at        是否被at
      * @return 执行的结果集，已经排序了。
      */
-    private ListenResult[] invoke(MsgGet msgGet, Set<Object> args, AtDetection at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+    private ListenResult[] invoke(MsgGet msgGet, Set<Object> args, AtDetection at,
+                                  SenderSendList sendList , SenderSetList setList, SenderGetList getList){
         //构建MsgSender对象
 
         //参数获取getter
@@ -210,19 +231,32 @@ public class ListenerManager implements MsgReceiver {
      * @return 参数集合
      */
     private Object[] getParams(MsgGet msgGet){
+        List<Object> plist = new ArrayList<>();
         String msg = msgGet.getMsg();
+        // 获取当前接收到消息的Code
+        String code = msgGet.getThisCode();
         //配置参数
         //获取cqCodeUtil
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
         //判断是否at自己
         //获取本机QQ号
         AtDetection atDetection = () -> {
-            String localQQCode = ResourceDispatchCenter.getBaseConfigration().getLocalQQCode();
-            return cqCodeUtil.isAt(msg, localQQCode);
+            String localCode = ResourceDispatchCenter.getBaseConfigration().getLocalQQCode();
+            return cqCodeUtil.isAt(msg, localCode);
         };
+        //0 : msgGet
+        plist.add(msgGet);
+        //1 : codeUtil
+        plist.add(cqCodeUtil);
+        //2 : atDetection
+        plist.add(atDetection);
         //组装参数
-        //* 组装参数不再携带QQWebSocketSender对象和QQHttpSender对象，而是交给Manager动态创建         *
-        return new Object[]{msgGet, cqCodeUtil, atDetection};
+        //* 组装参数不再携带QQWebSocketSender对象和QQHttpSender对象，而是交给Manager动态创建
+        if(msgGet.getThisCode() != null){
+            BotInfo bot = BotRuntime.getRuntime().getBotManager().getBot(msgGet.getThisCode());
+            plist.add(bot);
+        }
+        return plist.toArray(new Object[0]);
     }
 
     /**
@@ -241,27 +275,23 @@ public class ListenerManager implements MsgReceiver {
             map.put("atDetection", at);
             map.put("msgType", msgType);
             map.put(msgType.toString(), msgType);
-            MsgSender msgSender = MsgSender.build(sendList, setList, getList, lm);
+            MsgSender msgSender = MsgSender.build(sendList, setList, getList, lm, BotRuntime.getRuntime());
             map.put("msgSender", msgSender);
             //将整合的送信器与原生sender都传入
             if(sendList != null){
-                map.put("sendList", sendList);
                 map.put("sender", sendList);
-                map.put("SENDER", sendList);
             }
             if(setList != null){
-                map.put("setList", setList);
                 map.put("setter", setList);
-                map.put("SETTER", setList);
             }
             if(getList != null){
-                map.put("getList", getList);
                 map.put("getter", getList);
-                map.put("GETTER", getList);
             }
 
             for (Object arg : args) {
-                map.put(arg.getClass().getSimpleName(), arg);
+                if(arg != null){
+                    map.put(arg.getClass().getSimpleName(), arg);
+                }
             }
 
             return AdditionalDepends.getInstance(map);

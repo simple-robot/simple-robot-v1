@@ -5,6 +5,7 @@ lang.init.finished=language has already init finished. All non-Chinese languages
 
 # RobotRunException相关
 exception.run.moreDepends=Scan to multiple [{0}] implementation classes.
+exception.run.runtime.init.failed=Runtime init failed.
 
 # AnnotationException相关，其中包括AnnotationUtils中出现的格式化参数
 exception.annotation.class=class [{0}] should not use annotation [{1}] : {2}
@@ -85,6 +86,10 @@ exception.timeTask.registerWhyFailed=Scheduled task [{0}] registration failed: {
 # RobotApiException相关
 exception.api.notSupport=API types not supported by the component: [{0}]
 
+# FilterException相关
+exception.filter.exists=filter [{0}] has already exists.
+exception.filter.notfound=DIY filter [{0}] not found.
+
 # 其他异常
 
 # 数字转化异常 NumberFormatException，出现在BasicResourceWarehouse类中
@@ -134,6 +139,20 @@ run.intercept.getter.prepare=Prepare getter interceptor...
 run.intercept.getter.empty=No getter interceptor
 run.intercept.getter.load=Load getter interceptor: {0}
 
+# botManager
+run.botmanager.get.depend=Try to get BotManager instance object from dependency center
+run.botmanager.get.default=Use the default BotManager {0}
+run.botmanager.load=load BotManager {0}
+run.runtime.init=Runtime initialized.
+run.runtime.bot.verify=Bot list verify success.
+
+
+# runtime
+runtime.bot.register=bot [{0}] register success！
+runtime.bot.register.failed=bot register failed: {0}
+
+# filter
+filter.register=register filter: {0}
 
 # 送信拦截器
 ## 当某个API被拦截器阻止，或者说拦截的时候的消息

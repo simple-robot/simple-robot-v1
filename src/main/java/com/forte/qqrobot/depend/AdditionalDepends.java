@@ -94,7 +94,8 @@ public class AdditionalDepends implements DependGetter {
             // 名称绝对不可重复
             nameMap.merge(k, v, nameMapMergeThrows(k));
         });
-        //构建
+
+        // 构建
         return new AdditionalDepends(typeMap, nameMap);
     }
 

@@ -88,7 +88,7 @@ public class CQAppendList implements AppendList {
     private void add(CharSequence value){
         if(value != null && value.length() > 0){
             // 如果不是CQ码，转义
-            if(!(value instanceof CQCode)){
+            if(!(value instanceof CatCode)){
                 list.add(CQ_CODE_UTIL.escapeOutCQCode( value.toString() ));
             }else{
                 // 否则，直接添加
@@ -153,8 +153,8 @@ public class CQAppendList implements AppendList {
 
 
     @Override
-    public CQCode[] getCQCodes() {
-        return list.stream().filter(c -> c instanceof CQCode).toArray(CQCode[]::new);
+    public CatCode[] getCQCodes() {
+        return list.stream().filter(c -> c instanceof CatCode).toArray(CatCode[]::new);
     }
 
     @Override
@@ -179,7 +179,7 @@ public class CQAppendList implements AppendList {
 
     @Override
     public boolean containsType(CQCodeTypes types) {
-        return list.stream().filter(c -> c instanceof CQCode).anyMatch(c -> ((CQCode) c).getCQCodeTypes().equals(types));
+        return list.stream().filter(c -> c instanceof CatCode).anyMatch(c -> ((CatCode) c).getCQCodeTypes().equals(types));
     }
 
 
@@ -190,11 +190,11 @@ public class CQAppendList implements AppendList {
 
 
     @Override
-    public void forEachCQCode(BiConsumer<CQCode, Integer> each) {
+    public void forEachCQCode(BiConsumer<CatCode, Integer> each) {
         for (int i = 0; i < list.size(); i++) {
             CharSequence item = list.get(i);
-            if (item instanceof CQCode) {
-                each.accept((CQCode) item, i);
+            if (item instanceof CatCode) {
+                each.accept((CatCode) item, i);
             }
         }
     }
@@ -206,8 +206,8 @@ public class CQAppendList implements AppendList {
     }
 
     @Override
-    public Stream<CQCode> streamCQCode() {
-        return list.stream().filter(c -> c instanceof CQCode).map(c -> (CQCode) c);
+    public Stream<CatCode> streamCQCode() {
+        return list.stream().filter(c -> c instanceof CatCode).map(c -> (CatCode) c);
     }
 
     /**

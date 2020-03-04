@@ -4,6 +4,7 @@ lang.init.finished=语言已初始化完毕。
 
 # RobotRunException相关
 exception.run.moreDepends=扫描到多个[ {0} ]的实现类。
+exception.run.runtime.init.failed=Runtime初始化异常
 
 # AnnotationException相关，其中包括AnnotationUtils中出现的格式化参数
 exception.annotation.class=类[{0}]不应当使用[{1}]注解: {2}
@@ -85,6 +86,10 @@ exception.timeTask.registerWhyFailed=定时任务[{0}]注册失败: {1}
 # RobotApiException相关
 exception.api.notSupport=组件所不支持的API类型：[ {0} ]
 
+# FilterException相关
+exception.filter.exists=已经存在自定义过滤器：{0}
+exception.filter.notfound=无法获取自定义过滤器{0}：不存在！
+
 # 其他异常
 
 # 数字转化异常 NumberFormatException，出现在BasicResourceWarehouse类中
@@ -139,12 +144,19 @@ run.intercept.getter.prepare=准备getter送信拦截器...
 run.intercept.getter.empty=无getter送信拦截器
 run.intercept.getter.load=加载getter送信拦截器: {0}
 
+# botManager
+run.botmanager.get.depend=尝试从依赖中心获取账号管理器实例对象
+run.botmanager.get.default=使用默认的账号管理器 {0}
+run.botmanager.load=加载账号管理器 {0}
+run.runtime.init=Runtime初始化完毕。
+run.runtime.bot.verify=Bot账号列表验证完成。
+
 # runtime
 runtime.bot.register=账号[{0}]注册成功！
 runtime.bot.register.failed=账号注册失败: {0}
 
-
-
+# filter
+filter.register=注册过滤器：{0}
 
 # 送信拦截器
 ## 当某个API被拦截器阻止，或者说拦截的时候的消息

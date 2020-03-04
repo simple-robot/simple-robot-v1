@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.function.Supplier;
 
 /**
- *
+ * <pre> 应当于启动初期就初始化的
  * <pre> 运行期间的信息，启动后进行初始化并注入至依赖中心。
  * <pre> 运行期间, 内部所使用的实例应当只存在一个实例。
  * <pre> 可以对其进行覆盖，来实现分布式的登录信息同步。
@@ -32,6 +32,7 @@ public class BotRuntime {
      * 日志的语言前缀：runtime
      */
     private final QQLogLang log = new QQLogLang("runtime");
+
 
     private Collection<ListenerInfo> listenerInfos;
     private BaseConfiguration        configuration;
@@ -71,7 +72,7 @@ public class BotRuntime {
      */
     public static synchronized BotRuntime initRuntime(
             // 初始化所需要的资源
-            Collection<ListenerInfo> listenerInfos, Collection<BotInfo> botInfos, BaseConfiguration configuration,
+            Collection<ListenerInfo> listenerInfos, BotInfo[] botInfos, BaseConfiguration configuration,
             // 部分数据存放资源
             // botManager获取器
             Supplier<BotManager> botManagerSupplier
@@ -109,6 +110,18 @@ public class BotRuntime {
             throw new RobotRuntimeException(0, "botRuntime has not initialized!");
         }
         return runtime;
+    }
+
+    /**
+     * 获取BotManager
+     * @return botManager
+     */
+    public BotManager getBotManager(){
+        return botManager;
+    }
+
+    public BaseConfiguration getConfiguration(){
+        return configuration;
     }
 
 }

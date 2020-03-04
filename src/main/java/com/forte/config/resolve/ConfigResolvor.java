@@ -236,8 +236,8 @@ public class ConfigResolvor {
                             throw new RuntimeException(e);
                         }
                     };
-                } catch (NoSuchMethodException ignore) {
-
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(e);
                 }
             }
 

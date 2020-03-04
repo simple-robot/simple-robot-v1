@@ -2,6 +2,7 @@ package com.forte.qqrobot.test;
 
 import com.forte.qqrobot.beans.messages.msgget.GroupMsg;
 import com.forte.qqrobot.beans.messages.types.GroupMsgType;
+import com.forte.qqrobot.beans.messages.types.PowerType;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -131,5 +132,25 @@ public class TestGroupMsg implements GroupMsg {
                 ", time=" + time +
                 ", originalData='" + originalData + '\'' +
                 '}';
+    }
+
+    /**
+     * 获取此人在群里的权限
+     *
+     * @return 权限，例如群员、管理员等
+     */
+    @Override
+    public PowerType getPowerType() {
+        return null;
+    }
+
+    /**
+     * 重新定义此人的权限
+     *
+     * @param powerType 权限
+     */
+    @Override
+    public void setPowerType(PowerType powerType) {
+
     }
 }

@@ -14,11 +14,34 @@ import java.util.function.BiPredicate;
 public enum MostType {
 
     /** 需要全部匹配 */
-    EVERY_MATCH((msg, kw, filter) -> Arrays.stream(kw).allMatch(k -> filter.test(msg, k))),
+    EVERY_MATCH((msg, kw, filter) -> {
+        boolean b = true;
+        for (String k : kw) {
+            b &= filter.test(msg, k);
+        }
+        return b;
+//        return Arrays.stream(kw).allMatch(k -> filter.test(msg, k));
+    }),
     /** 任意一个匹配 */
-    ANY_MATCH((msg, kw, filter) -> Arrays.stream(kw).anyMatch(k -> filter.test(msg, k))),
+    ANY_MATCH((msg, kw, filter) -> {
+        for (String k : kw) {
+            if(filter.test(msg, k)){
+                return true;
+            }
+        }
+        return false;
+        // return Arrays.stream(kw).anyMatch(k -> filter.test(msg, k));
+    }),
     /** 没有匹配 */
-    NONE_MATCH((msg, kw, filter) -> Arrays.stream(kw).noneMatch(k -> filter.test(msg, k)))
+    NONE_MATCH((msg, kw, filter) -> {
+        for (String k : kw) {
+            if (filter.test(msg, k)) {
+                return false;
+            }
+        }
+        return true;
+//        return Arrays.stream(kw).noneMatch(k -> filter.test(msg, k));
+    })
     ;
 
     /**

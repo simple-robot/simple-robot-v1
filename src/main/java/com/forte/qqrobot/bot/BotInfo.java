@@ -27,4 +27,10 @@ public interface BotInfo {
      */
     LoginInfo getInfo();
 
+    /**
+     * 获取当前bot所对应的送信器
+     * @return 当前账号送信器
+     */
+    BotSender getSender();
+
 }

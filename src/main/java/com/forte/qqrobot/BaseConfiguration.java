@@ -10,10 +10,7 @@ import com.forte.qqrobot.bot.BotInfoImpl;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
-import com.forte.qqrobot.listener.invoker.ListenerMethod;
-import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.log.LogLevel;
-import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.system.CoreSystem;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 
@@ -43,7 +40,12 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     /**
      * 用于对多账号进行注册，先是只保存部分信息
      */
-    private final List<Map.Entry<String, BotInfo>> advanceBotInfo = new ArrayList<>();
+    private List<Map.Entry<String, BotInfo>> advanceBotInfo = new ArrayList<>();
+
+    /**
+     * 指定一个默认的Botinfo，没有人工指定的情况下，会默认设定为第一次注册的账号信息
+     */
+    private BotInfo defaultBotInfo;
 
     /*
         此类是在language初始化之前使用的，故此不使用语言化
@@ -64,7 +66,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     /**
      * 服务器ip，默认为127.0.0.1
      */
-    @Conf(value = "core.ip",comment = "服务器的IP地址，一般代表为上报地址")
+    @Conf(value = "core.ip", comment = "服务器的IP地址，一般代表为上报地址")
     private String ip = "127.0.0.1";
 
     /**
@@ -76,7 +78,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     /**
      * 弃用字段
      */
-    @Conf(value = "core.localQQCode",comment = "本机的QQ号，是否需要配置与组件相关。1.8.x后弃用属性。")
+    @Conf(value = "core.localQQCode", comment = "本机的QQ号，是否需要配置与组件相关。1.8.x后弃用属性。")
     @Deprecated
     private String localQQCode = "";
 
@@ -110,10 +112,10 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 监听函数返回值的选择器，默认为选择第一个出现的Break监听。
      */
     @Conf(value = "core.resultSelectType", setterName = "setResultSelectTypeByName", setterParameterType = String.class,
-    comment = "监听函数返回值的选择器，默认为选择第一个出现的Break监听。")
+            comment = "监听函数返回值的选择器，默认为选择第一个出现的Break监听。")
     private ResultSelectType resultSelectType = ResultSelectType.FIRST_BREAK;
 
-    public void setResultSelectTypeByName(String name){
+    public void setResultSelectTypeByName(String name) {
         this.resultSelectType = ResultSelectType.valueOf(name);
     }
 
@@ -131,10 +133,12 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     //※ 各个配置的详细说明查看com.forte.qqrobot.utils.BaseLocalThreadPool.PoolConfig对象内的字段注释。
     //  ///
 
-    /** 如果这个不是null，则优先使用此配置 */
+    /**
+     * 如果这个不是null，则优先使用此配置
+     */
     private BaseLocalThreadPool.PoolConfig poolConfig = null;
 
-    /** 
+    /**
      * 核心池的大小
      * 默认为null，当为null的时候，默认使用最佳线程数量
      */
@@ -144,12 +148,13 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     /**
      * 线程池初始化的阻塞系数，用来决定最终的线程池线程数量。
      * 默认为0.2， 即认为你的每个监听器在执行的时候，有20%的时间是处于线程阻塞状态。
+     *
      * @see CoreSystem#getBestPoolSize(double)
      * @see <a href='https://www.cnblogs.com/jpfss/p/11016180.html'>参考文章</a>
      */
     @Conf(value = "core.threadPool.blockingFactor", comment = "线程池初始化的阻塞系数，用来在未手动配置的情况下决定最终的线程池线程数量。")
     private Double blockingFactor = 0.2;
-    
+
     /**
      * 线程池最大线程数，这个参数也是一个非常重要的参数，它表示在线程池中最多能创建多少个线程；
      * 默认为null，当为null的时候，默认为{@link #corePoolSize}的2倍
@@ -178,7 +183,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * TimeUnit.NANOSECONDS;       //纳秒
      */
     @Conf(value = "core.threadPool.timeUnit", setterName = "setTimeUnitByName", setterParameterType = String.class,
-    comment = "参数keepAliveTime的时间单位")
+            comment = "参数keepAliveTime的时间单位")
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
     /**
@@ -207,9 +212,10 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 日志等级, 默认为info级别
      */
     @Conf(value = "core.logLevel", setterName = "setLogLevelByName", setterParameterType = String.class,
-    comment = "志等级, 默认为info级别")
-    private LogLevel logLevel = LogLevel.INFO ;
-    public void setLogLevelByName(String name){
+            comment = "日志等级, 默认为info级别")
+    private LogLevel logLevel = LogLevel.INFO;
+
+    public void setLogLevelByName(String name) {
         this.logLevel = LogLevel.valueOf(name);
     }
 
@@ -218,10 +224,39 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 设置日志默认语言
      */
     @Conf(value = "core.language", setterName = "setLanguageByTag", setterParameterType = String.class,
-    comment = "使用的信息语言。默认为系统当前语言。")
+            comment = "使用的信息语言。默认为系统当前语言。")
     private Locale language = Locale.getDefault();
-    public void setLanguageByTag(String tag){
+
+    public void setLanguageByTag(String tag) {
         language = Language.getLocaleByTag(tag);
+    }
+
+
+    @Conf(value = "core.bots", setterName = "registerBotsFormatter", setterParameterType = String.class,
+            comment = "需要注册的bot列表。格式：{code}:{path},{code}:{path}...即，一组bot中，格式为code+冒号':'+path路径，多组bot信息使用英文半角逗号','分割。")
+    private String registerBots = null;
+
+    /**
+     * 对配置文件的信息进行注册, 一般手动注册时候不需要使用此方法
+     * @param registerBots registerBots
+     */
+    public void registerBotsFormatter(String registerBots){
+        if(registerBots == null || (registerBots = registerBots.trim()).length() == 0){
+                return;
+        }
+        // 根据逗号切割
+        for (String botInfo : registerBots.split(",")) {
+            if(botInfo.trim().length() == 0){
+                throw new ConfigurationException("configuration 'core.bots' is malformed.");
+            }
+            int first = botInfo.indexOf(":");
+            String code = botInfo.substring(0, first).trim();
+            String path = botInfo.substring(first + 1).trim();
+            if(path.endsWith("/")){
+                path = path.substring(0, path.length()-1);
+            }
+            registerBot(code, path);
+        }
     }
 
 
@@ -233,27 +268,27 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     /**
      * 通过name获取枚举对象
      */
-    public void setTimeUnitByName(String name){
+    public void setTimeUnitByName(String name) {
         this.timeUnit = TimeUnit.valueOf(name);
     }
 
     /**
      * 获取线程池的阻塞队列
      */
-    public BlockingQueue<Runnable> getWorkQueue(){
-        if(this.workQueue != null){
+    public BlockingQueue<Runnable> getWorkQueue() {
+        if (this.workQueue != null) {
             return this.workQueue;
-        }else{
-            if(this.workQueueFrom == null){
+        } else {
+            if (this.workQueueFrom == null) {
                 return null;
-            }else{
+            } else {
                 try {
                     Class<?> clz = Class.forName(workQueueFrom);
                     Object instance = clz.newInstance();
                     this.workQueue = (BlockingQueue<Runnable>) instance;
                     return this.workQueue;
                 } catch (Exception e) {
-                    throw new ConfigurationException("无法读取包路径'"+ workQueueFrom +"'来作为'"+ BlockingQueue.class +"'实例。", e);
+                    throw new ConfigurationException("无法读取包路径'" + workQueueFrom + "'来作为'" + BlockingQueue.class + "'实例。", e);
                 }
             }
         }
@@ -262,21 +297,21 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     /**
      * 获取线程池配置对象
      */
-    public BaseLocalThreadPool.PoolConfig getPoolConfig(){
-        if(this.poolConfig != null){
+    public BaseLocalThreadPool.PoolConfig getPoolConfig() {
+        if (this.poolConfig != null) {
             return this.poolConfig;
-        }else{
+        } else {
             // 如果为null，根据参数获取。
             // 阻塞系数
-            if(this.blockingFactor == null){
+            if (this.blockingFactor == null) {
                 this.blockingFactor = 0.0;
             }
             // 核心线程数量
-            if(this.corePoolSize == null){
+            if (this.corePoolSize == null) {
                 this.corePoolSize = CoreSystem.getBestPoolSize(this.blockingFactor);
             }
             // 最大线程数量, 默认为corePoolSize的2倍。
-            if(this.maximumPoolSize == null){
+            if (this.maximumPoolSize == null) {
                 this.maximumPoolSize = this.corePoolSize << 1;
             }
 
@@ -314,48 +349,176 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
 
     /**
      * 注册一个机器人的信息。
-     * 有可能是bot账号+ip，或者bot账号+请求根路径，此处根据不同的插件结果不同。
-     * 由于不存在bot的详细信息，所以登录需要验证
+     *
      * @param botCode bot账号
-     * @param path    上报地址，一般为一个ip或者请求路径
+     * @param path    上报地址，为一个完整的请求路径
      */
-    public void registerBot(String botCode, String path){
+    public void registerBot(String botCode, String path) {
+        if (botCode == null || botCode.trim().length() == 0) {
+            botCode = null;
+        }
+        BotInfoImpl botInfo = new BotInfoImpl(botCode, path, null, null);
+        if(getDefaultBotInfo() == null){
+            setDefaultBotInfo(botInfo);
+        }
         // 注册一个bot信息
-        advanceBotInfo.add(new AbstractMap.SimpleEntry<>(botCode, new BotInfoImpl(botCode, path, null)));
+        advanceBotInfo.add(new AbstractMap.SimpleEntry<>(botCode, botInfo));
+    }
+
+    /**
+     * 注册一个机器人的信息。
+     * @param botCode bot账号
+     * @param ip      上报地址的ip
+     * @param port    上报地址的端口
+     * @param path     如果存在，上报地址的路径
+     */
+    public void registerBot(String botCode, String ip, int port, String path){
+        registerBot(botCode, toHttpPath(ip, port, path));
     }
 
     /**
      * 仅仅注册一个路径信息，需要是一个完整路径，例如一个http路径或者一个ws的连接路径。
      * 在启动后需要通过此路径来验证或者连接
+     *
      * @param path 上报路径
      */
-    public void registerBot(String path){
-        advanceBotInfo.add(new AbstractMap.SimpleEntry<>(null, new BotInfoImpl(null, path, null)));
+    public void registerBot(String path) {
+        registerBot(null, path);
     }
 
     /**
      * <pre> 仅注册一个路径信息，信息分为ip、端口、一个可能存在的额外路径。
-     * <pre> 开发者如果需要实现对于ip、端口、额外路径的转化规则，尝试重写{@link #toPath(String, int, String)}方法。默认情况下为转化为http协议路径。
+     * <pre> 开发者如果需要实现对于ip、端口、额外路径的转化规则，尝试重写{@link #toHttpPath(String, int, String)}方法。默认情况下为转化为http协议路径。
      * @param ip    ip地址
      * @param port  端口
      * @param path nullable
      */
-    public void registerBot(String ip, int port, String path){
-        // 转化为path
-        advanceBotInfo.add(new AbstractMap.SimpleEntry<>(null, new BotInfoImpl(null, toPath(ip, port, path), null)));
+    public void registerBot(String ip, int port, String path) {
+        registerBot(null, toHttpPath(ip, port, path));
     }
 
+    /**
+     * 注册一个机器人的信息。与普通的registerBot不同，此处注册的机器人会直接覆盖当前的默认机器人信息
+     *
+     * @param botCode bot账号
+     * @param path    上报地址，为一个完整的请求路径
+     */
+    public void registerBotAsDefault(String botCode, String path) {
+        if (botCode == null || botCode.trim().length() == 0) {
+            botCode = null;
+        }
+        BotInfoImpl botInfo = new BotInfoImpl(botCode, path, null, null);
+        setDefaultBotInfo(botInfo);
+        // 注册一个bot信息
+        advanceBotInfo.add(new AbstractMap.SimpleEntry<>(botCode, botInfo));
+    }
 
-    protected String toPath(String ip, int port, String path){
+    /**
+     * 注册一个机器人的信息。
+     * @param botCode bot账号
+     * @param ip      上报地址的ip
+     * @param port    上报地址的端口
+     * @param path     如果存在，上报地址的路径
+     */
+    public void registerBotAsDefault(String botCode, String ip, int port, String path){
+        registerBotAsDefault(botCode, toHttpPath(ip, port, path));
+    }
+
+    /**
+     * 仅仅注册一个路径信息，需要是一个完整路径，例如一个http路径或者一个ws的连接路径。
+     * 在启动后需要通过此路径来验证或者连接
+     *
+     * @param path 上报路径
+     */
+    public void registerBotAsDefault(String path) {
+        registerBotAsDefault(null, path);
+    }
+
+    /**
+     * <pre> 仅注册一个路径信息，信息分为ip、端口、一个可能存在的额外路径。
+     * <pre> 开发者如果需要实现对于ip、端口、额外路径的转化规则，尝试重写{@link #toHttpPath(String, int, String)}方法。默认情况下为转化为http协议路径。
+     * @param ip    ip地址
+     * @param port  端口
+     * @param path nullable
+     */
+    public void registerBotAsDefault(String ip, int port, String path) {
+        registerBotAsDefault(null, toHttpPath(ip, port, path));
+    }
+
+    /**
+     * 获取当前记录的默认bot的信息
+     * @return 默认bot信息
+     */
+    public BotInfo getDefaultBotInfo(){
+        return defaultBotInfo;
+    }
+
+    public void setDefaultBotInfo(BotInfo botInfo){
+        this.defaultBotInfo = botInfo;
+    }
+
+    /**
+     * 获取预先注册的bot信息。
+     */
+    public Map<String, List<BotInfo>> getAdvanceBotInfo() {
+        // 将数据转化为map，key为bot的账号（如果存在的话）
+        // 不存在账号信息的，key将会为null，只有key为null的时候，list才可以有多个参数，其余情况下，一个key只能对应一个地址。
+        Map<String, List<BotInfo>> botInfoMap = new HashMap<>(2);
+        // 不注册多次相同的path
+        Set<String> pathSet = new HashSet<>(2);
+
+        for (Map.Entry<String, BotInfo> botEntry : advanceBotInfo) {
+            BotInfo botInfo = botEntry.getValue();
+            String code = botEntry.getKey();
+            List<BotInfo> botInfos = botInfoMap.computeIfAbsent(code, k -> new ArrayList<>());
+            if (code == null) {
+                // 无账号配置
+                if (pathSet.add(botInfo.getPath())) {
+                    // 保存成功，无重复path，则记录这个botInfo
+                    botInfos.add(botInfo);
+                } else {
+                    throw new ConfigurationException("Cannot register the same path multiple times: " + botInfo.getPath());
+                }
+            } else {
+                // 有code
+                if (botInfos.size() > 0) {
+                    // 已经存在bot信息，抛出异常
+                    throw new ConfigurationException("Cannot register the same code multiple times: " + code);
+                } else {
+                    // 验证path
+                    if (pathSet.add(botInfo.getPath())) {
+                        // 保存成功，无重复path，则记录这个botInfo
+                        botInfos.add(botInfo);
+                    } else {
+                        throw new ConfigurationException("Cannot register the same path multiple times: " + botInfo.getPath());
+                    }
+                }
+            }
+        }
+
+        // 返回最终结果
+        return botInfoMap;
+    }
+
+    /**
+     * 将ip、端口、后缀路径拼接为一个请求路径
+     *
+     * @param ip   ip地址
+     * @param port 端口
+     * @param path 路径
+     * @return
+     */
+    protected String toHttpPath(String ip, int port, String path) {
         StringBuilder sb = new StringBuilder("http://");
         sb.append(ip).append(':').append(port);
-        if(!path.startsWith("/")){
-            sb.append("/");
+        if (path != null) {
+            if(!path.startsWith("/")){
+                sb.append("/");
+            }
+            sb.append(path);
         }
-        sb.append(path);
         return sb.toString();
     }
-
 
 
     /**
@@ -419,10 +582,12 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
         return Arrays.stream(this.scannerPackage).collect(Collectors.toSet());
     }
 
+    @Deprecated
     public String getLocalQQNick() {
         return localQQNick;
     }
 
+    @Deprecated
     public T setLocalQQNick(String localQQNick) {
         this.localQQNick = localQQNick;
         return configuration;
@@ -496,7 +661,8 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
                         if (number < 0 || number > 255) {
                             throw new ConfigurationException("ip number can not use '" + s + "'");
                         }
-                    }catch (NumberFormatException ignored ){ }
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
             }
         }
@@ -652,8 +818,6 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     public void setLanguage(Locale language) {
         this.language = language;
     }
-
-
 
 
 }

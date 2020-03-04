@@ -13,6 +13,7 @@ public interface AtDetection {
 
     /**
      * 检测是否被at了
+     * @return 是否被at
      */
     boolean test();
 

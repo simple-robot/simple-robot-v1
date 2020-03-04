@@ -26,6 +26,7 @@ import java.util.function.*;
  * @since JDK1.8
  **/
 public class DependCenter implements DependGetter, DependInjector {
+
     /** 以防万一，此处对依赖资源管理中心的单例工厂进行计数 */
     private static final AtomicInteger singleFactoryNo = new AtomicInteger(1);
 
@@ -546,7 +547,6 @@ public class DependCenter implements DependGetter, DependInjector {
      */
     private Object getParameter(Parameter parameter, AdditionalDepends additionalDepends){
         //获取注解
-//        com.forte.qqrobot.anno.depend.Depend dependAnnotation = parameter.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class);
         com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(parameter, com.forte.qqrobot.anno.depend.Depend.class);
 
         //获取到的参数
@@ -615,6 +615,33 @@ public class DependCenter implements DependGetter, DependInjector {
     //
     //**************************************
 
+    /**
+     * 根据一个父类类型，获取所有存在的子类。理论上效率较低
+     * @param <T> 父类类型，例如一个接口类型
+     * @return 所有实现类
+     */
+    public <T> List<T> getByType(Class<T> superType){
+        List<T> list = new ArrayList<>(4);
+        // 使用类型工厂
+        Set<Class> keySet = classResourceWareHouse.keySet();
+        for (Class keyClass : keySet) {
+            if(keyClass.equals(superType) || FieldUtils.isChild(keyClass, superType)){
+                list.add((T) get(keyClass));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 根据一个父类类型，获取所有存在的子类。理论上效率较低
+     * @see #getByType(Class, Object[])
+     * @param superType 父类类型，例如一个接口类型
+     * @param a 转化为数组
+     * @return 所有实现类
+     */
+    public <T> T[] getByType(Class<T> superType, T[] a){
+        return getByType(superType).toArray(a);
+    }
 
     /**
      * 通过类型获取依赖对象

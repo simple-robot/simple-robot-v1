@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class ImageCQCode extends CQCode {
+public class ImageCQCode extends CatCode {
 
     /** 本类对象固定为image类型 */
     private static final CQCodeTypes CQ_CODE_TYPE = CQCodeTypes.image;
@@ -93,7 +93,7 @@ public class ImageCQCode extends CQCode {
      * @param cqCode    cqCode对象
      * @return          ImageCqCode对象
      */
-    public static ImageCQCode of(CQCode cqCode) throws IOException {
+    public static ImageCQCode of(CatCode cqCode) throws IOException {
         if(!cqCode.getCQCodeTypes().equals(CQ_CODE_TYPE)){
             throw new CQParseException("cannotToImage", cqCode.getCQCodeTypes());
         }

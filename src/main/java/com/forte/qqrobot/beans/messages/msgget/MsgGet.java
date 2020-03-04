@@ -2,6 +2,7 @@ package com.forte.qqrobot.beans.messages.msgget;
 
 import com.forte.qqrobot.beans.messages.OriginalAble;
 import com.forte.qqrobot.beans.messages.RootBean;
+import com.forte.qqrobot.beans.messages.ThisCodeAble;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -16,24 +17,12 @@ import java.util.function.Function;
  * @date Created in 2019/4/18 10:30
  * @version 1.0
  **/
-public interface MsgGet extends OriginalAble, RootBean {
+public interface MsgGet extends OriginalAble, ThisCodeAble, RootBean {
 
     /** 获取ID, 一般用于消息类型判断 */
     String getId();
 
 
-
-    /**
-     * 此消息获取的时候，代表的是哪个账号获取到的消息。
-     * @return 接收到此消息的账号。
-     */
-    String getThisCode();
-
-    /**
-     * 允许重新定义Code以实现在存在多个机器人的时候切换处理。
-     * @param code code
-     */
-    void setThisCode(String code);
 
     /**
      * 一般来讲，监听到的消息大部分都会有个“消息内容”。定义此方法获取消息内容。

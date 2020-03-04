@@ -45,9 +45,9 @@ public enum CQCodeTypes {
      * {1}为该原创表情的ID，存放在酷Q目录的data\bface\下
      */
     bface("bface",
-            new String[]{"id"},
+            new String[]{"p", "id"},
             new String[0],
-            new String[]{".+"},
+            new String[]{".+", ".+"},
             2),
 
     /**
@@ -231,6 +231,52 @@ public enum CQCodeTypes {
             new String[]{".+", ".+", ".+"},
             16),
 
+    /**
+     * 厘米秀，content, qq都可以被忽略
+     */
+    show("show",
+            new String[]{"content", "id", "qq"},
+            new String[]{"content", "qq"},
+            new String[]{".+", ".+", ".+"},
+            17
+    ),
+
+    /**
+     * 联系人分享，type一般可能是qq或者group
+     * [CQ:contact,id=1234546,type=qq]
+     */
+    contact("contact",
+            new String[]{"id", "type"},
+            new String[]{"id", "type"},
+            new String[]{".+", ".+"},
+            18
+    ),
+
+    /**
+     * <pre> 其他未提及类型的富文本消息，例如小程序分享、红包、聊天记录分享、公告更新等
+     * <pre> 例如：
+     * <pre> [CQ:rich,text=新人入群]
+     * <pre> [CQ:rich,content={"news":{"action":""&#44;"android_pkg_name":""&#44;"app_type":1&#44;"appid":100951776&#44;"desc":""&#44;"jumpUrl":"http://url.cn/59GKFYV"&#44;"preview":"http://url.cn/5KKWwq5"&#44;"source_icon":""&#44;"source_url":""&#44;"tag":"哔哩哔哩"&#44;"title":"火柴人 - Hue and Syn vs Yupia and…"}},title=&#91;分享&#93;火柴人 - Hue and Syn vs Yupia and…]
+     * <pre> [CQ:rich,text=
+     *           群聊的聊天记录     小小小小圆厨:时间&#91;图片&#93;&#91;图片&#93;&#91;图片&#93;&#91;图片&#93;&#91;图片&#93;&#91;图片&#93;&#91;图片&#93;&#91;图片&#93;...        查看转发消息]
+     * <pre> [CQ:rich,content={"music":{"action":""&#44;"android_pkg_name":""&#44;"app_type":1&#44;"appid":100495085&#44;"desc":"澤野弘之"&#44;"jumpUrl":"http://music.163.com/song/499009/?userid=1307247684"&#44;"musicUrl":"http://url.cn/5zUhvrO"&#44;"preview":"http://url.cn/5SxKLMJ"&#44;"sourceMsgId":"0"&#44;"source_icon":""&#44;"source_url":""&#44;"tag":"网易云音乐"&#44;"title":"UNICORN"}},title=&#91;分享&#93;UNICORN]
+     */
+    rich("rich",
+            new String[]{"content", "text", "title", "url"},
+            new String[]{"content", "type", "title", "url"},
+            new String[]{".+", ".+", ".+", ".+"},
+            19
+    ),
+
+    /**
+     * 红包CQ码
+     */
+    hb("hb",
+            new String[]{"title"},
+            new String[]{"title"},
+            new String[]{".+"},
+            20
+    )
 
     ;
 
@@ -610,7 +656,6 @@ public enum CQCodeTypes {
         this.ignoreAbleKeys = Arrays.stream(ignoreAbleKeys).collect(Collectors.toSet());
         this.valuesRegex = valuesRegex;
         this.sort = sort;
-//        this.equalsID = function + ":" + Arrays.stream(keys).sorted().collect(Collectors.joining());
         this.equalsID = toEqualsID(function, keys);
 
         //生成匹配正则表达式

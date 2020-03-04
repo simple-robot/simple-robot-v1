@@ -1,6 +1,5 @@
 package com.forte.qqrobot.timetask;
 
-import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
