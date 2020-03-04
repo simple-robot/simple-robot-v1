@@ -48,7 +48,7 @@ public interface AppendList {
     AppendList append(AppendList list);
 
     /** 获取拼接列表中的CQCode对象 */
-    CatCode[] getCQCodes();
+    CQCode[] getCQCodes();
 
     /** 获取某个索引上的值 */
     CharSequence get(int index);
@@ -71,7 +71,7 @@ public interface AppendList {
     /**
      * 只遍历CQCode的foreach，携带索引参数
      */
-    void forEachCQCode(BiConsumer<CatCode, Integer> each);
+    void forEachCQCode(BiConsumer<CQCode, Integer> each);
 
     @Override
     String toString();
@@ -80,7 +80,7 @@ public interface AppendList {
     Stream<CharSequence> stream();
 
     /** 转化为仅保留CQCode的流对象 */
-    Stream<CatCode> streamCQCode();
+    Stream<CQCode> streamCQCode();
 
     /**
      * 1.3.10 add, 当上一个消息与下一个消息为同类型的时候，合并。
