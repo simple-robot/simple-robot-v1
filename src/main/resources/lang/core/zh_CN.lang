@@ -90,6 +90,10 @@ exception.api.notSupport=组件所不支持的API类型：[ {0} ]
 exception.filter.exists=已经存在自定义过滤器：{0}
 exception.filter.notfound=无法获取自定义过滤器{0}：不存在！
 
+# verifyException相关
+exception.botVerify.failed=账号{0}验证失败：{1}
+exception.botVerify.failed.mismatch=账号{0}验证失败：获取账号不匹配：{1}
+
 # 其他异常
 
 # 数字转化异常 NumberFormatException，出现在BasicResourceWarehouse类中

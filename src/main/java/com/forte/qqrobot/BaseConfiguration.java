@@ -2,6 +2,8 @@ package com.forte.qqrobot;
 
 import com.forte.config.Conf;
 import com.forte.lang.Language;
+import com.forte.qqrobot.beans.function.ExFunction;
+import com.forte.qqrobot.beans.function.PathAssembler;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 import com.forte.qqrobot.beans.types.ResultSelectType;
@@ -66,8 +68,13 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     /**
      * 服务器ip，默认为127.0.0.1
      */
-    @Conf(value = "core.ip", comment = "服务器的IP地址，一般代表为上报地址")
+    @Conf(value = "core.ip", comment = "服务器的IP地址，一般代表为上报地址.1.8.0后弃用")
     private String ip = "127.0.0.1";
+
+    /**
+     * 提供一个默认的端口
+     */
+    private int port = 5700;
 
     /**
      * 弃用字段
@@ -99,7 +106,6 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 酷Q根路径的配置，默认为null
      */
     @Conf(value = "core.cqPath", comment = "酷Q根路径的配置，默认为null。目前此属性用处不大。")
-    @Deprecated
     private String cqPath;
 
     /**
@@ -351,7 +357,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 注册一个机器人的信息。
      *
      * @param botCode bot账号
-     * @param path    上报地址，为一个完整的请求路径
+     * @param path    上报地址，为一个完整的请求路径，例如：http://127.0.0.1:12345
      */
     public void registerBot(String botCode, String path) {
         if (botCode == null || botCode.trim().length() == 0) {
@@ -373,12 +379,13 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * @param path     如果存在，上报地址的路径
      */
     public void registerBot(String botCode, String ip, int port, String path){
-        registerBot(botCode, toHttpPath(ip, port, path));
+        registerBot(botCode, toPath(ip, port, path));
     }
 
     /**
      * 仅仅注册一个路径信息，需要是一个完整路径，例如一个http路径或者一个ws的连接路径。
-     * 在启动后需要通过此路径来验证或者连接
+     * 在启动后需要通过此路径来验证或者连接。
+     * 一般来说直接使用这个就行了。
      *
      * @param path 上报路径
      */
@@ -388,13 +395,13 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
 
     /**
      * <pre> 仅注册一个路径信息，信息分为ip、端口、一个可能存在的额外路径。
-     * <pre> 开发者如果需要实现对于ip、端口、额外路径的转化规则，尝试重写{@link #toHttpPath(String, int, String)}方法。默认情况下为转化为http协议路径。
+     * <pre> 开发者如果需要实现对于ip、端口、额外路径的转化规则，尝试重写{@link #toPath(String, int, String)}方法。默认情况下为转化为http协议路径。
      * @param ip    ip地址
      * @param port  端口
      * @param path nullable
      */
     public void registerBot(String ip, int port, String path) {
-        registerBot(null, toHttpPath(ip, port, path));
+        registerBot(null, toPath(ip, port, path));
     }
 
     /**
@@ -421,7 +428,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * @param path     如果存在，上报地址的路径
      */
     public void registerBotAsDefault(String botCode, String ip, int port, String path){
-        registerBotAsDefault(botCode, toHttpPath(ip, port, path));
+        registerBotAsDefault(botCode, toPath(ip, port, path));
     }
 
     /**
@@ -436,13 +443,13 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
 
     /**
      * <pre> 仅注册一个路径信息，信息分为ip、端口、一个可能存在的额外路径。
-     * <pre> 开发者如果需要实现对于ip、端口、额外路径的转化规则，尝试重写{@link #toHttpPath(String, int, String)}方法。默认情况下为转化为http协议路径。
+     * <pre> 开发者如果需要实现对于ip、端口、额外路径的转化规则，尝试重写{@link #toPath(String, int, String)}方法。默认情况下为转化为http协议路径。
      * @param ip    ip地址
      * @param port  端口
      * @param path nullable
      */
     public void registerBotAsDefault(String ip, int port, String path) {
-        registerBotAsDefault(null, toHttpPath(ip, port, path));
+        registerBotAsDefault(null, toPath(ip, port, path));
     }
 
     /**
@@ -461,6 +468,10 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 获取预先注册的bot信息。
      */
     public Map<String, List<BotInfo>> getAdvanceBotInfo() {
+        // 如果没有任何信息，注册一个127:5700的默认地址
+        if(advanceBotInfo.size() == 0){
+            registerBot("http://" + ip + ":" + port);
+        }
         // 将数据转化为map，key为bot的账号（如果存在的话）
         // 不存在账号信息的，key将会为null，只有key为null的时候，list才可以有多个参数，其余情况下，一个key只能对应一个地址。
         Map<String, List<BotInfo>> botInfoMap = new HashMap<>(2);
@@ -508,7 +519,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * @param path 路径
      * @return
      */
-    protected String toHttpPath(String ip, int port, String path) {
+    protected String toPath(String ip, int port, String path) {
         StringBuilder sb = new StringBuilder("http://");
         sb.append(ip).append(':').append(port);
         if (path != null) {
@@ -520,6 +531,13 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
         return sb.toString();
     }
 
+    /**
+     * 根据当前的{@link #toPath(String, int, String)}获取路径拼接函数
+     * @return 拼接函数
+     */
+    public PathAssembler getPathAssembler(){
+        return this::toPath;
+    }
 
     /**
      * 包扫描普通监听器
@@ -623,7 +641,6 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
         return cqPath;
     }
 
-    @Deprecated
     public T setCqPath(String cqPath) {
         this.cqPath = cqPath;
         return configuration;

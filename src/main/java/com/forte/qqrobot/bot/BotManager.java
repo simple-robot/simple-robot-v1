@@ -1,5 +1,10 @@
 package com.forte.qqrobot.bot;
 
+import com.forte.qqrobot.beans.function.PathAssembler;
+import com.forte.qqrobot.beans.function.VerifyFunction;
+
+import java.util.function.Function;
+
 /**
  * Bot信息管理器
  * 其实现类应该存在一个公共的无参构造
@@ -42,6 +47,62 @@ public interface BotManager {
      * @return 是否注册成功
      */
     boolean registerBot(BotInfo info);
+
+    /**
+     * 注册一个bot。
+     * @param code 账号, 可以为null
+     * @param ip   ip地址
+     * @param port 端口号
+     * @param path 请求路径
+     * @return 是否注册成功
+     */
+    default boolean registerBot(String code, String ip, int port, String path){
+        return registerBot(code, getPathAssembler().apply(ip, port, path));
+    }
+
+    /**
+     * 注册一个bot。
+     * @param code      账号, 可以为null
+     * @param fullPath  完整路径
+     * @return 是否注册成功
+     */
+    default boolean registerBot(String code, String fullPath){
+        return registerBot(new BotInfoImpl(code, fullPath, null, null));
+    }
+
+    /**
+     * 注册一个bot。code为null
+     * @param ip        ip地址
+     * @param port      端口号
+     * @param path      请求路径
+     * @return  是否注册成功
+     */
+    default boolean registerBot(String ip, int port, String path){
+        return registerBot(null, ip, port, path);
+    }
+
+    /**
+     * 注册一个bot。code为null
+     * @param fullPath 完整路径
+     * @return  是否注册成功
+     */
+    default boolean registerBot(String fullPath){
+        return registerBot(null, fullPath);
+    }
+
+    /**
+     * 获取注册用的验证函数
+     *
+     * @return 验证函数
+     */
+    VerifyFunction getVerifyFunction();
+
+    /**
+     * 获取路径拼接函数
+     * @return 拼接函数
+     */
+    PathAssembler getPathAssembler();
+
 
 
 }

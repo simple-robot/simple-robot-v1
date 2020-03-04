@@ -11,6 +11,9 @@ import com.forte.qqrobot.anno.Config;
 import com.forte.qqrobot.anno.CoreVersion;
 import com.forte.qqrobot.anno.DIYFilter;
 import com.forte.qqrobot.anno.depend.AllBeans;
+import com.forte.qqrobot.beans.function.ExFunction;
+import com.forte.qqrobot.beans.function.PathAssembler;
+import com.forte.qqrobot.beans.function.VerifyFunction;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.bot.BotManagerImpl;
@@ -44,7 +47,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 启动类总抽象类，在此实现部分通用功能
@@ -212,10 +217,43 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     protected abstract SenderGetList getGetter();
 
     /**
+     * 启动时候的初始验证函数
+     * @param confBotInfos
+     * @return
+     */
+    protected BotInfo[] verifyBot(Map<String, List<BotInfo>> confBotInfos){
+        BotInfo defaultBotInfo = getConf().getDefaultBotInfo();
+        return confBotInfos.entrySet().stream()
+                .flatMap(e -> {
+                    String code = e.getKey();
+                    return e.getValue().stream().map(info -> {
+                        BotInfo botInfo = verifyBot(code, info);
+                        if(defaultBotInfo.getPath().equals(botInfo.getPath())){
+                            // 如果是默认bot的地址，覆盖内容
+                            getConf().setDefaultBotInfo(botInfo);
+                        }
+                        return botInfo;
+                    });
+                }).toArray(BotInfo[]::new);
+    }
+
+    /**
      * <pre> start之前，会先对账号进行验证。将会使用此方法对注册的bot账号信息进行验证。
      * <pre> 鉴于机制的变更，最好在bot初始化的时候便将每个bot所对应的sender初始化结束。
+     * <pre> 此验证函数后续会被注入至BotManager对象中用于动态验证。
+     * <pre> 推荐在验证失败的时候抛出异常。
+     * @param code 用户账号，可能为null
+     * @param info 用于验证的bot，一般来讲应当至少存在一个path
      */
-    protected abstract BotInfo[] verifyBots(Map<String, List<BotInfo>> confBotInfos);
+    protected abstract BotInfo verifyBot(String code, BotInfo info);
+
+    /**
+     * 获取账号验证的函数
+     * @return 验证函数
+     */
+    protected VerifyFunction verifyBot(){
+        return b -> verifyBot(b.getBotCode(), b);
+    }
 
     /**
      * 获取特殊API对象
@@ -285,7 +323,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         getLog().debug("botmanager.get.depend");
         BotManager botManager = dependCenter.get(BotManager.class);
         if(botManager == null){
-            botManager = new BotManagerImpl();
+            PathAssembler pathAssembler = getConf().getPathAssembler();
+            botManager = new BotManagerImpl(pathAssembler, verifyBot());
             dependCenter.load(botManager);
             getLog().debug("botmanager.get.default", botManager);
         }
@@ -326,8 +365,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
             // 注入runtime
             DependCenter dependCenter = getDependCenter();
             dependCenter.load(botRuntime);
-            // 注入config
-            dependCenter.load(botRuntime.getConfiguration());
         } catch (CloneNotSupportedException e) {
             throw new RobotRunException("runtime.init.failed", e);
         }
@@ -386,6 +423,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
         // ** 依赖注入完毕 **
 
+        // 注册config
+        dependCenter.load(config);
+
         //根据配置类的扫描结果来构建监听器管理器和阻断器
         // 准备获取消息拦截器
 
@@ -435,6 +475,12 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
         //**************** 加载所有存在于依赖中的DIYFilter ****************//
         loadDIYFilter(dependCenter);
+
+        //**************** 注册PathAssembler和VerifyFunction ****************//
+        VerifyFunction verifyFunction = verifyBot();
+        PathAssembler pathAssembler = config.getPathAssembler();
+        dependCenter.load(verifyFunction);
+        dependCenter.load(pathAssembler);
 
         //返回依赖管理器
         return dependCenter;
@@ -710,7 +756,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
         //开始验证账号并连接
         // 验证账号
-        BotInfo[] botInfos = verifyBots(configuration.getAdvanceBotInfo());
+        BotInfo[] botInfos = verifyBot(configuration.getAdvanceBotInfo());
         getLog().debug("runtime.bot.verify");
         // 初始化Runtime对象
         initRuntime(config, botInfos);

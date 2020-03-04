@@ -9,6 +9,7 @@ import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 import com.forte.qqrobot.beans.messages.result.StrangerInfo;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.bot.BotManager;
+import com.forte.qqrobot.bot.BotSender;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
@@ -82,13 +83,29 @@ public class MsgSender implements Sender {
     }
 
     /**
-     * 获取一个默认的或者随机的Bot对象
+     * 获取一个默认的Bot对象
      * @return {@link BotInfo} bot信息
      */
     public BotInfo bot(){
         return runtime.getBotManager().defaultBot();
     }
 
+    /**
+     * 获取一个指定bot的送信器
+     * @param botCode bot账号
+     * @return bot送信器
+     */
+    public BotSender botSender(String botCode){
+        return bot(botCode).getSender();
+    }
+
+    /**
+     * 获取默认的Bot送信器
+     * @return bot送信器
+     */
+    public BotSender botSender(){
+        return bot().getSender();
+    }
 
 
     //**************** 判断相关 ****************//

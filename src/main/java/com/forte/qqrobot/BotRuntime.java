@@ -35,10 +35,12 @@ public class BotRuntime {
 
 
     private Collection<ListenerInfo> listenerInfos;
-    private BaseConfiguration        configuration;
+    private BaseConfiguration configuration;
 
-    /** bot信息管理器 */
-    private BotManager               botManager;
+    /**
+     * bot信息管理器
+     */
+    private BotManager botManager;
 
     /**
      * <pre> 构建要给RuntimeInfo实例，目前需要的参数：
@@ -48,26 +50,23 @@ public class BotRuntime {
      * @param botManager     注册的bot信息
      * @param configuration 配置信息，最终会得到一份复印份
      */
-    private BotRuntime(Collection<ListenerInfo> listenerInfos, BotManager botManager, BaseConfiguration configuration){
+    private BotRuntime(Collection<ListenerInfo> listenerInfos, BotManager botManager, BaseConfiguration configuration) {
         this.listenerInfos = listenerInfos;
         this.botManager = botManager;
         // clone配置类
-        try {
-            this.configuration =  (BaseConfiguration) configuration.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RobotDevException("configClone");
-        }
+        this.configuration = configuration;
     }
 
     /**
      * 获取语言日志对象，语言在此类实例化结束后应当已经初始化完毕。
      */
-    protected QQLogLang getLog(){
+    protected QQLogLang getLog() {
         return log;
     }
 
     /**
      * 初始化runtime对象
+     *
      * @return 初始化的结果
      */
     public static synchronized BotRuntime initRuntime(
@@ -78,7 +77,7 @@ public class BotRuntime {
             Supplier<BotManager> botManagerSupplier
     ) throws CloneNotSupportedException {
         // 已经初始化过了
-        if(runtime != null){
+        if (runtime != null) {
             throw new RobotRuntimeException(0, "botRuntime has already initialized!");
         }
 
@@ -88,7 +87,7 @@ public class BotRuntime {
         for (BotInfo botInfo : botInfos) {
             if (botManager.registerBot(botInfo)) {
                 LoginInfo info = botInfo.getInfo();
-                String name = info.getName() + "("+ info.getCode() +")";
+                String name = info.getName() + "(" + info.getCode() + ")";
                 // 注册成功
                 QQLog.info("runtime.bot.register", name);
             } else {
@@ -103,10 +102,11 @@ public class BotRuntime {
 
     /**
      * 获取Runtime，如果尚未初始化则抛出异常。
+     *
      * @return
      */
-    public static BotRuntime getRuntime(){
-        if(runtime == null){
+    public static BotRuntime getRuntime() {
+        if (runtime == null) {
             throw new RobotRuntimeException(0, "botRuntime has not initialized!");
         }
         return runtime;
@@ -114,13 +114,14 @@ public class BotRuntime {
 
     /**
      * 获取BotManager
+     *
      * @return botManager
      */
-    public BotManager getBotManager(){
+    public BotManager getBotManager() {
         return botManager;
     }
 
-    public BaseConfiguration getConfiguration(){
+    public BaseConfiguration getConfiguration() {
         return configuration;
     }
 

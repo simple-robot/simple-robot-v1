@@ -90,6 +90,10 @@ exception.api.notSupport=API types not supported by the component: [{0}]
 exception.filter.exists=filter [{0}] has already exists.
 exception.filter.notfound=DIY filter [{0}] not found.
 
+# verifyException相关
+exception.botVerify.failed=bot[{0}]verify failed: {1}
+exception.botVerify.failed.mismatch=bot[{0}]verify failed: code mismatch: {1}
+
 # 其他异常
 
 # 数字转化异常 NumberFormatException，出现在BasicResourceWarehouse类中
