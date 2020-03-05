@@ -170,7 +170,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * @param config 配置类
      */
     private void languageInit(Application<CONFIG> app, CONFIG config){
-        ClassLoader classLoader = app.getClass().getClassLoader();
+        ClassLoader classLoader = app.getApplicationClass().getClassLoader();
         Locale language = config.getLanguage();
         // 语言初始化
         Language.init(classLoader, language);
@@ -318,6 +318,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * @param dependCenter 依赖中心
      */
     private void initBotManager(DependCenter dependCenter){
+        System.out.println(dependCenter.get(VerifyFunction.class));
+        System.out.println(dependCenter.get(PathAssembler.class));
         // 初始化bot管理中心
         // 尝试从依赖中获取，如果获取不到，使用默认的管理中心并存入依赖
         getLog().debug("botmanager.get.depend");
@@ -540,7 +542,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      */
     private DependCenter scanAndInject(CONFIG config, Application<CONFIG> app) {
         //包路径
-        String appPackage = app.getClass().getPackage().getName();
+        String appPackage = app.getPackage().getName();
         Set<String> scanAllPackage = new HashSet<>();
 
         //配置完成后，如果没有进行扫描，则默认扫描启动类同级包
@@ -548,7 +550,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         Set<String> scannerPackage = config.getScannerPackage();
 
         //查看启动类上是否存在@AllBeans注解
-        AllBeans annotation = AnnotationUtils.getAnnotation(app.getClass(), AllBeans.class);
+        AllBeans annotation = AnnotationUtils.getAnnotation(app.getApplicationClass(), AllBeans.class);
         if (annotation != null) {
             //如果存在全局包扫描
             String[] value = annotation.value();
@@ -669,9 +671,26 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         RUN_LOG.info("os.version", System.getProperty("os.version"));
         // 线程池信息
         BaseLocalThreadPool.PoolConfig poolConfig = config.getPoolConfig();
-        RUN_LOG.info("thread.blockingFactor", config.getBlockingFactor());
-        RUN_LOG.info("thread.size", poolConfig.getCorePoolSize());
-        RUN_LOG.info("thread.maxSize", poolConfig.getMaximumPoolSize());
+        // color
+        Colors blockingFactor = Colors.builder().add(config.getBlockingFactor(), FontColorTypes.GREEN).build();
+        Colors poolSize = Colors.builder().add(poolConfig.getCorePoolSize(), FontColorTypes.GREEN).build();
+        Colors maxPoolSize = Colors.builder().add(poolConfig.getMaximumPoolSize(), FontColorTypes.GREEN).build();
+
+        getLog().info("thread.blockingFactor", blockingFactor);
+        getLog().info("thread.size",           poolSize);
+        getLog().info("thread.maxSize",        maxPoolSize);
+    }
+
+    /**
+     * 展示初始化的bot信息
+     */
+    private void showBotInfo(BotManager manager){
+        for (BotInfo bot : manager.bots()) {
+            Colors code = Colors.builder().add(bot.getInfo().getCode(), FontColorTypes.GREEN).build();
+            Colors name = Colors.builder().add(bot.getInfo().getName(), FontColorTypes.GREEN).build();
+            Colors level = Colors.builder().add(bot.getInfo().getLevel(), FontColorTypes.GREEN).build();
+            getLog().info("bot.info", code, name, level);
+        }
 
     }
 
@@ -706,11 +725,17 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
             }
         }else{
             // has annotation
+            Class<?> application = applicationAnno.application();
+            if(application.equals(Application.class)){
+                application = appClass;
+            }
+
+            // get configuration
             SimpleRobotConfiguration configAnnotation = AnnotationUtils.getAnnotation(appClass, SimpleRobotConfiguration.class);
             CONFIG conf = getConf();
             Class<CONFIG> confClass = (Class<CONFIG>) conf.getClass();
 
-            AutoResourceApplication<CONFIG> autoResourceApplication = AutoResourceApplication.autoConfig(confClass, applicationAnno, configAnnotation);
+            AutoResourceApplication<CONFIG> autoResourceApplication = AutoResourceApplication.autoConfig(confClass, applicationAnno, configAnnotation, application);
 
             // 正常启动
             run(autoResourceApplication, args);
@@ -765,7 +790,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         String name = start(dependCenter, manager);
         // 展示系统信息
         showSystemInfo(configuration);
-
+        showBotInfo(getBotManager());
         // > 启动之后
         afterStart(configuration);
 

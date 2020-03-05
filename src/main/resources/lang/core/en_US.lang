@@ -149,6 +149,7 @@ run.botmanager.get.default=Use the default BotManager {0}
 run.botmanager.load=load BotManager {0}
 run.runtime.init=Runtime initialized.
 run.runtime.bot.verify=Bot list verify success.
+run.bot.info=bot info: code: {0}, nick: {1}, level: {2}
 
 
 # runtime

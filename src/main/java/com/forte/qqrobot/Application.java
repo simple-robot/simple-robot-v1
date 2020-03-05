@@ -20,6 +20,24 @@ public interface Application<CONFIG extends BaseConfiguration> {
     void after(CQCodeUtil cqCodeUtil, MsgSender sender);
 
     /**
+     * 获取启动器的包路径。默认情况下即获取当前类的包路径。
+     * 无特殊需求不要重写。
+     * @return {@link Package}
+     */
+    default Package getPackage(){
+        return this.getClass().getPackage();
+    }
+
+    /**
+     * 获取Application启动器的Class，默认情况下即获取自己的Class。
+     * 无特殊需求不要重写。
+     * @return Class
+     */
+    default Class<?> getApplicationClass(){
+        return this.getClass();
+    }
+
+    /**
      * 这个方法不需要重写了啦！
      */
     default String author(){

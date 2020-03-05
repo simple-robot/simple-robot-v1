@@ -14,12 +14,15 @@
     - 在实现了`Filterable`接口的前提下，增加一个注解`@DIYFilter`以指定自定义filter的名称。(同时支持`@Beans`)
     - `@Filter`中增加两个参数以使用上述的自定义Filter。
     - 增加两个注解：`@SimpleRobotApplication` 和 `@SimpleRobotConfiguration`, 以支持注解形式的启动, 基本摒弃早期的代码配置。
-    - CQ码中增加：show、contact、rich、hb类型
-    - 增加一个BotRuntime类，其可在启动后通过静态代码获取。
+    - CQ码中增加：`show`、`contact`、`rich`、`hb`类型
+    - 增加一个`BotRuntime`类，其可在启动后通过静态代码获取。
+    - bug修复:
+        - 修复依赖注入的实例构建参数自动注入bug
+    
             
-※ 注①：此版本核心不向下兼容。
+**※ 注①：此版本核心不向下兼容。**
 
-※ 注②：多账号功能目前仍在测试，如果遇到BUG请及时反馈。 
+**※ 注②：多账号功能目前仍在测试，如果遇到BUG请及时反馈。**
             
         
 

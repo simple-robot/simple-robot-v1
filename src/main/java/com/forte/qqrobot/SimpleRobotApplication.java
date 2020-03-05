@@ -14,8 +14,7 @@ import java.lang.annotation.Target;
 public @interface SimpleRobotApplication {
 
     /**
-     *  <pre> 启动器所处的class位置。如果指定了Application接口的类型本身，则说明使用当前标注了这个注解的类。
-     *  <pre> 如果这个类型为Application本身
+     *  <pre> 启动器所处的class位置。如果指定了Application接口的类型本身，则说明直接使用当前标注了这个注解的类来生成代理。
      */
     Class<? extends Application> application() default Application.class;
 

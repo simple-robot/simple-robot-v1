@@ -390,18 +390,17 @@ public class BeansFactory {
     static NameTypeEntry[] getNameTypeArrayByParameters(Parameter[] parameters){
         return Arrays.stream(parameters).map(p -> {
             //判断参数上是否存在@Depend注解
-//            Depend dependAnnotation = p.getAnnotation(Depend.class);
             Depend dependAnnotation = AnnotationUtils.getAnnotation(p, Depend.class);
-            String pName = paramNameGetter.getParameterName(p);
+//            String pName = paramNameGetter.getParameterName(p);
             Class<?> pType = p.getType();
             if(dependAnnotation != null){
                 //存在注解
-                String paramName = dependAnnotation.value().trim().length() == 0 ? pName : dependAnnotation.value();
+                String paramName = dependAnnotation.value().trim().length() == 0 ? null : dependAnnotation.value();
                 Class<?> paramType = dependAnnotation.type().length == 0 ? pType : dependAnnotation.type()[0];
                 return NameTypeEntry.getInstanceLower(paramName, paramType);
             }else{
                 //没有注解，获取参数名和类型并封装
-                return NameTypeEntry.getInstanceLower(pName, pType);
+                return NameTypeEntry.getInstanceLower(null, pType);
             }
         }).toArray(NameTypeEntry[]::new);
     }

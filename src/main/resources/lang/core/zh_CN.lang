@@ -154,6 +154,7 @@ run.botmanager.get.default=使用默认的账号管理器 {0}
 run.botmanager.load=加载账号管理器 {0}
 run.runtime.init=Runtime初始化完毕。
 run.runtime.bot.verify=Bot账号列表验证完成。
+run.bot.info=账号信息获取成功: 账号: {0}, 昵称: {1}, 等级: {2}
 
 # runtime
 runtime.bot.register=账号[{0}]注册成功！

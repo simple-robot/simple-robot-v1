@@ -41,18 +41,6 @@ public class BotManagerImpl implements BotManager {
         this.botMap = new ConcurrentHashMap<>(2);
     }
 
-    public BotManagerImpl(PathAssembler pathAssembler, VerifyFunction verifyFunction, int initialCapacity){
-        this.pathAssembler = pathAssembler;
-        this.verifyFunction = verifyFunction;
-        this.botMap = new ConcurrentHashMap<>(initialCapacity);
-    }
-
-    public BotManagerImpl(PathAssembler pathAssembler, VerifyFunction verifyFunction, Supplier<Map<String, BotInfo>> botMapGetter){
-        this.pathAssembler = pathAssembler;
-        this.verifyFunction = verifyFunction;
-        this.botMap = botMapGetter.get();
-    }
-
 
     /**
      * 大多数情况下，可能不一定必须指定一个bot，则此方法规定获取一个默认的bot

@@ -125,8 +125,9 @@ public class DependCenter implements DependGetter, DependInjector {
      * @param bean 实例对象
      */
     public <T> DependCenter load(String name, T bean){
-        Depend<T> depend = buildDepend(name, bean);
-        saveDepend(depend);
+//        Depend<T> depend =
+                buildDepend(name, bean);
+//        saveDepend(depend);
         return this;
     }
 
@@ -137,24 +138,26 @@ public class DependCenter implements DependGetter, DependInjector {
      * @param bean  实例对象
      * @return      构建对应的单例Depend对象
      */
-    private <T> Depend<T> buildDepend(String name, T bean){
+    private <T> void buildDepend(String name, T bean){
         Beans<T> beans = BeansFactory.getBeansSingle(name, bean);
 
-        // 实例获取函数
-        Supplier<T> getter = () -> bean;
-
-        //参数注入函数
-        Consumer<T> injectDepend = getInjectDependConsumer(beans);
-
-        //额外参数注入函数
-        BiConsumer<T, DependGetter> addInjectDependConsumer = getAddInjectDependConsumer(beans);
-
-        return new Depend<>(beans.getName(),
-                beans.getType(),
-                beans.isSingle(),
-                getter,
-                injectDepend,
-                addInjectDependConsumer);
+        saveBeanToDepend(beans);
+//
+//        // 实例获取函数
+//        Supplier<T> getter = () -> bean;
+//
+//        //参数注入函数
+//        Consumer<T> injectDepend = getInjectDependConsumer(beans);
+//
+//        //额外参数注入函数
+//        BiConsumer<T, DependGetter> addInjectDependConsumer = getAddInjectDependConsumer(beans);
+//
+//        return new Depend<>(beans.getName(),
+//                beans.getType(),
+//                beans.isSingle(),
+//                getter,
+//                injectDepend,
+//                addInjectDependConsumer);
     }
 
 
@@ -223,37 +226,39 @@ public class DependCenter implements DependGetter, DependInjector {
         List<Beans> beans = BeansFactory.getBeans(BeansAnno, Arrays.stream(loadsClasses).distinct().filter(classTest).toArray(Class[]::new));
 
         //后遍历
-        beans.forEach(b -> {
-                    //获取依赖
-                    //获取依赖所需参数的获取函数
-                    Supplier<Object[]> paramsGetter = getInstanceParamsSupplier(b);
-                    //封装为Depend对象
-                    String name = b.getName();
-                    Class<?> type = b.getType();
-                    //判断是否为单例
-                    Supplier<?> supplier;
-                    if (b.isSingle()) {
-                        //是单例，获取的时候先获取，如果获取失败则保存
-                        supplier = () -> SINGLE_FACTORY.getOrSet(b.getType(), () -> b.getGetInstanceFunction().apply(paramsGetter.get()));
-                    } else {
-                        supplier = () -> b.getGetInstanceFunction().apply(paramsGetter.get());
-                    }
-                    //参数注入函数
-                    Consumer<?> injectDepend = getInjectDependConsumer(b);
-
-                    //额外参数注入函数
-                    BiConsumer<?, DependGetter> additional = getAddInjectDependConsumer(b);
-
-                    //封装为Depend对象
-                    Depend<?> depend = new Depend(name, type, b.isSingle(), supplier, injectDepend, additional);
-
-                    //保存
-                    saveDepend(depend);
-                });
+        beans.forEach(this::saveBeanToDepend);
 
         //每次加载后，尝试垃圾回收释放内存
         System.gc();
         return this;
+    }
+
+    private <T> void saveBeanToDepend(Beans<T> b){
+        //获取依赖
+        //获取依赖所需参数的获取函数
+        Supplier<Object[]> paramsGetter = getInstanceParamsSupplier(b);
+        //封装为Depend对象
+        String name = b.getName();
+        Class<?> type = b.getType();
+        //判断是否为单例
+        Supplier<?> supplier;
+        if (b.isSingle()) {
+            //是单例，获取的时候先获取，如果获取失败则保存
+            supplier = () -> SINGLE_FACTORY.getOrSet(b.getType(), () -> b.getGetInstanceFunction().apply(paramsGetter.get()));
+        } else {
+            supplier = () -> b.getGetInstanceFunction().apply(paramsGetter.get());
+        }
+        //参数注入函数
+        Consumer<?> injectDepend = getInjectDependConsumer(b);
+
+        //额外参数注入函数
+        BiConsumer<?, DependGetter> additional = getAddInjectDependConsumer(b);
+
+        //封装为Depend对象
+        Depend<?> depend = new Depend(name, type, b.isSingle(), supplier, injectDepend, additional);
+
+        //保存
+        saveDepend(depend);
     }
 
     /**
@@ -267,7 +272,6 @@ public class DependCenter implements DependGetter, DependInjector {
             throw new DependResourceException("dependExistByName", depend);
         }
 
-//        QQLog.info("load Depend >> " + depend);
         QQLog.info("run.depend.load", depend);
 
         //判断类型，如果是基础数据类型，保存到基础，否则保存至其他
@@ -308,19 +312,21 @@ public class DependCenter implements DependGetter, DependInjector {
             NameTypeEntry nameTypeEntry = instanceNeed[i];
             Supplier<?> paramSupplier;
             //先判断是否为常量类型
-            if (BasicResourceWarehouse.isBasicType(nameTypeEntry.getValue())) {
+            String name = nameTypeEntry.getKey();
+            Class value = nameTypeEntry.getValue();
+            if (BasicResourceWarehouse.isBasicType(value)) {
                 //是常量类型, 验证空指针
-                Objects.requireNonNull(nameTypeEntry.getKey(), Language.format("exception.nullPointer.basicNameCannotEmpty"));
+                Objects.requireNonNull(name, Language.format("exception.nullPointer.basicNameCannotEmpty"));
                 //获取常量类型
-                paramSupplier = () -> constant(nameTypeEntry.getKey());
+                paramSupplier = () -> constant(name);
             } else {
                 //不是常量类，获取参数
-                if (nameTypeEntry.getKey() != null) {
+                if (name != null) {
                     //有名称，通过名称获取
-                    paramSupplier = () -> get(nameTypeEntry.getKey());
+                    paramSupplier = () -> get(name);
                 } else {
                     //没有名称，通过类型获取
-                    paramSupplier = () -> get(nameTypeEntry.getValue());
+                    paramSupplier = () -> get(value);
                 }
             }
             params[i] = paramSupplier;
@@ -338,7 +344,6 @@ public class DependCenter implements DependGetter, DependInjector {
         Class<T> type = beans.getType();
         //获取全部字段, 根据注解获取(或全部注入), 转化为字段值注入函数
         Consumer<T>[] consumerArray = Arrays.stream(FieldUtils.getFields(type, true))
-//                .filter(f -> beans.getBeans().allDepend() || f.getAnnotation(com.forte.qqrobot.anno.depend.Depend.class) != null)
                 .filter(f -> beans.getBeans().allDepend() || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
