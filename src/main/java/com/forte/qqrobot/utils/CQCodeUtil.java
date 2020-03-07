@@ -661,8 +661,7 @@ public class CQCodeUtil {
             return false;
         }
         //如果存在at的CQ码并且参数‘qq’是某个qq
-//        return getCQCodeFromMsg(msg).stream().anyMatch(cq -> cq.getCQCodeTypes().equals(CQCodeTypes.at) && cq.get("qq").equals(qq));
-        return msg.contains(getCQCode_At(qq).toString());
+        return msg.contains(getCQCode_at(qq));
     }
 
     /**

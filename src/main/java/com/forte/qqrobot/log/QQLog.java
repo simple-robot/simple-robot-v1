@@ -23,7 +23,11 @@ import java.time.LocalDateTime;
  **/
 public class QQLog extends ColorSystem {
 
+    /** warning 类型 */
     public static final PrintStream warning;
+
+    /** success类型 */
+    public static final PrintStream success;
 
     /**
      * 全局日志级别，先优先使用此日志级别进行筛选，默认info
@@ -56,6 +60,24 @@ public class QQLog extends ColorSystem {
             warningPrintStream = null;
         }
         warning = warningPrintStream;
+
+        //设置成功类型输出
+        PrintStream successPrintStream;
+        try {
+            successPrintStream = FortePlusPrintStream.getInstance(System.out, obj -> {
+                Colors timeColors = Colors.builder().add("[" + LocalDateTime.now().toString() + "]", Colors.FONT.BLUE).build();
+                Colors typeColors = Colors.builder()
+                        .add("[", Colors.FONT.BLUE)
+                        .add("SUC ", Colors.FONT.DARK_GREEN)
+                        .add("]", Colors.FONT.BLUE)
+                        .build();
+                Colors msgColors = Colors.builder().add(obj, Colors.FONT.DARK_GREEN).build();
+                return timeColors + " " + typeColors + " " + msgColors;
+            });
+        } catch (IllegalAccessException | UnsupportedEncodingException e) {
+            successPrintStream = null;
+        }
+        success = successPrintStream;
     }
 
 
@@ -136,6 +158,14 @@ public class QQLog extends ColorSystem {
 
     public static void info(Object msg, Throwable e, Object... format) {
         log(msg, LogLevel.INFO, info, e, format);
+    }
+
+    public static void success(Object msg, Object... format) {
+        log(msg, LogLevel.SUCCESS, success, null, format);
+    }
+
+    public static void success(Object msg, Throwable e, Object... format) {
+        log(msg, LogLevel.SUCCESS, success, e, format);
     }
 
     public static void debug(Object msg, Object... format) {

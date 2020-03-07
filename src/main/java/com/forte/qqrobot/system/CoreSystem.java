@@ -65,7 +65,7 @@ public final class CoreSystem {
                     LOG_LANG.warning("version.notnewest", CORE_VERSION, versionFamily, url1, url2);
                 }else{
                     // 没有最新的，即当前是最新的
-                    LOG_LANG.info("version.newest", CORE_VERSION, versionFamily);
+                    LOG_LANG.success("version.newest", CORE_VERSION, versionFamily);
                 }
             }catch (Exception e){
                 LOG_LANG.warning("check.failed");

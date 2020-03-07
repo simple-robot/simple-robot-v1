@@ -6,11 +6,6 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static com.forte.qqrobot.log.QQLog.ifCan;
-import static com.forte.qqrobot.log.QQLog.info;
-import static com.forte.qqrobot.log.QQLog.debug;
-import static com.forte.qqrobot.log.QQLog.warning;
-import static com.forte.qqrobot.log.QQLog.err;
 
 /**
  * 用于整合{@link com.forte.lang.Language}
@@ -64,7 +59,7 @@ public class QQLogLang {
         String msgStr = msg.toString();
         // 判断语言是否已经初始化完成
         msgStr = Language.format(getTag(msgStr), formatArgs);
-        if(ifCan(level)){
+        if(QQLog.ifCan(level)){
             if(QQLog.getLogBack().onLog(msgStr, level)){
                 logStream.println(msgStr);
                 if(e != null){
@@ -89,31 +84,39 @@ public class QQLogLang {
     }
 
     public void info(Object msg, Throwable e, Object... format) {
-        log(msg, LogLevel.INFO, info, e, format);
+        log(msg, LogLevel.INFO, QQLog.info, e, format);
+    }
+
+    public void success(Object msg, Object... format) {
+        log(msg, LogLevel.SUCCESS, QQLog.success, null, format);
+    }
+
+    public void success(Object msg, Throwable e, Object... format) {
+        log(msg, LogLevel.SUCCESS, QQLog.success, e, format);
     }
 
     public void debug(Object msg, Object... format) {
-        log(msg, LogLevel.DEBUG, debug, null, format);
+        log(msg, LogLevel.DEBUG, QQLog.debug, null, format);
     }
 
     public void debug(Object msg, Throwable e, Object... format) {
-        log(msg, LogLevel.DEBUG, debug, e, format);
+        log(msg, LogLevel.DEBUG, QQLog.debug, e, format);
     }
 
     public void warning(Object msg, Object... format) {
-        log(msg, LogLevel.WARNING, warning, null, format);
+        log(msg, LogLevel.WARNING, QQLog.warning, null, format);
     }
 
     public void warning(Object msg, Throwable e, Object... format) {
-        log(msg, LogLevel.WARNING, warning, e, format);
+        log(msg, LogLevel.WARNING, QQLog.warning, e, format);
     }
 
     public void error(Object msg, Object... format) {
-        log(msg, LogLevel.ERROR, err, null, format);
+        log(msg, LogLevel.ERROR, QQLog.err, null, format);
     }
 
     public void error(Object msg, Throwable e, Object... format) {
-        log(msg, LogLevel.ERROR, err, e, format);
+        log(msg, LogLevel.ERROR, QQLog.err, e, format);
     }
 
 }

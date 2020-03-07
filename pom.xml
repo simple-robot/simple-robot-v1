@@ -14,14 +14,13 @@
     <artifactId>simple-robot-core</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署需要大于1.8.0 2020/3/5 记得修改CoreSystem的版本号 -->
-    <version>1.8.0</version>
+    <!-- 下次部署需要大于1.8.1 2020/3/8 记得修改CoreSystem的版本号 -->
+    <version>1.8.1</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>
     <url>https://github.com/ForteScarlet/simple-robot-core</url>
     <!--  An SDK for robot, like QQRobot  -->
-<!--    <description>simple robot for coolQ</description>-->
     <description>An SDK for robot, like QQRobot</description>
 
     <scm>

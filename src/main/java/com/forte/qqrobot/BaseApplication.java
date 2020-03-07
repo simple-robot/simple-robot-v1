@@ -47,9 +47,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 启动类总抽象类，在此实现部分通用功能
@@ -785,6 +783,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
         //获取管理器
         ListenerManager manager = ResourceDispatchCenter.getListenerManager();
+        dependCenter.load(manager);
 
         // > 启动之前
         beforeStart(configuration);
@@ -893,7 +892,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         String sp1 = Colors.builder().add(' ', wowThatIsRainbowToo$()).add(' ', wowThatIsRainbowToo$()).build().toString();
         String sp2 = Colors.builder().add(' ', wowThatIsRainbowToo$()).add(' ', wowThatIsRainbowToo$()).build().toString();
 
-        String oh_hi_is_me = getFace() + " by simple-robot@ForteScarlet ~~";
+        String oh_hi_is_me = __$f$__() + " by simple-robot@ForteScarlet ~~";
         int length = oh_hi_is_me.length() + 4;
         char line = ' ';
         /* QQLog初始化的时候输出个东西~ */
@@ -920,7 +919,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     private ColorTypes wowThatIsRainbowToo$(){
         return RandomUtil.getRandomElement(BackGroundColorTypes.values());
     }
-    private String getFace(){
+    private String __$f$__(){
         String[] s = {
                 "O(∩_∩)O",
                 "o(*￣▽￣*)o",

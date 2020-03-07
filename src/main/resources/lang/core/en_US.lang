@@ -159,6 +159,9 @@ runtime.bot.register.failed=bot register failed: {0}
 # filter
 filter.register=register filter: {0}
 
+# listen 执行异常
+listener.run.error=listener [{0}] invoke failed! {1}
+
 # 送信拦截器
 ## 当某个API被拦截器阻止，或者说拦截的时候的消息
 intercept.block=API [{0}] has been blocked.

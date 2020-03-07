@@ -240,10 +240,7 @@ public class ListenerManager implements MsgReceiver {
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
         //判断是否at自己
         //获取本机QQ号
-        AtDetection atDetection = () -> {
-            String localCode = ResourceDispatchCenter.getBaseConfigration().getLocalQQCode();
-            return cqCodeUtil.isAt(msg, localCode);
-        };
+        AtDetection atDetection = () -> cqCodeUtil.isAt(msg, code);
         //0 : msgGet
         plist.add(msgGet);
         //1 : codeUtil
@@ -335,7 +332,7 @@ public class ListenerManager implements MsgReceiver {
                         // 如果有异常，输出这个异常
                         Throwable error = result.getError();
                         if(error != null){
-                            QQLog.error("监听函数["+ lm.getUUID() +"]执行异常：", error);
+                            QQLog.error("listener.run.error", error, lm.getUUID(), error.getMessage());
                         }
                         return result;
                     } catch (Throwable e) {
@@ -389,7 +386,7 @@ public class ListenerManager implements MsgReceiver {
                         // 如果有异常，输出这个异常
                         Throwable error = result.getError();
                         if(error != null){
-                            QQLog.error("监听函数["+ lm.getUUID() +"]执行异常：", error);
+                            QQLog.error("listener.run.error", error, lm.getUUID(), error.getMessage());
                         }
                         return result;
                     } catch (Throwable e) {
