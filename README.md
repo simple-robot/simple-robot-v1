@@ -165,27 +165,7 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
             <th>项目链接</th>
 		</tr>
     </thead>
-    <tbody>
-        <tr>
-        	<td>LEMOC支持组件框架</td>
-            <th rowspan='3'>
-            	<a href="https://gitee.com/ForteScarlet" target="_blank">
-                	ForteScarlet
-                </a>
-            </th>
-            <td>基于simple-robot, 针对于酷Q插件 LEMOC 的对接组件</td>
-            <td>https://github.com/ForteScarlet/simple-robot-component-lemoc</td>
-        </tr>
-        <tr>
-            <td>HTTP API支持组件框架</td>
-            <td>HTTP API支持组件框架ForteScarlet基于simple-robot, 针对于酷Q插件 HTTP API的对接组件</td>
-            <td>https://github.com/ForteScarlet/simple-robot-component-httpapi</td>
-        </tr>
-        <tr>
-            <td>CQ HTTP API支持组件框架</td>
-            <td>CoolQ HTTP API支持组件框架ForteScarlet基于simple-robot, 针对于酷Q插件 CQ HTTP API的对接组件</td>
-            <td>https://github.com/ForteScarlet/simple-robot-component-coolHttpApi</td>
-        </tr>
+    <tbody> 
         <tr>
         	<td>SinaNya</td>
             <th>斯塔尼亚</th>
