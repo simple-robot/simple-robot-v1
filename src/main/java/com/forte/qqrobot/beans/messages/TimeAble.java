@@ -25,14 +25,6 @@ public interface TimeAble {
     }
 
     /**
-     * 将时间视为秒值时间戳来获取{@link LocalDateTime}对象
-     */
-    default LocalDateTime getTimeBySec(Long nanoOfSec){
-        Long time = getTime();
-        return time == null ? null : LocalDateTime.ofInstant(Instant.ofEpochSecond(time, nanoOfSec), ZoneId.systemDefault());
-    }
-
-    /**
      * 将时间视为毫秒值时间戳来获取{@link LocalDateTime}对象
      */
     default LocalDateTime getTimeByMilli(){
@@ -48,13 +40,6 @@ public interface TimeAble {
         return time == null ? null : Instant.ofEpochSecond(time);
     }
 
-    /**
-     * 将时间视为秒值时间戳来获取{@link Instant}对象
-     */
-    default Instant getInstantBySec(Long nanoOfSec){
-        Long time = getTime();
-        return time == null ? null : Instant.ofEpochSecond(time, nanoOfSec);
-    }
 
     /**
      * 将时间视为毫秒值时间戳来获取{@link Instant}对象

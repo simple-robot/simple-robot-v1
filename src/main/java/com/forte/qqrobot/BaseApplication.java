@@ -11,7 +11,6 @@ import com.forte.qqrobot.anno.Config;
 import com.forte.qqrobot.anno.CoreVersion;
 import com.forte.qqrobot.anno.DIYFilter;
 import com.forte.qqrobot.anno.depend.AllBeans;
-import com.forte.qqrobot.beans.function.ExFunction;
 import com.forte.qqrobot.beans.function.PathAssembler;
 import com.forte.qqrobot.beans.function.VerifyFunction;
 import com.forte.qqrobot.bot.BotInfo;
@@ -39,6 +38,7 @@ import com.forte.qqrobot.sender.intercept.SenderSetIntercept;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
+import com.forte.qqrobot.system.CoreSystem;
 import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.*;
 
@@ -387,6 +387,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         logInit(config);
         // 语言初始化
         languageInit(app, config);
+        //版本检测
+        coreCheckVersion(config);
         //配置fastJson
         fastJsonInit();
         //公共资源初始化
@@ -400,6 +402,13 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
 
     }
 
+    private void coreCheckVersion(CONFIG config){
+        // 康康是否要检测版本
+        if(config.getCheckVersion()){
+            CoreSystem.checkVersion();
+        }
+
+    }
 
 
     /**
@@ -414,6 +423,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 配置结束后的方法
      */
     private DependCenter afterConfig(CONFIG config, Application<CONFIG> app) {
+
         //构建监听扫描器
         ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
 

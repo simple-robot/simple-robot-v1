@@ -10,6 +10,9 @@ public interface Group extends ResultInner {
     String getName();
     /** 群号 */
     String getCode();
-    /** 群头像地址 */
-    String getHeadUrl();
+    /** 群头像地址, 默认情况下直接使用p.qlogo接口 */
+    default String getHeadUrl(){
+        String groupCode = getCode();
+        return "http://p.qlogo.cn/gh/"+ groupCode +"/"+ groupCode +"/640";
+    }
 }

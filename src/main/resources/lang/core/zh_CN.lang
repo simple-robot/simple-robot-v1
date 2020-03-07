@@ -167,4 +167,11 @@ filter.register=注册过滤器：{0}
 ## 当某个API被拦截器阻止，或者说拦截的时候的消息
 intercept.block=API[{0}]已被阻止
 
+## CoreSystem中使用的日志
+system.version.check=将要开始版本检测。请无视版本检测结束前所出现的错误日志，他们没有什么危害。
+system.version.check.failed=版本检测失败。你可以选择自行前往maven仓库进行查看。
+system.version.newest=当前核心版本: {0}, 为{1}版本系列中最新版。
+system.version.notnewest=当前核心版本: {0}, 在{1}版本系列中存在更高级的版本, 可以考虑切换核心版本。\n注意，核心替换需要保证前两个版本号位相相同：{1}\n你可以参考：\n参考一: {2}\n参考二：{3}
+
+
 

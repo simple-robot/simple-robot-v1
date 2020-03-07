@@ -14,8 +14,6 @@ public abstract class AbstractGroup extends AbstractResultInner implements Group
 
     private String code;
 
-    private String headUrl;
-
     @Override
     public String getName() {
         return name;
@@ -32,15 +30,6 @@ public abstract class AbstractGroup extends AbstractResultInner implements Group
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    @Override
-    public String getHeadUrl() {
-        return headUrl;
-    }
-
-    public void setHeadUrl(String headUrl) {
-        this.headUrl = headUrl;
     }
 
     @Override

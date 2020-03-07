@@ -1,7 +1,9 @@
 package com.forte.qqrobot;
 
+import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
+import com.forte.qqrobot.utils.FieldUtils;
 import org.apache.http.impl.io.EmptyInputStream;
 
 import java.io.InputStream;
@@ -18,6 +20,8 @@ class AutoResourceApplication<CONFIG extends BaseConfiguration> implements Resou
     private String resources;
     private Properties properties;
     private Class<?> baseClass;
+    /** 如果baseClass是个此类接口，则获取它的实例 */
+    private Application<CONFIG> baseApplication;
 
     /**
      * 通过Application注解与Config注解转化一个启动器接口
@@ -44,8 +48,19 @@ class AutoResourceApplication<CONFIG extends BaseConfiguration> implements Resou
                 }
             }
         }
+
+        Application<CONFIG> baseApp = null;
+
+        // 是application的子类，尝试获取他的实例对象
+        if(FieldUtils.isChild(baseClass, Application.class)){
+            try {
+                baseApp = (Application<CONFIG>) baseClass.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new ConfigurationException(baseClass + " can not get new instance to Application<" + configClass + ">");
+            }
+        }
         // 返回实例对象
-        return new AutoResourceApplication<>(resources, properties, baseClass);
+        return new AutoResourceApplication<>(resources, properties, baseClass, baseApp);
     }
 
     /**
@@ -53,10 +68,11 @@ class AutoResourceApplication<CONFIG extends BaseConfiguration> implements Resou
      * @param resources  resources配置文件路径 不可为null
      * @param properties 额外的参数, 可以为null
      */
-    AutoResourceApplication(String resources, Properties properties, Class<?> baseClass){
+    AutoResourceApplication(String resources, Properties properties, Class<?> baseClass, Application<CONFIG> baseApplication){
         this.resources = resources;
         this.properties = properties;
         this.baseClass = baseClass;
+        this.baseApplication = baseApplication;
     }
 
     public String resourceName(){
@@ -109,14 +125,21 @@ class AutoResourceApplication<CONFIG extends BaseConfiguration> implements Resou
 
     /**
      * 此方法将会在配置文件装配完成后执行.
-     * 所以如果这个时候更改Properties是 没有用的~没有用的~
-     *
+     * 如果启动器实例对象存在，执行用户操作
      * @param args          properties配置内容
      * @param configuration 配置好的配置文件
      */
     @Override
-    public void before(Properties args, CONFIG configuration) { }
+    public void before(Properties args, CONFIG configuration) {
+        if(baseApplication != null){
+            baseApplication.before(configuration);
+        }
+    }
 
     @Override
-    public void after(CQCodeUtil cqCodeUtil, MsgSender sender) { }
+    public void after(CQCodeUtil cqCodeUtil, MsgSender sender) {
+        if(baseApplication != null){
+            baseApplication.after(cqCodeUtil, sender);
+        }
+    }
 }

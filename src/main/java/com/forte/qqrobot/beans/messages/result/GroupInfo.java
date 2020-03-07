@@ -1,5 +1,7 @@
 package com.forte.qqrobot.beans.messages.result;
 
+import com.forte.qqrobot.beans.messages.TimeAble;
+
 import java.util.Map;
 
 /**
@@ -53,5 +55,11 @@ public interface GroupInfo extends InfoResult {
 
     /** 获取群标签 */
     String[] getTags();
+
+    /** 群头像地址, 默认情况下直接使用p.qlogo接口 */
+    default String getHeadUrl(){
+        String groupCode = getCode();
+        return "http://p.qlogo.cn/gh/"+ groupCode +"/"+ groupCode +"/640";
+    }
 
 }

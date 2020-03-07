@@ -15,9 +15,9 @@ public @interface Version {
     /** 版本 */
     String version();
     /** 组件名称 */
-    String value();
+    String value() default "";
     //开发者
-    String author();
+    String author() default "ForteScarlet";
     //其他注释一类的东西？
     String comment() default "";
     String email() default "";

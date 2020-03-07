@@ -148,7 +148,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 核心池的大小
      * 默认为null，当为null的时候，默认使用最佳线程数量
      */
-    @Conf(value = "core.threadPool.corePoolSize", comment = "核心池的大小。默认根据CPU核心数计算最佳线程数量")
+    @Conf(value = "core.threadPool.corePoolSize", comment = "核心池的大小。默认根据CPU核心数计算最佳线程数量 / 2")
     private Integer corePoolSize = null;
 
     /**
@@ -159,7 +159,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * @see <a href='https://www.cnblogs.com/jpfss/p/11016180.html'>参考文章</a>
      */
     @Conf(value = "core.threadPool.blockingFactor", comment = "线程池初始化的阻塞系数，用来在未手动配置的情况下决定最终的线程池线程数量。")
-    private Double blockingFactor = 0.2;
+    private Double blockingFactor = 0.0;
 
     /**
      * 线程池最大线程数，这个参数也是一个非常重要的参数，它表示在线程池中最多能创建多少个线程；
@@ -312,13 +312,13 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
             if (this.blockingFactor == null) {
                 this.blockingFactor = 0.0;
             }
-            // 核心线程数量
+            // 核心线程数量, 默认为最佳数量/2
             if (this.corePoolSize == null) {
-                this.corePoolSize = CoreSystem.getBestPoolSize(this.blockingFactor);
+                this.corePoolSize = CoreSystem.getBestPoolSize(this.blockingFactor) >> 1;
             }
-            // 最大线程数量, 默认为corePoolSize的2倍。
+            // 最大线程数量, 默认为corePoolSize的2倍+1。
             if (this.maximumPoolSize == null) {
-                this.maximumPoolSize = this.corePoolSize << 1;
+                this.maximumPoolSize = (this.corePoolSize << 1) + 1;
             }
 
             BaseLocalThreadPool.PoolConfig config = new BaseLocalThreadPool.PoolConfig();
@@ -347,6 +347,9 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      */
     @Conf(value = "core.localServerPort", comment = "尚未实装配置，可无视。> 本地服务器使用的端口号，默认为8808")
     private int localServerPort = 8808;
+
+    @Conf(value = "core.checkVersion", comment = "从maven仓库检查是否存在可用的、可直接覆盖的更新的核心版本并进行提示。检测范围是前两位版本号相同的情况下。")
+    private Boolean checkVersion = true;
 
 
     //**************************************
@@ -566,16 +569,6 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     }
 
 
-    /**
-     * 注册一个自定义类型的MsgGet监听枚举
-     * 尚在施工中
-     */
-    @Deprecated
-    public void registerMsgGetType(String name, Class<? extends MsgGet> msgType) {
-        // come soon
-        throw new RobotRuntimeException("此方法尚在施工中。");
-    }
-
 
     //**************** getter & setter ****************//
 
@@ -600,29 +593,68 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
         return Arrays.stream(this.scannerPackage).collect(Collectors.toSet());
     }
 
+    /**
+     * @see #registerBot(String, String)
+     * @see #registerBot(String)
+     * @see #registerBot(String, String, int, String)
+     * @see #registerBot(String, int, String)
+     * @see #registerBotAsDefault(String, String)
+     * @see #registerBotAsDefault(String, String, int, String)
+     * @see #registerBotAsDefault(String, int, String)
+     */
     @Deprecated
     public String getLocalQQNick() {
         return localQQNick;
     }
 
+    /**
+     * @see #registerBot(String, String)
+     * @see #registerBot(String)
+     * @see #registerBot(String, String, int, String)
+     * @see #registerBot(String, int, String)
+     * @see #registerBotAsDefault(String, String)
+     * @see #registerBotAsDefault(String, String, int, String)
+     * @see #registerBotAsDefault(String, int, String)
+     */
     @Deprecated
     public T setLocalQQNick(String localQQNick) {
         this.localQQNick = localQQNick;
         return configuration;
     }
 
+    /**
+     * @see #registerBot(String, String)
+     * @see #registerBot(String)
+     * @see #registerBot(String, String, int, String)
+     * @see #registerBot(String, int, String)
+     * @see #registerBotAsDefault(String, String)
+     * @see #registerBotAsDefault(String, String, int, String)
+     * @see #registerBotAsDefault(String, int, String)
+     */
     @Deprecated
     public String getLocalQQCode() {
         return this.localQQCode;
     }
 
+    /**
+     * @see #registerBot(String, String)
+     * @see #registerBot(String)
+     * @see #registerBot(String, String, int, String)
+     * @see #registerBot(String, int, String)
+     * @see #registerBotAsDefault(String, String)
+     * @see #registerBotAsDefault(String, String, int, String)
+     * @see #registerBotAsDefault(String, int, String)
+     */
     @Deprecated
     public T setLocalQQCode(String localQQCode) {
         this.localQQCode = localQQCode;
         return configuration;
     }
 
-
+    /**
+     * @see BotRuntime
+     * @see com.forte.qqrobot.bot.BotManager
+     */
     @Deprecated
     public LoginQQInfo getLoginQQInfo() {
         return loginQQInfo;
@@ -646,6 +678,15 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
         return configuration;
     }
 
+    /**
+     * @see #registerBot(String, String)
+     * @see #registerBot(String)
+     * @see #registerBot(String, String, int, String)
+     * @see #registerBot(String, int, String)
+     * @see #registerBotAsDefault(String, String)
+     * @see #registerBotAsDefault(String, String, int, String)
+     * @see #registerBotAsDefault(String, int, String)
+     */
     @Deprecated
     public String getIp() {
         return ip;
@@ -691,7 +732,13 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     }
 
     /**
-     * 不再支持单一QQ信息配置，后期进行统一信息获取
+     * @see #registerBot(String, String)
+     * @see #registerBot(String)
+     * @see #registerBot(String, String, int, String)
+     * @see #registerBot(String, int, String)
+     * @see #registerBotAsDefault(String, String)
+     * @see #registerBotAsDefault(String, String, int, String)
+     * @see #registerBotAsDefault(String, int, String)
      */
     @Deprecated
     public T setLoginQQInfo(LoginQQInfo loginQQInfo) {
@@ -836,5 +883,11 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
         this.language = language;
     }
 
+    public Boolean getCheckVersion() {
+        return checkVersion;
+    }
 
+    public void setCheckVersion(Boolean checkVersion) {
+        this.checkVersion = checkVersion;
+    }
 }

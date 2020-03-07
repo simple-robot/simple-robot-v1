@@ -1,5 +1,19 @@
 ## 版本更新记录
 
+## (now)
+- 修改默认情况下的线程池线各项参数：<br>
+    （注：`最佳的线程数 = CPU可用核心数 / (1 - 阻塞系数), 其中: 0 >= 阻塞系数 > 1`）
+    - 默认线程阻塞系数为0
+    - 默认情况下核心线程数量为最佳CPU线程数量的 1/2
+    - 默认情况下最大线程数量核心线程数量的2倍+1
+- CoreSystem类中增加两个方法，以检测当前核心版本和获取当前版本，并将当前核心版本加入SystemProperties    
+- GroupInfo继承接口TimeAble，可对时间进行多格式转化
+- 配置增加一项：`core.checkVersion`, 参数为布尔类型，即检查当前核心版本下是否有更新的、可直接覆盖的版本。默认为`true`
+- 为`GroupInfo`和`GroupList`中的`Group`增加默认的`getHeadUrl` (获取群头像)接口实现。    
+- 优化注解配置与启动器的启动转化逻辑，使其支持标注在任何实现了`Application`接口的类上时，会获取其实例并执行。配置覆盖顺序：代码配置 -覆盖-> 注解配置 -覆盖-> 文件配置    
+    
+
+
 ## 1.8.0
 - KeywordMatchType枚举中增加更多预设：
     STARTS_WITH、TRIM_STARTS_WITH、RE_CQCODE_STARTS_WITH、RE_CQCODE_TRIM_STARTS_WITH、ENDS_WITH、TRIM_ENDS_WITH、RE_CQCODE_ENDS_WITH、RE_CQCODE_TRIM_ENDS_WITH

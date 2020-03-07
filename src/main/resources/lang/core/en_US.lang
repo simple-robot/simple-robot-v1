@@ -164,3 +164,9 @@ filter.register=register filter: {0}
 intercept.block=API [{0}] has been blocked.
 
 
+## CoreSystem中使用的日志
+system.version.check=Will start version detection.Please ignore the error logs that appear before the version detection ends, they are not harmful.
+system.version.check.failed=Version check failed.You can choose to go to the maven repository to view it by yourself.
+system.version.newest=Current core version: {0}, Is the latest version in the {1} version series.
+system.version.notnewest=当Previous core version: {0}, There are more advanced versions in the {1} version series, you can consider switching the core version.\nNote that the core replacement needs to ensure that the first two version numbers are the same:{1}\nYou can refer to:\nReference 1: {2}\nReference 2: {3}
+
