@@ -146,7 +146,7 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
 - 你可以通过联系邮箱`ForteScarlet@163.com`向我反馈bug或者提出建议意见（可能会处理不及时）。
 
 ## 更新计划
-对于未来的更新计划可以从github的project中或者[更新计划.md](更新计划.md)中看到。一般想到什么的话会优先更新`更新计划.md`。
+对于未来的更新计划可以从github的projects中或者[更新计划](更新计划.md)中看到。一般想到什么的话会优先更新`更新计划.md`。
 
 
 ## 赞助一下？

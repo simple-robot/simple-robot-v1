@@ -234,7 +234,7 @@ public abstract class BaseRootSender implements RootSender{
      * @param msg   消息内容
      */
     @Override
-    public boolean sendDiscussMsg(String group, String msg) {
+    public String sendDiscussMsg(String group, String msg) {
         throw RobotApiException.byFrom();
     }
 
@@ -245,7 +245,7 @@ public abstract class BaseRootSender implements RootSender{
      * @param msg   消息内容
      */
     @Override
-    public boolean sendGroupMsg(String group, String msg) {
+    public String sendGroupMsg(String group, String msg) {
         throw RobotApiException.byFrom();
     }
 
@@ -256,7 +256,7 @@ public abstract class BaseRootSender implements RootSender{
      * @param msg 消息内容
      */
     @Override
-    public boolean sendPrivateMsg(String QQ, String msg) {
+    public String sendPrivateMsg(String QQ, String msg) {
         throw RobotApiException.byFrom();
     }
 
@@ -281,6 +281,23 @@ public abstract class BaseRootSender implements RootSender{
     public boolean sendLike(String QQ, int times) {
         throw RobotApiException.byFrom();
     }
+
+    /**
+     * 发布群公告
+     * 目前，top、toNewMember、confirm参数是无效的
+     * @param group 群号
+     * @param title 标题
+     * @param text   正文
+     * @param top    是否置顶，默认false
+     * @param toNewMember 是否发给新成员 默认false
+     * @param confirm 是否需要确认 默认false
+     * @return 是否发布成功
+     */
+    @Override
+    public boolean sendGroupNotice(String group, String title, String text, boolean top, boolean toNewMember, boolean confirm){
+        throw RobotApiException.byFrom();
+    }
+
 
     /**
      * 设置类型接口汇总方法

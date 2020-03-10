@@ -6,6 +6,7 @@ import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.bot.BotInfo;
+import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.MsgIntercept;
@@ -16,7 +17,6 @@ import com.forte.qqrobot.listener.result.ListenResultImpl;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
-import com.forte.qqrobot.sender.senderlist.SenderList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.utils.CQCodeUtil;
@@ -75,30 +75,24 @@ public class ListenerManager implements MsgReceiver {
      */
     private static final ListenResult[] EMPTY_RESULT = new ListenResult[0];
 
-
-//    /**
-//     * 根据函数构建三大送信器
-//     * @param msgget     消息接收器
-//     * @param senderFunc 送信器sender获取函数
-//     * @param setterFunc 送信器setter获取函数
-//     * @param getterFunc 送信器getter获取函数
-//     * @return 相应结果列表
-//     */
-//    public ListenResult[] onMsg(MsgGet msgget,
-//                                Function<MsgGet, SenderSendList> senderFunc,
-//                                Function<MsgGet, SenderSetList> setterFunc,
-//                                Function<MsgGet, SenderGetList> getterFunc
-//                                ){
-//
-//        // 返回最终结果
-//        return onMsg(msgget, senderFunc.apply(msgget), setterFunc.apply(msgget), getterFunc.apply(msgget));
-//    }
+    /**
+     * Bot管理器，用于筛选那些没有被注册（即获取不到的）bot的消息
+     */
+    private BotManager botManager;
 
     /**
      * 接收到了消息
      */
     @Override
     public ListenResult[] onMsg(MsgGet msgget, SenderSendList sender, SenderSetList setter, SenderGetList getter){
+        // 首先对bot进行判断
+        String thisCode = msgget.getThisCode();
+        // 如果thisCode为null，则可能代表组件不支持多bot的区分
+        if(thisCode != null && botManager.getBot(thisCode) == null){
+            QQLog.error("listener.bot.noVerify", thisCode);
+            return EMPTY_RESULT;
+        }
+
         // 消息拦截
         // 构建上下文对象
         MsgGetContext msgContext = new MsgGetContext(msgget, sender, setter, getter, msgContextGlobalMap);
@@ -430,7 +424,10 @@ public class ListenerManager implements MsgReceiver {
      * @param methods 函数集合
      * @param intercepts 消息拦截器数组 nullable
      */
-    public ListenerManager(Collection<ListenerMethod> methods, MsgIntercept[] intercepts){
+    public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager, MsgIntercept[] intercepts){
+        // bot管理器
+        this.botManager = botManager;
+
         // 排序并构建消息拦截器
         if(intercepts != null){
             MsgIntercept[] msgInterceptsCopy = Arrays.copyOf(intercepts, intercepts.length);

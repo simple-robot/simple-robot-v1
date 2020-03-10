@@ -24,10 +24,11 @@ import java.util.function.Supplier;
 
 /**
  * 可缓存的GETTER构建工厂
- *
+ * 效率存疑，弃用
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+@Deprecated
 public class CacheGetterFactory {
     /*
         getter的缓存通过动态代理来实现。

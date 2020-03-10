@@ -5,6 +5,7 @@ import com.forte.qqrobot.anno.*;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.beans.types.BreakType;
+import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.listener.MsgIntercept;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
@@ -242,7 +243,7 @@ public class ListenerMethodScanner {
      * 构建监听函数管理器实例
      * @return 监听函数管理器实例
      */
-    public ListenerManager buildManager(MsgIntercept[] intercepts){
+    public ListenerManager buildManager(BotManager botManager, MsgIntercept[] intercepts){
         return new ListenerManager(listenerMethodSet, intercepts);
     }
 
