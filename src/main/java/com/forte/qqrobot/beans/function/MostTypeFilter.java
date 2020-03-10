@@ -1,6 +1,7 @@
 package com.forte.qqrobot.beans.function;
 
 import java.util.function.BiPredicate;
+import java.util.regex.Pattern;
 
 /**
  * 为枚举{@link com.forte.qqrobot.beans.types.MostType}服务, 作为函数接口使用。
@@ -22,6 +23,6 @@ public interface MostTypeFilter {
      * @param filter    单个规则匹配的匹配规则
      * @return 是否匹配
      */
-    boolean test(String msg, String[] keywords, BiPredicate<String, String> filter);
+    boolean test(String msg, Pattern[] keywords, BiPredicate<String, Pattern> filter);
 
 }

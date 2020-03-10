@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 /**
- *
  * 监听函数中使用的上下文
  * 有两种值，一个是永久生效的全局上下文，一个是单个对象生效的当前上下文
  *
@@ -15,22 +15,44 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 public class ListenContext {
 
-    /** 全局生效的数据Map，全局域 */
-    private static Map<String, Object> globalContext = new ConcurrentHashMap<>(4);
+    /**
+     * 全局生效的数据Map，全局域
+     */
+    private Map<String, Object> globalContext;
 
-    /** 单次生效的Map, 使用懒加载，当前域 */
+    /**
+     * 单次生效的Map, 使用懒加载，当前域
+     */
     private Map<String, Object> normalMap;
 
-    /** 获取实例对象 */
-    public static ListenContext getInstance(){
-        return new ListenContext();
+    public ListenContext(Map<String, Object> globalContext) {
+        this.globalContext = globalContext;
+    }
+
+    public ListenContext(Map<String, Object> globalContext, Map<String, Object> normalMap) {
+        this.globalContext = globalContext;
+        this.normalMap = normalMap;
+    }
+
+    /**
+     * 获取实例对象
+     */
+    public static ListenContext getInstance(Map<String, Object> globalContext) {
+        return new ListenContext(globalContext);
+    }
+
+    /**
+     * 获取实例对象
+     */
+    public static ListenContext getInstance(Map<String, Object> globalContext, Map<String, Object> normalMap) {
+        return new ListenContext(globalContext, normalMap);
     }
 
     /**
      * 初始化normalMap
      */
-    private Map<String, Object> getNormalMap(){
-        if(normalMap == null){
+    private Map<String, Object> getNormalMap() {
+        if (normalMap == null) {
             normalMap = new HashMap<>(4);
         }
         return normalMap;
@@ -38,7 +60,8 @@ public class ListenContext {
 
     /**
      * 默认的get方法。<br>
-     *     会优先从当前域获取，获取不到则寻找全局域
+     * 会优先从当前域获取，获取不到则寻找全局域
+     *
      * @param key key
      * @return 值
      */
@@ -50,46 +73,51 @@ public class ListenContext {
 
     /**
      * 从当前域中获取
+     *
      * @param key key
      * @return 值
      */
-    public Object getNormal(String key){
+    public Object getNormal(String key) {
         return getNormalMap().get(key);
     }
 
     /**
      * 从全局域中获取
+     *
      * @param key key
      * @return 值
      */
-    public Object getGlobal(String key){
+    public Object getGlobal(String key) {
         return globalContext.get(key);
     }
 
     /**
      * 默认的记录一个域值，默认记录在当前域
-     * @param key    键
-     * @param value  值
+     *
+     * @param key   键
+     * @param value 值
      */
-    public Object set(String key, Object value){
+    public Object set(String key, Object value) {
         return setNormal(key, value);
     }
 
     /**
      * 记录一个当前域值
-     * @param key    键
-     * @param value  值
+     *
+     * @param key   键
+     * @param value 值
      */
-    public Object setNormal(String key, Object value){
+    public Object setNormal(String key, Object value) {
         return getNormalMap().put(key, value);
     }
 
     /**
      * 记录一个全局域值
-     * @param key    键
-     * @param value  值
+     *
+     * @param key   键
+     * @param value 值
      */
-    public Object setGlobal(String key, Object value){
+    public Object setGlobal(String key, Object value) {
         return globalContext.put(key, value);
     }
 
@@ -97,55 +125,30 @@ public class ListenContext {
     /**
      * 清除域。默认为清除当前域
      */
-    public void clear(){
+    public void clear() {
         getNormalMap().clear();
     }
 
     /**
      * 清除全局域
      */
-    public void clearGlobal(){
-        clearContext();
-    }
-
-    /**
-     * 清除全局域
-     */
-    public static void clearContext(){
+    public void clearGlobal() {
         globalContext.clear();
     }
 
     /**
      * 当前域keySet
      */
-    public Set<String> normalKeySet(){
+    public Set<String> normalKeySet() {
         return getNormalMap().keySet();
     }
 
     /**
      * 全局域keySet
      */
-    public Set<String> globalKeySet(){
-        return keySet();
-    }
-
-    /**
-     * 全局域keySet
-     */
-    public static Set<String> keySet(){
+    public Set<String> globalKeySet() {
         return globalContext.keySet();
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

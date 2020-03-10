@@ -11,7 +11,21 @@
 - 为`GroupInfo`和`GroupList`中的`Group`增加默认的`getHeadUrl` (获取群头像)接口实现。    
 - 优化注解配置与启动器的启动转化逻辑，使其支持标注在任何实现了`Application`接口的类上时，会获取其实例并执行。配置覆盖顺序：代码配置 -覆盖-> 注解配置 -覆盖-> 文件配置    
 - 修复`AtDetection`在`1.8.x`后出现的bug
+- 为`Filterable`接口增加一个参数：`ListenContext` (监听上下文)
+- 为`Filterable`接口修改一个参数：`@Filter` (注解对象) 修改为类`Filter` (与注解同名的数据类对象)
 - 将监听执行异常的文字加入到语言文件
+- 修复`ListenContext`的"当前上下文"无法连携当前上下监听器值的bug
+- 简单修改`ListenContext`内部结构
+- 修改了`@Filter`内部对于`value`参数的匹配规则, 理论上会略微增加效率
+
+- 增加接口`HttpClientAble`接口，以实现自定义http请求方式, 以使得用户可以摒弃原本内部低效率的`HttpClientUtil`的使用。如果没有实现，核心内部会提供一个默认的实现方式，类似于原本的`HttpClientUtil`。
+- 增加`HttpClientHelper`类，以使用上述的`HttpClientAble`接口，使用`registerClient`方法注册。
+- 增加注解`@HttpTemplate`来自动注册一个`HttpClientAble`接口的实现类到`HttpClientHelper`类中。
+
+- 调整父类启动器`BaseApplication`对于子类的约束方式，实现服务启动与信息获取分离，实现了由核心框架控制服务开启。
+- 调整父类启动器`BaseApplication`的`run`方法，使其拥有返回值，并将原本可以通过`application`实例对象获取的值移动到`SimpleRobotContext`中获取。
+
+
 
 
 ## 1.8.0

@@ -1,6 +1,6 @@
 package com.forte.qqrobot.listener;
 
-import com.forte.qqrobot.anno.Filter;
+import com.forte.qqrobot.anno.data.Filter;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.listener.invoker.AtDetection;
 
@@ -12,11 +12,12 @@ public interface Filterable {
 
     /**
      * 根据自定义规则对消息进行过滤
-     * @param filter filter注解对象
-     * @param msgget 接收到的消息
-     * @param at     判断当前消息是否被at的函数
+     * @param filter  filter注解对象
+     * @param msgget  接收到的消息
+     * @param at      判断当前消息是否被at的函数
+     * @param context 监听上下文
      * @return 是否通过
      */
-    boolean filter(Filter filter, MsgGet msgget, AtDetection at);
+    boolean filter(Filter filter, MsgGet msgget, AtDetection at, ListenContext context);
 
 }

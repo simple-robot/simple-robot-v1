@@ -64,6 +64,15 @@ public class BotRuntime {
         return log;
     }
 
+    public static synchronized BotRuntime initRuntime(Collection<ListenerInfo> listenerInfos, BaseConfiguration configuration, BotManager botManager) throws CloneNotSupportedException {
+        // 已经初始化过了
+        if (runtime != null) {
+            throw new RobotRuntimeException(0, "botRuntime has already initialized!");
+        }
+        runtime = new BotRuntime(listenerInfos, botManager, (BaseConfiguration) configuration.clone());
+        return runtime;
+    }
+
     /**
      * 初始化runtime对象
      *

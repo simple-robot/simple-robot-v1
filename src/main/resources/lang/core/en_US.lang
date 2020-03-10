@@ -94,6 +94,12 @@ exception.filter.notfound=DIY filter [{0}] not found.
 exception.botVerify.failed=bot[{0}]verify failed: {1}
 exception.botVerify.failed.mismatch=bot[{0}]verify failed: code mismatch: {1}
 
+# clientHelper
+exception.httpClientHelper.nameExists=http template named [{0}] is already exists!
+exception.httpClientHelper.notExists=http template named [{0}] is not exists!
+exception.httpClientHelper.noDefault=there are no default name.
+
+
 # 其他异常
 
 # 数字转化异常 NumberFormatException，出现在BasicResourceWarehouse类中

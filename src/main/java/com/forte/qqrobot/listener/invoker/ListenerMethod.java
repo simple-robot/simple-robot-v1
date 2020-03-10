@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +48,15 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
     /** 过滤器注解，如果没有则为null */
     private final Filter filter;
+
+    /** filter注解对应的封装对象 */
+    private final com.forte.qqrobot.anno.data.Filter filterData;
+
+    /** 正则匹配值，提前解析好 */
+    private final Pattern[] patternValue;
+
+    private final Pattern[] patternCodeValue;
+    private final Pattern[] patternGroupValue;
 
     /** 阻塞过滤器注解，如果没有则为null */
     private final BlockFilter blockFilter;
@@ -104,6 +114,14 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         this.listenerGetter = listenerGetter;
         this.listenerGetterWithAddition  = listenerGetterWithAddition;
         this.filter = filter;
+
+
+        this.filterData = com.forte.qqrobot.anno.data.Filter.build(filter);
+        this.patternValue = filterData.patternValue();
+        this.patternCodeValue = filterData.patternCodeValue();
+        this.patternGroupValue = filterData.patternGroupValue();
+
+
         this.blockFilter = blockFilter;
         this.spare = spare;
         this.block = block;
@@ -146,27 +164,20 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
      * @param additionalDepends 可以提供的额外参数(动态参数)
      */
     ListenResult invoke(AdditionalDepends additionalDepends) throws Throwable {
-        // 构建一个监听函数上下文对象
-        ListenContext context = ListenContext.getInstance();
-        additionalDepends.put("context", context);
-        // TODO init()
 
         //遍历参数类型数组, 进行参数注入
         //将参数注入单独提出
         //获取方法执行的参数
         Object[] args = ResourceDispatchCenter.getDependCenter().getMethodParameters(method, additionalDepends);
 
-        // TODO paramInit()
-
         // 获取监听函数所在类实例
         // 考虑到系统优化，
         //  后期将监听函数的实例修改为单例，并且在获取监听函数实例的时候不再提供额外参数。
         // 2019/12/27 已修改
-//        T listener = listenerGetterWithAddition.apply(additionalDepends);
+
         T listener = getListener();
 
         //执行方法
-        boolean success = false;
         Object invoke = null;
         Throwable error = null;
         // break 初始值
@@ -176,10 +187,8 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         // 捕获异常
         try {
             invoke = method.invoke(listener, args);
-            success = true;
         }catch (Throwable e){
             // 出现异常，判定为执行失败
-            success = false;
             error = e;
         }
 
@@ -196,7 +205,7 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
      * 使用ListenerMethod对象构建
      */
     static <T> ListenerMethodBuilder<T> build(Supplier<T> listenerGetter, Function<DependGetter, T> listenerGetterWithAddition, Method method, MsgGetTypes[] type){
-        return new ListenerMethodBuilder(listenerGetter, listenerGetterWithAddition, method, type);
+        return new ListenerMethodBuilder<>(listenerGetter, listenerGetterWithAddition, method, type);
     }
 
 
@@ -316,6 +325,23 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         return filter;
     }
 
+
+
+    /**
+     * 得到的是原本的数组而非复制的
+     * @return
+     */
+    public Pattern[] getPatternValue(){
+        return patternValue;
+    }
+    public Pattern[] getPatternCodeValue() {
+        return patternCodeValue;
+    }
+
+    public Pattern[] getPatternGroupValue() {
+        return patternGroupValue;
+    }
+
     public BlockFilter getBlockFilter() {
         return blockFilter;
     }
@@ -335,6 +361,11 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     @Override
     public int compareTo(ListenerMethod o) {
         return Integer.compare(sort, o.sort);
+    }
+
+
+    public com.forte.qqrobot.anno.data.Filter getFilterData() {
+        return filterData;
     }
 
 

@@ -94,6 +94,11 @@ exception.filter.notfound=无法获取自定义过滤器{0}：不存在！
 exception.botVerify.failed=账号{0}验证失败：{1}
 exception.botVerify.failed.mismatch=账号{0}验证失败：获取账号不匹配：{1}
 
+# clientHelper
+exception.httpClientHelper.nameExists=名称为[{0}]的Http模板已经存在！
+exception.httpClientHelper.notExists=名称为[{0}]的Http模板不存在！
+exception.httpClientHelper.noDefault=不存在默认Http模板！
+
 # 其他异常
 
 # 数字转化异常 NumberFormatException，出现在BasicResourceWarehouse类中

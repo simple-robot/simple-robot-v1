@@ -8,6 +8,7 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.exception.RobotRuntimeException;
+import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.listener.MsgIntercept;
 import com.forte.qqrobot.listener.MsgGetContext;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
@@ -69,7 +70,15 @@ public class ListenerManager implements MsgReceiver {
      * 由于全局Map可能会出现线程问题，故此使用线程安全的Map
      */
     private Map<String, Object> msgContextGlobalMap = new ConcurrentHashMap<>(4);
+
     
+    /**
+     * 每一个manager对象内部维护一个用于listen上下文对象的全局map对象，用于初始化ListenContext
+     * <br>
+     * 由于全局Map可能会出现线程问题，故此使用线程安全的Map
+     */
+    private Map<String, Object> listenContextGlobalMap = new ConcurrentHashMap<>(4);
+
     /**
      * 空的监听回执列表
      */
@@ -122,27 +131,6 @@ public class ListenerManager implements MsgReceiver {
         return invoke(msgget, params, at, sender, setter, getter);
     }
 
-//    /**
-//     * 接收到了消息
-//     */
-//    @Override
-//    public ListenResult[] onMsg(MsgGet msgget, SenderList sender){
-//        return onMsg(msgget,
-//                sender.isSenderList() ? (SenderSendList) sender : null,
-//                sender.isSetterList() ? (SenderSetList) sender : null,
-//                sender.isGetterList() ? (SenderGetList) sender : null);
-//    }
-//
-//    /**
-//     * 接收到了消息
-//     */
-//    @Override
-//    public ListenResult[] onMsg(MsgGet msgget, MsgSender sender){
-//        return onMsg(msgget,
-//                sender == null ? null : sender.SENDER,
-//                sender == null ? null : sender.SETTER,
-//                sender == null ? null : sender.GETTER);
-//    }
 
     /**
      * 接收到了消息响应
@@ -153,12 +141,14 @@ public class ListenerManager implements MsgReceiver {
      */
     private ListenResult[] invoke(MsgGet msgGet, Set<Object> args, AtDetection at,
                                   SenderSendList sendList , SenderSetList setList, SenderGetList getList){
-        //构建MsgSender对象
 
+        // 构建一个监听函数上下文对象
+        ListenContext context = ListenContext.getInstance(listenContextGlobalMap);
         //参数获取getter
-        Function<ListenerMethod, AdditionalDepends> paramGetter = buildParamGetter(msgGet, args, at, sendList, setList, getList);
+        Function<ListenerMethod, AdditionalDepends> paramGetter = buildParamGetter(msgGet, args, at, sendList, setList, getList, context);
         //获取消息类型
         MsgGetTypes type = MsgGetTypes.getByType(msgGet.getClass());
+
 
         //先查看是否存在阻断函数，如果存在阻断函数则执行仅执行阻断函数
         //获取阻断器
@@ -166,21 +156,20 @@ public class ListenerManager implements MsgReceiver {
         Set<ListenerMethod> blockMethod = plug.getBlockMethod(type);
         if(blockMethod != null){
             //如果存在阻断，执行阻断
-            invokeBlock(blockMethod, paramGetter, msgGet, at);
+            invokeBlock(blockMethod, paramGetter, msgGet, at, context);
 
-            // TODO 考虑移除此阻断机制
             ListenResult<Object> blockResult = ListenResultImpl.result(1, null, true, false, false, null);
 
             return new ListenResult[]{blockResult};
         }else{
             //如果不存在阻断，正常执行
             //先执行普通监听函数
-            Map.Entry<Integer, List<ListenResult>> normalIntResult = invokeNormal(type, paramGetter, msgGet, at);
+            Map.Entry<Integer, List<ListenResult>> normalIntResult = invokeNormal(type, paramGetter, msgGet, at, context);
             int invokeNum = normalIntResult.getKey();
 
             //如果没有普通监听函数执行成功，则尝试执行备用监听函数
             if(invokeNum <= 0){
-                Map.Entry<Integer, List<ListenResult>> spareIntList = invokeSpare(type, paramGetter, msgGet, at);
+                Map.Entry<Integer, List<ListenResult>> spareIntList = invokeSpare(type, paramGetter, msgGet, at, context);
                 normalIntResult.getValue().addAll(spareIntList.getValue());
             }
             // 将结果转化为数组并返回
@@ -205,15 +194,18 @@ public class ListenerManager implements MsgReceiver {
      * @param msgGet        接收到的消息
      * @param at            是否被at
      */
-    private void invokeBlock(Set<ListenerMethod> blockMethod, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, AtDetection at){
+    private void invokeBlock(Set<ListenerMethod> blockMethod, Function<ListenerMethod, AdditionalDepends> paramGetter,
+                             MsgGet msgGet, AtDetection at, ListenContext context){
         //过滤
         //获取过滤器
         ListenerFilter filter = ResourceDispatchCenter.getListenerFilter();
-        blockMethod.stream().filter(lisM -> filter.blockFilter(lisM, msgGet, at)).forEach(lisM -> {
+        blockMethod.stream().filter(lisM -> filter.blockFilter(lisM, msgGet, at, context)).forEach(lisM -> {
             //剩下的为过滤好的监听函数
             try{
                 //执行函数
-                lisM.invoke(paramGetter.apply(lisM));
+                AdditionalDepends addition = paramGetter.apply(lisM);
+                addition.put("context", context);
+                lisM.invoke(addition);
 
             }catch (Throwable e){
                 QQLog.error("阻断函数["+ lisM.getBeanToString() +"]执行函数["+ lisM.getMethodToString() +"]出现错误！", e);
@@ -260,7 +252,15 @@ public class ListenerManager implements MsgReceiver {
      * 构建参数获取getter
      * 额外参数作为 {@link AdditionalDepends} 类进行封装
      */
-    private Function<ListenerMethod, AdditionalDepends> buildParamGetter(MsgGet msgGet, Set<Object> args, AtDetection at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+    private Function<ListenerMethod, AdditionalDepends> buildParamGetter(MsgGet msgGet,
+                                                                         Set<Object> args,
+                                                                         AtDetection at,
+                                                                         SenderSendList sendList ,
+                                                                         SenderSetList setList,
+                                                                         SenderGetList getList,
+                                                                         ListenContext ListenContext
+
+    ){
         //增加参数:MsgGetTypes
         MsgGetTypes msgType = MsgGetTypes.getByType(msgGet.getClass());
 
@@ -274,6 +274,7 @@ public class ListenerManager implements MsgReceiver {
             map.put(msgType.toString(), msgType);
             MsgSender msgSender = MsgSender.build(sendList, setList, getList, lm, BotRuntime.getRuntime());
             map.put("msgSender", msgSender);
+            map.put("context", ListenContext);
             //将整合的送信器与原生sender都传入
             if(sendList != null){
                 map.put("sender", sendList);
@@ -303,7 +304,8 @@ public class ListenerManager implements MsgReceiver {
      * @param at            是否被at
      * @return              执行成功函数数量 & 结果集合(排过序的)
      */
-    private Map.Entry<Integer, List<ListenResult>> invokeNormal(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, AtDetection at){
+    private Map.Entry<Integer, List<ListenResult>> invokeNormal(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter,
+                                                                MsgGet msgGet, AtDetection at, ListenContext context){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
         //执行结果集合
@@ -318,7 +320,7 @@ public class ListenerManager implements MsgReceiver {
         // 这个first就是第一个出现的ListenBreak。但是，没啥用
         Optional<ListenResult> first = normalMethods.stream()
                 // 先过滤掉不符合条件的函数
-                .filter(lm -> listenerFilter.filter(lm, msgGet, at))
+                .filter(lm -> listenerFilter.filter(lm, msgGet, at, context))
                 // 在根据是否截断进行过滤，当出现了第一个截断返回值的时候停止执行
                 // 通过filter与findFirst组合使用来实现。
                 .map(lm -> {
@@ -357,7 +359,8 @@ public class ListenerManager implements MsgReceiver {
      * @param msgGet        接收的消息
      * @param at            是否被at
      */
-    private Map.Entry<Integer, List<ListenResult>> invokeSpare(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter, MsgGet msgGet, AtDetection at){
+    private Map.Entry<Integer, List<ListenResult>> invokeSpare(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter,
+                                                               MsgGet msgGet, AtDetection at, ListenContext context){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
 
@@ -373,7 +376,7 @@ public class ListenerManager implements MsgReceiver {
         // 这个first就是第一个出现的break。但是，没啥用
         Optional<ListenResult> first = spareMethods.stream()
                 // 先过滤掉不符合条件的函数
-                .filter(lm -> listenerFilter.filter(lm, msgGet, at))
+                .filter(lm -> listenerFilter.filter(lm, msgGet, at, context))
                 // 通过filter与findFirst组合使用来实现。
                 .map(lm -> {
                     try {

@@ -2,8 +2,8 @@ package com.forte.qqrobot.beans.types;
 
 import com.forte.qqrobot.beans.function.MostTypeFilter;
 
-import java.util.Arrays;
 import java.util.function.BiPredicate;
+import java.util.regex.Pattern;
 
 /**
  * 此枚举规定了如果关键词匹配的时候有多个关键词，那么如何匹配
@@ -16,31 +16,28 @@ public enum MostType {
     /** 需要全部匹配 */
     EVERY_MATCH((msg, kw, filter) -> {
         boolean b = true;
-        for (String k : kw) {
+        for (Pattern k : kw) {
             b &= filter.test(msg, k);
         }
         return b;
-//        return Arrays.stream(kw).allMatch(k -> filter.test(msg, k));
     }),
     /** 任意一个匹配 */
     ANY_MATCH((msg, kw, filter) -> {
-        for (String k : kw) {
+        for (Pattern k : kw) {
             if(filter.test(msg, k)){
                 return true;
             }
         }
         return false;
-        // return Arrays.stream(kw).anyMatch(k -> filter.test(msg, k));
     }),
     /** 没有匹配 */
     NONE_MATCH((msg, kw, filter) -> {
-        for (String k : kw) {
+        for (Pattern k : kw) {
             if (filter.test(msg, k)) {
                 return false;
             }
         }
         return true;
-//        return Arrays.stream(kw).noneMatch(k -> filter.test(msg, k));
     })
     ;
 
@@ -51,7 +48,7 @@ public enum MostType {
      * @param filter    关键词匹配方法
      * @return  是否匹配
      */
-    public boolean test(String msg, String[] keywords,  BiPredicate<String, String> filter){
+    public boolean test(String msg, Pattern[] keywords,  BiPredicate<String, Pattern> filter){
         return moreFilter.test(msg, keywords, filter);
     }
 
@@ -62,7 +59,7 @@ public enum MostType {
      * @param keywordMatchType 关键词匹配类型
      * @return  是否匹配
      */
-    public boolean test(String msg, String[] keywords, KeywordMatchType keywordMatchType){
+    public boolean test(String msg, Pattern[] keywords, KeywordMatchType keywordMatchType){
         return moreFilter.test(msg, keywords, keywordMatchType.filter);
     }
 

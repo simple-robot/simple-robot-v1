@@ -1,8 +1,9 @@
 package com.forte.qqrobot.beans.function;
 
-import com.forte.qqrobot.anno.Filter;
+import com.forte.qqrobot.anno.data.Filter;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.listener.Filterable;
+import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.listener.invoker.AtDetection;
 
 /**
@@ -12,6 +13,6 @@ import com.forte.qqrobot.listener.invoker.AtDetection;
 @FunctionalInterface
 public interface MostDIYTypeFilter {
 
-    boolean test(Filter filter, MsgGet msg, AtDetection at, Filterable[] filters);
+    boolean test(Filter filter, MsgGet msg, AtDetection at, ListenContext context, Filterable[] filters);
 
 }

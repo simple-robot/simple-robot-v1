@@ -8,10 +8,12 @@ import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.KeywordMatchType;
 import com.forte.qqrobot.exception.FilterException;
 import com.forte.qqrobot.listener.Filterable;
+import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.log.QQLogLang;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * 监听器过滤器
@@ -84,7 +86,7 @@ public class ListenerFilter {
      * @param listenerMethod 监听函数对象
      * @param at             是否被at了
      */
-    public boolean filter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at) {
+    public boolean filter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at, ListenContext context) {
         //如果不存在filter注解，直接放过
         if (!listenerMethod.hasFilter()) {
             return true;
@@ -101,7 +103,7 @@ public class ListenerFilter {
 
         //**************** 正常判断 ****************//
 
-        return allFilter(listenerMethod, msgGet, at);
+        return allFilter(listenerMethod, msgGet, at, context);
     }
 
 
@@ -111,10 +113,10 @@ public class ListenerFilter {
      * @param listenerMethod 监听函数
      * @param at             是否被at
      */
-    public boolean blockFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at) {
+    public boolean blockFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at, ListenContext context) {
         //如果不存在filter注解，则使用普通过滤器判断
         if (!listenerMethod.hasBlockFilter()) {
-            return filter(listenerMethod, msgGet, at);
+            return filter(listenerMethod, msgGet, at, context);
         }
         //获取过滤注解
         BlockFilter filter = listenerMethod.getBlockFilter();
@@ -129,37 +131,19 @@ public class ListenerFilter {
 
         //**************** 正常判断 ****************//
 
-        return allFilter(listenerMethod, msgGet, at);
-
-//        //获取关键词组
-//        String[] value = filter.value();
-//        //如果关键词数量大于1，则进行关键词过滤
-//        if (value.length > 0) {
-//            if (value.length == 1) {
-//                //如果只有一个参数，直接判断
-//                String singleValue = value[0];
-//                // 不再移除atCQ码
-//                return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
-//            } else {
-//                //如果有多个参数，按照规则判断
-//                //根据获取规则匹配
-//                return filter.mostType().test(msgGet.getMsg(), value, filter.keywordMatchType());
-//            }
-//        } else {
-//            return true;
-//        }
+        return allFilter(listenerMethod, msgGet, at, context);
     }
 
     /**
      * 全部的普配流程都走一遍，通过了才行
      */
-    private boolean allFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at) {
+    private boolean allFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at, ListenContext context) {
         // 基础过滤
         return  wordsFilter(listenerMethod, msgGet)
                 && groupFilter(listenerMethod, msgGet)
                 && codeFilter(listenerMethod, msgGet)
                 // 自定义过滤
-                && diyFilter(listenerMethod, msgGet, at)
+                && diyFilter(listenerMethod, msgGet, at, context)
                 ;
 
 
@@ -175,18 +159,21 @@ public class ListenerFilter {
      * @param at             是否被at了的判断器
      * @return 过滤结果
      */
-    private boolean diyFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at){
+    private boolean diyFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at, ListenContext context){
         Filter filter = listenerMethod.getFilter();
         String[] names = filter.diyFilter();
         if(names.length == 0){
             return true;
         }
+        // 封装对象
+        com.forte.qqrobot.anno.data.Filter filterData = listenerMethod.getFilterData();
+
         Filterable[] filters = getFilters(names);
         if(filters.length == 1){
-            return filters[0].filter(filter, msgGet, at);
+            return filters[0].filter(filterData, msgGet, at, context);
         }else{
             // 有多个
-            return filter.mostDIYType().test(filter, msgGet, at, filters);
+            return filter.mostDIYType().test(filterData, msgGet, at, context, filters);
         }
     }
 
@@ -202,29 +189,24 @@ public class ListenerFilter {
         Filter filter = listenerMethod.getFilter();
 
         //获取关键词组
-        String[] value = filter.value();
+        Pattern[] patternValue = listenerMethod.getPatternValue();
         //如果关键词数量大于1，则进行关键词过滤
-        if (value.length > 0) {
-            if (value.length == 1) {
+        if (patternValue.length > 0) {
+            if (patternValue.length == 1) {
                 //如果只有一个参数，直接判断
-                String singleValue = value[0];
+                Pattern singleValue = patternValue[0];
                 //如果需要被at，判断的时候移除at的CQ码
                 //2019/10/25 不再移除CQ码
                 return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
             } else {
                 //如果有多个参数，按照规则判断
                 //根据获取规则匹配
-                return filter.mostType().test(msgGet.getMsg(), value, filter.keywordMatchType());
+                return filter.mostType().test(msgGet.getMsg(), patternValue, filter.keywordMatchType());
             }
         } else {
             return true;
         }
     }
-
-    /**
-     * QQ号、群号的过滤规则，固定为去空并全匹配
-     */
-    private static final KeywordMatchType CODES_MATCH_TYPE = KeywordMatchType.TRIM_EQUALS;
 
 
     /**
@@ -250,7 +232,9 @@ public class ListenerFilter {
         }
 
         //获取需要的QQ号
-        String[] codes = filter.code();
+        Pattern[] codes = listenerMethod.getPatternCodeValue();
+
+
         if (codes.length == 0) {
             //没有codes，直接放过
             return true;
@@ -261,7 +245,7 @@ public class ListenerFilter {
                 return false;
             }
             if (codes.length == 1) {
-                String code = codes[0];
+                Pattern code = codes[0];
                 return codeMatchType.test(qqCode, code);
             } else {
                 //有多个
@@ -294,7 +278,7 @@ public class ListenerFilter {
         KeywordMatchType groupMatchType = filter.groupMatchType();
 
         //群号列表
-        String[] groups = filter.group();
+        Pattern[] groups = listenerMethod.getPatternGroupValue();
         //如果获取到的号码为null则不通过
         if (groups.length == 0) {
             //没有要匹配的，直接放过
@@ -307,7 +291,7 @@ public class ListenerFilter {
         }
         if (groups.length == 1) {
             //只有一条
-            String group = groups[0];
+            Pattern group = groups[0];
             return groupMatchType.test(groupCode, group);
         } else {
             return filter.mostGroupType().test(groupCode, groups, groupMatchType);
