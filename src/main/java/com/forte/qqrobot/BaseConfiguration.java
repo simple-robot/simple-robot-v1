@@ -338,19 +338,26 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
 
     /**
      * 是否启用本地服务器，默认启动
+     * 暂时无用
      */
     @Conf(value = "core.localServerEnable", comment = "尚未实装配置，可无视。> 是否启用本地服务器，默认为true")
+    @Deprecated
     private boolean localServerEnable = true;
 
     /**
      * 本地服务器使用的端口号，默认为8808
+     * 暂时无用
      */
     @Conf(value = "core.localServerPort", comment = "尚未实装配置，可无视。> 本地服务器使用的端口号，默认为8808")
+    @Deprecated
     private int localServerPort = 8808;
 
     @Conf(value = "core.checkVersion", comment = "从maven仓库检查是否存在可用的、可直接覆盖的更新的核心版本并进行提示。检测范围是前两位版本号相同的情况下。")
     private Boolean checkVersion = true;
 
+
+    @Conf(value = "core.enableServer", comment = "是否让组件启动一个(可能存在的)内置监听服务器，例如HTTP服务器或者ws服务器。默认开启")
+    private Boolean enableServer = true;
 
     //**************************************
     //*             以下为方法
@@ -889,5 +896,13 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
 
     public void setCheckVersion(Boolean checkVersion) {
         this.checkVersion = checkVersion;
+    }
+
+    public Boolean getEnableServer() {
+        return enableServer;
+    }
+
+    public void setEnableServer(Boolean enableServer) {
+        this.enableServer = enableServer;
     }
 }

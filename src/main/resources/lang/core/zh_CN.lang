@@ -170,6 +170,7 @@ filter.register=注册过滤器：{0}
 
 # listen 执行异常
 listener.run.error=监听函数[{0}]执行异常! {1}
+listener.bot.noVerify=BOT[{0}]未认证! 消息已被拦截。
 
 # 送信拦截器
 ## 当某个API被拦截器阻止，或者说拦截的时候的消息

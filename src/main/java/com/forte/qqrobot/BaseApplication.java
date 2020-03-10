@@ -13,6 +13,7 @@ import com.forte.qqrobot.anno.DIYFilter;
 import com.forte.qqrobot.anno.depend.AllBeans;
 import com.forte.qqrobot.beans.function.PathAssembler;
 import com.forte.qqrobot.beans.function.VerifyFunction;
+import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.bot.BotManagerImpl;
@@ -35,6 +36,7 @@ import com.forte.qqrobot.sender.*;
 import com.forte.qqrobot.sender.intercept.SenderGetIntercept;
 import com.forte.qqrobot.sender.intercept.SenderSendIntercept;
 import com.forte.qqrobot.sender.intercept.SenderSetIntercept;
+import com.forte.qqrobot.sender.senderlist.RootSenderList;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
@@ -47,27 +49,26 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 启动类总抽象类，在此实现部分通用功能
+ * 启动类总抽象类，在此实现部分通用功能并向组件提供抽象方法来获取功能的拓展与兼容
  * 实现closeable接口
  *
  * @param <CONFIG> 对应的插件配置类类型
- * @param <SP_API> 由组件实现方提供的特殊API对象。
- *                 此类型没有任何限制，一般情况下我希望此类型是提供于我提供的三大API接口中不存在的API。
- *                 例如：获取插件信息等等。
- *                 有时候，这个类型可能就是你实现了三大API接口的那个对象
+ * @param <SEND> sender送信器对应类型
+ * @param <SET>  setter送信器对应类型
+ * @param <GET>  getter送信器对应类型
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/29 10:18
  * @since JDK1.8
  **/
-@CoreVersion(
-        version = "",
-        author = "ForteScarlet",
-        email = "ForteScarlet@163.com"
-)
-public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> implements Closeable {
+public abstract class BaseApplication<CONFIG extends BaseConfiguration,
+        SEND extends SenderSendList,
+        SET extends SenderSetList,
+        GET extends SenderGetList
+        > implements Closeable {
 
     /**
      * 启动器使用的日志，前缀为“run”
@@ -107,6 +108,10 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      */
     private String[] args;
 
+    private ListenerManager manager;
+
+    private ListenerMethodScanner scanner;
+
     /**
      * bot管理中心
      */
@@ -139,7 +144,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         //将CQCodeUtil放入资源调度中心
         ResourceDispatchCenter.saveCQCodeUtil(CQCodeUtil.build());
         //将ListenerMethodScanner放入资源调度中心
-        ResourceDispatchCenter.saveListenerMethodScanner(new ListenerMethodScanner());
+        scanner = new ListenerMethodScanner();
+        ResourceDispatchCenter.saveListenerMethodScanner(scanner);
         //将ListenerFilter放入资源调度中心
         ResourceDispatchCenter.saveListenerFilter(new ListenerFilter());
     }
@@ -200,19 +206,53 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     //**************** 获取三种送信器 ****************//
 
     /**
-     * 获取消息发送接口, 将会在连接成功后使用
+     * 弃用
      */
-    protected abstract SenderSendList getSender();
+    @Deprecated
+    protected SenderSendList getSender(){return null;}
 
     /**
-     * 获取事件设置接口, 将会在连接成功后使用
+     * 弃用
      */
-    protected abstract SenderSetList getSetter();
+    @Deprecated
+    protected SenderSetList getSetter(){return null;}
 
     /**
-     * 获取资源获取接口, 将会在连接成功后使用
+     * 弃用
      */
-    protected abstract SenderGetList getGetter();
+    @Deprecated
+    protected SenderGetList getGetter(){return null;}
+
+    /**
+     * 提供一个msgGet，将其转化为SendList
+     * @param msgGet msgGet
+     * @return {@link SenderSendList}
+     */
+    protected abstract SEND getSender(MsgGet msgGet, BotManager botManager);
+    /**
+     * 提供一个msgGet，将其转化为SetList
+     * @param msgGet msgGet
+     * @return {@link SenderSetList}
+     */
+    protected abstract SET getSetter(MsgGet msgGet, BotManager botManager);
+    /**
+     * 提供一个msgGet，将其转化为GetList
+     * @param msgGet msgGet
+     * @return {@link SenderGetList}
+     */
+    protected abstract GET getGetter(MsgGet msgGet, BotManager botManager);
+
+
+    /**
+     * 根据{@link #getSender(MsgGet, BotManager)}, {@link #getSetter(MsgGet, BotManager)}, {@link #getGetter(MsgGet, BotManager)} 三个函数构建一个RootSenderList
+     * 参数分别为一个BotManager和一个MsgGet对象
+     * 如果组件不是分为三个部分而构建，则可以考虑重写此函数
+     * 此函数最终会被送入组件实现的runServer中
+     * @return RooenderList构建函数
+     */
+    protected Function<MsgGet, RootSenderList> getRootSenderFunction(BotManager botManager){
+        return m -> new ProxyRootSender(getSender(m, botManager), getSetter(m, botManager), getGetter(m, botManager));
+    }
 
     /**
      * 启动时候的初始验证函数
@@ -254,21 +294,40 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
     }
 
     /**
-     * 获取特殊API对象
+     * 弃用
      */
-    public abstract SP_API getSpecialApi();
+    @Deprecated
+    public Object getSpecialApi(){return null;}
 
     /**
-     * 开发者实现的启动方法
-     * v1.1.2-BETA后返回值修改为String，意义为启动结束后打印“启动成功”的时候使用的名字
-     * 例如，返回值为“server”，则会输出“server”启动成功
-     * <p>
-     * v1.4.1之后增加一个参数：dependCenter
+     * <pre> 开发者实现的启动方法
+     * <pre> v1.1.2-BETA后返回值修改为String，意义为启动结束后打印“启动成功”的时候使用的名字
+     * <pre> 例如，返回值为“server”，则会输出“server”启动成功
+     * <pre> v1.4.1之后增加一个参数：dependCenter
+     * <pre> v1.9.0后不再作为抽象方法，私有化并拆分
      *
      * @param dependCenter 依赖管理器，可以支持组件额外注入部分依赖。
      * @param manager      监听管理器，用于分配获取到的消息
      */
-    protected abstract String start(DependCenter dependCenter, ListenerManager manager);
+    private String start(DependCenter dependCenter, ListenerManager manager){
+
+    }
+
+    /**
+     * 获取一个bu's不使用在监听函数中的默认送信器
+     * @param dependCenter
+     * @param manager
+     * @param defaultBot
+     * @return
+     */
+    protected abstract MsgSender getDefaultSender(DependCenter dependCenter, ListenerManager manager, BotInfo defaultBot);
+
+
+    protected abstract String runServer(DependCenter dependCenter, ListenerManager manager, Function<MsgGet, RootSenderList> senderFunction);
+
+
+
+
 
     /**
      * 开发者实现的获取Config对象实例的方法
@@ -307,7 +366,24 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      */
     protected void afterDepend(CONFIG config, Application<CONFIG> app, Register register, DependCenter dependCenter) {
         // 初始化bot管理中心
-        initBotManager(dependCenter);
+        BotManager botManager = initBotManager(dependCenter);
+
+        // 注册监听函数并构建ListenerManager
+        registerListener(config, app, scanner, dependCenter, botManager);
+
+
+        //**************** 加载所有的送信器拦截器 ****************//
+        loadMsgSenderIntercept(config, dependCenter);
+
+        //**************** 加载所有存在于依赖中的DIYFilter ****************//
+        loadDIYFilter(config, dependCenter);
+
+        //**************** 注册PathAssembler和VerifyFunction ****************//
+        VerifyFunction verifyFunction = verifyBot();
+        PathAssembler pathAssembler = config.getPathAssembler();
+        dependCenter.load(verifyFunction);
+        dependCenter.load(pathAssembler);
+
 
     }
 
@@ -315,9 +391,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 初始化账号管理器BotManager
      * @param dependCenter 依赖中心
      */
-    private void initBotManager(DependCenter dependCenter){
-        System.out.println(dependCenter.get(VerifyFunction.class));
-        System.out.println(dependCenter.get(PathAssembler.class));
+    private BotManager initBotManager(DependCenter dependCenter){
         // 初始化bot管理中心
         // 尝试从依赖中获取，如果获取不到，使用默认的管理中心并存入依赖
         getLog().debug("botmanager.get.depend");
@@ -330,6 +404,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         }
         this.botManager = botManager;
         getLog().debug("botmanager.load", botManager);
+        return botManager;
     }
 
 
@@ -421,42 +496,19 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * 配置结束后的方法
      */
     private DependCenter afterConfig(CONFIG config, Application<CONFIG> app) {
-
-        //构建监听扫描器
-        ListenerMethodScanner scanner = ResourceDispatchCenter.getListenerMethodScanner();
-
         // 扫描并获取依赖中心
         DependCenter dependCenter = scanAndInject(config, app);
 
-        // 注册监听函数
-        registerListener(config, app, scanner, dependCenter);
-
         // ** 依赖注入完毕 **
-
         // 注册config
         dependCenter.load(config);
 
-        //根据配置类的扫描结果来构建监听器管理器和阻断器
-        // 准备获取消息拦截器
+        //返回依赖管理器
+        return dependCenter;
+    }
 
-        RUN_LOG.debug("intercept.msg.prepare");
-        MsgIntercept[] msgIntercepts = dependCenter.getByType(MsgIntercept.class, new MsgIntercept[0]);
-        if(msgIntercepts == null || msgIntercepts.length == 0){
-            RUN_LOG.debug("intercept.msg.empty");
-        }
-
-        // 构建管理中心
-        ListenerManager manager = scanner.buildManager(msgIntercepts);
-
-        // 构建阻断器
-        Plug plug = scanner.buildPlug();
-
-        //保存
-        ResourceDispatchCenter.saveListenerManager(manager);
-        ResourceDispatchCenter.savePlug(plug);
-
-
-        //准备截器
+    private void loadMsgSenderIntercept(CONFIG config, DependCenter dependCenter){
+        //准备拦截器
         RUN_LOG.debug("intercept.sender.prepare");
         SenderSendIntercept[] senderSendIntercepts = dependCenter.getByType(SenderSendIntercept.class, new SenderSendIntercept[0]);
         if(senderSendIntercepts == null || senderSendIntercepts.length == 0){
@@ -482,24 +534,12 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         MsgSender.setSenderSendIntercepts(senderSendIntercepts);
         MsgSender.setSenderSetIntercepts(senderSetIntercepts);
         MsgSender.setSenderGetIntercepts(senderGetIntercepts);
-
-        //**************** 加载所有存在于依赖中的DIYFilter ****************//
-        loadDIYFilter(dependCenter);
-
-        //**************** 注册PathAssembler和VerifyFunction ****************//
-        VerifyFunction verifyFunction = verifyBot();
-        PathAssembler pathAssembler = config.getPathAssembler();
-        dependCenter.load(verifyFunction);
-        dependCenter.load(pathAssembler);
-
-        //返回依赖管理器
-        return dependCenter;
     }
 
     /**
      * 加载所有的DIYFilter
      */
-    private void loadDIYFilter(DependCenter dependCenter){
+    private void loadDIYFilter(CONFIG config, DependCenter dependCenter){
         Filterable[] filterables = dependCenter.getByType(Filterable.class, new Filterable[0]);
         for (Filterable filterable : filterables) {
             Class<? extends Filterable> filterClass = filterable.getClass();
@@ -514,7 +554,6 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
             name = name == null ? FieldUtils.headLower(filterClass.getSimpleName()) : name;
             ListenerFilter.registerFilter(name, filterable);
         }
-
     }
 
 
@@ -526,8 +565,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
      * @param scanner      扫描器
      * @param dependCenter 依赖中心
      */
-    private void registerListener(CONFIG config, Application<CONFIG> app, ListenerMethodScanner scanner, DependCenter dependCenter) {
-
+    private void registerListener(CONFIG config, Application<CONFIG> app, ListenerMethodScanner scanner, DependCenter dependCenter, BotManager botManager) {
         // > 监听函数注册之前
         beforeRegisterListener(config, app, scanner, dependCenter);
 
@@ -541,6 +579,27 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
                 register.performingTasks(c);
             }
         }
+
+        //根据配置类的扫描结果来构建监听器管理器和阻断器
+        // 准备获取消息拦截器
+
+        RUN_LOG.debug("intercept.msg.prepare");
+        MsgIntercept[] msgIntercepts = dependCenter.getByType(MsgIntercept.class, new MsgIntercept[0]);
+        if(msgIntercepts == null || msgIntercepts.length == 0){
+            RUN_LOG.debug("intercept.msg.empty");
+        }
+
+        // 构建监听器管理中心
+        // 构建管理中心
+        manager = scanner.buildManager(botManager, msgIntercepts);
+
+        // 构建阻断器
+        Plug plug = scanner.buildPlug();
+
+        //保存
+        ResourceDispatchCenter.saveListenerManager(manager);
+        ResourceDispatchCenter.savePlug(plug);
+
     }
 
     /**
@@ -780,9 +839,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration, SP_API> 
         // 依赖注入之后
         afterDepend(config, app, this.register, dependCenter);
 
-
         //获取管理器
-        ListenerManager manager = ResourceDispatchCenter.getListenerManager();
         dependCenter.load(manager);
 
         // > 启动之前

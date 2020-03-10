@@ -3,16 +3,16 @@ package com.forte.qqrobot.listener.invoker;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.listener.result.ListenResult;
 import com.forte.qqrobot.sender.MsgSender;
-import com.forte.qqrobot.sender.senderlist.*;
+import com.forte.qqrobot.sender.senderlist.RootSenderList;
+import com.forte.qqrobot.sender.senderlist.SenderGetList;
+import com.forte.qqrobot.sender.senderlist.SenderSendList;
+import com.forte.qqrobot.sender.senderlist.SenderSetList;
 
 import java.util.function.Function;
 
 
 /**
- *
- * 消息接收者接口，用于向外界用户提供消息接收接口
- * 返回值一般都是监听回执{@link com.forte.qqrobot.listener.result.ListenResult[]}数组
- *
+ * {@link ListenerManager} s所使用的接口
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
