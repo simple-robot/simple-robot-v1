@@ -1,5 +1,9 @@
 ## 版本更新记录
 
+## 1.10.1
+- 修复由于`@Filter`过滤机制的变动而导致`KeywordMatchTypeFactory`工厂创建的枚举无法使用的BUG。
+
+
 ## 1.10.0
 - 修改SENDER接口，为`setGroupLeave`(退出群)API增加一个参数：`dissolve`: 假如此账号是群主，则此参数代表是否要解散群。默认为false
 

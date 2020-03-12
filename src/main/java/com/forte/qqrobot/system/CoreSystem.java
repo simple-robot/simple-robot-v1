@@ -16,7 +16,7 @@ import java.util.Properties;
  * @author ForteScarlet
  * @version  1.7.0
  */
-@Version(version = "1.10.0")
+@Version(version = "1.10.1")
 public final class CoreSystem {
 
     /** 当前程序的RUN_TIME对象 */

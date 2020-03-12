@@ -84,11 +84,21 @@ public enum KeywordMatchType {
     /**
      * 进行比对
      * @param msg       消息
-     * @param keyword   关键词
+     * @param keyword   关键词的正则对象
      * @return          比对结果
      */
     public Boolean test(String msg, Pattern keyword){
         return msg != null && filter.test(msg, keyword);
+    }
+
+    /**
+     * 进行比对
+     * @param msg       消息
+     * @param keyword   关键词
+     * @return          比对结果
+     */
+    public Boolean test(String msg, String keyword){
+        return msg != null && filter.test(msg, Pattern.compile(keyword));
     }
 
     /**

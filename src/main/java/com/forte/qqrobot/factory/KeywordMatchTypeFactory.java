@@ -7,6 +7,7 @@ import com.forte.qqrobot.log.QQLog;
 
 import java.util.function.BiPredicate;
 import java.util.function.IntFunction;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -65,7 +66,7 @@ public class KeywordMatchTypeFactory extends BaseFactory<KeywordMatchType> {
      * @throws EnumInstantiationRequireException 参数权限验证失败
      * @throws EnumInstantiationException        实例化异常
      */
-    public KeywordMatchType register(String name, BiPredicate<String, String> filter) throws EnumInstantiationRequireException, EnumInstantiationException {
+    public KeywordMatchType register(String name, BiPredicate<String, Pattern> filter) throws EnumInstantiationRequireException, EnumInstantiationException {
             return super.registerEnum(name, filter);
     }
 
@@ -77,7 +78,7 @@ public class KeywordMatchTypeFactory extends BaseFactory<KeywordMatchType> {
      * @param filter    字符串过滤规则
      * @return
      */
-    public static KeywordMatchType registerType(String name, BiPredicate<String, String> filter) throws EnumInstantiationRequireException, EnumInstantiationException {
+    public static KeywordMatchType registerType(String name, BiPredicate<String, Pattern> filter) throws EnumInstantiationRequireException, EnumInstantiationException {
         return getInstance().register(name, filter);
     }
 
