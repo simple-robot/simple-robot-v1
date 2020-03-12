@@ -621,6 +621,27 @@ public class DependCenter implements DependGetter, DependInjector {
     //**************************************
 
     /**
+     * 根据父类类型寻找依赖池中的存在的子类类型列表
+     * @param superType 父类类型
+     * @param <T>
+     * @return
+     */
+    public <T> List<Class<? extends T>> getTypesBySuper(Class<T> superType){
+        List<Class<? extends T>> list = new ArrayList<>(4);
+        // 使用类型工厂
+        Set<Class> keySet = classResourceWareHouse.keySet();
+        for (Class keyClass : keySet) {
+            if(keyClass.equals(superType) || FieldUtils.isChild(keyClass, superType)){
+                // 类型下的depend唯一
+                if(classResourceWareHouse.get(keyClass).size() == 1){
+                    list.add(keyClass);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
      * 根据一个父类类型，获取所有存在的子类。理论上效率较低
      * @param <T> 父类类型，例如一个接口类型
      * @return 所有实现类

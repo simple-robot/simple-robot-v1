@@ -1,6 +1,8 @@
 package com.forte.qqrobot;
 
 import com.forte.qqrobot.bot.BotManager;
+import com.forte.qqrobot.depend.Depend;
+import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
@@ -34,12 +36,16 @@ public class SimpleRobotContext<
     public final SET SETTER;
     public final GET GETTER;
 
-    public BotManager botManager;
+    private BotManager botManager;
 
     /** 监听消息字符串转化函数 */
     private MsgParser msgParser;
+
     /** 监听消息执行器 */
     private MsgProcessor processor;
+
+    /** 依赖中心 */
+    private DependCenter dependCenter;
 
     /**
      * 构造函数
@@ -50,13 +56,21 @@ public class SimpleRobotContext<
      * @param msgParser 消息字符串转化器
      * @param processor 监听消息执行器
      */
-    public SimpleRobotContext(SEND sender, SET setter, GET getter, BotManager manager, MsgParser msgParser, MsgProcessor processor){
+    public SimpleRobotContext(SEND sender,
+                              SET setter,
+                              GET getter,
+                              BotManager manager,
+                              MsgParser msgParser,
+                              MsgProcessor processor,
+                              DependCenter dependCenter
+                              ){
         this.SENDER = sender;
         this.SETTER = setter;
         this.GETTER = getter;
         this.botManager = manager;
         this.msgParser = msgParser;
         this.processor = processor;
+        this.dependCenter = dependCenter;
     }
 
     /**
@@ -83,6 +97,14 @@ public class SimpleRobotContext<
      */
     public MsgProcessor getMsgProcessor(){
         return processor;
+    }
+
+    /**
+     * 获取依赖管理中心
+     * @return 依赖管理中心
+     */
+    public DependCenter getDependCenter(){
+        return dependCenter;
     }
 
 }

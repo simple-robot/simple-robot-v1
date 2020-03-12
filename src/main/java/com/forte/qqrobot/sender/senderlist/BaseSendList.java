@@ -15,7 +15,7 @@ public abstract class BaseSendList implements SenderSendList {
      * @param msg   消息内容
      */
     @Override
-    public boolean sendDiscussMsg(String group, String msg) {
+    public String sendDiscussMsg(String group, String msg) {
         throw RobotApiException.byFrom();
     }
 
@@ -26,7 +26,7 @@ public abstract class BaseSendList implements SenderSendList {
      * @param msg   消息内容
      */
     @Override
-    public boolean sendGroupMsg(String group, String msg) {
+    public String sendGroupMsg(String group, String msg) {
         throw RobotApiException.byFrom();
     }
 
@@ -37,7 +37,7 @@ public abstract class BaseSendList implements SenderSendList {
      * @param msg 消息内容
      */
     @Override
-    public boolean sendPrivateMsg(String QQ, String msg) {
+    public String sendPrivateMsg(String QQ, String msg) {
         throw RobotApiException.byFrom();
     }
 

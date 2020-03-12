@@ -4,6 +4,8 @@ import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.ResultSelectType;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.result.ListenResult;
+import com.forte.qqrobot.sender.ProxyRootSender;
+import com.forte.qqrobot.sender.senderlist.RootSenderList;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
@@ -33,9 +35,7 @@ public class MsgProcessor implements MsgProcessable {
      * 对于三大送信器的构建函数
      */
 
-    private Function<MsgGet, SenderSendList> senderFunc;
-    private Function<MsgGet, SenderSetList> setterFunc;
-    private Function<MsgGet, SenderGetList> getterFunc;
+    private Function<MsgGet, RootSenderList> rootSenderFunc;
 
     /**
      * 构造
@@ -49,14 +49,28 @@ public class MsgProcessor implements MsgProcessable {
             ResultSelectType selectType,
             ListenerManager listenerManager,
             Function<MsgGet, SenderSendList> senderFunc,
-            Function<MsgGet, SenderSetList> setterFunc,
-            Function<MsgGet, SenderGetList> getterFunc
+            Function<MsgGet, SenderSetList > setterFunc,
+            Function<MsgGet, SenderGetList > getterFunc
     ){
         this.selectType = selectType;
         this.listenerManager = listenerManager;
-        this.senderFunc = senderFunc;
-        this.setterFunc = setterFunc;
-        this.getterFunc = getterFunc;
+        this.rootSenderFunc = m -> new ProxyRootSender(senderFunc.apply(m), setterFunc.apply(m), getterFunc.apply(m));
+    }
+
+    /**
+     * 构造
+     * @param selectType            监听回执筛选器
+     * @param listenerManager       监听函数管理器
+     * @param rootSenderFunc        rootSender构造器
+     */
+    public MsgProcessor(
+            ResultSelectType selectType,
+            ListenerManager listenerManager,
+            Function<MsgGet, RootSenderList> rootSenderFunc
+    ){
+        this.selectType = selectType;
+        this.listenerManager = listenerManager;
+        this.rootSenderFunc = rootSenderFunc;
     }
 
     /**
@@ -66,7 +80,7 @@ public class MsgProcessor implements MsgProcessable {
      */
     @Override
     public ListenResult[] onMsg(MsgGet msgGet) {
-        return listenerManager.onMsg(msgGet, senderFunc, setterFunc, getterFunc);
+        return listenerManager.onMsg(msgGet, rootSenderFunc);
     }
 
     /**

@@ -116,7 +116,7 @@ public class HttpClientHelper implements HttpClientAble {
      * @return 网页的返回值字符串
      */
     @Override
-    public String post(String url, Map<String, String> params, Map<String, String> cookies, Map<String, String> header) {
+    public String post(String url, String params, Map<String, String> cookies, Map<String, String> header) {
         return httpTemplate.post(url, params, cookies, header);
     }
 

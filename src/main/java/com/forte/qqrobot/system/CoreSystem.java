@@ -4,7 +4,8 @@ package com.forte.qqrobot.system;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.anno.Version;
 import com.forte.qqrobot.log.QQLogLang;
-import com.forte.qqrobot.utils.HttpClientUtil;
+import com.forte.qqrobot.sender.HttpClientAble;
+import com.forte.qqrobot.sender.HttpClientHelper;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.Properties;
  * @author ForteScarlet
  * @version  1.7.0
  */
-@Version(version = "1.8.1")
+@Version(version = "1.9.0")
 public final class CoreSystem {
 
     /** 当前程序的RUN_TIME对象 */
@@ -68,7 +69,8 @@ public final class CoreSystem {
                     LOG_LANG.success("version.newest", CORE_VERSION, versionFamily);
                 }
             }catch (Exception e){
-                LOG_LANG.warning("check.failed");
+                LOG_LANG.warning("version.check.failed");
+                LOG_LANG.debug("version.check.failed", e);
             }
         }
     }
@@ -81,6 +83,8 @@ public final class CoreSystem {
      * @return key为版本系，value为是否存在更新版本
      */
     private static Map.Entry<String, Boolean> hasNewerVersion(String version, String groupId, String artifactId){
+        HttpClientAble defaultHttp = HttpClientHelper.getDefaultHttp();
+
         String[] vs = version.split("\\.");
         int lastVersionUpper = Integer.parseInt(vs[vs.length - 1]) + 1;
         StringBuilder sb = new StringBuilder();
@@ -103,14 +107,16 @@ public final class CoreSystem {
 
         // 检测是否有高一级的版本
         String checkUrl1 = url + upperVs;
-        String checkString1 = HttpClientUtil.get(checkUrl1);
+        LOG_LANG.debug("version.check.url", checkUrl1);
+        String checkString1 = defaultHttp.get(checkUrl1);
         if(checkString1 != null){
             end.setValue(true);
             return end;
         }
         // 尝试在加1级别的小等级
         String checkUrl2 = url + upperVsPlus;
-        String checkString2 = HttpClientUtil.get(checkUrl2);
+        LOG_LANG.debug("version.check.url", checkUrl2);
+        String checkString2 = defaultHttp.get(checkUrl2);
         if(checkString2 != null){
             end.setValue(true);
             return end;

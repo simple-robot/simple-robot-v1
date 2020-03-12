@@ -12,7 +12,7 @@ public interface Filterable {
 
     /**
      * 根据自定义规则对消息进行过滤
-     * @param filter  filter注解对象
+     * @param filter  filter注解对象, 如果不存在@Filter，则会为null
      * @param msgget  接收到的消息
      * @param at      判断当前消息是否被at的函数
      * @param context 监听上下文

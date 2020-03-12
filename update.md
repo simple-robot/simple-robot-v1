@@ -4,23 +4,41 @@
 - SENDER中增加一个新的接口：发送群公告
 - 由此版本开始，SENDER中的：`sendPrivateMsg`、`sendGroupMsg`、`sendDiscussMsg`将修改返回值，由`boolean`修改为`String`来代表发送的消息的消息ID，以实现可以对自己的消息进行撤回。
    一般情况下，如果返回的字符串为`null`，则可能代表原返回值的`false`
-   注意: 如果你的sender在发送消息的时候被送信拦截器所拦截，则默认的返回值可能是一个空字符串而不是`null`。
+   注意: 如果你的sender在发送消息的时候被**送信拦截器**所拦截，则默认的返回值可能是一个空字符串而不是`null`。
    
 - 启动器中，修改面向组件的约定，分离启动器中的“组件启动”、“组件服务启动”等配置
 - 将类似于“无服务启动”的选项整合进核心中，提供一个配置项`core.enableServer`来决定是否需要让组件启动一个服务，默认为`true`，即开启。
-- 提供启动方法`run`的返回值`SimpleRobotContext`(或者是此类针对于组件的特殊子类)，并在其中提供提供一些有用的函数，例如：
-    - 默认的三大送信器
-    - `BotManager`
-    - 监听函数原生字符串转`MsgGet`对象的函数
-    - 监听函数的执行器
 其中后两项，由于组件的启动机制修改，你可以通过这两项对象来实现自定义消息接收，并以更高效的处理环境来处理。
-例如，你设置了上述配置属性`core.enableServer=false`，来阻止组件内部的服务器生成(它们大多数效率不够高效)，然后通过上面提到的"监听函数字符串转化器"与"监听函数执行器"来实现通过外部搭建的服务来分配任务(例如常见的springboot+tomcat的web服务或者基于netty的高效nio服务)
+例如，你设置了上述配置属性`core.enableServer=false`，来阻止组件内部的服务器的启动(它们大多数效率不够高效)，然后通过上面提到的"监听函数字符串转化器"与"监听函数执行器"来实现通过外部搭建的服务来分配任务(例如常见的springboot+tomcat的web服务或者基于netty的高效nio服务)
  
 - 监听器处理逻辑变更：当接收到未注册的bot的消息的时候，不会处理消息内容并提供一个error日志。
    
-    
+- 为`Filterable`接口增加一个参数：`ListenContext` (监听上下文)
+- 为`Filterable`接口修改一个参数：`@Filter` (注解对象) 修改为类`Filter` (与注解同名的数据类对象)
+- 将监听执行异常的文字加入到语言文件
+- 修复`ListenContext`的"当前上下文"无法连携当前上下监听器值的bug
+- 简单修改`ListenContext`内部结构
+- 修改了`@Filter`内部对于`value`参数的匹配规则, 理论上会略微增加效率
 
+- 增加接口`HttpClientAble`接口，以实现自定义http请求方式, 使得用户可以摒弃原本内部的`HttpClientUtil`的使用。如果没有实现，核心内部会提供一个默认的实现方式，类似于原本的`HttpClientUtil`。
+- 增加`HttpClientHelper`类，以使用上述的`HttpClientAble`接口，使用`registerClient`方法注册。
+- 增加注解`@HttpTemplate`来自动注册一个`HttpClientAble`接口的实现类到`HttpClientHelper`类中。
 
+- 调整父类启动器`BaseApplication`对于子类的约束方式，实现服务启动与信息获取分离，实现了由核心框架控制服务开启。
+- 调整父类启动器`BaseApplication`的`run`方法，使其拥有返回值，并将原本可以通过`application`实例对象获取的值移动到`SimpleRobotContext`中获取。
+- 提供启动方法`run`的返回值`SimpleRobotContext`(或者是此类针对于组件的特殊子类)，并在其中提供提供一些有用的函数，例如：
+  - 默认的三大送信器
+  - `BotManager`
+  - 监听函数原生字符串转`MsgGet`对象的函数
+  - 监听函数的执行器
+  - `DependCenter`依赖中心
+  
+- `@Filter`注解中增加三个参数：`String[] bot()`、`KeywordMatchType botMatchType()`、`MostType mostBotType()`, 这三个参数与群号过滤、qq号过滤类似，用来筛选"当前接收消息的BOT"。假如监听消息获取到的"ThisCode"参数为null，则默认放行。
+- `@Filter`匹配策略修改：如果当前消息是**群号携带者**但是获取到的群号为null，则一律放行。（之前为不放行）
+- `@Filter`匹配策略修改：如果当前消息是**账号携带者**但是获取到的账号为null，则一律放行。（之前为不放行）
+- 目前过滤器自带的过滤规则顺序为：bot -> group -> code -> word -> 自定义
+
+- 修改注解`@SimpleRobotApplication`注解中的`application`参数的匹配规则，如果在`resources`路径中无法获取，则会尝试将其作为文件路径获取。
 
 
 
@@ -36,19 +54,6 @@
 - 为`GroupInfo`和`GroupList`中的`Group`增加默认的`getHeadUrl` (获取群头像)接口实现。    
 - 优化注解配置与启动器的启动转化逻辑，使其支持标注在任何实现了`Application`接口的类上时，会获取其实例并执行。配置覆盖顺序：代码配置 -覆盖-> 注解配置 -覆盖-> 文件配置    
 - 修复`AtDetection`在`1.8.x`后出现的bug
-- 为`Filterable`接口增加一个参数：`ListenContext` (监听上下文)
-- 为`Filterable`接口修改一个参数：`@Filter` (注解对象) 修改为类`Filter` (与注解同名的数据类对象)
-- 将监听执行异常的文字加入到语言文件
-- 修复`ListenContext`的"当前上下文"无法连携当前上下监听器值的bug
-- 简单修改`ListenContext`内部结构
-- 修改了`@Filter`内部对于`value`参数的匹配规则, 理论上会略微增加效率
-
-- 增加接口`HttpClientAble`接口，以实现自定义http请求方式, 以使得用户可以摒弃原本内部低效率的`HttpClientUtil`的使用。如果没有实现，核心内部会提供一个默认的实现方式，类似于原本的`HttpClientUtil`。
-- 增加`HttpClientHelper`类，以使用上述的`HttpClientAble`接口，使用`registerClient`方法注册。
-- 增加注解`@HttpTemplate`来自动注册一个`HttpClientAble`接口的实现类到`HttpClientHelper`类中。
-
-- 调整父类启动器`BaseApplication`对于子类的约束方式，实现服务启动与信息获取分离，实现了由核心框架控制服务开启。
-- 调整父类启动器`BaseApplication`的`run`方法，使其拥有返回值，并将原本可以通过`application`实例对象获取的值移动到`SimpleRobotContext`中获取。
 
 
 

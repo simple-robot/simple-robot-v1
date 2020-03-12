@@ -244,7 +244,7 @@ public class ListenerMethodScanner {
      * @return 监听函数管理器实例
      */
     public ListenerManager buildManager(BotManager botManager, MsgIntercept[] intercepts){
-        return new ListenerManager(listenerMethodSet, intercepts);
+        return new ListenerManager(listenerMethodSet, botManager, intercepts);
     }
 
     /**

@@ -13,11 +13,7 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
@@ -34,13 +30,13 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author H__D
  * @date 2016年10月19日 上午11:27:25
  */
+@Deprecated
 public class HttpClientUtil {
 
     // utf-8字符编码
@@ -72,9 +68,7 @@ public class HttpClientUtil {
     private static RequestConfig requestConfig;
 
     static {
-
         try {
-            //System.out.println("初始化HttpClientTest~~~开始");
             SSLContextBuilder builder = new SSLContextBuilder();
 
             builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
@@ -263,31 +257,31 @@ public class HttpClientUtil {
     }
 
 
-    /**
-     * 发送 post请求（带文件）
-     *
-     * @param httpUrl   地址
-     * @param maps      参数
-     * @param fileLists 附件
-     */
-    public static String post(String httpUrl, Map<String, String> maps, List<File> fileLists) {
-        HttpPost httpPost = new HttpPost(httpUrl);// 创建httpPost
-        MultipartEntityBuilder meBuilder = MultipartEntityBuilder.create();
-        if (maps != null) {
-            for (String key : maps.keySet()) {
-                meBuilder.addPart(key, new StringBody(maps.get(key), ContentType.TEXT_PLAIN));
-            }
-        }
-        if (fileLists != null) {
-            for (File file : fileLists) {
-                FileBody fileBody = new FileBody(file);
-                meBuilder.addPart("files", fileBody);
-            }
-        }
-        HttpEntity reqEntity = meBuilder.build();
-        httpPost.setEntity(reqEntity);
-        return sendHttpRequest(httpPost);
-    }
+//    /**
+//     * 发送 post请求（带文件）
+//     *
+//     * @param httpUrl   地址
+//     * @param maps      参数
+//     * @param fileLists 附件
+//     */
+//    public static String post(String httpUrl, Map<String, String> maps, List<File> fileLists) {
+//        HttpPost httpPost = new HttpPost(httpUrl);// 创建httpPost
+//        MultipartEntityBuilder meBuilder = MultipartEntityBuilder.create();
+//        if (maps != null) {
+//            for (String key : maps.keySet()) {
+//                meBuilder.addPart(key, new StringBody(maps.get(key), ContentType.TEXT_PLAIN));
+//            }
+//        }
+//        if (fileLists != null) {
+//            for (File file : fileLists) {
+//                FileBody fileBody = new FileBody(file);
+//                meBuilder.addPart("files", fileBody);
+//            }
+//        }
+//        HttpEntity reqEntity = meBuilder.build();
+//        httpPost.setEntity(reqEntity);
+//        return sendHttpRequest(httpPost);
+//    }
 
     /**
      * 发送 post请求

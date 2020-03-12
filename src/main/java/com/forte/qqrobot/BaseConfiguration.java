@@ -316,6 +316,10 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
             if (this.corePoolSize == null) {
                 this.corePoolSize = CoreSystem.getBestPoolSize(this.blockingFactor) >> 1;
             }
+            // 核心线程数量如果为0，设置为1
+            if (this.corePoolSize <= 0) {
+                this.corePoolSize = 1;
+            }
             // 最大线程数量, 默认为corePoolSize的2倍+1。
             if (this.maximumPoolSize == null) {
                 this.maximumPoolSize = (this.corePoolSize << 1) + 1;

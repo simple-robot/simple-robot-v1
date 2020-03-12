@@ -112,7 +112,23 @@ public @interface Filter {
      */
     MostDIYType mostDIYType() default MostDIYType.ANY_MATCH;
 
+    //**************** 以下为1.9.0添加 ****************//
 
+    /**
+     * 如果当前组件支持获取“当前接收消息的机器人”的话，此处为筛选为只处理哪些bot的消息
+     */
+    String[] bot() default {};
+
+    /**
+     * 对于单个机器人账号的匹配规则，一般来讲使用默认的equals即可
+     */
+    KeywordMatchType botMatchType() default KeywordMatchType.TRIM_EQUALS;
+
+    /**
+     * 与{@link #mostType()} 功能类似，当{@link #bot()}存在多个bot的时候，判断其匹配规则。
+     * 默认为任意匹配即可。
+     */
+    MostType mostBotType() default MostType.ANY_MATCH;
 
 
     /**

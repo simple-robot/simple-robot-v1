@@ -7,12 +7,12 @@ package com.forte.qqrobot.exception;
  */
 public class RobotRunException extends RobotRuntimeException {
 
-    private static final String EXCEPTION_TAG = "run";
-
-    @Override
-    public String getExceptionTag(){
-        return EXCEPTION_TAG;
-    }
+//    private static final String EXCEPTION_TAG = "run";
+//
+//    @Override
+//    public String getExceptionTag(){
+//        return EXCEPTION_TAG;
+//    }
 
     public RobotRunException() {
     }

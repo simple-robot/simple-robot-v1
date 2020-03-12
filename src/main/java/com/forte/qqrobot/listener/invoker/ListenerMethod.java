@@ -57,6 +57,7 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
     private final Pattern[] patternCodeValue;
     private final Pattern[] patternGroupValue;
+    private final Pattern[] patternBotValue;
 
     /** 阻塞过滤器注解，如果没有则为null */
     private final BlockFilter blockFilter;
@@ -115,11 +116,21 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         this.listenerGetterWithAddition  = listenerGetterWithAddition;
         this.filter = filter;
 
+        if(filter == null){
+            this.filterData = null;
+            Pattern[] emptyArray = new Pattern[0];
+            this.patternValue = emptyArray;
+            this.patternCodeValue = emptyArray;
+            this.patternGroupValue = emptyArray;
+            this.patternBotValue = emptyArray;
+        }else{
+            this.filterData = com.forte.qqrobot.anno.data.Filter.build(filter);
+            this.patternValue = filterData.patternValue();
+            this.patternCodeValue = filterData.patternCodeValue();
+            this.patternGroupValue = filterData.patternGroupValue();
+            this.patternBotValue = filterData.patternBotValue();
+        }
 
-        this.filterData = com.forte.qqrobot.anno.data.Filter.build(filter);
-        this.patternValue = filterData.patternValue();
-        this.patternCodeValue = filterData.patternCodeValue();
-        this.patternGroupValue = filterData.patternGroupValue();
 
 
         this.blockFilter = blockFilter;
@@ -340,6 +351,9 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
     public Pattern[] getPatternGroupValue() {
         return patternGroupValue;
+    }
+    public Pattern[] getPatternBotValue(){
+        return patternBotValue;
     }
 
     public BlockFilter getBlockFilter() {

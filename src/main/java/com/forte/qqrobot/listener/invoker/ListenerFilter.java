@@ -4,6 +4,7 @@ import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
 import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
+import com.forte.qqrobot.beans.messages.ThisCodeAble;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.KeywordMatchType;
 import com.forte.qqrobot.exception.FilterException;
@@ -139,9 +140,10 @@ public class ListenerFilter {
      */
     private boolean allFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at, ListenContext context) {
         // 基础过滤
-        return  wordsFilter(listenerMethod, msgGet)
+        return     botFilter(listenerMethod, msgGet)
                 && groupFilter(listenerMethod, msgGet)
                 && codeFilter(listenerMethod, msgGet)
+                && wordsFilter(listenerMethod, msgGet)
                 // 自定义过滤
                 && diyFilter(listenerMethod, msgGet, at, context)
                 ;
@@ -240,9 +242,9 @@ public class ListenerFilter {
             return true;
         } else {
             String qqCode = qqCodeAble.getQQCode();
-            //如果获取到的号码为null则不通过
+            //如果获取到的号码为null则通过
             if (qqCode == null) {
-                return false;
+                return true;
             }
             if (codes.length == 1) {
                 Pattern code = codes[0];
@@ -279,15 +281,15 @@ public class ListenerFilter {
 
         //群号列表
         Pattern[] groups = listenerMethod.getPatternGroupValue();
-        //如果获取到的号码为null则不通过
         if (groups.length == 0) {
             //没有要匹配的，直接放过
             return true;
         }
 
         String groupCode = groupCodeAble.getGroupCode();
+        //如果获取到的号码为null则通过
         if (groupCode == null) {
-            return false;
+            return true;
         }
         if (groups.length == 1) {
             //只有一条
@@ -298,5 +300,42 @@ public class ListenerFilter {
         }
     }
 
+
+    /**
+     * bot账号过滤
+     *
+     * @param listenerMethod 监听函数
+     * @param msgGet         消息封装
+     * @return 是否匹配
+     */
+    private boolean botFilter(ListenerMethod listenerMethod, MsgGet msgGet) {
+        // 如果获取到的thisCode为null，直接放行
+        String thisCode = msgGet.getThisCode();
+        if(thisCode == null){
+            return true;
+        }
+
+        //获取过滤注解
+        Filter filter = listenerMethod.getFilter();
+
+        // 群号匹配规则
+        KeywordMatchType botMatchType = filter.botMatchType();
+
+        //群号列表
+        Pattern[] bots = listenerMethod.getPatternBotValue();
+        //如果获取到的号码为null则不通过
+        if (bots.length == 0) {
+            //没有要匹配的，直接放过
+            return true;
+        }
+
+        if (bots.length == 1) {
+            //只有一条
+            Pattern bot = bots[0];
+            return botMatchType.test(thisCode, bot);
+        } else {
+            return filter.mostBotType().test(thisCode, bots, botMatchType);
+        }
+    }
 
 }

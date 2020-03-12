@@ -6,10 +6,14 @@ import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.FieldUtils;
 import org.apache.http.impl.io.EmptyInputStream;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * 使用注解自动装配的资源启动器
@@ -64,6 +68,39 @@ class AutoResourceApplication<CONFIG extends BaseConfiguration> implements Resou
     }
 
     /**
+     * 通过Application注解与Config注解转化一个启动器接口
+     * @param configClass               配置类的类型class
+     * @param applicationAnnotation     启动器注解，不能为null
+     * @param configurationAnnotation   启动器上的注解配置，可以为null
+     * @return 自动资源配置启动器
+     */
+    static <CONFIG extends BaseConfiguration> AutoResourceApplication<CONFIG> autoConfig(Class<CONFIG> configClass,
+                                                                                         SimpleRobotApplication applicationAnnotation,
+                                                                                         SimpleRobotConfiguration configurationAnnotation,
+                                                                                         Class<?> baseClass,
+                                                                                         Supplier<Application<CONFIG>> applicationSupplier){
+        String resources = applicationAnnotation.resources().trim();
+        Properties properties = new Properties();
+
+        // load config
+        if(configurationAnnotation != null){
+            ConfigurationProperty[] value = configurationAnnotation.value();
+            for (ConfigurationProperty property : value) {
+                String k = property.key();
+                String v = property.value();
+                if(k.trim().length() > 0 && v.trim().length() > 0){
+                    properties.setProperty(k, v);
+                }
+            }
+        }
+
+        Application<CONFIG> baseApp = applicationSupplier.get();
+        // 返回实例对象
+        return new AutoResourceApplication<>(resources, properties, baseClass, baseApp);
+    }
+
+
+    /**
      * 构造
      * @param resources  resources配置文件路径 不可为null
      * @param properties 额外的参数, 可以为null
@@ -109,7 +146,13 @@ class AutoResourceApplication<CONFIG extends BaseConfiguration> implements Resou
             return EmptyInputStream.INSTANCE;
         }
         InputStream stream = this.getClass().getResourceAsStream(resourceName());
-        return Objects.requireNonNull(stream, "未读取到配置文件 : resource inputstream is null.");
+        if(stream == null){
+            try {
+                stream = new BufferedInputStream(new FileInputStream(resourceName()));
+            } catch (FileNotFoundException ignored) { }
+        }
+
+        return Objects.requireNonNull(stream, "resource inputstream is null: " + resources);
     }
 
     @Override

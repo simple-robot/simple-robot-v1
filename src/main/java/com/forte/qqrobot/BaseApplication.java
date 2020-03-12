@@ -8,8 +8,8 @@ import com.forte.plusutils.consoleplus.console.colors.BackGroundColorTypes;
 import com.forte.plusutils.consoleplus.console.colors.ColorTypes;
 import com.forte.plusutils.consoleplus.console.colors.FontColorTypes;
 import com.forte.qqrobot.anno.Config;
-import com.forte.qqrobot.anno.CoreVersion;
 import com.forte.qqrobot.anno.DIYFilter;
+import com.forte.qqrobot.anno.HttpTemplate;
 import com.forte.qqrobot.anno.depend.AllBeans;
 import com.forte.qqrobot.beans.function.PathAssembler;
 import com.forte.qqrobot.beans.function.VerifyFunction;
@@ -67,7 +67,8 @@ import java.util.stream.Collectors;
 public abstract class BaseApplication<CONFIG extends BaseConfiguration,
         SEND extends SenderSendList,
         SET extends SenderSetList,
-        GET extends SenderGetList
+        GET extends SenderGetList,
+        CONTEXT extends SimpleRobotContext<SEND, SET, GET>
         > implements Closeable {
 
     /**
@@ -86,7 +87,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
     /**
      * 没有监听函数的送信器
      */
-    private MsgSender NO_METHOD_SENDER;
+    private MsgSender defaultMsgSender;
 
     /**
      * 注册器，赋值在扫描方法结束后
@@ -242,16 +243,39 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
      */
     protected abstract GET getGetter(MsgGet msgGet, BotManager botManager);
 
+    /**
+     * 获取一个组件专属的SimpleRobotContext对象
+     * @param defaultMsgSender 函数{@link #getDefaultSender(DependCenter, ListenerManager, BotManager)}的最终返回值
+     * @param manager       botManager对象
+     * @param msgParser     消息字符串转化函数
+     * @param processor     消息处理器
+     * @param dependCenter  依赖中心
+     * @return 组件的Context对象实例
+     */
+    protected abstract CONTEXT getComponentContext(MsgSender defaultMsgSender,
+                                                                                                        BotManager manager,
+                                                                                                        MsgParser msgParser,
+                                                                                                        MsgProcessor processor,
+                                                                                                        DependCenter dependCenter);
+
 
     /**
      * 根据{@link #getSender(MsgGet, BotManager)}, {@link #getSetter(MsgGet, BotManager)}, {@link #getGetter(MsgGet, BotManager)} 三个函数构建一个RootSenderList
      * 参数分别为一个BotManager和一个MsgGet对象
      * 如果组件不是分为三个部分而构建，则可以考虑重写此函数
      * 此函数最终会被送入组件实现的runServer中
-     * @return RooenderList构建函数
+     * @return RootSenderList构建函数
      */
     protected Function<MsgGet, RootSenderList> getRootSenderFunction(BotManager botManager){
         return m -> new ProxyRootSender(getSender(m, botManager), getSetter(m, botManager), getGetter(m, botManager));
+    }
+
+    /**
+     * 获取MsgParser函数, 默认根据{@link #msgParse(String)}生成
+     * @return MsgParser
+     */
+    protected MsgParser getMsgParser(){
+        return this::msgParse;
     }
 
     /**
@@ -309,24 +333,51 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
      * @param dependCenter 依赖管理器，可以支持组件额外注入部分依赖。
      * @param manager      监听管理器，用于分配获取到的消息
      */
-    private String start(DependCenter dependCenter, ListenerManager manager){
+    private StartResult start(DependCenter dependCenter, ListenerManager manager){
+        BotManager botManager = getBotManager();
+        CONFIG conf = getConf();
+        this.defaultMsgSender = getDefaultSender(dependCenter, manager, botManager);
+        String message = "no server";
+        // 如果需要启动server
+        Function<MsgGet, RootSenderList> rootSenderFunction = getRootSenderFunction(botManager);
+        MsgProcessor msgProcessor = new MsgProcessor(conf.getResultSelectType(), manager, rootSenderFunction);
+        MsgParser msgParser = getMsgParser();
+        if(conf.getEnableServer()){
+            message = runServer(dependCenter, manager, msgProcessor, msgParser);
+        }
 
+        return new StartResult(message, this.defaultMsgSender, msgProcessor, msgParser);
     }
 
     /**
-     * 获取一个bu's不使用在监听函数中的默认送信器
-     * @param dependCenter
-     * @param manager
-     * @param defaultBot
+     * 获取一个不使用在监听函数中的默认送信器
+     * @param dependCenter 依赖中心
+     * @param manager      监听器管理中心
+     * @param botManager   bot管理中心
      * @return
      */
-    protected abstract MsgSender getDefaultSender(DependCenter dependCenter, ListenerManager manager, BotInfo defaultBot);
+    protected abstract MsgSender getDefaultSender(DependCenter dependCenter, ListenerManager manager, BotManager botManager);
 
+    /**
+     * 启动一个服务，这有可能是http或者是ws的监听服务
+     * @param dependCenter   依赖中心
+     * @param manager        监听管理器
+     * @param msgProcessor   送信解析器
+     * @return
+     */
+    protected abstract String runServer(DependCenter dependCenter,
+                                        ListenerManager manager,
+                                        MsgProcessor msgProcessor,
+                                        MsgParser msgParser
+                                        );
 
-    protected abstract String runServer(DependCenter dependCenter, ListenerManager manager, Function<MsgGet, RootSenderList> senderFunction);
-
-
-
+    /**
+     * 字符串转化为MsgGet的方法，最终会被转化为{@link MsgParser}函数，
+     * 会作为参数传入{@link #runServer(DependCenter, ListenerManager, MsgProcessor, MsgParser)}, 也会封装进{@link SimpleRobotContext}中
+     * @param str
+     * @return
+     */
+    protected abstract MsgGet msgParse(String str);
 
 
     /**
@@ -365,6 +416,14 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
      * @return 所有的执行任务
      */
     protected void afterDepend(CONFIG config, Application<CONFIG> app, Register register, DependCenter dependCenter) {
+        // 初始化http模板
+        initHttpTemplate(dependCenter);
+        // 初始化bot验证函数与路径拼接函数
+        //**************** 注册PathAssembler和VerifyFunction ****************//
+        VerifyFunction verifyFunction = verifyBot();
+        dependCenter.load(verifyFunction);
+        PathAssembler pathAssembler = config.getPathAssembler();
+        dependCenter.load(pathAssembler);
         // 初始化bot管理中心
         BotManager botManager = initBotManager(dependCenter);
 
@@ -378,11 +437,39 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
         //**************** 加载所有存在于依赖中的DIYFilter ****************//
         loadDIYFilter(config, dependCenter);
 
-        //**************** 注册PathAssembler和VerifyFunction ****************//
-        VerifyFunction verifyFunction = verifyBot();
-        PathAssembler pathAssembler = config.getPathAssembler();
-        dependCenter.load(verifyFunction);
-        dependCenter.load(pathAssembler);
+    }
+
+    /**
+     * 初始化http模板, 没有dependCenter参数，即优先初始化一个httpclient的内部默认模板
+     */
+    private void initHttpTemplate(){
+        HttpClientHelper.registerClient(DefaultHttpClientTemplate.TEMP_NAME, new DefaultHttpClientTemplate());
+    }
+
+
+    /**
+     * 初始化http模板
+     */
+    private void initHttpTemplate(DependCenter dependCenter){
+        // 获取所有的HttpClientAble实现类的类型
+        List<Class<? extends HttpClientAble>> templates = dependCenter.getTypesBySuper(HttpClientAble.class);
+        for (Class<? extends HttpClientAble> httpTemp : templates) {
+            String temName;
+            boolean def = false;
+            HttpTemplate annotation = AnnotationUtils.getAnnotation(httpTemp, HttpTemplate.class);
+            if(annotation == null || annotation.value().trim().length() == 0){
+                temName = FieldUtils.headLower(httpTemp.getSimpleName());
+            }else{
+                temName = annotation.value().trim();
+                def = annotation.beDefault();
+            }
+            HttpClientHelper.registerClient(temName, () -> dependCenter.get(httpTemp));
+            if(def){
+                HttpClientHelper.setDefaultName(temName);
+            }
+        }
+
+
 
 
     }
@@ -397,8 +484,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
         getLog().debug("botmanager.get.depend");
         BotManager botManager = dependCenter.get(BotManager.class);
         if(botManager == null){
-            PathAssembler pathAssembler = getConf().getPathAssembler();
-            botManager = new BotManagerImpl(pathAssembler, verifyBot());
+            PathAssembler pathAssembler = dependCenter.get(PathAssembler.class);
+            VerifyFunction verifyFunction = dependCenter.get(VerifyFunction.class);
+            botManager = new BotManagerImpl(pathAssembler, verifyFunction);
             dependCenter.load(botManager);
             getLog().debug("botmanager.get.default", botManager);
         }
@@ -456,6 +544,8 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
      * 初始化
      */
     private void init(Application<CONFIG> app, CONFIG config) {
+        // httpTempInit
+        initHttpTemplate();
         //日志初始化
         logInit(config);
         // 语言初始化
@@ -507,6 +597,11 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
         return dependCenter;
     }
 
+    /**
+     * 加载消息拦截器
+     * @param config
+     * @param dependCenter
+     */
     private void loadMsgSenderIntercept(CONFIG config, DependCenter dependCenter){
         //准备拦截器
         RUN_LOG.debug("intercept.sender.prepare");
@@ -643,7 +738,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
         //**************** 配置依赖注入相关 ****************//
         //配置依赖管理器
         //将依赖管理对象放入资源管理中心
-        DependGetter dependGetter = getConfiguration().getDependGetter();
+        DependGetter dependGetter = getConf().getDependGetter();
 
         //此处可以尝试去寻找被扫描到的接口对象
         // 寻找携带@Config且实现了Dependgetter的类
@@ -724,7 +819,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
 
     private void registerTimeTask(){
         //注册定时任务
-        this.register.registerTimeTask(this.NO_METHOD_SENDER);
+        this.register.registerTimeTask(this.defaultMsgSender);
     }
 
     /**
@@ -769,7 +864,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
      * @param appClass 启动类
      * @param args      参数
      */
-    public void run(Class<?> appClass, String... args){
+    public CONTEXT run(Class<?> appClass, String... args){
         SimpleRobotApplication applicationAnno = AnnotationUtils.getAnnotation(appClass, SimpleRobotApplication.class);
         if(applicationAnno == null){
             int modifiers = appClass.getModifiers();
@@ -782,7 +877,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
                 // yes, child.
                 try {
                     Application<CONFIG> newInstance = (Application<CONFIG>) appClass.newInstance();
-                    run(newInstance, args);
+                    return run(newInstance, args);
                 } catch (Exception e) {
                     throw new RobotRunException(1, appClass + "can not be a simple-robot-application: cannot get newInstance.", e);
                 }
@@ -805,17 +900,41 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
             AutoResourceApplication<CONFIG> autoResourceApplication = AutoResourceApplication.autoConfig(confClass, applicationAnno, configAnnotation, application);
 
             // 正常启动
-            run(autoResourceApplication, args);
+            return run(autoResourceApplication, args);
         }
 
     }
+
+    /**
+     * 使一个实例也可以进行注解解析。
+     * 此时，{@link SimpleRobotApplication#application()} 参数将会失效
+     * @param app　　启动器实例
+     * @param args   java执行参数
+     */
+    public CONTEXT runWithApplication(Application<CONFIG> app, String... args){
+        Class<? extends Application> appClass = app.getClass();
+        SimpleRobotApplication applicationAnno = AnnotationUtils.getAnnotation(appClass, SimpleRobotApplication.class);
+        if(applicationAnno == null){
+            return run(app, args);
+        }else{
+            // 存在注解
+            // get configuration
+            SimpleRobotConfiguration configAnnotation = AnnotationUtils.getAnnotation(appClass, SimpleRobotConfiguration.class);
+            CONFIG conf = getConf();
+            Class<CONFIG> confClass = (Class<CONFIG>) conf.getClass();
+            AutoResourceApplication<CONFIG> autoResourceApplication = AutoResourceApplication.autoConfig(confClass, applicationAnno, configAnnotation, appClass, () -> app);
+            // 正常启动
+            return run(autoResourceApplication, args);
+        }
+    }
+
 
     /**
      * 执行的主程序
      * @param app 启动器接口的实现类
      * @param args 可能会有用的额外指令参数，一般是main方法的参数
      */
-    public void run(Application<CONFIG> app, String... args) {
+    public CONTEXT run(Application<CONFIG> app, String... args) {
         long s = System.currentTimeMillis();
 
         // 记录执行参数
@@ -853,20 +972,24 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
         initRuntime(config, botInfos);
         getLog().debug("runtime.init");
         // 连接/启动
-        String name = start(dependCenter, manager);
+        StartResult startResult = start(dependCenter, manager);
+        String name = startResult.getStartName();
+
+        CONTEXT componentContext = getComponentContext(startResult.getDefaultMsgSender(),
+                botManager,
+                startResult.getMsgParser(),
+                startResult.getMsgProcessor(),
+                dependCenter);
+
         // 展示系统信息
         showSystemInfo(configuration);
         showBotInfo(getBotManager());
+
         // > 启动之后
         afterStart(configuration);
 
         //获取CQCodeUtil实例
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
-        //构建没有监听函数的送信器并保存
-        MsgSender sender = MsgSender.build(getSender(), getSetter(), getGetter(), BotRuntime.getRuntime());
-        this.NO_METHOD_SENDER = sender;
-        // MsgSender存入依赖中心
-        dependCenter.loadIgnoreThrow(sender);
 
         after(configuration);
 
@@ -876,7 +999,9 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
         getLog().info(msg, Colors.builder().add(name, Colors.FONT.DARK_GREEN).build(), e - s);
 
         //连接之后
-        app.after(cqCodeUtil, sender);
+        app.after(cqCodeUtil, this.defaultMsgSender);
+
+        return componentContext;
     }
 
     /**
@@ -918,7 +1043,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
      * ※ 此送信器无法进行阻断
      */
     public MsgSender getMsgSender() {
-        return this.NO_METHOD_SENDER;
+        return this.defaultMsgSender;
     }
 
 
