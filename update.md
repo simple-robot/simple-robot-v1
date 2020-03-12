@@ -1,7 +1,7 @@
 ## 版本更新记录
 
 ## 1.9.0
-- SENDER中增加一个新的接口：发送群公告
+- SENDER中增加一个新的接口：发送群公告(sendGroupNotice)
 - 由此版本开始，SENDER中的：`sendPrivateMsg`、`sendGroupMsg`、`sendDiscussMsg`将修改返回值，由`boolean`修改为`String`来代表发送的消息的消息ID，以实现可以对自己的消息进行撤回。
    一般情况下，如果返回的字符串为`null`，则可能代表原返回值的`false`
    注意: 如果你的sender在发送消息的时候被**送信拦截器**所拦截，则默认的返回值可能是一个空字符串而不是`null`。

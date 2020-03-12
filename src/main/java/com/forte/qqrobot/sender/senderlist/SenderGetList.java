@@ -418,6 +418,7 @@ public interface SenderGetList extends SenderList {
 
 
     /**
+     * 效率存疑，弃用
      * 获取默认的缓存器，默认缓存器数据缓存1小时
      * @deprecated  目前缓存使用动态代理以及localThread进行缓存，会很影响效率，所以在此标记过时，以待优化。
      */
@@ -428,6 +429,7 @@ public interface SenderGetList extends SenderList {
     }
 
     /**
+     * 效率存疑，弃用
      * 转化为缓存getter
      * @param time 缓存保存的秒时长
      * @deprecated  目前缓存使用动态代理以及localThread进行缓存，会很影响效率，所以在此标记过时，以待优化。
@@ -439,6 +441,7 @@ public interface SenderGetList extends SenderList {
     }
 
     /**
+     * 效率存疑，弃用
      * 转化为缓存getter
      * @param time          时长
      * @param cacheTypes    时间对应的增量类型
@@ -451,6 +454,7 @@ public interface SenderGetList extends SenderList {
     }
 
     /**
+     * 效率存疑，弃用
      * 指定过期时间
      * @param to    到某个指定的时间过期
      * @deprecated  目前缓存使用动态代理以及localThread进行缓存，会很影响效率，所以在此标记过时，以待优化。
@@ -463,6 +467,7 @@ public interface SenderGetList extends SenderList {
 
 
     /**
+     * 效率存疑，弃用
      * 取消缓存状态
      * @deprecated  目前缓存使用动态代理以及localThread进行缓存，会很影响效率，所以在此标记过时，以待优化。
      */
