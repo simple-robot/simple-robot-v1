@@ -41,21 +41,6 @@ public class KeywordMatchTypeFactory extends BaseFactory<KeywordMatchType> {
         return FACTORY;
     }
 
-//    /**
-//     * 注册一个新的 {@link KeywordMatchType} 实例
-//     * 会对异常进行捕获并通过{@link QQLog#error(Object, Throwable)}打印
-//     * @param name      枚举名称
-//     * @param filter    字符串过滤规则
-//     * @return 枚举实例
-//     */
-//    public KeywordMatchType register(String name, BiPredicate<String, String> filter) {
-//        try {
-//            return registerOrThrow(name, filter);
-//        } catch (EnumInstantiationRequireException | EnumInstantiationException e) {
-//            QQLog.error("枚举类型[ com.forte.qqrobot.beans.types.KeywordMatchType ]实例[ "+ name +" ]构建失败", e);
-//            return null;
-//        }
-//    }
 
     /**
      * 注册一个新的 {@link KeywordMatchType} 实例
