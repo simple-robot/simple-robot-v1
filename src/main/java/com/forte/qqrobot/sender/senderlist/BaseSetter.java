@@ -135,7 +135,7 @@ public abstract class BaseSetter implements Setter {
      * @param group 群号
      */
     @Override
-    public boolean setGroupLeave(String group) {
+    public boolean setGroupLeave(String group, boolean b) {
         throw RobotApiException.byFrom();
     }
 

@@ -122,7 +122,7 @@ public abstract class BaseSetList implements SenderSetList {
      * @param group 群号
      */
     @Override
-    public boolean setGroupLeave(String group) {
+    public boolean setGroupLeave(String group, boolean d) {
         throw RobotApiException.byFrom();
     }
 

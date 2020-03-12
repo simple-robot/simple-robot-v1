@@ -3,8 +3,8 @@ lang.init.finished=语言已初始化完毕。
 # 异常相关
 
 # RobotRunException相关
-exception.run.moreDepends=扫描到多个[ {0} ]的实现类。
-exception.run.runtime.init.failed=Runtime初始化异常
+exception.robotRun.moreDepends=扫描到多个[ {0} ]的实现类。
+exception.robotRun.runtime.init.failed=Runtime初始化异常
 
 # AnnotationException相关，其中包括AnnotationUtils中出现的格式化参数
 exception.annotation.class=类[{0}]不应当使用[{1}]注解: {2}

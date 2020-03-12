@@ -4,8 +4,8 @@ lang.init.finished=language has already init finished. All non-Chinese languages
 # 异常相关
 
 # RobotRunException相关
-exception.run.moreDepends=Scan to multiple [{0}] implementation classes.
-exception.run.runtime.init.failed=Runtime init failed.
+exception.robotRun.moreDepends=Scan to multiple [{0}] implementation classes.
+exception.robotRun.runtime.init.failed=Runtime init failed.
 
 # AnnotationException相关，其中包括AnnotationUtils中出现的格式化参数
 exception.annotation.class=class [{0}] should not use annotation [{1}] : {2}

@@ -1,5 +1,10 @@
 ## 版本更新记录
 
+## 1.10.0
+- 修改SENDER接口，为`setGroupLeave`(退出群)API增加一个参数：`dissolve`: 假如此账号是群主，则此参数代表是否要解散群。默认为false
+
+
+
 ## 1.9.0
 - SENDER中增加一个新的接口：发送群公告(sendGroupNotice)
 - 由此版本开始，SENDER中的：`sendPrivateMsg`、`sendGroupMsg`、`sendDiscussMsg`将修改返回值，由`boolean`修改为`String`来代表发送的消息的消息ID，以实现可以对自己的消息进行撤回。

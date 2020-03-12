@@ -272,9 +272,25 @@ public interface SenderSetList extends SenderList {
     /**
      * 退出群
      * @param group 群号
+     * @param dissolve 假如此账号是群主，则此参数代表是否要解散群。默认为false
      */
     @InterceptValue(value = "false")
-    boolean setGroupLeave(String group);
+    boolean setGroupLeave(String group, boolean dissolve);
+
+    /**
+     * 退出群
+     * @param group 群号
+     */
+    default boolean setGroupLeave(GroupCodeAble group, boolean dissolve){
+        return setGroupLeave(group.getGroupCode(), dissolve);
+    }
+    /**
+     * 退出群
+     * @param group 群号
+     */
+    default boolean setGroupLeave(String group){
+        return setGroupLeave(group, false);
+    };
 
     /**
      * 退出群

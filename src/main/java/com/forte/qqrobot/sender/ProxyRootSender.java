@@ -200,9 +200,10 @@ public class ProxyRootSender implements RootSenderList {
         return setter.setDiscussLeave(group);
     }
 
+
     @Override
-    public boolean setGroupLeave(String group) {
-        return setter.setGroupLeave(group);
+    public boolean setGroupLeave(String group, boolean dissolve) {
+        return setter.setGroupLeave(group, dissolve);
     }
 
     @Override
