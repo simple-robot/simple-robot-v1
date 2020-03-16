@@ -2,6 +2,9 @@ lang.init.finished=语言已初始化完毕。
 
 # 异常相关
 
+# exception.exceptionProcess
+exception.exceptionProcess.exists=已存在针对异常类型[{0}]的处理！同一个类型的异常处理不能存在多个: {1}, {2}
+
 # RobotRunException相关
 exception.robotRun.moreDepends=扫描到多个[ {0} ]的实现类。
 exception.robotRun.runtime.init.failed=Runtime初始化异常

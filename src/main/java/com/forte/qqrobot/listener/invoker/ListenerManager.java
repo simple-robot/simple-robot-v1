@@ -226,7 +226,9 @@ public class ListenerManager implements MsgReceiver {
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
         //判断是否at自己
         //获取本机QQ号
-        AtDetection atDetection = () -> cqCodeUtil.isAt(msg, code);
+        // 获取AT判断函数
+        final Function<MsgGet, AtDetection> atDetectionFunction = ListenerFilter.getAtDetectionFunction();
+        AtDetection atDetection = atDetectionFunction.apply(msgGet);
         //0 : msgGet
         plist.add(msgGet);
         //1 : codeUtil

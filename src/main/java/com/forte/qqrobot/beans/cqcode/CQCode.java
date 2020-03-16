@@ -11,7 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * CQCode参数
+ * <pre> CQCode封装类
+ * <pre> 从核心1.10.2开始，不再进行权限认证。
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/9 11:42
  * @since JDK1.8
@@ -223,29 +224,6 @@ public class CQCode
     protected CQCode(CQCodeTypes cqCodeTypes, Map<String, String> params){
         this.CqCodeType = cqCodeTypes;
         this.params = params;
-
-        //遍历参数，判断参数是否都是符合规范的
-        //需要的参数
-        String[] keys = cqCodeTypes.getKeys();
-        //获取可以忽略的参数
-        Set<String> ignoreAbleKeys = cqCodeTypes.getIgnoreAbleKeys();
-        for (String key : keys) {
-            String getParams = params.get(key);
-            if(getParams == null && (!ignoreAbleKeys.contains(key))){
-                throw new CQParamsException("paramCannotIgnore", cqCodeTypes, key);
-            }
-
-            if(getParams != null){
-                String keyRegex = cqCodeTypes.getKeyRegex(key);
-                if(keyRegex != null && !getParams.matches(keyRegex)){
-                    throw new CQParamsException("paramMismatch", cqCodeTypes, key, keyRegex, getParams);
-                }
-
-            }
-
-
-        }
-
         updateToString();
     }
 

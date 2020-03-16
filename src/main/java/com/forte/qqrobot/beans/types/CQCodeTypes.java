@@ -9,14 +9,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * 此枚举保存全部的CQCode类型。<br>
- * 且提供了一个{@link com.forte.qqrobot.factory.CQCodeTypeFactory}来支持动态扩展此枚举。<br>
- * 请不要使用任何非工厂创建的形式（例如自己通过反射或者其他工具）创建此类的实例对象。此类中维护一个function映射，
- * 用于通过function值快速定位CQCodeType，并且提供了一个注册接口{@link #register(CQCodeTypes)} 来支持额外注册的实例对象，并对其进行验证。
- * 包括{@link com.forte.qqrobot.factory.CQCodeTypeFactory}中也提供了直接创建新枚举实例的相关接口，并提供参数验证。
- * 假如您使用了其他手段自己创建了一个额外的实例，可能会导致valueOf所取值与内部的function映射值不相符、参数冲突等一系列问题。
- * <br>
- * <br>
+ * <pre> 此枚举保存全部的CQCode类型。
+ * <pre> 且提供了一个{@link com.forte.qqrobot.factory.CQCodeTypeFactory}来支持动态扩展此枚举。
+ * <pre> 请不要使用任何非工厂创建的形式（例如自己通过反射或者其他工具）创建此类的实例对象。此类中维护一个function映射，
+ * <pre>  用于通过function值快速定位CQCodeType，并且提供了一个注册接口{@link #register(CQCodeTypes)} 来支持额外注册的实例对象，并对其进行验证。
+ * <pre> 包括{@link com.forte.qqrobot.factory.CQCodeTypeFactory}中也提供了直接创建新枚举实例的相关接口，并提供参数验证。
+ * <pre> 假如您使用了其他手段自己创建了一个额外的实例，可能会导致valueOf所取值与内部的function映射值不相符、参数冲突等一系列问题。
+ * <pre> 从核心1.10.2开始，不再进行权限认证。
  *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/8 14:55
@@ -27,7 +26,7 @@ public enum CQCodeTypes {
     /**
      * 默认的未知类型，当无法获取或解析的时候将会使用此类型
      */
-    defaultType("", new String[0], new String[0], new String[0], -99),
+    defaultType("?", new String[0], new String[0], new String[0], -99),
 
     /**
      * [CQ:face,id={1}] - QQ表情
@@ -301,7 +300,7 @@ public enum CQCodeTypes {
 
     /**
      * 根据类型和参数名称列表来获取一个具体的枚举类型对象实例
-     *
+     * 1.10.2: 如果function只存在一个，直接返回，否则再通过参数判断
      * @param function   function 值, 即类型，例如"image"或者"share"之类的
      * @param paramNames 参数列表值，需要保证顺序
      * @return CQCodeTypes实例对象, 如果没有则会返回defaultType
@@ -311,9 +310,10 @@ public enum CQCodeTypes {
         CQCodeTypes[] cqCodeTypes = AllCQCodeTypeMap.get(function);
         if (cqCodeTypes == null || cqCodeTypes.length == 0) {
             return defaultType;
-        } else {
+        } else if(cqCodeTypes.length == 1) {
+            return cqCodeTypes[0];
+        } else{
             // 筛选paramNames
-
             // 如果不为null，则遍历并匹配参数match
             for (CQCodeTypes type : cqCodeTypes) {
                 // 根据type筛选params并匹配
@@ -527,7 +527,6 @@ public enum CQCodeTypes {
      * 查看某个字符串中是否存在此类型的CQ码
      */
     public boolean contains(String text) {
-//        return text.matches(".*" + this.matchRegex + ".*");
         return matchRegexPattern.matcher(text).find();
     }
 
@@ -580,6 +579,7 @@ public enum CQCodeTypes {
         CQCodeTypes[] cqCodeTypes = AllCQCodeTypeMap.get(function);
         return Arrays.copyOf(cqCodeTypes, cqCodeTypes.length);
     }
+
 
     /**
      * 判断是否为两个等值的CQ码

@@ -2,6 +2,9 @@ lang.init.finished=language has already init finished. All non-Chinese languages
 
 
 # 异常相关
+# exception.exceptionProcess
+exception.exceptionProcess.exists=Processing already exists for exception type [{0}]! There cannot be more than one exception handler of the same type: {1}, {2}
+
 
 # RobotRunException相关
 exception.robotRun.moreDepends=Scan to multiple [{0}] implementation classes.

@@ -64,7 +64,8 @@ import java.util.stream.Collectors;
  * @date Created in 2019/3/29 10:18
  * @since JDK1.8
  **/
-public abstract class BaseApplication<CONFIG extends BaseConfiguration,
+public abstract class BaseApplication<
+        CONFIG extends BaseConfiguration,
         SEND extends SenderSendList,
         SET extends SenderSetList,
         GET extends SenderGetList,
@@ -418,12 +419,14 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
     protected void afterDepend(CONFIG config, Application<CONFIG> app, Register register, DependCenter dependCenter) {
         // 初始化http模板
         initHttpTemplate(dependCenter);
+
         // 初始化bot验证函数与路径拼接函数
         //**************** 注册PathAssembler和VerifyFunction ****************//
         VerifyFunction verifyFunction = verifyBot();
         dependCenter.load(verifyFunction);
         PathAssembler pathAssembler = config.getPathAssembler();
         dependCenter.load(pathAssembler);
+
         // 初始化bot管理中心
         BotManager botManager = initBotManager(dependCenter);
 
@@ -812,14 +815,14 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
     /**
      * 有些事情需要连接之后才能做，例如加载定时任务，需要空函数送信器
      */
-    private void after(CONFIG config) {
+    private void after(CONFIG config, MsgSender defaultMsgSender) {
         // 注册定时任务
-        registerTimeTask();
+        registerTimeTask(defaultMsgSender);
     }
 
-    private void registerTimeTask(){
+    private void registerTimeTask(MsgSender defaultMsgSender){
         //注册定时任务
-        this.register.registerTimeTask(this.defaultMsgSender);
+        this.register.registerTimeTask(defaultMsgSender);
     }
 
     /**
@@ -991,7 +994,7 @@ public abstract class BaseApplication<CONFIG extends BaseConfiguration,
         //获取CQCodeUtil实例
         CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
 
-        after(configuration);
+        after(configuration, startResult.getDefaultMsgSender());
 
         long e = System.currentTimeMillis();
         // 展示连接成功的信息

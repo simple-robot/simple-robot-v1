@@ -1,5 +1,8 @@
 ## 版本更新记录
 
+## 1.10.2
+- 
+
 ## 1.10.1
 - 修复由于`@Filter`过滤机制的变动而导致`KeywordMatchTypeFactory`工厂创建的枚举无法使用的BUG。
 

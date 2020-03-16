@@ -11,9 +11,13 @@ import com.forte.qqrobot.exception.FilterException;
 import com.forte.qqrobot.listener.Filterable;
 import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.log.QQLogLang;
+import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 /**
@@ -34,6 +38,36 @@ public class ListenerFilter {
      * 用户全部自定义的Filter
      */
     private static final Map<String, Filterable> DIY_FILTERS = new ConcurrentHashMap<>(4);
+
+    /**
+     * at判断器, 默认情况下即使用CQ码作为判断
+     */
+    private static volatile AtomicReference<Function<MsgGet, AtDetection>> AT_DETECTION_FUNCTION = new AtomicReference<>(msg -> () -> CQCodeUtil.build().isAt(msg));
+
+
+    /**
+     * 获取当前的at判断函数
+     * @return 当前的at判断函数
+     */
+    public static Function<MsgGet, AtDetection> getAtDetectionFunction(){
+        return AT_DETECTION_FUNCTION.get();
+    }
+
+    /**
+     * 注册一个新的at判断函数，替换当前函数
+     * @param atDetectionFunction at判断函数
+     */
+    public static void registerAtDetectionFunction(Function<MsgGet, AtDetection> atDetectionFunction){
+        AT_DETECTION_FUNCTION.updateAndGet(old -> atDetectionFunction);
+    }
+
+    /**
+     * 根据当前的at判断函数来更新一个at判断函数
+     * @param updateFunction at判断函数的更新函数
+     */
+    public static void updateAtDetectionFunction(UnaryOperator<Function<MsgGet, AtDetection>> updateFunction){
+        AT_DETECTION_FUNCTION.updateAndGet(updateFunction);
+    }
 
     /**
      * 注册一个自定义的filter
