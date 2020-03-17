@@ -159,10 +159,10 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
 <table>
     <thead>
         <tr>
-            <th>项目名称</th>
+            <td>项目名称</td>
             <th>作者</th>
-            <th>项目简介</th>
-            <th>项目链接</th>
+            <td>项目简介</td>
+            <td>项目链接</td>
 		</tr>
     </thead>
     <tbody> 
