@@ -9,8 +9,18 @@ public interface LoginQQInfo extends InfoResult {
 
     /** 昵称 */
     String getName();
-    /** QQ号 */
+    /**
+     * QQ号
+     * @see #getCode()
+     */
     String getQQ();
+
+    /** 将会取代方法：getQQ()  */
+    default String getCode(){
+        return getQQ();
+    }
+
+
     /** 头像地址 */
     String getHeadUrl();
     /** 等级 */

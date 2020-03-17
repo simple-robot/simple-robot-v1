@@ -109,6 +109,14 @@ public class CQCode
     }
 
     /**
+     * 获取CQCode的类型
+     * @return CQCode的类型
+     */
+    public String getCQCodeTypesName() {
+        return CqCodeType.getFunction();
+    }
+
+    /**
      * 获取CQCode的类型。<br>
      * 这是一个名字比较短的方法。
      */

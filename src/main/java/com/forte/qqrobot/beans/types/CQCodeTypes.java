@@ -333,6 +333,9 @@ public enum CQCodeTypes {
      * 类型名
      */
     private final String function;
+
+    private final String functionHead;
+
     /**
      * 参数列表
      */
@@ -652,6 +655,7 @@ public enum CQCodeTypes {
      */
     CQCodeTypes(String function, String[] keys, String[] ignoreAbleKeys, String[] valuesRegex, int sort) {
         this.function = function;
+        this.functionHead = "[CQ:" + function;
         this.keys = keys;
         this.ignoreAbleKeys = Arrays.stream(ignoreAbleKeys).collect(Collectors.toSet());
         this.valuesRegex = valuesRegex;
@@ -717,10 +721,17 @@ public enum CQCodeTypes {
             Arrays.sort(sortArray, Comparator.comparing(s -> sortMap.getOrDefault(s, -1)));
             return sortArray;
         };
-
-        // 注册自己
-        // 根据枚举反编译规则，不能直接在构造中注册自己
-//        register(this);
     }
 
+    public String getFunctionHead() {
+        return functionHead;
+    }
+
+    public Pattern getMatchRegexPattern() {
+        return matchRegexPattern;
+    }
+
+    public String getParamMatch() {
+        return paramMatch;
+    }
 }
