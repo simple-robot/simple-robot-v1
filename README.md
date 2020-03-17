@@ -204,7 +204,13 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
                     主体为对于上述提到的<b>SinaNya项目 <sub>by 斯塔尼亚</sub></b>的二次封装.
                 </p>
             </td>
-            <td>https://github.com/17336324331/Robot-Spring.git</td>
+            <td>https://github.com/17336324331/Robot-Spring</td>
+        </tr>
+        <tr>
+            <td>coolqhttpapisimpleyiluoeandxishirobot</td>
+            <th>以罗伊</th>
+            <td>就是用simple-robot框架写的一个小机器人啦,windows linux上都能正确运行(目前)</td>
+            <td>https://github.com/YiluoE/coolqhttpapisimpleyiluoeandxishirobot</td>
         </tr>
 </tbody>
 </table>  
