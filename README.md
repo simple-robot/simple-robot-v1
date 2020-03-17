@@ -159,7 +159,7 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
 <table>
     <thead>
         <tr>
-            <td>项目名称</td>
+            <th>项目名称</th>
             <th>作者</th>
             <td>项目简介</td>
             <td>项目链接</td>
@@ -167,35 +167,47 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
     </thead>
     <tbody> 
         <tr>
-        	<td style="word-wrap:break-word;word-break:break-all;" width="80px">SinaNya</td>
+        	<td style="word-wrap:break-word;word-break:break-all;" width="80px">
+        	    <p>SinaNya</p>
+        	</td>
             <th>斯塔尼亚</th>
             <td style="word-wrap:break-word;word-break:break-all;" width="120px">为COC/DND等TRPG准备的骰点机器人</td>
             <td>https://sinanya.com/</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">崩坏学园2小助手 - 萌萌新</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+                <p>崩坏学园2小助手 - 萌萌新</p> 
+            </td>
             <th>瑶光天枢</th>
             <td style="word-wrap:break-word;word-break:break-all;" width="120px">崩坏学园2的在线群聊，查询装备，模拟扭蛋，查询up记录，来份色图的机器人</td>
             <td>https://github.com/LiChen233/simple-robot</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">群管机器人</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+                <p>群管机器人</p> 
+            </td>
             <th rowspan='3'>会跑的仓鼠</th>
             <td style="word-wrap:break-word;word-break:break-all;" width="120px">基于simple开发的群机器人</td>
             <td>https://gitee.com/yaozhenyong/cqrobotjar2</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">游戏查询机器人</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+                <p>游戏查询机器人</p> 
+            </td>
             <td style="word-wrap:break-word;word-break:break-all;" width="120px">基于simple开发的娱乐性机器人</td>
             <td>https://gitee.com/yaozhenyong/cqrobotIndependent</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">云端控制面板</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+                <p>云端控制面板</p>
+            </td>
             <td style="word-wrap:break-word;word-break:break-all;" width="120px">主要做上面两个版本机器人的控制面板（web端）	</td>
             <td>https://gitee.com/yaozhenyong/Qqrobotwar</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">Robot-Spring</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+                <p>Robot-Spring</p>
+            </td>
             <th>千年老妖(1571650839)</th>
             <td style="word-wrap:break-word;word-break:break-all;" width="120px">
                 <p>基于酷Q的，使用Java语言开发的，面向COC的骰子机器人组件, 
@@ -208,7 +220,7 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
         </tr>
         <tr>
             <td style="word-wrap:break-word;word-break:break-all;" width="80px">
-                coolqhttpapisimpleyiluoeandxishirobot
+                <p>coolqhttpapisimpleyiluoeandxishirobot</p>
             </td>
             <th>以罗伊</th>
             <td style="word-wrap:break-word;word-break:break-all;" width="120px">
