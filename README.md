@@ -167,37 +167,37 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
     </thead>
     <tbody> 
         <tr>
-        	<td style="word-wrap:break-word;word-break:break-all;" width="100px";>SinaNya</td>
+        	<td style="word-wrap:break-word;word-break:break-all;" width="80px">SinaNya</td>
             <th>斯塔尼亚</th>
-            <td>为COC/DND等TRPG准备的骰点机器人</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="120px">为COC/DND等TRPG准备的骰点机器人</td>
             <td>https://sinanya.com/</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="100px";>崩坏学园2小助手 - 萌萌新</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">崩坏学园2小助手 - 萌萌新</td>
             <th>瑶光天枢</th>
-            <td>崩坏学园2的在线群聊，查询装备，模拟扭蛋，查询up记录，来份色图的机器人</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="120px">崩坏学园2的在线群聊，查询装备，模拟扭蛋，查询up记录，来份色图的机器人</td>
             <td>https://github.com/LiChen233/simple-robot</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="100px";>群管机器人</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">群管机器人</td>
             <th rowspan='3'>会跑的仓鼠</th>
-            <td>基于simple开发的群机器人</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="120px">基于simple开发的群机器人</td>
             <td>https://gitee.com/yaozhenyong/cqrobotjar2</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="100px";>游戏查询机器人</td>
-            <td>基于simple开发的娱乐性机器人</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">游戏查询机器人</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="120px">基于simple开发的娱乐性机器人</td>
             <td>https://gitee.com/yaozhenyong/cqrobotIndependent</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="100px";>云端控制面板</td>
-            <td>主要做上面两个版本机器人的控制面板（web端）	</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">云端控制面板</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="120px">主要做上面两个版本机器人的控制面板（web端）	</td>
             <td>https://gitee.com/yaozhenyong/Qqrobotwar</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="100px";>Robot-Spring</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">Robot-Spring</td>
             <th>千年老妖(1571650839)</th>
-            <td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="120px">
                 <p>基于酷Q的，使用Java语言开发的，面向COC的骰子机器人组件, 
                 使用架构为SpringBoot-Mybatis-CoolHttpApI。主要功能：COC跑团基础功能+斗图,聊天,群管等乱七八糟的功能</p>
                 <p>
@@ -207,9 +207,9 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
             <td>https://github.com/17336324331/Robot-Spring</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="100px";>coolqhttpapisimpleyiluoeandxishirobot</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">coolqhttpapisimpleyiluoeandxishirobot</td>
             <th>以罗伊</th>
-            <td>就是用simple-robot框架写的一个小机器人啦,windows linux上都能正确运行(目前)</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="120px">就是用simple-robot框架写的一个小机器人啦,windows linux上都能正确运行(目前)</td>
             <td>https://github.com/YiluoE/coolqhttpapisimpleyiluoeandxishirobot</td>
         </tr>
 </tbody>
