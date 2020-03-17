@@ -167,7 +167,7 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
     </thead>
     <tbody> 
         <tr>
-        	<td style="word-wrap:break-word;word-break:break-all;" width="80px">
+        	<td>
         	    <p>SinaNya</p>
         	</td>
             <th>斯塔尼亚</th>
@@ -175,7 +175,7 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
             <td>https://sinanya.com/</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+            <td>
                 <p>崩坏学园2小助手 - 萌萌新</p> 
             </td>
             <th>瑶光天枢</th>
@@ -183,7 +183,7 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
             <td>https://github.com/LiChen233/simple-robot</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+            <td>
                 <p>群管机器人</p> 
             </td>
             <th rowspan='3'>会跑的仓鼠</th>
@@ -191,21 +191,21 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
             <td>https://gitee.com/yaozhenyong/cqrobotjar2</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+            <td>
                 <p>游戏查询机器人</p> 
             </td>
             <td style="word-wrap:break-word;word-break:break-all;" width="120px">基于simple开发的娱乐性机器人</td>
             <td>https://gitee.com/yaozhenyong/cqrobotIndependent</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+            <td>
                 <p>云端控制面板</p>
             </td>
             <td style="word-wrap:break-word;word-break:break-all;" width="120px">主要做上面两个版本机器人的控制面板（web端）	</td>
             <td>https://gitee.com/yaozhenyong/Qqrobotwar</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+            <td>
                 <p>Robot-Spring</p>
             </td>
             <th>千年老妖(1571650839)</th>
@@ -219,7 +219,7 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
             <td>https://github.com/17336324331/Robot-Spring</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+            <td>
                 <p>coolqhttpapisimpleyiluoeandxishirobot</p>
             </td>
             <th>以罗伊</th>
