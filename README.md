@@ -207,9 +207,13 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
             <td>https://github.com/17336324331/Robot-Spring</td>
         </tr>
         <tr>
-            <td style="word-wrap:break-word;word-break:break-all;" width="80px">coolqhttpapisimpleyiluoeandxishirobot</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="80px">
+                coolqhttpapisimpleyiluoeandxishirobot
+            </td>
             <th>以罗伊</th>
-            <td style="word-wrap:break-word;word-break:break-all;" width="120px">就是用simple-robot框架写的一个小机器人啦,windows linux上都能正确运行(目前)</td>
+            <td style="word-wrap:break-word;word-break:break-all;" width="120px">
+                就是用simple-robot框架写的一个小机器人啦,windows linux上都能正确运行(目前)
+            </td>
             <td>https://github.com/YiluoE/coolqhttpapisimpleyiluoeandxishirobot</td>
         </tr>
 </tbody>
