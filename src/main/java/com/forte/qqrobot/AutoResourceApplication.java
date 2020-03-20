@@ -3,8 +3,8 @@ package com.forte.qqrobot;
 import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
+import com.forte.qqrobot.utils.EmptyInputStream;
 import com.forte.qqrobot.utils.FieldUtils;
-import org.apache.http.impl.io.EmptyInputStream;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;

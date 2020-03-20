@@ -15,6 +15,7 @@ import java.time.temporal.ChronoField;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+@Deprecated
 public class TestGroupMsg implements GroupMsg {
 
     private String QQ = "00000000";
