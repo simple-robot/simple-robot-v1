@@ -3,6 +3,8 @@ package com.forte.qqrobot.utils;
 import com.forte.qqrobot.beans.cqcode.AppendList;
 import com.forte.qqrobot.beans.cqcode.CQAppendList;
 import com.forte.qqrobot.beans.cqcode.CQCode;
+import com.forte.qqrobot.beans.messages.ThisCodeAble;
+import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.CQCodeTypes;
 import com.forte.qqrobot.exception.CQParseException;
 
@@ -721,6 +723,10 @@ public class CQCodeUtil {
         //CQ码list集合
         List<String> cqStrList = getCQCodeStrFromMsgByType(msg, types);
         return cqStrList.stream().map(CQCode::of).collect(Collectors.toList());
+    }
+
+    public boolean isAt(MsgGet msgget){
+        return isAt(msgget.getMsg(), msgget.getThisCode());
     }
 
     /**
