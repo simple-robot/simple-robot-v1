@@ -5,9 +5,9 @@ import com.forte.qqrobot.beans.messages.result.*;
 import com.forte.qqrobot.exception.RobotApiException;
 
 /**
- * @author ForteScarlet <[email]ForteScarlet@163.com>
- * @since JDK1.8
+ * @see BaseRootSenderList
  **/
+@Deprecated
 public abstract class BaseGetter implements Getter {
     /**
      * 通过定义好返回值的InfoGet对象获取返回值

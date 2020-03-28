@@ -3,10 +3,9 @@ package com.forte.qqrobot.sender.senderlist;
 import com.forte.qqrobot.exception.RobotApiException;
 
 /**
- * 抽象sendList实现类，所有方法直接抛出异常
- * @author ForteScarlet <[email]ForteScarlet@163.com>
- * @since JDK1.8
- **/
+ * @see BaseRootSenderList
+ */
+@Deprecated
 public abstract class BaseSendList implements SenderSendList {
     /**
      * 发送讨论组消息

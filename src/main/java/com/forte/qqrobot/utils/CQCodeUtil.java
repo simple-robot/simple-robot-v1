@@ -3,7 +3,6 @@ package com.forte.qqrobot.utils;
 import com.forte.qqrobot.beans.cqcode.AppendList;
 import com.forte.qqrobot.beans.cqcode.CQAppendList;
 import com.forte.qqrobot.beans.cqcode.CQCode;
-import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.types.CQCodeTypes;
 import com.forte.qqrobot.exception.CQParseException;
 
@@ -737,20 +736,20 @@ public class CQCodeUtil {
         return msg.contains(getCQCode_at(qq));
     }
 
-    /**
-     * 判断是否存在at当前code。
-     * 如果其中的thisCode为null，则永远返回false
-     *
-     * @return 是否at了某个qq
-     */
-    public boolean isAt(MsgGet msg) {
-        if (msg == null || msg.getThisCode() == null) {
-            return false;
-        }
-        //如果存在at的CQ码并且参数‘qq’是某个qq
-        final String at = getCQCode_at(msg.getThisCode());
-        return msg.getMsg().contains(at);
-    }
+//    /**
+//     * 判断是否存在at当前code。
+//     * 如果其中的thisCode为null，则永远返回false
+//     *
+//     * @return 是否at了某个qq
+//     */
+//    public boolean isAt(MsgGet msg) {
+//        if (msg == null || msg.getThisCode() == null) {
+//            return false;
+//        }
+//        //如果存在at的CQ码并且参数‘qq’是某个qq
+//        final String at = getCQCode_at(msg.getThisCode());
+//        return msg.getMsg().contains(at);
+//    }
 
     /**
      * 判断是否存在at某个qq

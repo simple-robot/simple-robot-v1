@@ -4,10 +4,8 @@ import com.forte.qqrobot.beans.messages.types.GroupAddRequestType;
 import com.forte.qqrobot.exception.RobotApiException;
 
 /**
- * 抽象SetList实现类，所有方法直接抛出异常
- * @author ForteScarlet <[email]ForteScarlet@163.com>
- * @since JDK1.8
- **/
+ * @see BaseRootSenderList
+ */
 public abstract class BaseSetList implements SenderSetList {
 
     /**

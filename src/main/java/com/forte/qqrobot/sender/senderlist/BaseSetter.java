@@ -6,9 +6,7 @@ import com.forte.qqrobot.exception.RobotApiException;
 import java.util.Map;
 
 /**
- * Setter整合
- * @author ForteScarlet <[email]ForteScarlet@163.com>
- * @since JDK1.8
+ * @see BaseRootSenderList
  **/
 public abstract class BaseSetter implements Setter {
 

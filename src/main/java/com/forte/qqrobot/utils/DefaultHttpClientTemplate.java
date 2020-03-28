@@ -9,7 +9,10 @@ import org.apache.http.HttpRequest;
 import org.apache.http.StatusLine;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -39,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 默认的HttpClient模板
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
 public class DefaultHttpClientTemplate implements HttpClientAble {
@@ -127,7 +131,8 @@ public class DefaultHttpClientTemplate implements HttpClientAble {
                 .setDefaultRequestConfig(requestConfig);
         if (cookieStore != null) {
             httpClientBuilder.setDefaultCookieStore(cookieStore);
-
+        }else{
+            httpClientBuilder.setDefaultCookieStore(baseCookieStore);
         }
         return httpClientBuilder.build();
     }
@@ -187,15 +192,30 @@ public class DefaultHttpClientTemplate implements HttpClientAble {
      * @param cookies     cookies
      * @param cookieStore cookieStore
      */
-    private static CookieStore toCookieStore(Map<String, String> cookies, CookieStore cookieStore) {
+    private static CookieStore toCookieStore(String domain, Map<String, String> cookies, CookieStore cookieStore) {
         CookieStore newCookieStore = new BasicCookieStore();
         // 添加旧的
-        cookieStore.getCookies().forEach(newCookieStore::addCookie);
+        newCookieStore.getCookies().forEach(cookieStore::addCookie);
         // 添加新的
         cookies.entrySet().stream()
-                .map(e -> new BasicClientCookie(e.getKey(), e.getValue()))
-                .forEach(cookieStore::addCookie);
+                .map(e -> {
+                    final BasicClientCookie cookie = new BasicClientCookie(e.getKey(), e.getValue());
+                    cookie.setPath("/");
+                    cookie.setDomain(domain);
+                    return cookie;
+                })
+                .forEach(newCookieStore::addCookie);
         return newCookieStore;
+    }
+
+    /**
+     * map转化为Cookie，并且添加额外的cookie
+     *
+     * @param cookies     cookies
+     * @param cookieStore cookieStore
+     */
+    private static CookieStore toCookieStore(Map<String, String> cookies, CookieStore cookieStore) {
+        return toCookieStore(".", cookies, cookieStore);
     }
 
     /**
@@ -221,6 +241,7 @@ public class DefaultHttpClientTemplate implements HttpClientAble {
             HttpEntity entity = response.getEntity();
             String entityString = EntityUtils.toString(entity, CHARSET_UTF_8);
             EntityUtils.consume(entity);
+
             return entityString;
         }
     }
@@ -252,11 +273,12 @@ public class DefaultHttpClientTemplate implements HttpClientAble {
 
             // 创建Get请求
             HttpGet httpGet = new HttpGet(uri);
-
+            // 获取domain
+            final String domain = httpGet.getURI().getAuthority();
             // 设置cookie
             CookieStore cookieStore;
             if (!cookies.isEmpty()) {
-                cookieStore = toCookieStore(cookies, baseCookieStore);
+                cookieStore = toCookieStore(domain, cookies, baseCookieStore);
             } else {
                 cookieStore = baseCookieStore;
             }
@@ -293,11 +315,13 @@ public class DefaultHttpClientTemplate implements HttpClientAble {
         try {
             // 创建Post请求
             HttpPost httpPost = new HttpPost(url);
+            // 获取domain
+            final String domain = httpPost.getURI().getAuthority();
 
             // 设置cookie
             CookieStore cookieStore;
             if (!cookies.isEmpty()) {
-                cookieStore = toCookieStore(cookies, baseCookieStore);
+                cookieStore = toCookieStore(domain, cookies, baseCookieStore);
             } else {
                 cookieStore = baseCookieStore;
             }
@@ -307,6 +331,7 @@ public class DefaultHttpClientTemplate implements HttpClientAble {
                 StringEntity entity = new StringEntity(params, CHARSET_UTF_8);
                 httpPost.setEntity(entity);
             }
+
 
             // 添加头信息
             addHeaders(httpPost, header);

@@ -3,13 +3,17 @@ package com.forte.qqrobot.sender.senderlist;
 import com.forte.qqrobot.beans.messages.result.*;
 import com.forte.qqrobot.beans.messages.types.GroupAddRequestType;
 import com.forte.qqrobot.exception.RobotApiException;
+import com.forte.qqrobot.sender.BaseAPITemplate;
+import com.forte.qqrobot.sender.HttpClientAble;
+import com.forte.qqrobot.sender.HttpClientHelper;
 
 /**
  * 送信器整合，全部抛出异常
+ *
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public abstract class BaseRootSenderList implements RootSenderList{
+public abstract class BaseRootSenderList implements RootSenderList {
     /**
      * 取匿名成员信息
      * 一般是使用匿名标识来获取
@@ -260,16 +264,17 @@ public abstract class BaseRootSenderList implements RootSenderList{
     /**
      * 发布群公告
      * 目前，top、toNewMember、confirm参数是无效的
-     * @param group 群号
-     * @param title 标题
-     * @param text   正文
-     * @param top    是否置顶，默认false
+     *
+     * @param group       群号
+     * @param title       标题
+     * @param text        正文
+     * @param top         是否置顶，默认false
      * @param toNewMember 是否发给新成员 默认false
-     * @param confirm 是否需要确认 默认false
+     * @param confirm     是否需要确认 默认false
      * @return 是否发布成功
      */
     @Override
-    public boolean sendGroupNotice(String group, String title, String text, boolean top, boolean toNewMember, boolean confirm){
+    public boolean sendGroupNotice(String group, String title, String text, boolean top, boolean toNewMember, boolean confirm) {
         throw RobotApiException.byFrom();
     }
 
@@ -404,12 +409,33 @@ public abstract class BaseRootSenderList implements RootSenderList{
 
     /**
      * 群签到
+     * 内部提供一个默认实现的接口
      *
      * @param group 群号
      */
     @Override
     public boolean setGroupSign(String group) {
-        throw RobotApiException.byFrom();
+        return setGroupSign(group, "签到", "签到");
+    }
+
+    /**
+     * 群签到
+     * 内部提供一个默认实现的接口
+     *
+     * @param group 群号
+     */
+    public boolean setGroupSign(String group, String poi, String text) {
+        try {
+            // 提供一个默认的登录接口
+            // 获取权限信息
+            final AuthInfo authInfo = getAuthInfo();
+            // 获取送信器
+            final HttpClientAble http = HttpClientHelper.getDefaultHttp();
+            BaseAPITemplate.groupSign(http, authInfo, group, poi, text);
+            return true;
+        } catch (Exception e) {
+            throw RobotApiException.byFrom();
+        }
     }
 
     /**

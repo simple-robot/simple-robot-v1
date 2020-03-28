@@ -3,7 +3,6 @@ package com.forte.qqrobot.utils;
 import com.alibaba.fastjson.JSONObject;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -14,14 +13,14 @@ import java.util.function.Function;
  **/
 public class JSONUtils {
 
-    private static final String originalName = "originalData";
+    private static final String ORIGINAL_NAME = "originalData";
 
     /**
      * 将json字符串转化为JSON对象
      */
     public static JSONObject toJsonObject(String jsonStr){
         JSONObject jsonObject = JSONObject.parseObject(jsonStr);
-        jsonObject.put(originalName, jsonStr);
+        jsonObject.put(ORIGINAL_NAME, jsonStr);
         return jsonObject;
     }
 

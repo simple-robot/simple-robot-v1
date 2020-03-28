@@ -1,12 +1,13 @@
 ## 版本更新记录
 
-# (now)
+# 1.10.5
 - 优化内部默认的HttpClient模板中对于Cookie的处理
 - 为Setter中的群签到增加默认的实现api
 - 并且增加一个BaseAPITemplate类以提供一个公用的默认模板API
 - 为loginInfo中的头像地址增加默认实现
 - 为内部的异常类提供一个新的获取message的方法`getLangMessage`
 - 更新版本检测时的日志信息内容
+- 简单修改`AnnotationUtils`使其能够适应其他情况
 
 # 1.10.4
 - 替换代码中所使用的`EmptyInputStream`为代码内部实现的类而非`httpcore`内的类，以防止一些可能发生的版本冲突。

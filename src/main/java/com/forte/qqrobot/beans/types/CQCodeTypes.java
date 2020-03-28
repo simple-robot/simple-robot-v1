@@ -1,5 +1,6 @@
 package com.forte.qqrobot.beans.types;
 
+import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.EnumValues;
 import com.forte.utils.regex.RegexUtil;
 
@@ -283,7 +284,7 @@ public enum CQCodeTypes {
     /**
      * 根据function名(即[CQ:后面的名字)获取CQCodeTypes对象实例
      * 已经过时，需要额外通过参数列表进行匹配
-     *
+     * 弃用方法
      * @param function 名称
      * @return CQCodeTypes实例对象
      * @see #getTypeByFunctionAndParams(String, String...)
@@ -597,9 +598,10 @@ public enum CQCodeTypes {
 
     /**
      * 判断是否存在某个equalsID
-     *
+     * 暂时弃用方法
      * @param id equalsID
      */
+    @Deprecated
     public boolean containsID(String id) {
         // 遍历values值
         for (CQCodeTypes value : EnumValues.values(CQCodeTypes.class, CQCodeTypes[]::new)) {

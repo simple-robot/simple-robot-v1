@@ -186,7 +186,7 @@ intercept.block=API[{0}]已被阻止
 system.version.check=将要开始版本检测。请无视版本检测结束前所出现的错误日志，他们没有什么危害。
 system.version.check.url=检测网址：{0}
 system.version.check.failed=版本检测失败。你可以选择自行前往maven仓库进行查看。
-system.version.newest=当前核心版本: {0}, 为{1}版本系列中最新版。
+system.version.newest=当前核心版本: {0}, 无法检测到{1}版本系列中的其他高版本，认为其为最新版。请以仓库中的实际版本号为主。
 system.version.notnewest=当前核心版本: {0}, 在{1}版本系列中存在更高级的版本, 可以考虑切换核心版本。\n注意，核心替换需要保证前两个版本号位相相同：{1}\n你可以参考：\n参考一: {2}\n参考二：{3}
 
 

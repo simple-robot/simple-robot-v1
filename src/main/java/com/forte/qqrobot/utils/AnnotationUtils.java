@@ -48,7 +48,7 @@ public class AnnotationUtils {
     }
 
 
-   /**
+    /**
      * 尝试从一个类对象中获取到@Beans注解
      */
     public static Beans getBeansAnnotationIfListen(Class<?> from) {
@@ -72,7 +72,6 @@ public class AnnotationUtils {
         return null;
     }
 
-
     /**
      * 从某个类上获取注解对象，注解可以深度递归
      * 如果存在多个继承注解，则优先获取浅层第一个注解，如果浅层不存在，则返回第一个获取到的注解
@@ -83,6 +82,20 @@ public class AnnotationUtils {
      * @return 获取到的第一个注解对象
      */
     public static <T extends Annotation> T getAnnotation(AnnotatedElement from, Class<T> annotationType) {
+        return getAnnotation(from, annotationType, (Class<T>[]) new Class[]{});
+    }
+
+    /**
+     * 从某个类上获取注解对象，注解可以深度递归
+     * 如果存在多个继承注解，则优先获取浅层第一个注解，如果浅层不存在，则返回第一个获取到的注解
+     * 请尽可能保证仅存在一个或者一种继承注解，否则获取到的类型将不可控
+     *
+     * @param from           获取注解的某个类
+     * @param annotationType 想要获取的注解类型
+     * @param ignored        获取注解列表的时候的忽略列表
+     * @return 获取到的第一个注解对象
+     */
+    public static <T extends Annotation> T getAnnotation(AnnotatedElement from, Class<T> annotationType, Class<T>... ignored) {
         // 首先尝试获取缓存
         T cache = getCache(from, annotationType);
         if(cache != null){
@@ -113,7 +126,7 @@ public class AnnotationUtils {
         }
 
         Annotation[] annotations = from.getAnnotations();
-        annotation = annotationable ? getAnnotationFromArrays(annotations, annotationType) : null;
+        annotation = annotationable ? getAnnotationFromArrays(annotations, annotationType, ignored) : null;
 
 
         // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
@@ -186,29 +199,47 @@ public class AnnotationUtils {
      * @param <T>
      * @return
      */
-    private static <T extends Annotation> T getAnnotationFromArrays(Annotation[] array, Class<T> annotationType) {
+    private static <T extends Annotation> T getAnnotationFromArrays(Annotation[] array, Class<T> annotationType, Class<T>... ignored) {
         //先浅查询第一层
         //全部注解
-        Annotation[] annotations = Arrays.stream(array).filter(a -> {
-            if (a == null) {
-                return false;
-            }
-            //如果此注解的类型就是我要的，直接放过
-            if (a.annotationType().equals(annotationType)) {
-                return true;
-            }
-            //否则，过滤掉java原生注解对象
-            //通过包路径判断
-            if (JAVA_ANNOTATION_PACKAGE.equals(a.annotationType().getPackage())) {
-                return false;
-            }
-            return true;
-        }).toArray(Annotation[]::new);
+        Annotation[] annotations = Arrays.stream(array)
+                .filter(a -> {
+                    for (Class<? extends Annotation> atype : ignored) {
+                        if (a.annotationType().equals(atype)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .filter(a -> {
+                    if (a == null) {
+                        return false;
+                    }
+                    //如果此注解的类型就是我要的，直接放过
+                    if (a.annotationType().equals(annotationType)) {
+                        return true;
+                    }
+                    //否则，过滤掉java原生注解对象
+                    //通过包路径判断
+                    if (JAVA_ANNOTATION_PACKAGE.equals(a.annotationType().getPackage())) {
+                        return false;
+                    }
+                    return true;
+                }).toArray(Annotation[]::new);
 
 
         if (annotations.length == 0) {
             return null;
         }
+
+        Class<? extends Annotation>[] annotationTypes = new Class[annotations.length];
+        for (int i = 0; i < annotations.length; i++) {
+            annotationTypes[i] = annotations[i].annotationType();
+        }
+
+        Class<T>[] newIgnored = new Class[annotationTypes.length + ignored.length];
+        System.arraycopy(ignored, 0, newIgnored, 0, ignored.length);
+        System.arraycopy(annotationTypes, 0, newIgnored, ignored.length, annotationTypes.length);
 
         //遍历
         for (Annotation a : annotations) {
@@ -221,7 +252,7 @@ public class AnnotationUtils {
         //如果浅层查询还是没有，递归查询
         //再次遍历
         for (Annotation a : annotations) {
-            T annotationGet = getAnnotation(a.annotationType(), annotationType);
+            T annotationGet = getAnnotation(a.annotationType(), annotationType, newIgnored);
             if (annotationGet != null) {
                 return annotationGet;
             }
@@ -299,7 +330,7 @@ public class AnnotationUtils {
     private static boolean saveCache(AnnotatedElement from, Annotation annotation){
         Set<Annotation> list;
         synchronized (ANNOTATION_CACHE) {
-             list = ANNOTATION_CACHE.get(from);
+            list = ANNOTATION_CACHE.get(from);
             // 如果为空，新建一个并保存
             if(list == null){
                 list = new CopyOnWriteArraySet<>();
@@ -317,6 +348,5 @@ public class AnnotationUtils {
     public static void cleanCache(){
         ANNOTATION_CACHE.clear();
     }
-
 
 }

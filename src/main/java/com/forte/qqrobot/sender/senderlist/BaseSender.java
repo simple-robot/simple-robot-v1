@@ -6,8 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Sender整合类
- **/
+ * @see BaseRootSenderList
+ */
+@Deprecated
 public abstract class BaseSender implements Sender{
 
     /**

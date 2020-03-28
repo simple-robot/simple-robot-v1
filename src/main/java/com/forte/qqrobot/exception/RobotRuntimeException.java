@@ -212,6 +212,26 @@ public class RobotRuntimeException extends RuntimeException {
         return localizedTag;
     }
 
+
+    /**
+     * 获取语言化转化后的消息字符串
+     * @return 语言化转化后的消息字符串
+     */
+    public String getLangMessage(){
+        return getLocalizedMessage();
+    }
+
+    /**
+     * 不再推荐使用此方法。请使用 {@link #getLangMessage()} 方法。
+     * @see #getLangMessage()
+     */
+    @Override
+    @Deprecated
+    public String getMessage(){
+        return super.getMessage();
+    }
+
+
     public RobotRuntimeException() {
     }
 
