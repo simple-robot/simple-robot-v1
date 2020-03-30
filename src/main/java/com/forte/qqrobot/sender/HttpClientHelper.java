@@ -2,6 +2,7 @@ package com.forte.qqrobot.sender;
 
 import com.forte.qqrobot.exception.HttpClientHelperException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
+import com.forte.qqrobot.utils.DefaultHttpClientTemplate;
 import org.apache.http.impl.bootstrap.HttpServer;
 
 import java.util.Map;
@@ -53,7 +54,9 @@ public class HttpClientHelper implements HttpClientAble {
      */
     public static HttpClientAble getDefaultHttp(){
         if(defaultClientName == null){
-            throw new HttpClientHelperException("noDefault");
+            final DefaultHttpClientTemplate defaultHttpClientTemplate = new DefaultHttpClientTemplate();
+            registerClient("defaultHttpClientTemplate", defaultHttpClientTemplate);
+            return defaultHttpClientTemplate;
         }
         return getHttp(defaultClientName);
     }

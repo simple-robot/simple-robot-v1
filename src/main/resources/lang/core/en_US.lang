@@ -183,6 +183,6 @@ intercept.block=API [{0}] has been blocked.
 system.version.check=Will start version detection.Please ignore the error logs that appear before the version detection ends, they are not harmful.
 system.version.check.url=check url: {0}
 system.version.check.failed=Version check failed.You can choose to go to the maven repository to view it by yourself.
-system.version.newest=Current core version: {0}, No other higher version in the {1} version series could be detected and considered to be the latest version. Please use the actual version number in the warehouse.
-system.version.notnewest=当Previous core version: {0}, There are more advanced versions in the {1} version series, you can consider switching the core version.\nNote that the core replacement needs to ensure that the first two version numbers are the same:{1}\nYou can refer to:\nReference 1: {2}\nReference 2: {3}
+system.version.newest=Current core version: {0}, currently the latest version in the {1} release series.
+system.version.notnewest=Current core version: {0}, there is a more advanced version {2} in the {1} version series, you can consider switching the core version. \nNote that the core replacement needs to ensure that the first two version numbers are the same: {1} \nYou can refer to: \nReference 1: {3} \nReference 2: {4}
 

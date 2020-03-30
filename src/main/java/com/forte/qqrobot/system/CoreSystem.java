@@ -1,22 +1,24 @@
 package com.forte.qqrobot.system;
 
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.anno.Version;
 import com.forte.qqrobot.log.QQLogLang;
 import com.forte.qqrobot.sender.HttpClientAble;
 import com.forte.qqrobot.sender.HttpClientHelper;
+import com.forte.qqrobot.utils.HttpClientUtil;
 
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 核心中类似于System的类, 也类似于一种工具类或者静态资源类。会逐步取代{@link ResourceDispatchCenter}中的部分功能。
  * @author ForteScarlet
  * @version  1.7.0
  */
-@Version(version = "1.10.4")
+@Version(version = "1.10.5",
+        versionFamily = "1.10")
 public final class CoreSystem {
 
     /** 当前程序的RUN_TIME对象 */
@@ -49,21 +51,38 @@ public final class CoreSystem {
      * 检测版本是否与最新版一致
      */
     public static void checkVersion(){
+        // 初始化版本号
+        Version versionAnnotation = CoreSystem.class.getAnnotation(Version.class);
         // 1.x版本下的groupId与artifactId
-        String coreGroupId = "io.github.ForteScarlet";
-        String coreArtifactId = "simple-robot-core";
+        String coreGroupId = versionAnnotation.groupId();
+        String coreArtifactId = versionAnnotation.artifactId();
+        String versionFamily = versionAnnotation.versionFamily();
+        String versionFamilySearch = versionFamily + ".*";
         // 如果未知，则不提示也不检测
         if(!"UNKNOWN".equals(CORE_VERSION)){
             try{
                 LOG_LANG.warning("version.check");
-                Map.Entry<String, Boolean> checkEnd = hasNewerVersion(CORE_VERSION, coreGroupId, coreArtifactId);
-                boolean newer = checkEnd.getValue();
-                String versionFamily = checkEnd.getKey();
+
+                // 检测版本。版本检测url为阿里云的maven镜像地址
+                String url = "https://maven.aliyun.com/artifact/aliyunMaven/searchArtifactByGav?_input_charset=UTF-8&groupId="+ coreGroupId +"&artifactId="+ coreArtifactId +"&version="+ versionFamilySearch +"&repoId=all";
+
+                String get = HttpClientHelper.getDefaultHttp().get(url);
+
+                JSONArray jsonArray = JSONObject.parseObject(get).getJSONArray("object");
+
+                final String firstVersion = jsonArray.stream().map(o -> o instanceof JSONObject ? (JSONObject) o : null)
+                        .filter(Objects::nonNull)
+                        .filter(o -> "sources".equals(o.getString("classifier")))
+                        .findFirst().map(f -> f.getString("version")).orElse(null);
+
+                boolean newer = !CORE_VERSION.equals(firstVersion);
+                String newerVersion = newer ? firstVersion : null;
+
                 if(newer){
                     // 有最新的，即当前不是最新的
-                    String url1 = "https://mvnrepository.com/artifact/"+coreGroupId+"/" + coreArtifactId;
-                    String url2 = "https://search.maven.org/artifact/"+ coreGroupId +"/" + coreArtifactId;
-                    LOG_LANG.warning("version.notnewest", CORE_VERSION, versionFamily, url1, url2);
+                    String url1 = "https://mvnrepository.com/artifact/"+coreGroupId+"/" + coreArtifactId + "/" + newerVersion;
+                    String url2 = "https://search.maven.org/artifact/"+ coreGroupId +"/" + coreArtifactId + "/"+ newerVersion +"/jar";
+                    LOG_LANG.warning("version.notnewest", CORE_VERSION, versionFamily, newerVersion, url1, url2);
                 }else{
                     // 没有最新的，即当前是最新的
                     LOG_LANG.success("version.newest", CORE_VERSION, versionFamily);

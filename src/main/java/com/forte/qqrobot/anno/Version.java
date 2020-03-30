@@ -14,6 +14,9 @@ import java.lang.annotation.*;
 public @interface Version {
     /** 版本 */
     String version();
+    String versionFamily();
+    String groupId() default "io.github.ForteScarlet";
+    String artifactId() default "simple-robot-core";
     /** 组件名称 */
     String value() default "";
     //开发者
