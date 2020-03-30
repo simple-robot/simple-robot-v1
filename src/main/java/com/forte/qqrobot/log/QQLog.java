@@ -133,7 +133,7 @@ public class QQLog extends ColorSystem {
         // 判断语言是否已经初始化完成
         msgStr = Language.format(msgStr, formatArgs);
         if(ifCan(level)){
-            if(qqLogBack.onLog(msgStr, level)){
+            if(qqLogBack.onLog(msgStr, level, e)){
                 logStream.println(msgStr);
                 if(e != null){
                     e.printStackTrace(logStream);

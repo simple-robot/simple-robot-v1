@@ -8,6 +8,7 @@
 - 为内部的异常类提供一个新的获取message的方法`getLangMessage`
 - 更新版本检测时的日志信息内容
 - 简单修改`AnnotationUtils`使其能够适应其他情况
+- 修复`QQLog`中，自定义的`QQLogBack`所得到的所有异常类均为null的问题
 
 # 1.10.4
 - 替换代码中所使用的`EmptyInputStream`为代码内部实现的类而非`httpcore`内的类，以防止一些可能发生的版本冲突。
