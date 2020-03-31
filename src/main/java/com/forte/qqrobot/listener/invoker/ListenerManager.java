@@ -25,6 +25,7 @@ import com.forte.qqrobot.utils.CQCodeUtil;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -479,14 +480,27 @@ public class ListenerManager implements MsgReceiver {
             //第二层，将参数按照是否为普通函数转化，转化完成后保存
             this.LISTENER_METHOD_MAP = firstMap.entrySet().stream().flatMap(e -> {
                 //准备数据
-                Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> result = new HashMap<>(firstMap.size());
+                Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> result = new HashMap<>(firstMap.size() / 2);
                 Map<Boolean, List<ListenerMethod>> groupBySpare = e.getValue().stream().collect(Collectors.groupingBy(lm -> !lm.isSpare()));
                 // 将结果集进行排序
                 groupBySpare.forEach((k, v) -> Collections.sort(v));
                 result.put(e.getKey(), groupBySpare);
                 return result.entrySet().stream();
-            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                // 使用EnumMap
+            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, throwingMerger(), () -> new EnumMap<>(MsgGetTypes.class)));
         }
     }
 
+
+    /**
+     * Returns a merge function, suitable for use in
+     * throws {@code IllegalStateException}.  This can be used to enforce the
+     * assumption that the elements being collected are distinct.
+     *
+     * @param <T> the type of input arguments to the merge function
+     * @return a merge function which always throw {@code IllegalStateException}
+     */
+    private static <T> BinaryOperator<T> throwingMerger() {
+        return (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
+    }
 }

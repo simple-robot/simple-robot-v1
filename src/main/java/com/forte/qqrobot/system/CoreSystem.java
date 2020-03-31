@@ -17,7 +17,7 @@ import java.util.*;
  * @author ForteScarlet
  * @version  1.7.0
  */
-@Version(version = "1.10.5",
+@Version(version = "1.10.6",
         versionFamily = "1.10")
 public final class CoreSystem {
 
