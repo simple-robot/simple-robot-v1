@@ -3,6 +3,7 @@
 
 
 > 项目对应GITHUB地址: https://github.com/ForteScarlet/simple-robot-core
+> 项目对应GITEE地址:  https://gitee.com/ForteScarlet/simple-robot-core
 
 **首先，点击项目右上角的`star`以开启隐藏链接。**
 
