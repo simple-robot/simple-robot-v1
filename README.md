@@ -171,14 +171,6 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
     </thead>
     <tbody> 
         <tr>
-        	<td>
-        	    <p>SinaNya</p>
-        	</td>
-            <th>斯塔尼亚</th>
-            <td style="word-wrap:break-word;word-break:break-all;" width="120px">为COC/DND等TRPG准备的骰点机器人</td>
-            <td>https://sinanya.com/</td>
-        </tr>
-        <tr>
             <td>
                 <p>崩坏学园2小助手 - 萌萌新</p> 
             </td>
@@ -216,9 +208,6 @@ compile group: 'io.github.ForteScarlet', name: 'simple-robot-core', version: '>$
             <td style="word-wrap:break-word;word-break:break-all;" width="120px">
                 <p>基于酷Q的，使用Java语言开发的，面向COC的骰子机器人组件, 
                 使用架构为SpringBoot-Mybatis-CoolHttpApI。主要功能：COC跑团基础功能+斗图,聊天,群管等乱七八糟的功能</p>
-                <p>
-                    主体为对于上述提到的<b>SinaNya项目 <sub>by 斯塔尼亚</sub></b>的二次封装.
-                </p>
             </td>
             <td>https://github.com/17336324331/Robot-Spring</td>
         </tr>
