@@ -3,35 +3,36 @@ package com.forte.qqrobot.exception;
 /**
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
-public class HttpResponseException extends DefaultHttpClientException {
-    public HttpResponseException() {
+public class DefaultHttpClientException extends RobotRuntimeException {
+
+    public DefaultHttpClientException() {
     }
 
-    public HttpResponseException(String message, Object... format) {
+    public DefaultHttpClientException(String message, Object... format) {
         super(message, format);
     }
 
-    public HttpResponseException(String message) {
+    public DefaultHttpClientException(String message) {
         super(message);
     }
 
-    public HttpResponseException(String message, Throwable cause, Object... format) {
+    public DefaultHttpClientException(String message, Throwable cause, Object... format) {
         super(message, cause, format);
     }
 
-    public HttpResponseException(String message, Throwable cause) {
+    public DefaultHttpClientException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public HttpResponseException(Throwable cause) {
+    public DefaultHttpClientException(Throwable cause) {
         super(cause);
     }
 
-    public HttpResponseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public DefaultHttpClientException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public HttpResponseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
+    public DefaultHttpClientException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
         super(message, cause, enableSuppression, writableStackTrace, format);
     }
 
@@ -41,7 +42,7 @@ public class HttpResponseException extends DefaultHttpClientException {
      * @param pointless 无意义参数，填任意值 pointless param
      * @param message   信息正文
      */
-    public HttpResponseException(int pointless, String message) {
+    public DefaultHttpClientException(int pointless, String message) {
         super(pointless, message);
     }
 
@@ -52,7 +53,7 @@ public class HttpResponseException extends DefaultHttpClientException {
      * @param message   信息正文
      * @param cause     异常
      */
-    public HttpResponseException(int pointless, String message, Throwable cause) {
+    public DefaultHttpClientException(int pointless, String message, Throwable cause) {
         super(pointless, message, cause);
     }
 
@@ -66,7 +67,7 @@ public class HttpResponseException extends DefaultHttpClientException {
      *                           or disabled
      * @param writableStackTrace whether or not the stack trace should
      */
-    public HttpResponseException(int pointless, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public DefaultHttpClientException(int pointless, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(pointless, message, cause, enableSuppression, writableStackTrace);
     }
 }

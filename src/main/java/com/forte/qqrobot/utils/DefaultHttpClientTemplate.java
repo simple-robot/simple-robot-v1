@@ -1,5 +1,6 @@
 package com.forte.qqrobot.utils;
 
+import com.forte.qqrobot.exception.DefaultHttpClientException;
 import com.forte.qqrobot.exception.HttpResponseException;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.HttpClientAble;
@@ -52,7 +53,6 @@ public class DefaultHttpClientTemplate implements HttpClientAble {
     /**
      * utf-8字符编码
      */
-    public static final String CHARSET_UTF_8_STRING = "utf-8";
     public static final Charset CHARSET_UTF_8 = StandardCharsets.UTF_8;
 
     /**
@@ -99,7 +99,7 @@ public class DefaultHttpClientTemplate implements HttpClientAble {
                     .setSocketTimeout(socketTimeout)
                     .setConnectTimeout(connectTimeout).build();
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            throw new RuntimeException(e);
+            throw new DefaultHttpClientException(e);
         }
         // 设置请求超时时间
         int timeout = 5000;
@@ -290,7 +290,7 @@ public class DefaultHttpClientTemplate implements HttpClientAble {
             CloseableHttpClient httpClient = getHttpClient(cookieStore);
             response = send(httpClient, httpGet);
         } catch (Exception e) {
-            QQLog.error(e);
+            throw new DefaultHttpClientException(e);
         }
         return response;
     }
@@ -340,7 +340,7 @@ public class DefaultHttpClientTemplate implements HttpClientAble {
             CloseableHttpClient httpClient = getHttpClient(cookieStore);
             response = send(httpClient, httpPost);
         } catch (Exception e) {
-            QQLog.error(e);
+            throw new DefaultHttpClientException(e);
         }
         return response;
     }
