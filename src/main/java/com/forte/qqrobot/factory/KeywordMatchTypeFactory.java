@@ -3,7 +3,6 @@ package com.forte.qqrobot.factory;
 import com.forte.qqrobot.beans.types.KeywordMatchType;
 import com.forte.qqrobot.exception.EnumInstantiationException;
 import com.forte.qqrobot.exception.EnumInstantiationRequireException;
-import com.forte.qqrobot.log.QQLog;
 
 import java.util.function.BiPredicate;
 import java.util.function.IntFunction;

@@ -1,8 +1,5 @@
 package com.forte.qqrobot.listener.error;
 
-import com.forte.qqrobot.beans.messages.msgget.MsgGet;
-import com.forte.qqrobot.sender.MsgSender;
-
 /**
  * 异常处理器接口
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>

@@ -1,7 +1,5 @@
 package com.forte.qqrobot.beans.messages.msgget;
 
-import java.util.StringJoiner;
-
 /**
  * DiscussMsg对应的抽象类
  * @see DiscussMsg

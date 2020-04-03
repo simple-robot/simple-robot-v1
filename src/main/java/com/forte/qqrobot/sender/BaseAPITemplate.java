@@ -1,9 +1,7 @@
 package com.forte.qqrobot.sender;
 
 import com.forte.qqrobot.beans.messages.result.AuthInfo;
-import com.forte.qqrobot.sender.intercept.InterceptValue;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;

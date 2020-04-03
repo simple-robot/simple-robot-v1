@@ -1,11 +1,7 @@
 package com.forte.qqrobot.depend;
 
-import org.apache.commons.collections.iterators.EmptyListIterator;
-
-import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * 通过实现此接口以指定一个获取资源实例的方法

@@ -17,7 +17,6 @@ import org.quartz.SchedulerException;
 
 import java.lang.reflect.Modifier;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;

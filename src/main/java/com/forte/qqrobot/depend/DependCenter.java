@@ -10,7 +10,6 @@ import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.SingleFactory;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;

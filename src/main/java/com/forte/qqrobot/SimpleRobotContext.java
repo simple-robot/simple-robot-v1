@@ -1,7 +1,6 @@
 package com.forte.qqrobot;
 
 import com.forte.qqrobot.bot.BotManager;
-import com.forte.qqrobot.depend.Depend;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;

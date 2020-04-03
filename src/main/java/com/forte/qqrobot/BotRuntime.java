@@ -3,7 +3,6 @@ package com.forte.qqrobot;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.bot.LoginInfo;
-import com.forte.qqrobot.exception.RobotDevException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.ListenerInfo;
 import com.forte.qqrobot.log.QQLog;

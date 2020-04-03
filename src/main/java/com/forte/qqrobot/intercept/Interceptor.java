@@ -1,7 +1,5 @@
 package com.forte.qqrobot.intercept;
 
-import com.forte.qqrobot.listener.MsgIntercept;
-
 /**
  *
  * 拦截器跟接口，定义拦截器接口规范。

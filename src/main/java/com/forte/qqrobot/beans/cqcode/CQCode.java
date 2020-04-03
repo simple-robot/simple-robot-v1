@@ -1,7 +1,6 @@
 package com.forte.qqrobot.beans.cqcode;
 
 import com.forte.qqrobot.beans.types.CQCodeTypes;
-import com.forte.qqrobot.exception.CQParamsException;
 import com.forte.qqrobot.exception.CQParseException;
 import com.forte.qqrobot.utils.CQCodeUtil;
 

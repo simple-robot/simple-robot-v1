@@ -3,8 +3,6 @@ package com.forte.qqrobot.factory;
 import com.forte.qqrobot.beans.types.CQCodeTypes;
 import com.forte.qqrobot.exception.EnumInstantiationException;
 import com.forte.qqrobot.exception.EnumInstantiationRequireException;
-import com.forte.qqrobot.exception.RobotRuntimeException;
-import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.ObjectsPlus;
 
 import java.util.Arrays;

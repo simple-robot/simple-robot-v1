@@ -1,6 +1,5 @@
 package com.forte.qqrobot.utils;
 
-import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.utils.reflect.EnumUtils;
 

@@ -2,7 +2,6 @@ package com.forte.qqrobot.utils;
 
 import com.forte.qqrobot.exception.DefaultHttpClientException;
 import com.forte.qqrobot.exception.HttpResponseException;
-import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.HttpClientAble;
 import com.forte.qqrobot.system.CoreSystem;
 import org.apache.http.HttpEntity;

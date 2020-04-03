@@ -11,7 +11,6 @@ import com.forte.qqrobot.exception.TimeTaskException;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.AnnotationUtils;
-import com.forte.qqrobot.utils.FieldUtils;
 import org.quartz.*;
 
 import java.lang.annotation.Annotation;

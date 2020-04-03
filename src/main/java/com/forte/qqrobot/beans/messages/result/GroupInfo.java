@@ -1,7 +1,5 @@
 package com.forte.qqrobot.beans.messages.result;
 
-import com.forte.qqrobot.beans.messages.TimeAble;
-
 import java.util.Map;
 
 /**

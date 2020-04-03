@@ -3,8 +3,6 @@ package com.forte.qqrobot.bot;
 import com.forte.qqrobot.beans.function.PathAssembler;
 import com.forte.qqrobot.beans.function.VerifyFunction;
 
-import java.util.function.Function;
-
 /**
  * Bot信息管理器
  * 其实现类应该存在一个公共的无参构造

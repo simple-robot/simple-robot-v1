@@ -5,7 +5,6 @@ import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.sender.MsgSender;
 
-import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;

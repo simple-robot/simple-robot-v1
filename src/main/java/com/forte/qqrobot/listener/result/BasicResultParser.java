@@ -1,7 +1,5 @@
 package com.forte.qqrobot.listener.result;
 
-import com.alibaba.fastjson.JSON;
-
 /**
  *
  * 基础转化类，存在部分返回值存在特殊含义。

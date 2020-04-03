@@ -1,7 +1,6 @@
 package com.forte.qqrobot.factory;
 
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
-import com.forte.qqrobot.exception.EnumFactoryException;
 import com.forte.qqrobot.exception.EnumInstantiationException;
 import com.forte.qqrobot.exception.EnumInstantiationRequireException;
 import com.forte.qqrobot.exception.RobotDevException;

@@ -4,7 +4,8 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.exception.NoSuchBlockNameException;
 import com.forte.qqrobot.listener.invoker.ListenerMethod;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 阻断器接口，

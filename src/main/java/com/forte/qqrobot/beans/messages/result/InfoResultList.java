@@ -3,9 +3,7 @@ package com.forte.qqrobot.beans.messages.result;
 import com.forte.qqrobot.utils.EmptyIterator;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**

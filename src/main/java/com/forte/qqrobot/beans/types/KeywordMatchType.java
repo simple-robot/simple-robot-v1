@@ -3,7 +3,6 @@ package com.forte.qqrobot.beans.types;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**

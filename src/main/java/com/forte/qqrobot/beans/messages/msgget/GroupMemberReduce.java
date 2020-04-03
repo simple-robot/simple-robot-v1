@@ -1,8 +1,6 @@
 package com.forte.qqrobot.beans.messages.msgget;
 
 import com.forte.qqrobot.beans.messages.CodesAble;
-import com.forte.qqrobot.beans.messages.GroupCodeAble;
-import com.forte.qqrobot.beans.messages.msgget.EventGet;
 import com.forte.qqrobot.beans.messages.types.ReduceType;
 
 /**

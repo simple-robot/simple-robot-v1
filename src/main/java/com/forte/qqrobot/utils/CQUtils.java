@@ -9,9 +9,12 @@ import java.util.Optional;
 /**
  * CQ相关工具类 <br>
  * ※ 应定义好CQ根路径
+ * 现在看看，没啥用处的东西
+ * 可能之后会改成别的什么吧
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+@Deprecated
 public class CQUtils {
 
     /** 图片文件夹路径 */

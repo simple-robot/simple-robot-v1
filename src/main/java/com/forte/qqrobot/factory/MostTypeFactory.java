@@ -4,7 +4,6 @@ import com.forte.qqrobot.beans.function.MostTypeFilter;
 import com.forte.qqrobot.beans.types.MostType;
 import com.forte.qqrobot.exception.EnumInstantiationException;
 import com.forte.qqrobot.exception.EnumInstantiationRequireException;
-import com.forte.qqrobot.log.QQLog;
 
 import java.util.function.IntFunction;
 

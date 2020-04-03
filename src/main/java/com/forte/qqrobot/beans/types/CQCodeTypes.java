@@ -1,6 +1,5 @@
 package com.forte.qqrobot.beans.types;
 
-import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.EnumValues;
 import com.forte.utils.regex.RegexUtil;
 

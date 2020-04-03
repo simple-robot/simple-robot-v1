@@ -1,14 +1,11 @@
 package com.forte.qqrobot.listener.error;
 
 import com.forte.qqrobot.anno.ExceptionCatch;
-import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.exception.ExceptionProcessException;
 import com.forte.qqrobot.exception.NoSuchExceptionHandleException;
 import com.forte.qqrobot.listener.result.BasicResultParser;
 import com.forte.qqrobot.listener.result.ListenResult;
-import com.forte.qqrobot.listener.result.ListenResultParser;
 import com.forte.qqrobot.log.QQLogLang;
-import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.FieldUtils;
 

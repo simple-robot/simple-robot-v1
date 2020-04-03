@@ -1,7 +1,5 @@
 package com.forte.qqrobot.bot;
 
-import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
-
 /**
  * 一个已注册的机器人的信息
  * 一个简单的信息封装类，一般为登录后验证完全部的登录信息后。

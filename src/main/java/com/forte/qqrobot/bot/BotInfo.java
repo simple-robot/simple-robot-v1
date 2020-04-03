@@ -1,7 +1,5 @@
 package com.forte.qqrobot.bot;
 
-import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
-
 /**
  * 一个已注册的机器人的信息标注接口
  *

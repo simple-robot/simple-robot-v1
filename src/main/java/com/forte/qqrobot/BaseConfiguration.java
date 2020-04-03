@@ -2,16 +2,13 @@ package com.forte.qqrobot;
 
 import com.forte.config.Conf;
 import com.forte.lang.Language;
-import com.forte.qqrobot.beans.function.ExFunction;
 import com.forte.qqrobot.beans.function.PathAssembler;
-import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 import com.forte.qqrobot.beans.types.ResultSelectType;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.bot.BotInfoImpl;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.ConfigurationException;
-import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.log.LogLevel;
 import com.forte.qqrobot.system.CoreSystem;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;

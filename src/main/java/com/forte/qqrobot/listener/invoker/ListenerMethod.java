@@ -9,7 +9,6 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.depend.DependGetter;
-import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.listener.result.BasicResultParser;
 import com.forte.qqrobot.listener.result.ListenResult;
 import com.forte.qqrobot.listener.result.ListenResultParser;
@@ -17,7 +16,8 @@ import com.forte.utils.basis.MD5Utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;

@@ -3,8 +3,6 @@ package com.forte.qqrobot.sender.senderlist;
 import com.forte.qqrobot.beans.messages.get.InfoGet;
 import com.forte.qqrobot.beans.messages.result.InfoResult;
 
-import java.util.Map;
-
 /**
  * 提供1个方法以汇总Getter方法
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>

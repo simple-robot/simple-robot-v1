@@ -2,7 +2,6 @@ package com.forte.qqrobot.sender.senderlist;
 
 import com.forte.qqrobot.exception.RobotApiException;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**

@@ -3,7 +3,6 @@ package com.forte.qqrobot.factory;
 import com.forte.qqrobot.beans.types.TimeTaskTemplate;
 import com.forte.qqrobot.exception.EnumInstantiationException;
 import com.forte.qqrobot.exception.EnumInstantiationRequireException;
-import com.forte.qqrobot.log.QQLog;
 import org.quartz.Trigger;
 
 import java.util.function.Function;

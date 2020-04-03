@@ -1,14 +1,10 @@
 package com.forte.qqrobot.bot;
 
-import com.forte.qqrobot.beans.function.ExFunction;
 import com.forte.qqrobot.beans.function.PathAssembler;
 import com.forte.qqrobot.beans.function.VerifyFunction;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * {@link BotManager}的基础实现类，使用Map储存数据。

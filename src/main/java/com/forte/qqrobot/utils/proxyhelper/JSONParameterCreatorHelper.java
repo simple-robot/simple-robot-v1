@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.forte.qqrobot.anno.Ignore;
 import com.forte.qqrobot.anno.Key;
 import com.forte.qqrobot.utils.AnnotationUtils;
-import com.forte.utils.reflect.ProxyUtils;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;

@@ -1,6 +1,6 @@
 package com.forte.qqrobot.utils;
 
-import java.awt.Color;
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Random;

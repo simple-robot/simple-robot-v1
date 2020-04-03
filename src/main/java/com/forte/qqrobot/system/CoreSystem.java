@@ -8,9 +8,11 @@ import com.forte.qqrobot.anno.Version;
 import com.forte.qqrobot.log.QQLogLang;
 import com.forte.qqrobot.sender.HttpClientAble;
 import com.forte.qqrobot.sender.HttpClientHelper;
-import com.forte.qqrobot.utils.HttpClientUtil;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 
 /**
  * 核心中类似于System的类, 也类似于一种工具类或者静态资源类。会逐步取代{@link ResourceDispatchCenter}中的部分功能。

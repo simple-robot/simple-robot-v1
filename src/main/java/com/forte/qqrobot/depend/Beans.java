@@ -1,7 +1,6 @@
 package com.forte.qqrobot.depend;
 
 import com.forte.lang.Language;
-import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.FieldUtils;
@@ -10,7 +9,6 @@ import com.forte.qqrobot.utils.ObjectsPlus;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.function.Function;
 
 /**

@@ -1,7 +1,10 @@
 package com.forte.qqrobot.sender.intercept;
 
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 送信器接口列表API， 用于标记一个API

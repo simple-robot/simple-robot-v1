@@ -3,12 +3,7 @@ package com.forte.qqrobot.log;
 import com.forte.lang.Language;
 import com.forte.plusutils.consoleplus.FortePlusPrintStream;
 import com.forte.plusutils.consoleplus.console.Colors;
-import com.forte.plusutils.consoleplus.console.ColorsBuilder;
-import com.forte.plusutils.consoleplus.console.colors.BackGroundColorTypes;
-import com.forte.plusutils.consoleplus.console.colors.ColorTypes;
-import com.forte.plusutils.consoleplus.console.colors.FontColorTypes;
 import com.forte.plusutils.consoleplus.system.ColorSystem;
-import com.forte.qqrobot.utils.RandomUtil;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
