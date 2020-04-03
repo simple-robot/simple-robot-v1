@@ -18,7 +18,7 @@ public class ExceptionHandleContextImpl<T extends Exception> extends BaseContext
     /** 使用的送信器 */
     private MsgSender msgSender;
     /** listen context */
-    private ListenContext context;
+    private ListenContext listenContext;
     /** 得到的异常 */
     private T exception;
     /** 监听函数的排序值 */
@@ -33,7 +33,7 @@ public class ExceptionHandleContextImpl<T extends Exception> extends BaseContext
         this.msgGet = msgGet;
         this.sort = sort;
         this.msgSender = msgSender;
-        this.context = context;
+        this.listenContext = context;
         this.exception = exception;
     }
 
@@ -71,6 +71,15 @@ public class ExceptionHandleContextImpl<T extends Exception> extends BaseContext
 
     public void setMsgSender(MsgSender msgSender) {
         this.msgSender = msgSender;
+    }
+
+    @Override
+    public ListenContext getListenContext() {
+        return listenContext;
+    }
+
+    public void setListenContext(ListenContext listenContext) {
+        this.listenContext = listenContext;
     }
 
     @Override

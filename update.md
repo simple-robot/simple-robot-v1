@@ -1,11 +1,10 @@
 ## 版本更新记录
 
-# (now)
+# 1.10.7
 - 默认的httpClient在请求接口并返回值code为300及以上的时候抛出的异常将会被抛出而不是被捕获。
-- 1.11.x之前预实装异常处理机制。
+- 1.11.x之前预实装异常处理机制。对应文档：[https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1614982](https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1614982)
 - `MsgIntercept`消息拦截器中的参数`MsgGetContext`中追加参数`ListenContext`
 - 使`ListenContext`继承`BaseContext`抽象类。
-
 
 
 # 1.10.6
