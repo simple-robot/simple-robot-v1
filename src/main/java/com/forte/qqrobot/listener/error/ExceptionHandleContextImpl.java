@@ -1,20 +1,31 @@
 package com.forte.qqrobot.listener.error;
 
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
+import com.forte.qqrobot.intercept.BaseContext;
 import com.forte.qqrobot.sender.MsgSender;
+
+import java.util.Map;
 
 /**
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
-public class ExceptionHandleContextImpl implements ExceptionHandleContext {
+public class ExceptionHandleContextImpl<T extends Exception> extends BaseContext<T> implements ExceptionHandleContext<T> {
+    /** 监听函数的id */
     private String id;
+    /** 接收到的消息 */
     private MsgGet msgGet;
+    /** 使用的送信器 */
     private MsgSender msgSender;
-    private Exception exception;
+    /** 得到的异常 */
+    private T exception;
+    /** 监听函数的排序值 */
+    private int sort;
 
-    public ExceptionHandleContextImpl(String id, MsgGet msgGet, MsgSender msgSender, Exception exception) {
+    public ExceptionHandleContextImpl(String id, MsgGet msgGet, int sort, MsgSender msgSender, Map<String, Object> globalMap, T exception) {
+        super(exception, globalMap);
         this.id = id;
         this.msgGet = msgGet;
+        this.sort = sort;
         this.msgSender = msgSender;
         this.exception = exception;
     }
@@ -38,6 +49,15 @@ public class ExceptionHandleContextImpl implements ExceptionHandleContext {
     }
 
     @Override
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+    @Override
     public MsgSender getMsgSender() {
         return msgSender;
     }
@@ -47,11 +67,11 @@ public class ExceptionHandleContextImpl implements ExceptionHandleContext {
     }
 
     @Override
-    public Exception getException() {
+    public T getException() {
         return exception;
     }
 
-    public void setException(Exception exception) {
+    public void setException(T exception) {
         this.exception = exception;
     }
 }

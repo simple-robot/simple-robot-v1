@@ -27,7 +27,7 @@ public class BodyResultParser implements ListenResultParser {
      * @return
      */
     @Override
-    public ListenResult parse(Object t, int sort, boolean isBreak, boolean isBreakPlugin, Throwable e) {
+    public ListenResult parse(Object t, int sort, boolean isBreak, boolean isBreakPlugin, Exception e) {
         if(e != null){
             return new ListenResultImpl<>(sort, t, false, isBreak, isBreakPlugin, e);
         }else{

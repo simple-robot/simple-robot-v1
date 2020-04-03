@@ -12,7 +12,7 @@ import java.util.Map;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public abstract class BaseContext<T> {
+public abstract class BaseContext<T> implements Context<T> {
 
     private T value;
 
@@ -22,9 +22,11 @@ public abstract class BaseContext<T> {
     /** 全局上下文参数 */
     private final Map<String, Object> globalContextMap;
 
+    @Override
     public T getValue(){
         return value;
     }
+    @Override
     public void setValue(T newValue){
         this.value = newValue;
     }
@@ -51,6 +53,7 @@ public abstract class BaseContext<T> {
      * @param key key
      * @return 当前上下文参数
      */
+    @Override
     public Object get(String key){
         return getContextMap().get(key);
     }
@@ -60,6 +63,7 @@ public abstract class BaseContext<T> {
      * @param key key
      * @param value value
      */
+    @Override
     public Object set(String key, Object value){
         return getContextMap().put(key, value);
     }
@@ -69,10 +73,12 @@ public abstract class BaseContext<T> {
      * @param key key
      * @return key
      */
+    @Override
     public Object getGlobal(String key){
         return getGlobalContextMap().get(key);
     }
 
+    @Override
     public Object setGlobal(String key, Object value){
         return getGlobalContextMap().put(key, value);
     }
@@ -80,10 +86,16 @@ public abstract class BaseContext<T> {
     /**
      * 清除内容。只会清除当前域
      */
+    @Override
     public void clear(){
         getContextMap().clear();
     }
 
+    @Override
+    public void clearAll(){
+        getContextMap().clear();
+        getGlobalContextMap().clear();
+    }
 
     /**
      * 构造

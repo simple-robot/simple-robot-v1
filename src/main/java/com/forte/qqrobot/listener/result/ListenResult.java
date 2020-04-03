@@ -46,7 +46,7 @@ public interface ListenResult<T> extends Comparable<ListenResult> {
      * 如果出现了异常，则此为异常
      * @return 出现的异常（如果有的话
      */
-    Throwable getError();
+    Exception getError();
 
     /**
      * 默认的排序方式为根据sortValue值进行排序

@@ -1,5 +1,12 @@
 package com.forte.qqrobot.depend;
 
+import org.apache.commons.collections.iterators.EmptyListIterator;
+
+import java.lang.reflect.Array;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * 通过实现此接口以指定一个获取资源实例的方法
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
@@ -33,5 +40,13 @@ public interface DependGetter {
      * 常量参数：8大基本数据类型、8大基础数据类型的封装类、String类
      */
     Object constant(String name);
+
+    /**
+     * 根据类型获取其所有实现类
+     * @param type 类型
+     */
+    default <T> List<T> getListByType(Class<T> type){
+        return Collections.emptyList();
+    }
 
 }

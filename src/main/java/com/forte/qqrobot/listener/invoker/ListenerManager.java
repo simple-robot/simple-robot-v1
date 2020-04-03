@@ -8,10 +8,13 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.depend.AdditionalDepends;
+import com.forte.qqrobot.exception.NoSuchExceptionHandleException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.listener.MsgIntercept;
 import com.forte.qqrobot.listener.MsgGetContext;
+import com.forte.qqrobot.listener.error.ExceptionHandleContextImpl;
+import com.forte.qqrobot.listener.error.ExceptionProcessCenter;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.listener.result.ListenResult;
 import com.forte.qqrobot.listener.result.ListenResultImpl;
@@ -70,7 +73,7 @@ public class ListenerManager implements MsgReceiver {
      * <br>
      * 由于全局Map可能会出现线程问题，故此使用线程安全的Map
      */
-    private Map<String, Object> msgContextGlobalMap = new ConcurrentHashMap<>(4);
+    private Map<String, Object> msgContextGlobalMap = new ConcurrentHashMap<>(2);
 
     
     /**
@@ -78,7 +81,7 @@ public class ListenerManager implements MsgReceiver {
      * <br>
      * 由于全局Map可能会出现线程问题，故此使用线程安全的Map
      */
-    private Map<String, Object> listenContextGlobalMap = new ConcurrentHashMap<>(4);
+    private Map<String, Object> listenContextGlobalMap = new ConcurrentHashMap<>(2);
 
     /**
      * 空的监听回执列表
@@ -89,6 +92,16 @@ public class ListenerManager implements MsgReceiver {
      * Bot管理器，用于筛选那些没有被注册（即获取不到的）bot的消息
      */
     private BotManager botManager;
+
+    /**
+     * 异常处理中心
+     */
+    private ExceptionProcessCenter exceptionProcessCenter;
+
+    /**
+     * 维护一个异常处理器所使用的全局map
+     */
+    private Map<String, Object> exceptionContextGlobalMap = new ConcurrentHashMap<>(2);
 
     /**
      * 接收到了消息
@@ -152,14 +165,13 @@ public class ListenerManager implements MsgReceiver {
         Set<ListenerMethod> blockMethod = plug.getBlockMethod(type);
         if(blockMethod != null){
             //如果存在阻断，执行阻断
-            invokeBlock(blockMethod, paramGetter, msgGet, at, context);
-
-            ListenResult<Object> blockResult = ListenResultImpl.result(1, null, true, false, false, null);
-
-            return new ListenResult[]{blockResult};
+            return invokeBlock(blockMethod, paramGetter, msgGet, at, context);
+//            ListenResult<Object> blockResult = ListenResultImpl.result(1, null, true, false, false, null);
+//            return new ListenResult[]{blockResult};
         }else{
             //如果不存在阻断，正常执行
             //先执行普通监听函数
+
             Map.Entry<Integer, List<ListenResult>> normalIntResult = invokeNormal(type, paramGetter, msgGet, at, context);
             int invokeNum = normalIntResult.getKey();
 
@@ -190,24 +202,34 @@ public class ListenerManager implements MsgReceiver {
      * @param msgGet        接收到的消息
      * @param at            是否被at
      */
-    private void invokeBlock(Set<ListenerMethod> blockMethod, Function<ListenerMethod, AdditionalDepends> paramGetter,
+    private ListenResult[] invokeBlock(Set<ListenerMethod> blockMethod, Function<ListenerMethod, AdditionalDepends> paramGetter,
                              MsgGet msgGet, AtDetection at, ListenContext context){
         //过滤
         //获取过滤器
         ListenerFilter filter = ResourceDispatchCenter.getListenerFilter();
-        blockMethod.stream().filter(lisM -> filter.blockFilter(lisM, msgGet, at, context)).forEach(lisM -> {
+        return blockMethod.stream().filter(lisM -> filter.blockFilter(lisM, msgGet, at, context)).map(lisM -> {
             //剩下的为过滤好的监听函数
+            AdditionalDepends addition = null;
             try{
                 //执行函数
-                AdditionalDepends addition = paramGetter.apply(lisM);
+                addition = paramGetter.apply(lisM);
                 addition.put("context", context);
-                lisM.invoke(addition);
-
-            }catch (Throwable e){
-                QQLog.error("阻断函数["+ lisM.getBeanToString() +"]执行函数["+ lisM.getMethodToString() +"]出现错误！", e);
+                return lisM.invoke(addition);
+            }catch (Exception e){
+                MsgSender sender = addition == null ? null : addition.get(MsgSender.class);
+                final ExceptionHandleContextImpl<Exception> exContext =
+                        new ExceptionHandleContextImpl<>(lisM.getUUID(), msgGet, lisM.getSort(), sender, exceptionContextGlobalMap, e);
+                try {
+                    return exceptionProcessCenter.doHandleResult(e, exContext);
+                } catch (NoSuchExceptionHandleException ex) {
+                    QQLog.error("阻断函数["+ lisM.getBeanToString() +"]执行函数["+ lisM.getMethodToString() +"]出现错误！", e);
+                    return null;
+                }
+            } catch (Throwable throwable) {
+                QQLog.error("阻断函数["+ lisM.getBeanToString() +"]执行函数["+ lisM.getMethodToString() +"]出现错误！", throwable);
+                return null;
             }
-
-        });
+        }).filter(Objects::nonNull).toArray(ListenResult[]::new);
     }
 
 
@@ -323,23 +345,30 @@ public class ListenerManager implements MsgReceiver {
                 // 通过filter与findFirst组合使用来实现。
                 .map(lm -> {
                     try {
-                        ListenResult result = lm.invoke(paramGetter.apply(lm));
+                        final AdditionalDepends additionalDepends = paramGetter.apply(lm);
+                        ListenResult result = lm.invoke(additionalDepends);
+                        // 如果有异常，處理或输出这个异常
+                        Exception error = result.getError();
+                        if(error != null){
+                            MsgSender sender = additionalDepends.get(MsgSender.class);
+                            final ExceptionHandleContextImpl<Exception> exContext =
+                                    new ExceptionHandleContextImpl<>(lm.getUUID(), msgGet, lm.getSort(), sender, exceptionContextGlobalMap, error);
+                            try {
+                                result = exceptionProcessCenter.doHandleResult(error, exContext);
+                            }catch (NoSuchExceptionHandleException e){
+                                QQLog.error("listener.run.error", error, lm.getUUID(), error.getLocalizedMessage());
+                            }
+                        }
                         results.add(result);
                         // 如果执行成功，计数+1
                         if(result.isSuccess()){
                             count.addAndGet(1);
-                        }
-                        // 如果有异常，输出这个异常
-                        Throwable error = result.getError();
-                        if(error != null){
-                            QQLog.error("listener.run.error", error, lm.getUUID(), error.getMessage());
                         }
                         return result;
                     } catch (Throwable e) {
                         // invoke里已经对方法的执行做了处理，如果还是会出错则代表是其他步骤出现了异常。
                        throw new RobotRuntimeException(e);
                     }
-
                 })
                 .filter(ListenResult::isToBreak)
                 .findFirst();
@@ -378,16 +407,24 @@ public class ListenerManager implements MsgReceiver {
                 // 通过filter与findFirst组合使用来实现。
                 .map(lm -> {
                     try {
-                        ListenResult result = lm.invoke(paramGetter.apply(lm));
+                        final AdditionalDepends additionalDepends = paramGetter.apply(lm);
+                        ListenResult result = lm.invoke(additionalDepends);
+                        // 如果有异常，输出这个异常
+                        Exception error = result.getError();
+                        if(error != null){
+                            MsgSender sender = additionalDepends.get(MsgSender.class);
+                            final ExceptionHandleContextImpl<Exception> exContext =
+                                    new ExceptionHandleContextImpl<>(lm.getUUID(), msgGet, lm.getSort(), sender, exceptionContextGlobalMap, error);
+                            try {
+                                result = exceptionProcessCenter.doHandleResult(error, exContext);
+                            }catch (NoSuchExceptionHandleException e){
+                                QQLog.error("listener.run.error", error, lm.getUUID(), error.getLocalizedMessage());
+                            }
+                        }
                         results.add(result);
                         // 如果执行成功，计数+1
                         if(result.isSuccess()){
                             count.addAndGet(1);
-                        }
-                        // 如果有异常，输出这个异常
-                        Throwable error = result.getError();
-                        if(error != null){
-                            QQLog.error("listener.run.error", error, lm.getUUID(), error.getMessage());
                         }
                         return result;
                     } catch (Throwable e) {
@@ -431,9 +468,12 @@ public class ListenerManager implements MsgReceiver {
      * @param methods 函数集合
      * @param intercepts 消息拦截器数组 nullable
      */
-    public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager, MsgIntercept[] intercepts){
+    public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, MsgIntercept[] intercepts){
         // bot管理器
         this.botManager = botManager;
+
+        // 异常处理中心
+        this.exceptionProcessCenter = exceptionProcessCenter;
 
         // 排序并构建消息拦截器
         if(intercepts != null){

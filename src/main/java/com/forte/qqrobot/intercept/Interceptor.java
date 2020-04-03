@@ -10,7 +10,7 @@ import com.forte.qqrobot.listener.MsgIntercept;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface Interceptor<T, C extends BaseContext<T>> extends Comparable<Interceptor<T, C>> {
+public interface Interceptor<T, C extends Context<T>> extends Comparable<Interceptor<T, C>> {
 
     /**
      * 排序方法，默认为1。

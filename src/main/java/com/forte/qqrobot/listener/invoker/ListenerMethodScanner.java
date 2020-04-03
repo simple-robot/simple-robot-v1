@@ -8,6 +8,7 @@ import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.listener.MsgIntercept;
+import com.forte.qqrobot.listener.error.ExceptionProcessCenter;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
 import com.forte.qqrobot.listener.invoker.plug.Plug;
 import com.forte.qqrobot.listener.result.BodyResultParser;
@@ -110,7 +111,6 @@ public class ListenerMethodScanner {
         //创建过滤器，排除有忽略注解的方法和静态方法
         if(classListen != null){
             //如果存在监听, 获取所有公共方法
-//            getFilter = m -> !MethodUtil.isStatic(m) && (m.getAnnotation(Ignore.class) == null);
             getFilter = m -> !MethodUtil.isStatic(m) && (AnnotationUtils.getAnnotation(m, Ignore.class) == null);
             sortClass = classListen.sort();
             nameClass = classListen.name();
@@ -124,7 +124,6 @@ public class ListenerMethodScanner {
         //参数获取类型
         MsgGetTypes[] msgGetTypes = Optional.ofNullable(classListen).map(Listen::value).orElse(null);
         //方法集合, 排除静态方法
-//        Method[] publicMethods = Arrays.stream(MethodUtil.getPublicMethods(clazz, getFilter)).toArray(Method[]::new);
         Stream<Method> publicMethodsStream = Arrays.stream(MethodUtil.getPublicMethods(clazz, getFilter));
 
         //遍历并构建ListenerMethod对象
@@ -177,7 +176,6 @@ public class ListenerMethodScanner {
                         + "#" +
                      ( methodLisName.trim().length() == 0 ? method.getName() : methodLisName );
             }
-//            String id = Optional.ofNullable(methodListen).map(Listen::name).orElse();
 
             // 是否为阻断函数
             ListenBreak listenBreak = AnnotationUtils.getAnnotation(method, ListenBreak.class);
@@ -243,8 +241,8 @@ public class ListenerMethodScanner {
      * 构建监听函数管理器实例
      * @return 监听函数管理器实例
      */
-    public ListenerManager buildManager(BotManager botManager, MsgIntercept[] intercepts){
-        return new ListenerManager(listenerMethodSet, botManager, intercepts);
+    public ListenerManager buildManager(BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, MsgIntercept[] intercepts){
+        return new ListenerManager(listenerMethodSet, botManager, exceptionProcessCenter, intercepts);
     }
 
     /**

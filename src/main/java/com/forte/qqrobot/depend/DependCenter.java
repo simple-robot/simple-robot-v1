@@ -10,6 +10,7 @@ import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.FieldUtils;
 import com.forte.qqrobot.utils.SingleFactory;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -622,9 +623,8 @@ public class DependCenter implements DependGetter, DependInjector {
 
     /**
      * 根据父类类型寻找依赖池中的存在的子类类型列表
+     * 只能得到当前依赖中心中的内容
      * @param superType 父类类型
-     * @param <T>
-     * @return
      */
     public <T> List<Class<? extends T>> getTypesBySuper(Class<T> superType){
         List<Class<? extends T>> list = new ArrayList<>(4);
@@ -647,15 +647,16 @@ public class DependCenter implements DependGetter, DependInjector {
      * @return 所有实现类
      */
     public <T> List<T> getByType(Class<T> superType){
-        List<T> list = new ArrayList<>(4);
-        // 使用类型工厂
-        Set<Class> keySet = classResourceWareHouse.keySet();
-        for (Class keyClass : keySet) {
-            if(keyClass.equals(superType) || FieldUtils.isChild(keyClass, superType)){
-                list.add((T) get(keyClass));
-            }
-        }
-        return list;
+        return getListByType(superType);
+//        List<T> list = new ArrayList<>(4);
+//        // 使用类型工厂
+//        Set<Class> keySet = classResourceWareHouse.keySet();
+//        for (Class keyClass : keySet) {
+//            if(keyClass.equals(superType) || FieldUtils.isChild(keyClass, superType)){
+//                list.add((T) get(keyClass));
+//            }
+//        }
+//        return listByType;
     }
 
     /**
@@ -729,12 +730,6 @@ public class DependCenter implements DependGetter, DependInjector {
         }
     }
 
-    /**
-     * 直接记录一个新的依赖
-     */
-    private void saveNew(Depend depend){
-
-    }
 
     public <T> Depend<T> getDepend(String name, Class<T> type){
         return getDepend(name);
@@ -1009,6 +1004,35 @@ public class DependCenter implements DependGetter, DependInjector {
     @Override
     public <T> T constant(String name, Class<T> type) {
         return (T) constant(name);
+    }
+
+    @Override
+    public <T> List<T> getListByType(Class<T> type){
+        List<T> outList = null;
+        if(!dependGetter.equals(this)){
+            // 先通过额外的dependGetter获取
+            outList = dependGetter.getListByType(type);
+        }
+        final List<T> list = getThisListByType(type);
+        if(outList != null){
+            list.addAll(outList);
+        }
+        return list;
+    }
+
+    /**
+     * 获取当前依赖工厂的list
+     */
+    private <T> List<T> getThisListByType(Class<T> superType){
+        List<T> list = new ArrayList<>(4);
+        // 使用类型工厂
+        Set<Class> keySet = classResourceWareHouse.keySet();
+        for (Class keyClass : keySet) {
+            if(keyClass.equals(superType) || FieldUtils.isChild(keyClass, superType)){
+                list.add((T) get(keyClass));
+            }
+        }
+        return list;
     }
 
     /**

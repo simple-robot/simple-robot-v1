@@ -28,18 +28,18 @@ public class ListenResultImpl<T> implements ListenResult<T> {
 
     private Boolean toBreakPlugin;
 
-    private Throwable error;
+    private Exception error;
 
 
-    public static <T> ListenResult<T> result(int sort, T result, boolean success, boolean toBreak, boolean toBreakPlugin, Throwable error){
+    public static <T> ListenResult<T> result(int sort, T result, boolean success, boolean toBreak, boolean toBreakPlugin, Exception error){
         return new ListenResultImpl<>(sort, result, success, toBreak, toBreakPlugin, error);
     }
 
-    public static <T> ListenResult<T> resultBreak(int sort, T result, boolean success, boolean toBreakPlugin, Throwable error){
+    public static <T> ListenResult<T> resultBreak(int sort, T result, boolean success, boolean toBreakPlugin, Exception error){
         return new ListenResultImpl<>(sort, result, success, true, toBreakPlugin, error);
     }
 
-    public static <T> ListenResult<T> resultEmpty(int sort,  boolean success,  boolean toBreak, boolean toBreakPlugin, Throwable error){
+    public static <T> ListenResult<T> resultEmpty(int sort,  boolean success,  boolean toBreak, boolean toBreakPlugin, Exception error){
         return new ListenResultImpl<>(sort, null, success, toBreak, toBreakPlugin, error);
     }
 
@@ -64,7 +64,7 @@ public class ListenResultImpl<T> implements ListenResult<T> {
      * @param result    返回值
      * @param success   成功与否
      */
-    public ListenResultImpl(int sort, T result, boolean success, boolean toBreak, boolean toBreakPlugin, Throwable error){
+    public ListenResultImpl(int sort, T result, boolean success, boolean toBreak, boolean toBreakPlugin, Exception error){
         this.sort = sort;
         this.result = result;
         this.success = success;
@@ -149,11 +149,11 @@ public class ListenResultImpl<T> implements ListenResult<T> {
     }
 
     @Override
-    public Throwable getError() {
+    public Exception getError() {
         return error;
     }
 
-    public void setError(Throwable error) {
+    public void setError(Exception error) {
         this.error = error;
     }
 

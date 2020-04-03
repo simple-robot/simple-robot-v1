@@ -15,6 +15,7 @@ import com.forte.qqrobot.listener.result.ListenResult;
 import com.forte.qqrobot.listener.result.ListenResultParser;
 import com.forte.utils.basis.MD5Utils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
@@ -174,7 +175,7 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
      *
      * @param additionalDepends 可以提供的额外参数(动态参数)
      */
-    ListenResult invoke(AdditionalDepends additionalDepends) throws Throwable {
+    ListenResult invoke(AdditionalDepends additionalDepends) throws Exception {
 
         //遍历参数类型数组, 进行参数注入
         //将参数注入单独提出
@@ -190,7 +191,7 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
         //执行方法
         Object invoke = null;
-        Throwable error = null;
+        Exception error = null;
         // break 初始值
 
         ListenResult result;
@@ -198,9 +199,17 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         // 捕获异常
         try {
             invoke = method.invoke(listener, args);
-        }catch (Throwable e){
+        }catch (Exception e){
             // 出现异常，判定为执行失败
-            error = e;
+            if(e instanceof InvocationTargetException){
+                final Throwable targetException = ((InvocationTargetException) e).getTargetException();
+                if(targetException instanceof Exception){
+                    error = (Exception) targetException;
+                }
+            }
+            if(error == null){
+                error = e;
+            }
         }
 
         // 根据返回值判断是否需要截断

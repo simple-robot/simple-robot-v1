@@ -18,6 +18,6 @@ public interface ListenResultParser {
      * @param e 如果存在异常，此为异常
      * @return 监听函数实现类
      */
-    ListenResult parse(Object t, int sort, boolean isBreak, boolean isBreakPlugin, Throwable e);
+    ListenResult parse(Object t, int sort, boolean isBreak, boolean isBreakPlugin, Exception e);
 
 }

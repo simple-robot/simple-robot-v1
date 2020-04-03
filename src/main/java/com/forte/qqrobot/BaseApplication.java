@@ -22,6 +22,8 @@ import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.RobotRunException;
 import com.forte.qqrobot.listener.Filterable;
 import com.forte.qqrobot.listener.MsgIntercept;
+import com.forte.qqrobot.listener.error.ExceptionHandle;
+import com.forte.qqrobot.listener.error.ExceptionProcessCenter;
 import com.forte.qqrobot.listener.invoker.ListenerFilter;
 import com.forte.qqrobot.listener.invoker.ListenerManager;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
@@ -430,8 +432,12 @@ public abstract class BaseApplication<
         // 初始化bot管理中心
         BotManager botManager = initBotManager(dependCenter);
 
+        // 初始化异常处理器
+        final ExceptionProcessCenter exceptionProcessCenter = initListenExceptionHandler(dependCenter);
+
+
         // 注册监听函数并构建ListenerManager
-        registerListener(config, app, scanner, dependCenter, botManager);
+        registerListener(config, app, scanner, dependCenter, botManager, exceptionProcessCenter);
 
 
         //**************** 加载所有的送信器拦截器 ****************//
@@ -440,6 +446,15 @@ public abstract class BaseApplication<
         //**************** 加载所有存在于依赖中的DIYFilter ****************//
         loadDIYFilter(config, dependCenter);
 
+    }
+
+
+    /**
+     * 初始化异常处理器
+     */
+    private ExceptionProcessCenter initListenExceptionHandler(DependCenter dependCenter){
+        final List<ExceptionHandle> exceptionHandles = dependCenter.getListByType(ExceptionHandle.class);
+        return ExceptionProcessCenter.getInstance(exceptionHandles);
     }
 
     /**
@@ -591,7 +606,6 @@ public abstract class BaseApplication<
     private DependCenter afterConfig(CONFIG config, Application<CONFIG> app) {
         // 扫描并获取依赖中心
         DependCenter dependCenter = scanAndInject(config, app);
-
         // ** 依赖注入完毕 **
         // 注册config
         dependCenter.load(config);
@@ -663,7 +677,10 @@ public abstract class BaseApplication<
      * @param scanner      扫描器
      * @param dependCenter 依赖中心
      */
-    private void registerListener(CONFIG config, Application<CONFIG> app, ListenerMethodScanner scanner, DependCenter dependCenter, BotManager botManager) {
+    private ListenerManager registerListener(CONFIG config, Application<CONFIG> app, ListenerMethodScanner scanner,
+                                  DependCenter dependCenter, BotManager botManager,
+                                  ExceptionProcessCenter exceptionProcessCenter
+                                  ) {
         // > 监听函数注册之前
         beforeRegisterListener(config, app, scanner, dependCenter);
 
@@ -680,7 +697,6 @@ public abstract class BaseApplication<
 
         //根据配置类的扫描结果来构建监听器管理器和阻断器
         // 准备获取消息拦截器
-
         RUN_LOG.debug("intercept.msg.prepare");
         MsgIntercept[] msgIntercepts = dependCenter.getByType(MsgIntercept.class, new MsgIntercept[0]);
         if(msgIntercepts == null || msgIntercepts.length == 0){
@@ -689,7 +705,7 @@ public abstract class BaseApplication<
 
         // 构建监听器管理中心
         // 构建管理中心
-        manager = scanner.buildManager(botManager, msgIntercepts);
+        manager = scanner.buildManager(botManager, exceptionProcessCenter, msgIntercepts);
 
         // 构建阻断器
         Plug plug = scanner.buildPlug();
@@ -698,6 +714,7 @@ public abstract class BaseApplication<
         ResourceDispatchCenter.saveListenerManager(manager);
         ResourceDispatchCenter.savePlug(plug);
 
+        return manager;
     }
 
     /**

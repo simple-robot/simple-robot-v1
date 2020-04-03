@@ -34,7 +34,7 @@ public class BasicResultParser implements ListenResultParser {
      * @return listenResult对象
      */
     @Override
-    public ListenResult parse(Object t, int sort, boolean isBreak, boolean isBreakPlugin, Throwable e) {
+    public ListenResult parse(Object t, int sort, boolean isBreak, boolean isBreakPlugin, Exception e) {
         // 如果存在异常，则必定执行异常
         // 如果结果为null，则同样认为执行失败
         if(e != null || t == null){

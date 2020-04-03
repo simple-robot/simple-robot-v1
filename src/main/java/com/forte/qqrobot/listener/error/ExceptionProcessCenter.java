@@ -4,6 +4,9 @@ import com.forte.qqrobot.anno.ExceptionCatch;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.exception.ExceptionProcessException;
 import com.forte.qqrobot.exception.NoSuchExceptionHandleException;
+import com.forte.qqrobot.listener.result.BasicResultParser;
+import com.forte.qqrobot.listener.result.ListenResult;
+import com.forte.qqrobot.listener.result.ListenResultParser;
 import com.forte.qqrobot.log.QQLogLang;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.AnnotationUtils;
@@ -75,7 +78,7 @@ public class ExceptionProcessCenter {
      * @return 实例对象
      */
     public static ExceptionProcessCenter getInstance() {
-        return new ExceptionProcessCenter(new HashMap<>(1));
+        return new ExceptionProcessCenter(new HashMap<>(0));
     }
 
     /**
@@ -114,6 +117,18 @@ public class ExceptionProcessCenter {
         return new ExceptionProcessCenter(map);
     }
 
+    /**
+     * 根据ExceptionHandle集来构建结果。
+     * 需要Exception Handle上存在{@link com.forte.qqrobot.anno.ExceptionCatch} 注解
+     * 如果不存在，则默认为处理{@link Exception}异常
+     * 一般来讲数量不会很多
+     *
+     * @param handles handles
+     * @return 实例对象
+     */
+    public static ExceptionProcessCenter getInstance(Collection<ExceptionHandle> handles) {
+        return getInstance(handles.toArray(new ExceptionHandle[0]));
+    }
 
     /**
      * 获取某个类型的异常处理器，如果不存在则返回null
@@ -188,6 +203,20 @@ public class ExceptionProcessCenter {
             throw new NoSuchExceptionHandleException(1, e.getClass().toString());
         }else{
             return handle.handle(context);
+        }
+    }
+
+    /**
+     * 对一个异常信息进行处理。如果无法获取到合适的handle，则会抛出一个异常。
+     */
+    public ListenResult doHandleResult(Exception e, ExceptionHandleContext context) throws NoSuchExceptionHandleException {
+        final ExceptionHandle handle = getHandle(e.getClass());
+        if(handle == null){
+            throw new NoSuchExceptionHandleException(1, e.getClass().toString());
+        }else{
+            final Object handleResult = handle.handle(context);
+            final BasicResultParser instance = BasicResultParser.getInstance();
+            return instance.parse(handleResult, context.getSort(), false, false, null);
         }
     }
 }
