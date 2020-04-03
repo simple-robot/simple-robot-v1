@@ -25,6 +25,10 @@ public class MsgGetContext extends BaseContext<MsgGet> {
 
     /** 消息类型 */
     private MsgGetTypes types;
+
+    /** 监听上下文 */
+    private ListenContext listenContext;
+
     /** sender */
     public final SenderSendList SENDER;
     /** setter */
@@ -44,7 +48,6 @@ public class MsgGetContext extends BaseContext<MsgGet> {
 
     //**************** element ****************//
 
-
     public MsgGetTypes getTypes() {
         return types;
     }
@@ -53,9 +56,23 @@ public class MsgGetContext extends BaseContext<MsgGet> {
         this.types = types;
     }
 
-    public MsgGetContext(MsgGet msgGet, SenderSendList sender, SenderSetList setter, SenderGetList getter, Map<String, Object> globalContextMap){
+    public ListenContext getListenContext(){
+        return listenContext;
+    }
+
+    /**
+     * 构造
+     * @param msgGet    接收到的消息
+     * @param context   监听上下文
+     * @param sender    sender
+     * @param setter    setter
+     * @param getter    getter
+     * @param globalContextMap  全局上下文Map
+     */
+    public MsgGetContext(MsgGet msgGet, ListenContext context, SenderSendList sender, SenderSetList setter, SenderGetList getter, Map<String, Object> globalContextMap){
         super(msgGet, globalContextMap);
         this.types = MsgGetTypes.getByType(msgGet);
+        this.listenContext = context;
         this.SENDER = sender;
         this.SETTER = setter;
         this.GETTER = getter;

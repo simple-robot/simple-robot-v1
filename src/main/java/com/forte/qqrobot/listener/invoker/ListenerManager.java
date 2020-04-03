@@ -103,9 +103,12 @@ public class ListenerManager implements MsgReceiver {
             return EMPTY_RESULT;
         }
 
+        // 构建一个监听函数上下文对象
+        ListenContext context = ListenContext.getInstance(listenContextGlobalMap);
+
         // 消息拦截
         // 构建上下文对象
-        MsgGetContext msgContext = new MsgGetContext(msgget, sender, setter, getter, msgContextGlobalMap);
+        MsgGetContext msgContext = new MsgGetContext(msgget, context, sender, setter, getter, msgContextGlobalMap);
         // 遍历所有的消息拦截器
         for (MsgIntercept intercept : intercepts) {
             if(!intercept.intercept(msgContext)){
@@ -123,7 +126,7 @@ public class ListenerManager implements MsgReceiver {
         AtDetection at = (AtDetection) params[2];
 
         //为消息分配监听函数
-        return invoke(msgget, params, at, sender, setter, getter);
+        return invoke(msgget, context, params, at, sender, setter, getter);
     }
 
 
@@ -134,11 +137,9 @@ public class ListenerManager implements MsgReceiver {
      * @param at        是否被at
      * @return 执行的结果集，已经排序了。
      */
-    private ListenResult[] invoke(MsgGet msgGet, Set<Object> args, AtDetection at,
+    private ListenResult[] invoke(MsgGet msgGet, ListenContext context, Set<Object> args, AtDetection at,
                                   SenderSendList sendList , SenderSetList setList, SenderGetList getList){
 
-        // 构建一个监听函数上下文对象
-        ListenContext context = ListenContext.getInstance(listenContextGlobalMap);
         //参数获取getter
         Function<ListenerMethod, AdditionalDepends> paramGetter = buildParamGetter(msgGet, args, at, sendList, setList, getList, context);
         //获取消息类型
@@ -178,8 +179,8 @@ public class ListenerManager implements MsgReceiver {
      * @param args      参数列表
      * @param at        是否被at
      */
-    private ListenResult[] invoke(MsgGet msgGet, Object[] args, AtDetection at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
-        return invoke(msgGet, Arrays.stream(args).collect(Collectors.toSet()), at, sendList, setList, getList);
+    private ListenResult[] invoke(MsgGet msgGet, ListenContext context, Object[] args, AtDetection at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+        return invoke(msgGet, context, Arrays.stream(args).collect(Collectors.toSet()), at, sendList, setList, getList);
     }
 
     /**

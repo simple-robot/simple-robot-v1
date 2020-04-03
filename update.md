@@ -1,5 +1,13 @@
 ## 版本更新记录
 
+# (now)
+- 默认的httpClient在请求接口并返回值code为300及以上的时候抛出的异常将会被抛出而不是被捕获。
+- 1.11.x之前预实装异常处理机制。
+- `MsgIntercept`消息拦截器中的参数`MsgGetContext`中追加参数`ListenContext`
+- 使`ListenContext`继承`BaseContext`抽象类。
+
+
+
 # 1.10.6
 - 修复在一些控制台编码不是UTF-8的控制台中输出中文可能会乱码的问题。
 - 简单修改部分代码的部分逻辑

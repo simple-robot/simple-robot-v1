@@ -32,7 +32,7 @@ public abstract class BaseContext<T> {
     /**
      * 获取contextMap
      */
-    private Map<String, Object> getContextMap(){
+    protected Map<String, Object> getContextMap(){
         if(contextMap == null){
             contextMap = new HashMap<>(4);
         }
@@ -42,7 +42,7 @@ public abstract class BaseContext<T> {
     /**
      * 获取全局Map
      */
-    private Map<String, Object> getGlobalContextMap(){
+    protected Map<String, Object> getGlobalContextMap(){
         return globalContextMap;
     }
 
@@ -77,6 +77,9 @@ public abstract class BaseContext<T> {
         return getGlobalContextMap().put(key, value);
     }
 
+    /**
+     * 清除内容。只会清除当前域
+     */
     public void clear(){
         getContextMap().clear();
     }
