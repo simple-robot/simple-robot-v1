@@ -1,10 +1,8 @@
 package com.forte.qqrobot.utils;
 
-import com.forte.qqrobot.BaseConfiguration;
 import com.forte.qqrobot.ResourceDispatchCenter;
 import com.forte.qqrobot.exception.ConfigurationException;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.util.Optional;
 
