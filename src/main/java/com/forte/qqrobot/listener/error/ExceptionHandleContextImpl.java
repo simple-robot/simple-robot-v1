@@ -2,6 +2,7 @@ package com.forte.qqrobot.listener.error;
 
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.intercept.BaseContext;
+import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.sender.MsgSender;
 
 import java.util.Map;
@@ -16,17 +17,23 @@ public class ExceptionHandleContextImpl<T extends Exception> extends BaseContext
     private MsgGet msgGet;
     /** 使用的送信器 */
     private MsgSender msgSender;
+    /** listen context */
+    private ListenContext context;
     /** 得到的异常 */
     private T exception;
     /** 监听函数的排序值 */
     private int sort;
 
-    public ExceptionHandleContextImpl(String id, MsgGet msgGet, int sort, MsgSender msgSender, Map<String, Object> globalMap, T exception) {
+    public ExceptionHandleContextImpl(String id, MsgGet msgGet, int sort,
+                                      MsgSender msgSender, Map<String, Object> globalMap,
+                                      ListenContext context,
+                                      T exception) {
         super(exception, globalMap);
         this.id = id;
         this.msgGet = msgGet;
         this.sort = sort;
         this.msgSender = msgSender;
+        this.context = context;
         this.exception = exception;
     }
 

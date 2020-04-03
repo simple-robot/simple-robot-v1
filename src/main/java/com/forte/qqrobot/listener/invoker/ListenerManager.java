@@ -218,7 +218,7 @@ public class ListenerManager implements MsgReceiver {
             }catch (Exception e){
                 MsgSender sender = addition == null ? null : addition.get(MsgSender.class);
                 final ExceptionHandleContextImpl<Exception> exContext =
-                        new ExceptionHandleContextImpl<>(lisM.getUUID(), msgGet, lisM.getSort(), sender, exceptionContextGlobalMap, e);
+                        new ExceptionHandleContextImpl<>(lisM.getUUID(), msgGet, lisM.getSort(), sender, exceptionContextGlobalMap, context, e);
                 try {
                     return exceptionProcessCenter.doHandleResult(e, exContext);
                 } catch (NoSuchExceptionHandleException ex) {
@@ -352,7 +352,7 @@ public class ListenerManager implements MsgReceiver {
                         if(error != null){
                             MsgSender sender = additionalDepends.get(MsgSender.class);
                             final ExceptionHandleContextImpl<Exception> exContext =
-                                    new ExceptionHandleContextImpl<>(lm.getUUID(), msgGet, lm.getSort(), sender, exceptionContextGlobalMap, error);
+                                    new ExceptionHandleContextImpl<>(lm.getUUID(), msgGet, lm.getSort(), sender, exceptionContextGlobalMap, context, error);
                             try {
                                 result = exceptionProcessCenter.doHandleResult(error, exContext);
                             }catch (NoSuchExceptionHandleException e){
@@ -414,7 +414,7 @@ public class ListenerManager implements MsgReceiver {
                         if(error != null){
                             MsgSender sender = additionalDepends.get(MsgSender.class);
                             final ExceptionHandleContextImpl<Exception> exContext =
-                                    new ExceptionHandleContextImpl<>(lm.getUUID(), msgGet, lm.getSort(), sender, exceptionContextGlobalMap, error);
+                                    new ExceptionHandleContextImpl<>(lm.getUUID(), msgGet, lm.getSort(), sender, exceptionContextGlobalMap, context, error);
                             try {
                                 result = exceptionProcessCenter.doHandleResult(error, exContext);
                             }catch (NoSuchExceptionHandleException e){
