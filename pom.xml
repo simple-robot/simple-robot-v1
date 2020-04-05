@@ -15,7 +15,7 @@
 
     <!-- 版本号 -->
     <!-- 下次部署需要大于1.10.5 2020/3/31 记得修改CoreSystem的版本号 -->
-    <version>1.10.7</version>
+    <version>1.11.-1</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>

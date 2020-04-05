@@ -89,6 +89,31 @@ public interface BotManager {
     }
 
     /**
+     * 注销掉一个bot，将其从bot列表中移除。
+     * 注意现成安全问题。
+     * @param code 要注销掉的bot账号
+     * @return 被移除掉的bot
+     */
+    BotInfo logOutBot(String code);
+
+    /**
+     * TODO 刷新一个Bot的账号信息
+     * @param code 要刷新的bot账号的信息
+     */
+    void refreshBot(String code);
+
+    /**
+     * TODO 刷新所有bot的信息
+     */
+    default void refreshBot(){
+        for (BotInfo bot : bots()) {
+            synchronized (bot){
+                refreshBot(bot.getBotCode());
+            }
+        }
+    }
+
+    /**
      * 获取注册用的验证函数
      *
      * @return 验证函数

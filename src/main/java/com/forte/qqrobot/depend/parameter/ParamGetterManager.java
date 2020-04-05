@@ -8,6 +8,7 @@ import com.forte.qqrobot.log.QQLog;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+@Deprecated
 public class ParamGetterManager {
 
     private static final String PARAM_NAME = "name";

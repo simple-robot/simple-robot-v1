@@ -1,5 +1,7 @@
 package com.forte.qqrobot.bot;
 
+import java.util.Objects;
+
 /**
  * 一个已注册的机器人的信息
  * 一个简单的信息封装类，一般为登录后验证完全部的登录信息后。
@@ -69,6 +71,29 @@ public class BotInfoImpl implements BotInfo {
 
     public void setInfo(LoginInfo info) {
         this.info = info;
+    }
+
+    /**
+     * 默认情况下，当code与请求路径相同的时候，即认为这两个bot相同。
+     * @param o other
+     * @return equals
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        BotInfoImpl botInfo = (BotInfoImpl) o;
+        return Objects.equals(botCode, botInfo.botCode) &&
+                Objects.equals(path, botInfo.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(botCode, path);
     }
 
     @Override

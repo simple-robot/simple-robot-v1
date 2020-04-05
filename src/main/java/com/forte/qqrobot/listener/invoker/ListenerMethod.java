@@ -1,6 +1,6 @@
 package com.forte.qqrobot.listener.invoker;
 
-import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.BotRuntime;
 import com.forte.qqrobot.anno.Block;
 import com.forte.qqrobot.anno.BlockFilter;
 import com.forte.qqrobot.anno.Filter;
@@ -176,11 +176,8 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
      * @param additionalDepends 可以提供的额外参数(动态参数)
      */
     ListenResult invoke(AdditionalDepends additionalDepends) throws Exception {
-
-        //遍历参数类型数组, 进行参数注入
-        //将参数注入单独提出
-        //获取方法执行的参数
-        Object[] args = ResourceDispatchCenter.getDependCenter().getMethodParameters(method, additionalDepends);
+        Object invoke = null;
+        Exception error = null;
 
         // 获取监听函数所在类实例
         // 考虑到系统优化，
@@ -189,28 +186,38 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
         T listener = getListener();
 
-        //执行方法
-        Object invoke = null;
-        Exception error = null;
-        // break 初始值
+        //遍历参数类型数组, 进行参数注入
+        //将参数注入单独提出
+        //获取方法执行的参数
+        Object[] args = null;
+        try {
+            args = BotRuntime.getRuntime().getDependCenter().getMethodParameters(method, additionalDepends);
+        }catch (Exception e){
+            error = e;
+        }
 
         ListenResult result;
 
-        // 捕获异常
-        try {
-            invoke = method.invoke(listener, args);
-        }catch (Exception e){
-            // 出现异常，判定为执行失败
-            if(e instanceof InvocationTargetException){
-                final Throwable targetException = ((InvocationTargetException) e).getTargetException();
-                if(targetException instanceof Exception){
-                    error = (Exception) targetException;
+        // 如果在参数获取阶段就出现了异常，跳过执行
+        if (error == null){
+            // 捕获异常
+            try {
+                //执行方法
+                invoke = method.invoke(listener, args);
+            }catch (Exception e){
+                // 出现异常，判定为执行失败
+                if(e instanceof InvocationTargetException){
+                    final Throwable targetException = ((InvocationTargetException) e).getTargetException();
+                    if(targetException instanceof Exception){
+                        error = (Exception) targetException;
+                    }
+                }
+                if(error == null){
+                    error = e;
                 }
             }
-            if(error == null){
-                error = e;
-            }
         }
+
 
         // 根据返回值判断是否需要截断
         boolean toBreak = listenBreak.test(invoke);
@@ -507,8 +514,12 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             ListenerMethodBuilder that = (ListenerMethodBuilder) o;
             return method.equals(that.method);
         }

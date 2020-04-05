@@ -3,6 +3,7 @@ package com.forte.qqrobot;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.bot.LoginInfo;
+import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.ListenerInfo;
 import com.forte.qqrobot.log.QQLog;
@@ -42,6 +43,11 @@ public class BotRuntime {
     private BotManager botManager;
 
     /**
+     * 依赖中心
+     */
+    private DependCenter dependCenter;
+
+    /**
      * <pre> 构建要给RuntimeInfo实例，目前需要的参数：
      * <pre> listenerInfo信息，一般在扫描结束后可以得到
      * <pre> botInfo信息，一般在配置完成后，构架完GETTER后可以得到
@@ -49,9 +55,10 @@ public class BotRuntime {
      * @param botManager     注册的bot信息
      * @param configuration 配置信息，最终会得到一份复印份
      */
-    private BotRuntime(Collection<ListenerInfo> listenerInfos, BotManager botManager, BaseConfiguration configuration) {
+    private BotRuntime(Collection<ListenerInfo> listenerInfos, BotManager botManager, DependCenter dependCenter, BaseConfiguration configuration) {
         this.listenerInfos = listenerInfos;
         this.botManager = botManager;
+        this.dependCenter = dependCenter;
         // clone配置类
         this.configuration = configuration;
     }
@@ -63,12 +70,15 @@ public class BotRuntime {
         return log;
     }
 
-    public static synchronized BotRuntime initRuntime(Collection<ListenerInfo> listenerInfos, BaseConfiguration configuration, BotManager botManager) throws CloneNotSupportedException {
+    public static synchronized BotRuntime initRuntime(Collection<ListenerInfo> listenerInfos,
+                                                      BaseConfiguration configuration,
+                                                      DependCenter dependCenter,
+                                                      BotManager botManager) throws CloneNotSupportedException {
         // 已经初始化过了
         if (runtime != null) {
             throw new RobotRuntimeException(0, "botRuntime has already initialized!");
         }
-        runtime = new BotRuntime(listenerInfos, botManager, (BaseConfiguration) configuration.clone());
+        runtime = new BotRuntime(listenerInfos, botManager, dependCenter, (BaseConfiguration) configuration.clone());
         return runtime;
     }
 
@@ -79,7 +89,7 @@ public class BotRuntime {
      */
     public static synchronized BotRuntime initRuntime(
             // 初始化所需要的资源
-            Collection<ListenerInfo> listenerInfos, BotInfo[] botInfos, BaseConfiguration configuration,
+            Collection<ListenerInfo> listenerInfos, BotInfo[] botInfos, BaseConfiguration configuration, DependCenter dependCenter,
             // 部分数据存放资源
             // botManager获取器
             Supplier<BotManager> botManagerSupplier
@@ -103,8 +113,7 @@ public class BotRuntime {
                 QQLog.warning("runtime.bot.register.failed", botInfo.getBotCode());
             }
         }
-
-        runtime = new BotRuntime(listenerInfos, botManager, (BaseConfiguration) configuration.clone());
+        runtime = new BotRuntime(listenerInfos, botManager, dependCenter, (BaseConfiguration) configuration.clone());
         return runtime;
     }
 
@@ -133,4 +142,7 @@ public class BotRuntime {
         return configuration;
     }
 
+    public DependCenter getDependCenter() {
+        return dependCenter;
+    }
 }

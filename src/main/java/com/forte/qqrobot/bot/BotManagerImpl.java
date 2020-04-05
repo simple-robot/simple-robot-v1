@@ -2,12 +2,14 @@ package com.forte.qqrobot.bot;
 
 import com.forte.qqrobot.beans.function.PathAssembler;
 import com.forte.qqrobot.beans.function.VerifyFunction;
+import com.forte.qqrobot.exception.BotVerifyException;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link BotManager}的基础实现类，使用Map储存数据。
+ *
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
 public class BotManagerImpl implements BotManager {
@@ -17,8 +19,10 @@ public class BotManagerImpl implements BotManager {
      */
     private String defaultBot;
 
-    /** 数据储存用的Map */
-    private Map<String, BotInfo> botMap;
+    /**
+     * 数据储存用的Map
+     */
+    private final Map<String, BotInfo> botMap;
 
     /**
      * 注册验证函数
@@ -31,7 +35,7 @@ public class BotManagerImpl implements BotManager {
     private PathAssembler pathAssembler;
 
 
-    public BotManagerImpl(PathAssembler pathAssembler, VerifyFunction verifyFunction){
+    public BotManagerImpl(PathAssembler pathAssembler, VerifyFunction verifyFunction) {
         this.pathAssembler = pathAssembler;
         this.verifyFunction = verifyFunction;
         this.botMap = new ConcurrentHashMap<>(2);
@@ -45,15 +49,15 @@ public class BotManagerImpl implements BotManager {
      */
     @Override
     public BotInfo defaultBot() {
-        if(defaultBot == null){
-            if(botMap.size() == 0){
+        if (defaultBot == null) {
+            if (botMap.size() == 0) {
                 return null;
-            }else{
+            } else {
                 BotInfo next = botMap.values().iterator().next();
                 defaultBot = next.getBotCode();
                 return next;
             }
-        }else{
+        } else {
             return getBot(defaultBot);
         }
     }
@@ -81,10 +85,11 @@ public class BotManagerImpl implements BotManager {
 
     /**
      * 获取全部的bots信息
+     *
      * @return bots
      */
     @Override
-    public BotInfo[] bots(){
+    public BotInfo[] bots() {
         return botMap.values().toArray(new BotInfo[0]);
     }
 
@@ -101,13 +106,13 @@ public class BotManagerImpl implements BotManager {
         // 在注册时候锁住map对象
         synchronized (botMap) {
             BotInfo botInfo = botMap.get(key);
-            if(botInfo == null){
+            if (botInfo == null) {
                 botMap.put(key, info);
-                if(defaultBot == null){
+                if (defaultBot == null) {
                     defaultBot = key;
                 }
                 return true;
-            }else{
+            } else {
                 // 已经存在, 不放入
                 return false;
             }
@@ -116,12 +121,50 @@ public class BotManagerImpl implements BotManager {
 
     /**
      * 验证一个Bot，此bot至少应当存在path
+     *
      * @param info bot info
      * @return 验证结果，有可能会是null，或者抛出异常。
      */
-    private BotInfo verifyBot(BotInfo info){
+    private BotInfo verifyBot(BotInfo info) {
         // 验证bot
         return verifyFunction.apply(info);
+    }
+
+    /**
+     * 注销掉一个bot，将其从bot列表中移除。
+     * 注意现成安全问题。
+     *
+     * @param code 要注销掉的bot账号
+     */
+    @Override
+    public BotInfo logOutBot(String code) {
+        // 移除掉一个bot的信息
+        // 先锁住botMap
+        synchronized (botMap) {
+            return botMap.remove(code);
+        }
+    }
+
+    /**
+     * 刷新一个Bot的账号信息
+     * @param code 要刷新的bot账号的信息
+     */
+    @Override
+    public void refreshBot(String code) {
+        // 刷新某个bot的信息
+        final BotInfo botInfo = botMap.get(code);
+        if (botInfo == null) {
+            throw new BotVerifyException("notExists", code);
+        }
+        // 通过当前的botInfo获取新注册的botInfo
+        final BotInfo newBotInfo = verifyBot(botInfo);
+        if(newBotInfo != null){
+            synchronized (botMap) {
+                botMap.put(code, botInfo);
+            }
+        }else{
+            throw new BotVerifyException("null");
+        }
     }
 
     /**
@@ -136,10 +179,11 @@ public class BotManagerImpl implements BotManager {
 
     /**
      * 获取路径拼接函数
+     *
      * @return 拼接函数
      */
     @Override
-    public PathAssembler getPathAssembler(){
+    public PathAssembler getPathAssembler() {
         return pathAssembler;
     }
 }

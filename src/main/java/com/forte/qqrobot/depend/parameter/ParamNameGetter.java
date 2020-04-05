@@ -9,6 +9,7 @@ import java.lang.reflect.Parameter;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+@Deprecated
 public interface ParamNameGetter {
 
     /**

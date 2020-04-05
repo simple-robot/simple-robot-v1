@@ -61,6 +61,10 @@ exception.dependResource.fieldSetterFuncFailed=字段值赋值函数构建异常
 exception.dependResource.moreDepend=存在不止一个[{0}]类型的依赖，请尝试使用名称获取。
 exception.dependResource.basicGet=常量类型[{0}]只能通过指定名称获取!
 
+### 没有
+exception.dependResource.noDepend=无法找到依赖：[{0}]。
+exception.dependResource.noDependAndOut=无法找到依赖：[{0}]，外部依赖也无法找到：{1}
+
 ## DependUtil中
 exception.dependResource.noFieldGetter=无法获取类[{0}]的字段[{1}]的getter方法
 exception.dependResource.cannotGetValue=无法通过getter[{0}]获取类[{1}]的字段值[{2}]
@@ -69,6 +73,7 @@ exception.dependResource.fieldValueGetFailed=类[{0}]的字段[{1}]值获取异�
 exception.dependResource.noFieldSetter=无法获取类[{0}]的字段[{1}]的setter方法
 exception.dependResource.CannotSetValue=无法通过setter[{0}]为类[{1}]的字段[{2}]赋值!
 exception.dependResource.fieldValueSetFailed=类[{0}]的字段[{1}]值赋值异常!
+
 
 # RobotDevException异常
 ### dynamicParamRepeat: 动态参数类型出现重复!
@@ -96,6 +101,12 @@ exception.filter.notfound=无法获取自定义过滤器{0}：不存在！
 # verifyException相关
 exception.botVerify.failed=账号{0}验证失败：{1}
 exception.botVerify.failed.mismatch=账号{0}验证失败：获取账号不匹配：{1}
+exception.botVerify.notExists=账号[{0}]不存在
+exception.botVerify.null=账号[{0}]验证结果为null
+
+# ListenerException
+exception.listener.init.failed=监听函数初始化错误！
+
 
 # clientHelper
 exception.httpClientHelper.nameExists=名称为[{0}]的Http模板已经存在！
@@ -104,6 +115,7 @@ exception.httpClientHelper.noDefault=不存在默认Http模板！
 
 # httpResponse
 exception.httpResponse.code=响应状态码：{0}, 信息: {1}
+
 
 # 其他异常
 
@@ -118,13 +130,6 @@ exception.noSuchMethod.noGet=无法获取[{0}]的{1}
 # 空指针异常
 ## 常量name不可为null, 使用在DependCenter中
 exception.nullPointer.basicNameCannotEmpty=常量类型的name不可为空!
-# 工具类中相关的内容
-#utils.
-#utils.
-#utils.
-#utils.
-#utils.
-#utils.
 
 # 其他一些运行期间，或者启动期间的参数
 
@@ -174,9 +179,11 @@ runtime.bot.register.failed=账号注册失败: {0}
 # filter
 filter.register=注册过滤器：{0}
 
-# listen 执行异常
+# listener
+listener.init=监听函数[{0}]初始化尝试成功。
 listener.run.error=监听函数[{0}]执行异常! {1}
 listener.bot.noVerify=BOT[{0}]未认证! 消息已被拦截。
+
 
 # 送信拦截器
 ## 当某个API被拦截器阻止，或者说拦截的时候的消息

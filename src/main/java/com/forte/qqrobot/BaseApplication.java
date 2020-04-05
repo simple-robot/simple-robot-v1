@@ -19,6 +19,7 @@ import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.bot.BotManagerImpl;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
+import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.exception.RobotRunException;
 import com.forte.qqrobot.listener.Filterable;
 import com.forte.qqrobot.listener.MsgIntercept;
@@ -503,7 +504,10 @@ public abstract class BaseApplication<
         // 初始化bot管理中心
         // 尝试从依赖中获取，如果获取不到，使用默认的管理中心并存入依赖
         getLog().debug("botmanager.get.depend");
-        BotManager botManager = dependCenter.get(BotManager.class);
+        BotManager botManager = null;
+        try {
+            botManager = dependCenter.get(BotManager.class);
+        }catch (DependResourceException ignored){}
         if(botManager == null){
             PathAssembler pathAssembler = dependCenter.get(PathAssembler.class);
             VerifyFunction verifyFunction = dependCenter.get(VerifyFunction.class);
@@ -542,12 +546,10 @@ public abstract class BaseApplication<
      * 初始化Runtime对象
      * @param config config配置
      */
-    private void initRuntime(CONFIG config, BotInfo[] botInfos){
+    private void initRuntime(CONFIG config, DependCenter dependCenter, BotInfo[] botInfos){
         // 初始化BotRuntime
         try {
-            BotRuntime botRuntime = BotRuntime.initRuntime(new ArrayList<>(), botInfos, config, this::getBotManager);
-            // 注入runtime
-            DependCenter dependCenter = getDependCenter();
+            BotRuntime botRuntime = BotRuntime.initRuntime(new ArrayList<>(), botInfos, config, dependCenter, this::getBotManager);
             dependCenter.load(botRuntime);
         } catch (CloneNotSupportedException e) {
             throw new RobotRunException("runtime.init.failed", e);
@@ -992,7 +994,7 @@ public abstract class BaseApplication<
         BotInfo[] botInfos = verifyBot(configuration.getAdvanceBotInfo());
         getLog().debug("runtime.bot.verify");
         // 初始化Runtime对象
-        initRuntime(config, botInfos);
+        initRuntime(config, dependCenter, botInfos);
         getLog().debug("runtime.init");
         // 连接/启动
         StartResult startResult = start(dependCenter, manager);

@@ -1,5 +1,13 @@
 ## 版本更新记录
 
+# now
+- 为BotManager增加两个方法：`BotInfo logOutBot(String code)`、`public void refreshBot(String code)`以移除、刷新一些bot信息。
+- 为`BotInfoImpl`提供默认的equals方法。
+- 修改依赖工厂机制，现在获取不到依赖将会抛出异常。
+- 修改监听函数加载机制，现在监听函数在启动的时候会初始化一次。
+
+
+
 # 1.10.7
 - 默认的httpClient在请求接口并返回值code为300及以上的时候抛出的异常将会被抛出而不是被捕获。
 - 1.11.x之前预实装异常处理机制。对应文档：[https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1614982](https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1614982)

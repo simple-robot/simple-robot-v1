@@ -62,6 +62,10 @@ exception.dependResource.fieldSetterFuncFailed=Field value assignment function b
 exception.dependResource.moreDepend=There is more than one [{0}] type dependency, try to get it by name.
 exception.dependResource.basicGet=The constant type [{0}] can only be obtained by specifying the name!
 
+### 没有
+exception.dependResource.noDepend=Unable to find dependency [{0}].
+exception.dependResource.noDependAndOut=Unable to find dependency [{0}], and external dependencies cannot be found: {1}
+
 ## DependUtil中
 exception.dependResource.noFieldGetter=Could not get getter method for field [{1}] of class [{0}]
 exception.dependResource.cannotGetValue=Failed to get field value [{2}] of class [{1}] via getter [{0}]
@@ -96,6 +100,11 @@ exception.filter.notfound=DIY filter [{0}] not found.
 # verifyException相关
 exception.botVerify.failed=bot[{0}]verify failed: {1}
 exception.botVerify.failed.mismatch=bot[{0}]verify failed: code mismatch: {1}
+exception.botVerify.notExists=Account [{0}] does not exist
+exception.botVerify.null=Account [{0}] verification result is null
+
+# ListenerException
+exception.listener.init.failed=listener initialization error!
 
 # clientHelper
 exception.httpClientHelper.nameExists=http template named [{0}] is already exists!
@@ -170,7 +179,8 @@ runtime.bot.register.failed=bot register failed: {0}
 # filter
 filter.register=register filter: {0}
 
-# listen 执行异常
+# listen
+listener.init=listener [{0}] initialization attempt was successful.
 listener.run.error=listener [{0}] invoke failed! {1}
 listener.bot.noVerify=BOT[{0}]not verify! The message has been intercepted.
 
