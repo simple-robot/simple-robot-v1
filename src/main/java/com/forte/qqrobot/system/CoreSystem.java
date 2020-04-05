@@ -19,8 +19,8 @@ import java.util.Properties;
  * @author ForteScarlet
  * @version  1.7.0
  */
-@Version(version = "1.10.6",
-        versionFamily = "1.10")
+@Version(version = "1.11.0",
+        versionFamily = "1.11")
 public final class CoreSystem {
 
     /** 当前程序的RUN_TIME对象 */
@@ -66,6 +66,7 @@ public final class CoreSystem {
                 LOG_LANG.warning("version.check");
 
                 // 检测版本。版本检测url为阿里云的maven镜像地址
+                // 可以抽空换成oss路径 https://oss.sonatype.org/content/groups/public/io/github/ForteScarlet/simple-robot-core/
                 String url = "https://maven.aliyun.com/artifact/aliyunMaven/searchArtifactByGav?_input_charset=UTF-8&groupId="+ coreGroupId +"&artifactId="+ coreArtifactId +"&version="+ versionFamilySearch +"&repoId=all";
 
                 String get = HttpClientHelper.getDefaultHttp().get(url);
@@ -77,7 +78,17 @@ public final class CoreSystem {
                         .filter(o -> "sources".equals(o.getString("classifier")))
                         .findFirst().map(f -> f.getString("version")).orElse(null);
 
-                boolean newer = !CORE_VERSION.equals(firstVersion);
+                boolean newer = false;
+                if(firstVersion != null && !CORE_VERSION.equals(firstVersion)){
+                    try {
+                        final String[] coreSplit = CORE_VERSION.split("\\.");
+                        final int coreVersionNumber = Integer.parseInt(coreSplit[coreSplit.length - 1]);
+                        final String[] firstSplit = firstVersion.split("\\.");
+                        final int firstVersionNumber = Integer.parseInt(firstSplit[firstSplit.length - 1]);
+                        newer = firstVersionNumber > coreVersionNumber;
+                    }catch (Exception ignored){}
+                }
+
                 String newerVersion = newer ? firstVersion : null;
 
                 if(newer){
