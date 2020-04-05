@@ -1,9 +1,9 @@
 ## 版本更新记录
 
-# now
+# 1.11.0
 - 为BotManager增加两个方法：`BotInfo logOutBot(String code)`、`public void refreshBot(String code)`以移除、刷新一些bot信息。
 - 为`BotInfoImpl`提供默认的equals方法。
-- 修改依赖工厂机制，现在获取不到依赖将会抛出异常。
+- 修改依赖工厂机制，现在获取不到依赖将会**抛出异常**而不是以null代替。
 - 修改监听函数加载机制，现在监听函数在启动的时候会初始化一次。
 
 
