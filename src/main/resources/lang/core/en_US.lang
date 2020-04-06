@@ -180,7 +180,7 @@ runtime.bot.register.failed=bot register failed: {0}
 filter.register=register filter: {0}
 
 # listen
-listener.init=listener [{0}] initialization attempt was successful.
+listener.init=listener [{0}] initialization attempt was successful. {1} ms
 listener.run.error=listener [{0}] invoke failed! {1}
 listener.bot.noVerify=BOT[{0}]not verify! The message has been intercepted.
 

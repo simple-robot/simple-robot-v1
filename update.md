@@ -1,5 +1,8 @@
 ## 版本更新记录
 
+# now
+- 将部分ListenerManager内部代码换回原来的模式
+
 # 1.11.0
 - 为BotManager增加两个方法：`BotInfo logOutBot(String code)`、`public void refreshBot(String code)`以移除、刷新一些bot信息。
 - 为`BotInfoImpl`提供默认的equals方法。

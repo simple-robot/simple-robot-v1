@@ -498,12 +498,13 @@ public class ListenerManager implements MsgReceiver {
             Map<MsgGetTypes[], Set<ListenerMethod>> collect = methods.stream()
                     // 分组的同时，初始化一次所有的监听函数
                     .peek(lm -> {
+                        final double initStart = System.currentTimeMillis();
                         try {
                             lm.getListener();
                         }catch (Exception e){
                             throw new ListenerException("init.failed", e);
                         }
-                        QQLog.debug("listener.init", lm.getUUID());
+                        QQLog.debug("listener.init", lm.getUUID(), (System.currentTimeMillis() - initStart));
                     })
                     //第一层分组
                     .collect(Collectors.groupingBy(ListenerMethod::getTypes, Collectors.toSet()));
@@ -537,7 +538,8 @@ public class ListenerManager implements MsgReceiver {
                 result.put(e.getKey(), groupBySpare);
                 return result.entrySet().stream();
                 // 使用EnumMap
-            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, throwingMerger(), () -> new EnumMap<>(MsgGetTypes.class)));
+                // 使用EnumMap的话，在用工厂创建额外的枚举类的时候会出问题。换回hashMap
+            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, throwingMerger(), HashMap::new));
         }
     }
 

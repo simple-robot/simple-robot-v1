@@ -180,7 +180,7 @@ runtime.bot.register.failed=账号注册失败: {0}
 filter.register=注册过滤器：{0}
 
 # listener
-listener.init=监听函数[{0}]初始化尝试成功。
+listener.init=监听函数[{0}]初始化尝试成功。{1} ms
 listener.run.error=监听函数[{0}]执行异常! {1}
 listener.bot.noVerify=BOT[{0}]未认证! 消息已被拦截。
 
