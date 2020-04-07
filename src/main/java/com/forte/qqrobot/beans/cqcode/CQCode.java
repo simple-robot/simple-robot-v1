@@ -25,13 +25,18 @@ public class CQCode
 {
 
     /** CQ码类型 */
-    private CQCodeTypes CqCodeType;
+    private CQCodeTypes cqCodeType;
+
+    /** CQ码类型字符串 */
+    private String cqCodeTypeName;
 
     /** CQ码参数集 */
     private final Map<String, String> params;
 
     /** toString用的字符串 */
     private String toString;
+
+    private CQCodeUtil util = CQCodeUtil.build();
 
     /**
      * 工厂方法
@@ -40,12 +45,22 @@ public class CQCode
      * @return CQCode实例对象
      */
     public static CQCode of(CQCodeTypes type, String[] params){
+        return of(type.getFunction(), type, params);
+    }
+
+    /**
+     * 工厂方法
+     * @param type      类型
+     * @param params    参数数组，格式：[id=12, type=2]
+     * @return CQCode实例对象
+     */
+    public static CQCode of(String typeName, CQCodeTypes type, String[] params){
         //使用LinkedHashMap
         Map<String, String> paramsMap = Arrays.stream(params).map(s -> {
-            String[] split = s.split("=");
+            String[] split = s.split("=", 2);
             return split.length > 1 ? split : null;
         }).filter(Objects::nonNull).collect(Collectors.toMap(a -> a[0], a -> a[1], throwingMerger(), LinkedHashMap::new));
-        return of(type, paramsMap);
+        return of(typeName, type, paramsMap);
     }
 
     /**
@@ -55,9 +70,17 @@ public class CQCode
      * @return CQCode实例对象
      */
     public static CQCode of(String typeStr, String[] params){
-        // 获取参数的key列表
-        String[] keyArray = Arrays.stream(params).map(p -> p.split("=")[0]).toArray(String[]::new);
-        return of(CQCodeTypes.getTypeByFunctionAndParams(typeStr, keyArray), params);
+        final CQCodeTypes[] types = CQCodeTypes.getCQCodeTypesByFunction(typeStr);
+        if(types.length == 1){
+
+            return of(typeStr, types[0], params);
+        }else if(types.length == 0){
+            return of(typeStr, CQCodeTypes.defaultType, params);
+        }else{
+            // 获取参数的key列表
+            String[] keyArray = Arrays.stream(params).map(p -> p.split("=", 2)[0]).toArray(String[]::new);
+            return of(typeStr, CQCodeTypes.getTypeByFunctionAndParams(typeStr, keyArray), params);
+        }
     }
 
     /**
@@ -68,8 +91,18 @@ public class CQCode
      */
     public static CQCode of(String typeStr, Map<String, String> params){
         String[] paramsArray = params.keySet().toArray(new String[0]);
-        return of(CQCodeTypes.getTypeByFunctionAndParams(typeStr, paramsArray), params);
+        return of(typeStr, CQCodeTypes.getTypeByFunctionAndParams(typeStr, paramsArray), params);
     }
+
+//    /**
+//     * 工厂方法
+//     * @param type      类型
+//     * @param params    参数列表
+//     * @return CQCode实例对象
+//     */
+//    public static CQCode of(CQCodeTypes type, Map<String, String> params){
+//        return new CQCode(type.getFunction(), type, params);
+//    }
 
     /**
      * 工厂方法
@@ -77,8 +110,8 @@ public class CQCode
      * @param params    参数列表
      * @return CQCode实例对象
      */
-    public static CQCode of(CQCodeTypes type, Map<String, String> params){
-        return new CQCode(type, params);
+    public static CQCode of(String typeName, CQCodeTypes type, Map<String, String> params){
+        return new CQCode(typeName, type, params);
     }
 
     /**
@@ -87,7 +120,8 @@ public class CQCode
      * @return CQ类
      */
     public static CQCode of(String cqStr){
-        if(cqStr.matches(CQCodeTypes.getCqcodeExtractRegex())){
+        cqStr = cqStr.trim();
+        if(checkCq(cqStr)){
             String[] arr = cqStr.substring(4, cqStr.length() - 1).split("\\,");
             //参数数组
             String[] paramArr = new String[arr.length - 1];
@@ -98,13 +132,20 @@ public class CQCode
         }
     }
 
+    /**
+     * 判断是否为一个首尾是[CQ: ... ]的字符串
+     */
+    private static boolean checkCq(String cqStr){
+        return cqStr.startsWith("[CQ:") && cqStr.endsWith("]");
+    }
+
 
     /**
      * 获取CQCode的类型
      * @return CQCode的类型
      */
     public CQCodeTypes getCQCodeTypes() {
-        return CqCodeType;
+        return cqCodeType;
     }
 
     /**
@@ -112,7 +153,7 @@ public class CQCode
      * @return CQCode的类型
      */
     public String getCQCodeTypesName() {
-        return CqCodeType.getFunction();
+        return cqCodeType.getFunction();
     }
 
     /**
@@ -124,8 +165,20 @@ public class CQCode
     }
 
     public void setCqCodeTypes(CQCodeTypes type){
-        this.CqCodeType = type;
+        this.cqCodeType = type;
+        this.cqCodeTypeName = type.getFunction();
         // 更新toString字符串
+        updateToString();
+    }
+
+    /**
+     * 设置cq码的参数
+     */
+    public void setCqCodeTypeName(String typeName){
+        // 尝试获取类型枚举
+        final CQCodeTypes typeFunction = CQCodeTypes.getTypeByFunctionAndParams(typeName, params.keySet().toArray(new String[0]));
+        this.cqCodeType = typeFunction;
+        this.cqCodeTypeName = typeName;
         updateToString();
     }
 
@@ -153,7 +206,7 @@ public class CQCode
      */
     public void updateToString(){
         //构建toString字符串
-        StringJoiner joiner = getJoiner(this.CqCodeType.getFunction());
+        StringJoiner joiner = getJoiner(this.cqCodeTypeName);
         this.params.forEach((k, v) -> joiner.add(k+"="+v));
         this.toString = joiner.toString();
     }
@@ -171,11 +224,12 @@ public class CQCode
     public String toString(boolean realParam){
         if(realParam){
             //构建toString字符串
-            StringJoiner joiner = getJoiner(this.CqCodeType.getFunction());
+            StringJoiner joiner = getJoiner(this.cqCodeTypeName);
             params.forEach((k, v) -> joiner.add(k+"="+v));
             return joiner.toString();
-        }else
+        }else {
             return toString();
+        }
     }
 
     /**
@@ -228,11 +282,22 @@ public class CQCode
     /**
      * 仅子类构造
      */
-    protected CQCode(CQCodeTypes cqCodeTypes, Map<String, String> params){
-        this.CqCodeType = cqCodeTypes;
+    protected CQCode(String typeName, CQCodeTypes cqCodeTypes, Map<String, String> params){
+        this.cqCodeType = cqCodeTypes;
+        this.cqCodeTypeName = typeName;
         this.params = params;
         updateToString();
     }
+
+//    /**
+//     * 仅子类构造
+//     */
+//    protected CQCode(CQCodeTypes cqCodeTypes, Map<String, String> params){
+//        this.cqCodeType = cqCodeTypes;
+//        this.cqCodeTypeName = cqCodeTypes.getFunction();
+//        this.params = params;
+//        updateToString();
+//    }
 
 
     /**
@@ -339,7 +404,7 @@ public class CQCode
      */
     @Override
     public boolean containsValue(Object value) {
-        return params.containsValue(CQCodeUtil.build().escapeValue(String.valueOf(value)));
+        return params.containsValue(util.escapeValue(String.valueOf(value)));
     }
 
     /**
@@ -348,7 +413,7 @@ public class CQCode
      */
     @Override
     public String get(Object key) {
-        return CQCodeUtil.build().escapeValueDecode(params.get(key));
+        return util.escapeValueDecode(params.get(key));
     }
 
     /**
@@ -358,7 +423,7 @@ public class CQCode
      */
     @Override
     public String put(String key, String value) {
-        return params.put(key, CQCodeUtil.build().escapeValue(value));
+        return params.put(key, util.escapeValue(value));
     }
 
     /**
@@ -407,7 +472,7 @@ public class CQCode
      */
     @Override
     public Collection<String> values() {
-        return params.values().stream().map(CQCodeUtil.build()::escapeValueDecode).collect(Collectors.toList());
+        return params.values().stream().map(util::escapeValueDecode).collect(Collectors.toList());
     }
 
     /**
@@ -422,7 +487,7 @@ public class CQCode
     /**
      * CQ码对象中使用的Entry对象，覆盖原本的Entry对象并进行参数转义
      */
-    public static class CQCodeEntry implements Map.Entry<String, String>{
+    public class CQCodeEntry implements Map.Entry<String, String>{
 
         /** 真正的entry对象 */
         private final Entry<String, String> realEntry;
@@ -446,7 +511,7 @@ public class CQCode
          */
         @Override
         public String getValue() {
-            return CQCodeUtil.build().escapeValueDecode(realEntry.getValue());
+            return util.escapeValueDecode(realEntry.getValue());
         }
 
         /**
@@ -480,6 +545,6 @@ public class CQCode
 
     @Override
     public int compareTo(CQCode o) {
-        return Integer.compare(this.CqCodeType.getSort(), o.CqCodeType.getSort());
+        return Integer.compare(this.cqCodeType.getSort(), o.cqCodeType.getSort());
     }
 }

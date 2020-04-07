@@ -648,6 +648,16 @@ public class CQCodeUtil {
     }
 
     /**
+     * 从信息字符串中提取出指定类型的CQCode码的字符串
+     * @param msg   消息字符串
+     * @return
+     */
+    public List<String> getCQCodeStrFromMsgByType(String msg, String typeFunction) {
+        String functionHead = "[CQ:" + typeFunction;
+        return substringCQCodeByHead(msg, functionHead);
+    }
+
+    /**
      * 根据CQ码的开头截取存在的字符串
      * @param msg           消息字符串
      * @param functionHead  CQ码开头
@@ -659,12 +669,12 @@ public class CQCodeUtil {
         int end = -1;
 
         do {
-            if ((start >= 0 || end >= 0)) {
+            if (start >= 0) {
                 cqList.add(msg.substring(start, end + 1));
             }
             start = msg.indexOf(functionHead, start + 1);
-            end = msg.indexOf(functionEnd, end + 1);
-        } while (start >= 0 || end >= 0);
+            end = msg.indexOf(functionEnd, start + 1);
+        } while (start >= 0 && end >= 0);
 
         return cqList;
     }
@@ -723,6 +733,23 @@ public class CQCodeUtil {
         List<String> cqStrList = getCQCodeStrFromMsgByType(msg, types);
         return cqStrList.stream().map(CQCode::of).collect(Collectors.toList());
     }
+
+    /**
+     * 从信息字符串中提取出指定类型的CQCode码对象
+     *
+     * @param msg   字符串
+     * @param typeStr 类型字符串
+     * @return 指定类型的CQ码类型
+     */
+    public List<CQCode> getCQCodeFromMsgByType(String msg, String typeStr) {
+        if (msg == null || msg.trim().length() <= 0) {
+            return Collections.emptyList();
+        }
+        //CQ码list集合
+        List<String> cqStrList = getCQCodeStrFromMsgByType(msg, typeStr);
+        return cqStrList.stream().map(CQCode::of).collect(Collectors.toList());
+    }
+
 
     public boolean isAt(MsgGet msgget){
         return isAt(msgget.getMsg(), msgget.getThisCode());

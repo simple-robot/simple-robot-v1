@@ -50,7 +50,7 @@ public class ImageCQCode extends CQCode {
      * @param params 参数列表
      */
     private ImageCQCode(Map<String, String> params) throws IOException {
-        super(CQ_CODE_TYPE, params);
+        super(CQ_CODE_TYPE.getFunction(), CQ_CODE_TYPE, params);
         //获取文件md5参数
         String fileId = params.get("file");
         if(fileId == null){

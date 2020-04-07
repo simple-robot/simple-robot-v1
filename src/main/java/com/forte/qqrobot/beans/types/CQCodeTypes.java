@@ -401,6 +401,8 @@ public enum CQCodeTypes {
      */
     private static final Map<String, CQCodeTypes[]> AllCQCodeTypeMap = new HashMap<>(32);
 
+    private static final CQCodeTypes[] EMPTY_TYPES = new CQCodeTypes[0];
+
     // 静态代码块，注册AllCQCodeTypeMap
     // 这个时候直接使用values吧
     static {
@@ -579,7 +581,7 @@ public enum CQCodeTypes {
      * @param function function类型
      */
     public static CQCodeTypes[] getCQCodeTypesByFunction(String function) {
-        CQCodeTypes[] cqCodeTypes = AllCQCodeTypeMap.get(function);
+        CQCodeTypes[] cqCodeTypes = AllCQCodeTypeMap.getOrDefault(function, EMPTY_TYPES);
         return Arrays.copyOf(cqCodeTypes, cqCodeTypes.length);
     }
 
@@ -672,8 +674,9 @@ public enum CQCodeTypes {
             boolean ignoreAble = this.ignoreAbleKeys.contains(key);
             //如果可忽略，使用括号括住并在最后加上?
             String in = "," + key + "=" + regex;
-            if (ignoreAble)
+            if (ignoreAble) {
                 in = ("(" + in + ")?");
+            }
 
             joiner.add(in);
         }
