@@ -1,5 +1,7 @@
 package com.forte.qqrobot.beans.messages.result;
 
+import com.forte.qqrobot.beans.messages.GroupCodeAble;
+
 import java.util.Map;
 
 /**
@@ -7,7 +9,7 @@ import java.util.Map;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface GroupInfo extends InfoResult {
+public interface GroupInfo extends InfoResult, GroupCodeAble {
 
     /** 群等级 */
     Integer getLevel();
@@ -58,6 +60,12 @@ public interface GroupInfo extends InfoResult {
     default String getHeadUrl(){
         String groupCode = getCode();
         return "http://p.qlogo.cn/gh/"+ groupCode +"/"+ groupCode +"/640";
+    }
+
+
+    @Override
+    default String getGroupCode(){
+        return getCode();
     }
 
 }

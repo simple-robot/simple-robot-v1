@@ -27,6 +27,18 @@ public interface QQCodeAble {
     }
 
     /**
+     * 获取账号头像
+     */
+    default String getQQHeadUrl(){
+        // 2020/4/8 http://q1.qlogo.cn/g?b=qq&nk=QQ号码&s=640
+        final String code = getCode();
+        if(code == null){
+            return null;
+        }
+        return "http://q1.qlogo.cn/g?b=qq&nk="+ code +"&s=640";
+    }
+
+    /**
      * 将{@link #getQQCode()} ()} 获取到的值转化为long类型
      * @return long类型的qq号
      * @throws NumberFormatException 存在数字转化隐患

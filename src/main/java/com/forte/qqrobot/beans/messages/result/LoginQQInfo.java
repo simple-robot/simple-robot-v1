@@ -1,12 +1,14 @@
 package com.forte.qqrobot.beans.messages.result;
 
+import com.forte.qqrobot.beans.messages.QQCodeAble;
+
 /**
  * 登录的QQ的信息
  *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface LoginQQInfo extends InfoResult {
+public interface LoginQQInfo extends InfoResult, QQCodeAble {
 
     /**
      * 昵称
@@ -20,12 +22,12 @@ public interface LoginQQInfo extends InfoResult {
      */
     String getQQ();
 
-    /**
-     * 将会取代方法：getQQ()
-     */
-    default String getCode() {
-        return getQQ();
-    }
+//    /**
+//     * 将会取代方法：getQQ()
+//     */
+//    default String getCode() {
+//        return getQQ();
+//    }
 
 
     /**
@@ -37,6 +39,11 @@ public interface LoginQQInfo extends InfoResult {
         } else {
             return "http://q.qlogo.cn/headimg_dl?dst_uin=" + getCode() + "&spec=640";
         }
+    }
+
+    @Override
+    default String getQQCode() {
+        return getQQ();
     }
 
     /**

@@ -1,11 +1,12 @@
 package com.forte.qqrobot.beans.messages.result.inner;
 
+import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.result.ResultInner;
 
 /**
  * 群列表的群信息
  */
-public interface Group extends ResultInner {
+public interface Group extends ResultInner, GroupCodeAble {
     /** 群名 */
     String getName();
     /** 群号 */
@@ -14,5 +15,10 @@ public interface Group extends ResultInner {
     default String getHeadUrl(){
         String groupCode = getCode();
         return "http://p.qlogo.cn/gh/"+ groupCode +"/"+ groupCode +"/640";
+    }
+
+    @Override
+    default String getGroupCode(){
+        return getCode();
     }
 }

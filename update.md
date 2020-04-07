@@ -2,6 +2,8 @@
 
 # 1.11.2
 - 修复CQCode相关操作中的bug
+- 接口`QQCodeAble`、`GroupCodeAble`中分别默认实现了获取QQ头像、群头像的方法。
+- 为一些接口继承`QQCodeAble`、`GroupCodeAble`
 
 # 1.11.1
 - 将部分ListenerManager内部代码换回原来的模式

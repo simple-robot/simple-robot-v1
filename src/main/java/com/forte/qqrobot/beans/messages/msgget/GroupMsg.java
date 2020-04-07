@@ -35,4 +35,5 @@ public interface GroupMsg extends MsgGet, CodesAble, FlagAble, PowerAble {
         return getId();
     }
 
+
 }

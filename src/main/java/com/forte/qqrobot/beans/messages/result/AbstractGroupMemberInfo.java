@@ -142,6 +142,7 @@ public abstract class AbstractGroupMemberInfo extends AbstractInfoResult impleme
         return black;
     }
 
+    @Override
     public Boolean isBlack() {
         return black;
     }
@@ -154,6 +155,7 @@ public abstract class AbstractGroupMemberInfo extends AbstractInfoResult impleme
         return allowChangeNick;
     }
 
+    @Override
     public Boolean isAllowChangeNick() {
         return allowChangeNick;
     }

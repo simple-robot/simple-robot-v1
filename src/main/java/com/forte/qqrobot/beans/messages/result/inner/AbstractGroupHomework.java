@@ -97,6 +97,7 @@ public abstract class AbstractGroupHomework extends AbstractResultInner implemen
         this.icon = icon;
     }
 
+    @Override
     public Boolean isNeedFeedBack() {
         return needFeedBack;
     }

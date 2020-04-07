@@ -1,5 +1,6 @@
 package com.forte.qqrobot.beans.messages.result;
 
+import com.forte.qqrobot.beans.messages.CodesAble;
 import com.forte.qqrobot.beans.messages.types.PowerType;
 import com.forte.qqrobot.beans.messages.types.SexType;
 
@@ -8,7 +9,7 @@ import com.forte.qqrobot.beans.messages.types.SexType;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface GroupMemberInfo extends InfoResult {
+public interface GroupMemberInfo extends InfoResult, CodesAble {
 
     /** 获取群号 */
     String getCode();
@@ -62,4 +63,14 @@ public interface GroupMemberInfo extends InfoResult {
     /** 禁言剩余时间 */
     Long getBanTime();
 
+
+    @Override
+    default String getGroupCode(){
+        return getCode();
+    }
+
+    @Override
+    default String getQQCode() {
+        return getQQ();
+    }
 }

@@ -1,5 +1,6 @@
 package com.forte.qqrobot.beans.messages.result;
 
+import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.types.SexType;
 
 /**
@@ -8,7 +9,7 @@ import com.forte.qqrobot.beans.messages.types.SexType;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface StrangerInfo extends InfoResult {
+public interface StrangerInfo extends InfoResult, QQCodeAble {
 
     /** QQ号 */
     String getQQ();
@@ -17,14 +18,19 @@ public interface StrangerInfo extends InfoResult {
     /** 年龄 */
     Integer getAge();
     /** 头像地址 */
-    String headUrl();
+    default String headUrl(){
+        return getQQHeadUrl();
+    }
     /** 等级 */
     Integer getLevel();
 
     /** 获取名称（昵称） */
     String getName();
 
-
+    @Override
+    default String getQQCode() {
+        return getQQ();
+    }
 
 
 

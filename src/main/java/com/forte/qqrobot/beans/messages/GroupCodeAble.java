@@ -13,6 +13,18 @@ public interface GroupCodeAble {
     String getGroupCode();
 
     /**
+     * 获取群头像的默认实现
+     */
+    default String getGroupHeadUrl(){
+        final String groupCode = getGroupCode();
+        if(groupCode == null){
+            return null;
+        }
+        // 2020/4/8 http://p.qlogo.cn/gh/QQ群号码/群号码/640/
+        return "http://p.qlogo.cn/gh/"+ groupCode +"/"+ groupCode +"/640/";
+    }
+
+    /**
      * 将{@link #getGroupCode()} 获取到的值转化为long类型
      * @return long类型的群号
      * @throws NumberFormatException 存在数字转化隐患

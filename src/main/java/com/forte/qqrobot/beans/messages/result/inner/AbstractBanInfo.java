@@ -39,6 +39,7 @@ public abstract class AbstractBanInfo extends AbstractResultInner implements Ban
         return manager;
     }
 
+    @Override
     public Boolean isManager() {
         return manager;
     }

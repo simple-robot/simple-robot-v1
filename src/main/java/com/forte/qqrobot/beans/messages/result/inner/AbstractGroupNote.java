@@ -82,6 +82,7 @@ public abstract class AbstractGroupNote extends AbstractResultInner implements G
         this.readNum = readNum;
     }
 
+    @Override
     public Boolean isShowEditCard() {
         return showEditCard;
     }
