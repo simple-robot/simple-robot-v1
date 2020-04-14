@@ -31,6 +31,8 @@ public final class CoreSystem {
     private static final String CORE_VERSION;
     /** 日志 */
     private static final QQLogLang LOG_LANG = new QQLogLang("system");
+    /** 核心版本的key名称 */
+    private static final String SIMPLE_ROBOT_CORE_VERSION_KEY ;
 
     // 加载资源
     static {
@@ -44,8 +46,9 @@ public final class CoreSystem {
         }else{
             CORE_VERSION = "UNKNOWN";
         }
+        SIMPLE_ROBOT_CORE_VERSION_KEY = "simplerobot.core.version";
         // 核心版本
-        System.setProperty("simplerobot.core.version", CORE_VERSION);
+        System.setProperty(SIMPLE_ROBOT_CORE_VERSION_KEY, CORE_VERSION);
 
     }
 
