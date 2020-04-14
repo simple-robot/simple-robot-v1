@@ -65,21 +65,20 @@ public class CQCode
 
     /**
      * 工厂方法
-     * @param typeStr   类型字符串
+     * @param typeName   类型字符串
      * @param params    参数数组，格式：[id=12, type=2]
      * @return CQCode实例对象
      */
-    public static CQCode of(String typeStr, String[] params){
-        final CQCodeTypes[] types = CQCodeTypes.getCQCodeTypesByFunction(typeStr);
+    public static CQCode of(String typeName, String[] params){
+        final CQCodeTypes[] types = CQCodeTypes.getCQCodeTypesByFunction(typeName);
         if(types.length == 1){
-
-            return of(typeStr, types[0], params);
+            return of(typeName, types[0], params);
         }else if(types.length == 0){
-            return of(typeStr, CQCodeTypes.defaultType, params);
+            return of(typeName, CQCodeTypes.defaultType, params);
         }else{
             // 获取参数的key列表
             String[] keyArray = Arrays.stream(params).map(p -> p.split("=", 2)[0]).toArray(String[]::new);
-            return of(typeStr, CQCodeTypes.getTypeByFunctionAndParams(typeStr, keyArray), params);
+            return of(typeName, CQCodeTypes.getTypeByFunctionAndParams(typeName, keyArray), params);
         }
     }
 
@@ -94,15 +93,15 @@ public class CQCode
         return of(typeStr, CQCodeTypes.getTypeByFunctionAndParams(typeStr, paramsArray), params);
     }
 
-//    /**
-//     * 工厂方法
-//     * @param type      类型
-//     * @param params    参数列表
-//     * @return CQCode实例对象
-//     */
-//    public static CQCode of(CQCodeTypes type, Map<String, String> params){
-//        return new CQCode(type.getFunction(), type, params);
-//    }
+    /**
+     * 工厂方法
+     * @param type      类型枚举
+     * @param params    参数列表
+     * @return CQCode实例对象
+     */
+    public static CQCode of(CQCodeTypes type, Map<String, String> params){
+        return of(type.getFunction(), type, params);
+    }
 
     /**
      * 工厂方法

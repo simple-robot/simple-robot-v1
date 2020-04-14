@@ -6,7 +6,12 @@ import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.msgget.FriendAddRequest;
 import com.forte.qqrobot.beans.messages.msgget.GroupAddRequest;
+import com.forte.qqrobot.beans.messages.result.AuthInfo;
 import com.forte.qqrobot.beans.messages.types.GroupAddRequestType;
+import com.forte.qqrobot.exception.RobotApiException;
+import com.forte.qqrobot.sender.BaseAPITemplate;
+import com.forte.qqrobot.sender.HttpClientAble;
+import com.forte.qqrobot.sender.HttpClientHelper;
 import com.forte.qqrobot.sender.intercept.InterceptValue;
 
 /**

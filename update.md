@@ -1,5 +1,10 @@
 ## 版本更新记录
 
+# now
+- 修复CQAppendList中出现二次转义的情况。
+- 修复CQCodeUtil中获取CQ码的时候出现索引越界的异常。
+- 群签到接口默认为“运势”签到
+
 # 1.11.2
 - 修复CQCode相关操作中的bug
 - 接口`QQCodeAble`、`GroupCodeAble`中分别默认实现了获取QQ头像、群头像的方法。

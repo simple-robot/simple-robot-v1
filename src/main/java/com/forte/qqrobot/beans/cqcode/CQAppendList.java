@@ -87,9 +87,13 @@ public class CQAppendList implements AppendList {
      */
     private void add(CharSequence value){
         if(value != null && value.length() > 0){
-            // 如果不是CQ码，转义
+            // 如果不是CQ码但是却存在'['或']'，转义
             if(!(value instanceof CQCode)){
-                list.add(CQ_CODE_UTIL.escapeOutCQCode( value.toString() ));
+                String valueString = value.toString();
+                if(valueString.contains("[") || valueString.contains("]")){
+                    valueString = CQ_CODE_UTIL.escapeOutCQCode( valueString );
+                }
+                list.add(valueString);
             }else{
                 // 否则，直接添加
                 list.add(value);

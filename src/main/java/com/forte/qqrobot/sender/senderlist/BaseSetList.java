@@ -6,6 +6,7 @@ import com.forte.qqrobot.exception.RobotApiException;
 /**
  * @see BaseRootSenderList
  */
+@Deprecated
 public abstract class BaseSetList implements SenderSetList {
 
     /**

@@ -61,15 +61,16 @@ public enum CQCodeTypes {
 
     /**
      * [CQ:image,file={1}] - 发送自定义图片
+     * 闪图：destruct=true
      * {1}为图片文件名称，图片存放在酷Q目录的data\image\下
      * 举例：[CQ:image,file=1.jpg]（发送data\image\1.jpg）
      * <p>
      * 部分插件也支持网络类型或者本地文件类型，所以添加路径格式
      */
     image("image",
-            new String[]{"file"},
-            new String[0],
-            new String[]{".+"},
+            new String[]{"file", "destruct"},
+            new String[]{"destruct"},
+            new String[]{".+", "true|false"},
             4),
 
 

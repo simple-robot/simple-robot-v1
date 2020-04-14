@@ -12,7 +12,7 @@ import java.util.Map;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-
+@Deprecated
 public abstract class BaseRootSender extends BaseRootSenderList implements RootSender {
     /**
      * 通过定义好返回值的InfoGet对象获取返回值

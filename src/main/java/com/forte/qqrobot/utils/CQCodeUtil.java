@@ -173,8 +173,13 @@ public class CQCodeUtil {
         //理论上，参数的数量应该不会小于keys的数量，如果长度不足，以null补位
         String[] realParams = new String[params.length];
         //遍历参数列表
-        for (int i = 0; i < keys.length; i++) {
-            String key = keys[i];
+        for (int i = 0; i < realParams.length; i++) {
+            String key;
+            if(keys.length > i){
+                key = keys[i];
+            }else{
+                key = Integer.toString(i);
+            }
             //获取value值并转义，如果参数不存在则标记为null
             //如果参数的索引不足类型的索引，以null补位
             String value = Optional.ofNullable(params.length >= (i + 1) ? params[i] : null).map(this::escapeValue).orElse(null);

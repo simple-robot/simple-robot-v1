@@ -8,6 +8,7 @@ import java.util.Map;
 /**
  * @see BaseRootSenderList
  **/
+@Deprecated
 public abstract class BaseSetter implements Setter {
 
     /**
