@@ -86,7 +86,6 @@
     </dependencies>
 
     <build>
-<!--        <pluginManagement>-->
         <plugins>
             <!-- maven仓库相关插件 -->
             <!-- (1) deploy插件 -->
@@ -242,7 +241,6 @@
             </plugin>
 
         </plugins>
-<!--        </pluginManagement>-->
     </build>
 
     <!-- maven相关配置 -->

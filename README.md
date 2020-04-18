@@ -13,6 +13,8 @@
 <br>
 
 **文档请见文档地址：**
+http://simple-robot-doc.forte.love
+或
 https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 <br>
 

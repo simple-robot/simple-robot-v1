@@ -6,10 +6,14 @@ import com.forte.qqrobot.utils.ReaderProperties;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * 语言类，用于读取lang文件
@@ -31,6 +35,12 @@ public class Language {
      * 组件使用的语言文件所在路径
      */
     private static final String COMPONENT_PATH_HEAD = "lang/component/";
+
+    /**
+     * modules下的文件，modules可能会有多个
+     */
+    private static final String MODULES_PATH_HEAD = "lang/modules/";
+
     /**
      * 语言文件路径下的前缀
      */
@@ -294,6 +304,37 @@ public class Language {
         }
     }
 
+
+    /**
+     * 加载所有本地语言资源
+     *
+     * @param loader 类加载器
+     * @param path   resources资源路径，开头请不要带'/'，其内部会进行尝试
+     * @param locale 加载的对应语言
+     * @param ifThrow 如果出现异常
+     * @throws IOException
+     */
+    private static void loadLangResources(ClassLoader loader, String path, Locale locale, Consumer<Exception> ifThrow) throws Exception {
+        if(ifThrow == null){
+            ifThrow = e -> {};
+        }
+        final Stream<InputStream> resourcesInputStreams = getResourcesInputStreams(loader, path, ifThrow);
+        // 读取语言数据, 覆盖en中已经存在的语言文件
+        ReaderProperties localeLangProperties = new ReaderProperties();
+
+        resourcesInputStreams.forEach(in -> {
+            try {
+                localeLangProperties.load(in);
+            } catch (IOException ignored) { }
+            // 进行格式转化
+            Set<String> names = localeLangProperties.stringPropertyNames();
+            // 使用传统方式遍历properties
+            for (String key : names) {
+                languageFormat.put(key, new MessageFormat(localeLangProperties.getProperty(key), locale));
+            }
+        });
+    }
+
     /**
      * 尝试获取一个resources资源输入流
      *
@@ -325,6 +366,30 @@ public class Language {
         return localeLangStream;
     }
 
+    /**
+     * 尝试获取resources资源输入流
+     *
+     * @param loader 类加载器
+     * @param path   资源路径
+     * @param ifThrow 如果出现异常
+     * @return 输入流列表
+     * @throws IOException
+     */
+    private static Stream<InputStream> getResourcesInputStreams(ClassLoader loader, String path, Consumer<Exception> ifThrow) throws IOException {
+        final Enumeration<URL> resources = loader.getResources(path);
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(Iterators.iter(resources), Spliterator.ORDERED | Spliterator.NONNULL),
+                false
+        ).map(url -> {
+            try {
+                return url.openStream();
+            } catch (IOException e) {
+                ifThrow.accept(e);
+                return null;
+            }
+        }).filter(Objects::nonNull);
+    }
+
 
     /**
      * 加载当前系统语言
@@ -332,7 +397,7 @@ public class Language {
      * @param loader 类加载器
      * @param locale 语言区域
      */
-    private static Exception[] localeInit(ClassLoader loader, Locale locale) throws Exception {
+    private static Exception[] localeInit(ClassLoader loader, Locale locale) {
         List<Exception> exceptions = new ArrayList<>();
         try {
             // 加载核心的本地语言
@@ -345,6 +410,12 @@ public class Language {
             loadLang(loader, COMPONENT_PATH_HEAD + locale + PATH_END, locale, path -> new NullPointerException("can not find language resources file in : '" + path + "'"));
         } catch (Exception e) {
             exceptions.add(e);
+        }
+        try {
+            // 加载modules语言
+            loadLangResources(loader, MODULES_PATH_HEAD + locale + PATH_END, locale, null);
+        } catch (Exception e) {
+            QQLog.debug("can not find language resources file in : ''{0}''", LANG_PATH_HEAD + locale + PATH_END);
         }
         try {
             // 加载可能存在的用户自定义语言, 不会warn异常
@@ -376,7 +447,12 @@ public class Language {
         } catch (Exception e) {
             exceptions.add(e);
         }
-
+        try {
+            // 加载modules语言
+            loadLangResources(loader, MODULES_PATH_HEAD + DEFAULT_LOCALE + PATH_END, DEFAULT_LOCALE, null);
+        } catch (Exception e) {
+            QQLog.debug("can not find language resources file in : ''{0}''", LANG_PATH_HEAD + DEFAULT_LOCALE + PATH_END);
+        }
         try {
             // 加载可能存在的用户自定义语言
             loadLang(loader, LANG_PATH_HEAD + DEFAULT_LOCALE + PATH_END, DEFAULT_LOCALE, null);
