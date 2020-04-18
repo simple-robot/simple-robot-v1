@@ -33,7 +33,8 @@ https://apidoc.gitee.com/ForteScarlet/simple-coolQ
 | 酷Q  |    LEMOC插件    | https://github.com/ForteScarlet/simple-robot-component-lemoc |
 | 酷Q  | HTTP TO CQ插件  | https://github.com/ForteScarlet/simple-robot-component-httpapi |
 | 酷Q  | CQ HTTP API插件 | https://github.com/ForteScarlet/simple-robot-component-coolHttpApi |
-
+| 酷Q  | JCQ插件 | https://github.com/ForteScarlet/simple-robot-component-JCQ |
+ 
 <br>
 <br>
 <br>
