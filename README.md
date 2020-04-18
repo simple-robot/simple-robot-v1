@@ -26,7 +26,7 @@ https://apidoc.gitee.com/ForteScarlet/simple-coolQ
 
 点击`star`后即可申请加入QQ群聊，QQ群号：**782930037**
 
-已经存在的组件框架：
+已经存在的**组件框架**：
 
 | 平台 |      依赖       |                           项目地址                           |
 | :--: | :-------------: | :----------------------------------------------------------: |
@@ -92,13 +92,11 @@ https://apidoc.gitee.com/ForteScarlet/simple-coolQ
 - 酷Q应用下的LEMOC插件(插件作者弃坑)
 - 酷Q应用下的HTTP API插件(插件作者仍在更新)
 - 酷Q应用下的CQ HTTP API插件(插件作者处于活跃状态)
+- 酷Q应用下的JCQ插件(使用原生函数)
 
 > 如果你根据核心开发了组件框架，可以告知我，我会更新在此处与下文处。
 
-> 如果你只是想开发一个QQ机器人，而不在乎使用什么平台，可以去试试酷Q应用下的CQ HTTP API插件，并结合对应的组件框架使用。<br>
-> 酷Q应用社区：https://cqp.cc/forum.php <br>
-> CQ HTTP API插件GITHUB：https://github.com/richardchien/coolq-http-api <br>
-> CQ HTTP API组件(即文档地址)：https://www.kancloud.cn/forte-scarlet/simple-coolq-doc <br>
+> 如果你只是想开发一个QQ机器人，而不在乎使用什么平台，请参考文档开头提到的组件框架。
 
 # 安装
 
