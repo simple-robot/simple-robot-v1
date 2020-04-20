@@ -2,6 +2,7 @@
 
 # now
 - 语言系统中增加模组(module)相关语言加载
+- 修复ListenContext对象在使用的时候无法正常依靠`get`与`set`取值设值的问题，并在Context中追加一个`put`方法，含义与`get`一致。
 
 # 1.11.3
 - 修复CQAppendList中出现二次转义的情况。

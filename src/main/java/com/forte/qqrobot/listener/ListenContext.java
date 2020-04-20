@@ -16,18 +16,18 @@ import java.util.Set;
 public class ListenContext extends BaseContext<Void> {
 
 
-    /**
-     * 单次生效的Map, 使用懒加载，当前域
-     */
-    private Map<String, Object> normalMap;
+//    /**
+//     * 单次生效的Map, 使用懒加载，当前域
+//     */
+//    private Map<String, Object> normalMap;
 
     public ListenContext(Map<String, Object> globalContext) {
         super(null, globalContext);
     }
 
+
     public ListenContext(Map<String, Object> globalContext, Map<String, Object> normalMap) {
-        super(null, globalContext);
-        this.normalMap = normalMap;
+        super(null, globalContext, normalMap);
     }
 
     /**
@@ -48,10 +48,7 @@ public class ListenContext extends BaseContext<Void> {
      * 初始化normalMap
      */
     private Map<String, Object> getNormalMap() {
-        if (normalMap == null) {
-            normalMap = new HashMap<>(4);
-        }
-        return normalMap;
+        return getContextMap();
     }
 
     /**
@@ -70,7 +67,7 @@ public class ListenContext extends BaseContext<Void> {
      */
     @Override
     public Object get(String key) {
-        Object normalGet = getNormalMap().get(key);
+        Object normalGet = getContextMap().get(key);
         return normalGet == null ? getGlobal(key) : normalGet;
     }
 
@@ -117,24 +114,6 @@ public class ListenContext extends BaseContext<Void> {
         return set(key, value);
     }
 
-//    /**
-//     * 记录一个全局域值
-//     * @param key   键
-//     * @param value 值
-//     */
-//    @Override
-//    public Object setGlobal(String key, Object value) {
-//        return globalContext.put(key, value);
-//    }
-
-
-//    /**
-//     * 清除域。默认为清除当前域
-//     */
-//    @Override
-//    public void clear() {
-//        getNormalMap().clear();
-//    }
 
     /**
      * 仅清除全局域
@@ -147,7 +126,7 @@ public class ListenContext extends BaseContext<Void> {
      * 当前域keySet
      */
     public Set<String> normalKeySet() {
-        return getNormalMap().keySet();
+        return getContextMap().keySet();
     }
 
     /**

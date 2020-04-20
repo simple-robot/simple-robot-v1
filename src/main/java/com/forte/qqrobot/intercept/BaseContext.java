@@ -106,5 +106,15 @@ public abstract class BaseContext<T> implements Context<T> {
         this.value = value;
         this.globalContextMap = globalContextMap;
     }
+    /**
+     * 构造
+     * @param value 上下文所对应的值
+     * @param globalContextMap 全局上下文值。
+     * */
+    public BaseContext(T value, Map<String, Object> globalContextMap, Map<String, Object> contextMap){
+        this.value = value;
+        this.globalContextMap = globalContextMap;
+        this.contextMap = contextMap;
+    }
 
 }

@@ -20,6 +20,16 @@ public interface Context<T> {
     Object get(String key);
 
     /**
+     * 含义与{@link #set(String, Object)}相同。
+     * @param key
+     * @param value
+     * @return
+     */
+    default Object put(String key, Object value){
+        return set(key, value);
+    }
+
+    /**
      * 记录一个当前上下文参数
      * @param key key
      * @param value value

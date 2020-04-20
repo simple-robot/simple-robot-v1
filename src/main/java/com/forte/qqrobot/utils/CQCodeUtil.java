@@ -205,7 +205,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Face(String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_face(String id) {
         return getCQCodeString(CQCodeTypes.face, id);
     }
@@ -228,7 +227,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Bface(String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_bface(String id) {
         return getCQCodeString(CQCodeTypes.bface, id);
     }
@@ -251,7 +249,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Sface(String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_sface(String id) {
         return getCQCodeString(CQCodeTypes.sface, id);
     }
@@ -274,7 +271,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Image(String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_image(String file) {
         return getCQCodeString(CQCodeTypes.image, file);
     }
@@ -299,7 +295,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Record(String, Boolean)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_record(String file, Boolean magic) {
         return getCQCodeString(CQCodeTypes.record, file, Optional.ofNullable(magic).map(Object::toString).orElse(null));
     }
@@ -323,7 +318,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Record(String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_record(String file) {
         return getCQCodeString(CQCodeTypes.record, file, null);
     }
@@ -347,7 +341,6 @@ public class CQCodeUtil {
      * @see #getCQCode_At(String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_at(String qq) {
         return getCQCodeString(CQCodeTypes.at, qq);
     }
@@ -369,7 +362,6 @@ public class CQCodeUtil {
      * @see #getCQCode_At(String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_atAll() {
         return getCQCodeString(CQCodeTypes.at, "all");
     }
@@ -392,7 +384,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Rps(String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_rps(String type) {
         return getCQCodeString(CQCodeTypes.rps, type);
     }
@@ -415,7 +406,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Dice(String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_dice(String type) {
         return getCQCodeString(CQCodeTypes.dice, type);
     }
@@ -437,7 +427,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Shake()
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_shake() {
         return getCQCodeString(CQCodeTypes.shake);
     }
@@ -461,7 +450,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Anonymous(Boolean)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_anonymous(Boolean ignore) {
         return getCQCodeString(CQCodeTypes.anonymous, Optional.ofNullable(ignore).map(Object::toString).orElse(null));
     }
@@ -487,7 +475,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Anonymous()
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_anonymous() {
         return getCQCodeString(CQCodeTypes.anonymous, (String) null);
     }
@@ -514,7 +501,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Music(String, String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_music(String type, String id) {
         return getCQCodeString(CQCodeTypes.music, type, id);
     }
@@ -543,7 +529,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Music_Custom(String, String, String, String, String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_music_custom(String url, String audio, String title, String content, String image) {
         return getCQCodeString(CQCodeTypes.music_custom, "custom", url, audio, title, content, image);
     }
@@ -574,7 +559,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Share(String, String, String, String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_share(String url, String title, String content, String image) {
         return getCQCodeString(CQCodeTypes.share, url, title, content, image);
     }
@@ -601,7 +585,6 @@ public class CQCodeUtil {
      * @see #getCQCode_Emoji(String)
      * @deprecated
      */
-    @Deprecated
     public String getCQCode_emoji(String id) {
         return getCQCodeString(CQCodeTypes.emoji, id);
     }
