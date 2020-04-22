@@ -1,5 +1,16 @@
 ## 版本更新记录
 
+# now
+- 优化依赖工厂，并修复部分隐藏nug
+- `@Beans`增加两个参数：`boolean init() default false`和`int priority() default Integer.MAX_VALUE`
+分别代表被标注的Beans是否在依赖工厂注入流程结束后执行一次初始化和这个Beans的优先级。
+- 为`@Beans`追加优先级概念。当在通过类型获取一个Beans的时候，如果依赖工厂中存在多个此类型的实例，则会选择优先级最高的(`升序排序，即数值最小的`)使用。
+例如，`TestInterface`接口存在两个实现类`Test1`和`Test2`，他们所标注的`@Beans`注解分别为`@Beans(priority = 1)`和`@Beans(priority = 2)`, 则在获取`TestInterface`d额时候会获取到`Test1`。
+注意，当最高优先级存在多个的时候，将会抛出异常。
+默认情况下优先级为最低，即`Integer.MAX_VALUE`
+
+
+
 # 1.11.4
 - 语言系统中增加模组(module)相关语言加载
 - 修复ListenContext对象在使用的时候无法正常依靠`get`与`set`取值设值的问题，并在Context中追加一个`put`方法，含义与`get`一致。

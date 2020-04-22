@@ -45,12 +45,17 @@ public class Beans<T> {
     /** Beans注解对象中的参数，用来代替Beans注解 */
     private final BeansData beans;
 
+    /** 是否需要初始化一次 */
+    private final boolean init;
+
+    /** 优先级 */
+    private final int priority;
 
     /**
      * 构造
      */
     public Beans(String NAME, Class<T> TYPE, boolean single, boolean allDepend, NameTypeEntry[] instanceNeed, Function<Object[], T> getInstanceFunction, Beans[] children,
-                 BeansData beans) {
+                 BeansData beans, boolean init, int priority) {
         this.NAME = NAME;
         this.TYPE = TYPE;
         this.single = single;
@@ -59,6 +64,8 @@ public class Beans<T> {
         this.getInstanceFunction = getInstanceFunction;
         this.children = children == null ? new Beans[0] : children;
         this.beans = beans;
+        this.init = init;
+        this.priority = priority;
 
         //判断除了数组之外的类型是否存在null值
         ObjectsPlus.allNonNull("com.forte.qqrobot.depend.Beans对象参数不可出现null值", this.NAME, this.TYPE, this.single, getInstanceFunction, this.beans);
@@ -152,7 +159,7 @@ public class Beans<T> {
 
         }
 
-        return new Beans<>(name, type, defaultSingle, defaultAllDepend, instanceNeed, getInstanceFunction, null, BeansData.getInstance());
+        return new Beans<>(name, type, defaultSingle, defaultAllDepend, instanceNeed, getInstanceFunction, null, BeansData.getInstance(), false, Integer.MAX_VALUE);
     }
 
 
@@ -190,7 +197,13 @@ public class Beans<T> {
         return beans;
     }
 
+    public boolean isInit() {
+        return init;
+    }
 
+    public int getPriority() {
+        return priority;
+    }
 
     @Override
     public String toString() {

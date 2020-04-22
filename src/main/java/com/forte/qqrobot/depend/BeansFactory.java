@@ -3,8 +3,6 @@ package com.forte.qqrobot.depend;
 import com.forte.lang.Language;
 import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.anno.depend.Depend;
-import com.forte.qqrobot.depend.parameter.ParamGetterManager;
-import com.forte.qqrobot.depend.parameter.ParamNameGetter;
 import com.forte.qqrobot.exception.AnnotationException;
 import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.utils.AnnotationUtils;
@@ -22,8 +20,10 @@ import java.util.stream.Stream;
  **/
 public class BeansFactory {
 
-    /** 参数名获取器 */
-    private static final ParamNameGetter paramNameGetter = ParamGetterManager.getParamNameGetter();
+//    /** 参数名获取器 */
+//    private static final ParamNameGetter paramNameGetter = ParamGetterManager.getParamNameGetter();
+
+
 
     /**
      * 从Class列表中过滤并转化为Beans列表
@@ -111,8 +111,12 @@ public class BeansFactory {
         //是否为单例
         boolean single = beansData.single();
 
+        int priority = beansData.priority();
+
         //是否全部字段标注@Depend
         boolean allDepend = beansData.allDepend();
+
+        boolean init = beansData.init();
 
         //实例化需要的参数列表
         NameTypeEntry[] instanceNeed = null;
@@ -204,7 +208,7 @@ public class BeansFactory {
         //获取实例的函数，转为final类型
         final Function<Object[], T> finalGetInstanceFunction = getInstanceFunction;
 
-        return new Beans<>(name, clazz, single, allDepend, finalInstanceNeed, finalGetInstanceFunction, children, beansData);
+        return new Beans<>(name, clazz, single, allDepend, finalInstanceNeed, finalGetInstanceFunction, children, beansData, init, priority);
     }
 
 
@@ -244,6 +248,8 @@ public class BeansFactory {
         //是否全部字段标注@Depend
         boolean allDepend = beansData.allDepend();
 
+        boolean init = beansData.init();
+
         //实例化需要的参数列表, 通过实例对象转化Beans，不需要实例化参数列表
         NameTypeEntry[] instanceNeed = new NameTypeEntry[0];
 
@@ -255,7 +261,7 @@ public class BeansFactory {
         Beans[] children = getChildren(beanType, name);
 
 
-        return new Beans<>(name, (Class<T>) beanType, true, allDepend, instanceNeed, getInstanceFunction, children, beansData);
+        return new Beans<>(name, (Class<T>) beanType, true, allDepend, instanceNeed, getInstanceFunction, children, beansData, init, beansData.priority());
     }
 
 
@@ -282,6 +288,7 @@ public class BeansFactory {
         boolean single = true;
         // /** 类下所有字段是否都作为依赖注入 */
         boolean allDepend = false;
+        int priority = Integer.MAX_VALUE;
         // /** 实例化所需要的参数列表及其对应的name */
         // 由于实例已经确定，不需要再去获取参数
         NameTypeEntry[] instanceNeed = NameTypeEntry.getEmpty();
@@ -300,10 +307,12 @@ public class BeansFactory {
         instance.setAllDepend(allDepend);
         instance.setSingle(single);
         instance.setValue(name);
+        instance.setInit(false);
+        instance.setPriority(priority);
 
 
         // 参数构建完成，创建实例
-        return new Beans<>(name, type, single, allDepend, instanceNeed, getInstanceFunction, children, instance);
+        return new Beans<>(name, type, single, allDepend, instanceNeed, getInstanceFunction, children, instance, false, priority);
     }
 
 
@@ -377,7 +386,7 @@ public class BeansFactory {
                 }
             };
 
-            return new Beans(name, type, single, alldepend, instanceNeed, getInstanceFunction, null, BeansData.getInstance(beanAnnotation));
+            return new Beans(name, type, single, alldepend, instanceNeed, getInstanceFunction, null, BeansData.getInstance(beanAnnotation), beanAnnotation.init(), beanAnnotation.priority());
         }).toArray(Beans[]::new);
 
 

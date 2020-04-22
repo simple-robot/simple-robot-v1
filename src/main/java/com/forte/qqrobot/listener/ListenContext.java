@@ -2,7 +2,6 @@ package com.forte.qqrobot.listener;
 
 import com.forte.qqrobot.intercept.BaseContext;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 

@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class Depend<V> {
+public class Depend<V> implements Comparable<Depend<?>> {
 
     /** 数据类型 */
     private final Class<V> TYPE;
@@ -30,6 +30,12 @@ public class Depend<V> {
     /** 使用额外参数对实例对象进行注入，需要保证额外参数内不存在更深一级的额参数 */
     private final BiConsumer<V, DependGetter> injectAdditionalDepend;
 
+    /** 优先级，升序排序 */
+    private final int priority;
+
+    /** 是否需要被初始化 */
+    private final boolean init;
+
     /**
      * 构造
      * @param name          依赖名称
@@ -39,7 +45,7 @@ public class Depend<V> {
      * @param injectDepend  依赖注入函数
      * @param injectAdditionalDepend  额外依赖注入函数
      */
-    public Depend(String name, Class<V> type, boolean single, Supplier<V> supplier, Consumer<V> injectDepend, BiConsumer<V, DependGetter> injectAdditionalDepend) {
+    public Depend(String name, Class<V> type, boolean single, Supplier<V> supplier, Consumer<V> injectDepend, BiConsumer<V, DependGetter> injectAdditionalDepend, boolean init, int priority) {
         Objects.requireNonNull(name);
         Objects.requireNonNull(type);
         Objects.requireNonNull(supplier);
@@ -52,6 +58,8 @@ public class Depend<V> {
         this.supplier = supplier;
         this.injectDepend = injectDepend;
         this.injectAdditionalDepend = injectAdditionalDepend;
+        this.init = init;
+        this.priority = priority;
     }
 
     /**
@@ -112,5 +120,21 @@ public class Depend<V> {
                 "TYPE=" + TYPE +
                 ", NAME='" + NAME + '\'' +
                 '}';
+    }
+
+    public boolean isInit() {
+        return init;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    @Override
+    public int compareTo(Depend o) {
+        if(o == null){
+            return 1;
+        }
+        return Integer.compare(priority, o.priority);
     }
 }

@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
 //监听类默认不使用单例类型
 //会牺牲一部分性能
 //2019/12/27 恢复为单例
-@Beans
+@Beans(init = true)
 @ByNameType(Listen.ByName.class)
 public @interface Listen {
 

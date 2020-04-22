@@ -28,14 +28,14 @@ import java.util.function.*;
  **/
 public class DependCenter implements DependGetter, DependInjector {
 
-    /**
-     * 以防万一，此处对依赖资源管理中心的单例工厂进行计数
-     */
-    private static final AtomicInteger singleFactoryNo = new AtomicInteger(1);
-
-    private static int getSingleFactoryNo() {
-        return singleFactoryNo.getAndAdd(1);
-    }
+//    /**
+//     * 以防万一，此处对依赖资源管理中心的单例工厂进行计数
+//     */
+//    private static final AtomicInteger singleFactoryNo = new AtomicInteger(1);
+//
+//    private static int getSingleFactoryNo() {
+//        return singleFactoryNo.getAndAdd(1);
+//    }
 
     /**
      * 获取方法参数名获取器
@@ -48,10 +48,13 @@ public class DependCenter implements DependGetter, DependInjector {
         以Class为键的资源仓库
         以name为键的资源仓库
      */
-    /**
-     * 依赖资源管理中心所使用的单例工厂
-     */
-    private final SingleFactory SINGLE_FACTORY;
+//    /**
+//     * 依赖资源管理中心所使用的单例工厂
+//     */
+//    private final SingleFactory SINGLE_FACTORY;
+
+    // 以依赖名称为key的单例Map
+    private final Map<String, Object> SINGLE_FACTORY;
 
     /**
      * 基础数据储存仓库
@@ -75,12 +78,30 @@ public class DependCenter implements DependGetter, DependInjector {
      */
     private final DependGetter dependGetter;
 
+    /** 记录需要初始化的依赖的列表 */
+    private Queue<Depend> initQueue = new LinkedList<>();
 
     /**
+     *　初始化一次需要被初始化的Depend
+     */
+    public void initDependWhoNeed(){
+        synchronized (this){
+            Depend polled;
+            do{
+                polled = initQueue.poll();
+                if(polled != null){
+                    polled.getInstance();
+                }
+            }while (polled != null);
+        }
+    }
+
+     /**
      * 构造
      */
     public DependCenter() {
-        SINGLE_FACTORY = SingleFactory.build(DependCenter.class + "_" + DependCenter.getSingleFactoryNo());
+//        SINGLE_FACTORY = SingleFactory.build(DependCenter.class + "_" + DependCenter.getSingleFactoryNo());
+        SINGLE_FACTORY = new ConcurrentHashMap<>(8);
         basicResourceWarehouse = new BasicResourceWarehouse();
         nameResourceWarehouse = new ConcurrentHashMap<>();
         classResourceWareHouse = new ConcurrentHashMap<>();
@@ -91,7 +112,8 @@ public class DependCenter implements DependGetter, DependInjector {
      * 构造
      */
     public DependCenter(DependGetter dependGetter) {
-        SINGLE_FACTORY = SingleFactory.build(DependCenter.class + "_" + DependCenter.getSingleFactoryNo());
+//        SINGLE_FACTORY = SingleFactory.build(DependCenter.class + "_" + DependCenter.getSingleFactoryNo());
+        SINGLE_FACTORY = new ConcurrentHashMap<>(8);
         basicResourceWarehouse = new BasicResourceWarehouse();
         nameResourceWarehouse = new ConcurrentHashMap<>();
         classResourceWareHouse = new ConcurrentHashMap<>();
@@ -263,7 +285,7 @@ public class DependCenter implements DependGetter, DependInjector {
         Supplier<?> supplier;
         if (b.isSingle()) {
             //是单例，获取的时候先获取，如果获取失败则保存
-            supplier = () -> SINGLE_FACTORY.getOrSet(b.getType(), () -> b.getGetInstanceFunction().apply(paramsGetter.get()));
+            supplier = () -> SINGLE_FACTORY.computeIfAbsent(b.getName(), key -> b.getGetInstanceFunction().apply(paramsGetter.get()));
         } else {
             supplier = () -> b.getGetInstanceFunction().apply(paramsGetter.get());
         }
@@ -274,7 +296,7 @@ public class DependCenter implements DependGetter, DependInjector {
         BiConsumer<?, DependGetter> additional = getAddInjectDependConsumer(b);
 
         //封装为Depend对象
-        Depend<?> depend = new Depend(name, type, b.isSingle(), supplier, injectDepend, additional);
+        Depend<?> depend = new Depend(name, type, b.isSingle(), supplier, injectDepend, additional, b.isInit(), b.getPriority());
 
         //保存
         saveDepend(depend);
@@ -310,8 +332,15 @@ public class DependCenter implements DependGetter, DependInjector {
                 add(depend);
             }}, (old, val) -> {
                 old.add(val.get(0));
+                // 根据优先级排序
+                Collections.sort(old);
                 return old;
             });
+
+            if(depend.isInit()){
+                // 需要初始化，记录至初始化队列
+                initQueue.add(depend);
+            }
         }
     }
 
@@ -481,13 +510,13 @@ public class DependCenter implements DependGetter, DependInjector {
                             //否则，是普通的类型，通过类型获取
                             fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(fieldType) : (add.get(fieldType) == null) ? this.getDepend(fieldType) : new Depend(fieldType.getSimpleName(), fieldType, false, () -> add.get(fieldType), v -> {
                             }, (v, a) -> {
-                            });
+                            }, beans.isInit(), beans.getPriority());
                         }
                     } else {
                         //指定了名称，直接获取
                         fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(name, fieldType) : (add.get(name, fieldType) == null) ? this.getDepend(name, fieldType) : new Depend(name, fieldType, false, () -> add.get(name, fieldType), v -> {
                         }, (v, a) -> {
-                        });
+                        }, beans.isInit(), beans.getPriority());
                     }
 
                     //判断字段是否可以注入的函数
@@ -659,7 +688,8 @@ public class DependCenter implements DependGetter, DependInjector {
         for (Class keyClass : keySet) {
             if (keyClass.equals(superType) || FieldUtils.isChild(keyClass, superType)) {
                 // 类型下的depend唯一
-                if (classResourceWareHouse.get(keyClass).size() == 1) {
+                List<Depend> depends = classResourceWareHouse.get(keyClass);
+                if (depends.size() > 0) {
                     list.add(keyClass);
                 }
             }
@@ -711,7 +741,7 @@ public class DependCenter implements DependGetter, DependInjector {
                 if (t != null) {
                     return new Depend<>(type.getSimpleName(), type, true, () -> t, ti -> {
                     }, (ti, a) -> {
-                    });
+                    }, false, Integer.MAX_VALUE - 1);
                 }
             } catch (Throwable e) {
                 outDependGetterThrow = e;
@@ -720,28 +750,52 @@ public class DependCenter implements DependGetter, DependInjector {
 
         // 先直接获取
         List<Depend> depends = classResourceWareHouse.get(type);
+        if(depends == null){
+            depends = Collections.emptyList();
+        }
 
         // 是否需要重新保存
         boolean save = false;
 
         //没有获取到，尝试通过子类型获取
-        if (depends == null || depends.size() == 0) {
+        if (depends.size() == 0) {
             Set<Class> keys = classResourceWareHouse.keySet();
             Class[] classes = keys.stream().filter(k -> FieldUtils.isChild(k, type)).toArray(Class[]::new);
             if (classes.length == 0) {
                 //还是没有，返回null
                 depends = null;
             } else if (classes.length > 1) {
-                //不止1个，抛出异常
-                throw new DependResourceException("moreChildType", type, Arrays.toString(classes));
+                //　多个子类，全部获取并排序
+                Depend[] dependsByClasses = Arrays.stream(classes).flatMap(c -> classResourceWareHouse.get(c).stream()).sorted().toArray(Depend[]::new);
+
+                if(dependsByClasses[0].getPriority() == dependsByClasses[1].getPriority()){
+                    //不止1个且最高优先级有多个，抛出异常
+                    throw new DependResourceException("moreChildType", type, Arrays.toString(classes));
+                }else{
+                    depends = new ArrayList<Depend>(){{add(dependsByClasses[0]);}};
+                    save = true;
+                }
             } else {
                 depends = classResourceWareHouse.get(classes[0]);
                 // 需要标记为重新保存
                 save = true;
             }
+        }else if(depends.size() > 1){
+            // 依赖多于1个
+            if(depends.get(0).getPriority() == depends.get(1).getPriority()){
+                //不止1个且最高优先级有多个，抛出异常
+                throw new DependResourceException("moreChildType", type, depends);
+            }else{
+                Depend first = depends.get(0);
+                // 否则，只留下最后一个并标记重新记录
+                depends = new ArrayList<Depend>(){{add(first);}};
+                save = true;
+
+            }
+
         }
         //判断
-        if (depends == null || depends.size() == 0) {
+        if (depends.size() == 0) {
             //如果还是没有，返回null
             // 2020/4/5 v1.11.0 改为抛出异常
 //            return null;
@@ -751,23 +805,30 @@ public class DependCenter implements DependGetter, DependInjector {
                 throw new DependResourceException("noDependAndOut", outDependGetterThrow, type, outDependGetterThrow.getLocalizedMessage());
             }
         } else if (depends.size() > 1) {
-            //多于一个, 一般情况下是使用父类类型获取的时候会存在的情况
-            throw new DependResourceException("moreDepend", type);
-        } else {
-            // 只有唯一的一个
+            // 多于一个，判断优先级
+            final Depend first = depends.get(0);
+            Depend second = depends.get(1);
+            if(first.getPriority() == second.getPriority()){
+                // 最高优先级相同，抛出异常。
+                //多于一个, 一般情况下是使用父类类型获取的时候会存在的情况
+                throw new DependResourceException("moreDepend", type);
+            }else{
+                // 否则仅留下第一个，并标记重新保存。
+                depends = new ArrayList<Depend>(){{add(first);}};
+                save = true;
+            }
+        }
+
+            // 获取唯一的一个，即第一个
             Depend single = depends.get(0);
             if (save) {
                 // 需要重新保存以实现缓存
                 // 一般来讲，既然能够拿到，则说明这个依赖必定存在于name中，所以直接保存类型
-                classResourceWareHouse.merge(type, new ArrayList<Depend>(1) {{
+                classResourceWareHouse.put(type, new ArrayList<Depend>(1) {{
                     add(single);
-                }}, (old, val) -> {
-                    old.add(val.get(0));
-                    return old;
-                });
+                }});
             }
             return single;
-        }
     }
 
 
@@ -792,7 +853,7 @@ public class DependCenter implements DependGetter, DependInjector {
                     Class<?> type = t.getClass();
                     return new Depend(type.getSimpleName(), type, true, () -> t, ti -> {
                     }, (ti, a) -> {
-                    });
+                    }, false, Integer.MAX_VALUE - 1);
                 }
             } catch (Throwable e) {
                 outDependGetterThrow = e;
