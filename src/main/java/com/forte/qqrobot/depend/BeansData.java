@@ -1,5 +1,6 @@
 package com.forte.qqrobot.depend;
 
+import com.forte.qqrobot.PriorityConstant;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.anno.depend.Depend;
 
@@ -52,7 +53,7 @@ public class BeansData {
      * 一个默认参数的@Beans参数
      * 默认对象中，当allDepend对象为false的时候，depend为null
      */
-    private static final BeansData DEFAULT = new BeansData("", true, false, null, new Class[0], false, Integer.MAX_VALUE);
+    private static final BeansData DEFAULT = new BeansData("", true, false, null, new Class[0], false, PriorityConstant.FIRST_LAST);
 
     /**
      * 私有构造

@@ -1,9 +1,11 @@
 package com.forte.qqrobot.bot;
 
+import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.beans.function.PathAssembler;
 import com.forte.qqrobot.beans.function.VerifyFunction;
 import com.forte.qqrobot.exception.BotVerifyException;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
+@Beans
 public class BotManagerImpl implements BotManager {
 
     /**
@@ -96,25 +99,35 @@ public class BotManagerImpl implements BotManager {
     /**
      * 注册一个botInfo。在实现的时候需要注意线程安全问题，概率较小，但是不是没有可能
      *
-     * @param info bot信息，作为key的code信息将会从其中获取。info中的各项参数不可为null
-     * @return 是否注册成功
+     * @param info bot信息，作为key的code信息将会从其中获取。info中path必须存在。
+     *             会对账号进行一次验证，如果通过则会添加。
+     * @return 如果注册成功，返回注册后的botInfo，否则返回null
      */
     @Override
-    public boolean registerBot(BotInfo info) {
+    public BotInfo registerBot(BotInfo info) {
         // 先验证函数
-        String key = (info = verifyBot(info)).getBotCode();
+        String key = info.getBotCode();
         // 在注册时候锁住map对象
         synchronized (botMap) {
+            if(key == null){
+                key = (info = verifyBot(info)).getBotCode();
+            }
+
             BotInfo botInfo = botMap.get(key);
             if (botInfo == null) {
                 botMap.put(key, info);
                 if (defaultBot == null) {
                     defaultBot = key;
                 }
-                return true;
+                return info;
             } else {
-                // 已经存在, 不放入
-                return false;
+                // 已经存在, 不放入并关闭info
+                try {
+                    info.close();
+                } catch (IOException e) {
+                    throw new BotVerifyException(e);
+                }
+                return null;
             }
         }
     }
@@ -141,7 +154,15 @@ public class BotManagerImpl implements BotManager {
         // 移除掉一个bot的信息
         // 先锁住botMap
         synchronized (botMap) {
-            return botMap.remove(code);
+            BotInfo remove = botMap.remove(code);
+            if(remove != null){
+                try {
+                    remove.close();
+                } catch (IOException e) {
+                    throw new BotVerifyException(e);
+                }
+            }
+            return remove;
         }
     }
 

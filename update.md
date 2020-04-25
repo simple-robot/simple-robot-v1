@@ -1,6 +1,6 @@
 ## 版本更新记录
 
-# now
+# 1.12.0 (beta)
 - 优化依赖工厂，并修复部分隐藏nug
 - `@Beans`增加两个参数：`boolean init() default false`和`int priority() default Integer.MAX_VALUE`
 分别代表被标注的Beans是否在依赖工厂注入流程结束后执行一次初始化和这个Beans的优先级。
@@ -8,8 +8,19 @@
 例如，`TestInterface`接口存在两个实现类`Test1`和`Test2`，他们所标注的`@Beans`注解分别为`@Beans(priority = 1)`和`@Beans(priority = 2)`, 则在获取`TestInterface`d额时候会获取到`Test1`。
 注意，当最高优先级存在多个的时候，将会抛出异常。
 默认情况下优先级为最低，即`Integer.MAX_VALUE`
+- 为BotInfo追加接口`closeable`的继承。
+- 增加一个`PriorityConstant`常量类，定义了一些比较基本的常量。
+- 修改`BotManager`接口的`registerBot`方法的返回值，修改前为`boolean`，目前为注册成功后的`botInfo`
+- 基础配置类中追加指定类加载器的配置`setClassLoader`用于一些类似于包扫描的地方。默认为当前线程中的类加载器。
+- 将`BotManager`的内部默认实例`BotManagerImpl`由硬编码形式修改为模组自动加载形式，其优先级为默认的最低。
 
+- 增加了一个会被默认注入到依赖工厂的`ConfigProperties`实例，当你使用了配置文件启动的时候，可以通过此类得到配置文件中的配置项。可用来为模组提供额外的配置。
+- 配置文件现在推荐在所有的配置前缀增加`simbot`以进行大分类。旧配置暂时依旧可用，但是不再推荐。
 
+- 为三个送信拦截器的参数的父类`SenderContext`追加一个方法`getMethod()`以支持获取当前拦截的方法实例。
+- 三个送信拦截器将不会再拦截Object的默认方法了。（例如`toString()`方法，除非组件实例重写了此方法。）
+
+- 大幅度调整内部结构。现在启动时，如果没有注册任何bot信息，将不会再强制注册一个默认地址了，而是变更为一个警告。
 
 # 1.11.4
 - 语言系统中增加模组(module)相关语言加载

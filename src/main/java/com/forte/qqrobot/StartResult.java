@@ -31,7 +31,7 @@ class StartResult<SEND, SET, GET> {
         return defaultMsgSender;
     }
 
-    public void setDefaultMsgSender(MsgSender defaultMsgSender) {
+    public void setDefaultMsgSender(DefaultBotSender defaultMsgSender) {
         this.defaultMsgSender = defaultMsgSender;
     }
 

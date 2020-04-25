@@ -3,6 +3,7 @@ package com.forte.qqrobot.sender.intercept;
 import com.forte.qqrobot.intercept.BaseContext;
 import com.forte.qqrobot.sender.senderlist.SenderList;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -21,9 +22,15 @@ public abstract class SenderContext<T extends SenderList> extends BaseContext<T>
      */
     private Object[] params;
 
-    public SenderContext(T value, Map<String, Object> globalContextMap, Object... params) {
+    /**
+     * 被代理的方法
+     */
+    private Method method;
+
+    public SenderContext(T value, Map<String, Object> globalContextMap, Method method, Object... params) {
         super(value, globalContextMap);
         this.params = params;
+        this.method = method;
     }
 
     public T getSender(){
@@ -36,5 +43,13 @@ public abstract class SenderContext<T extends SenderList> extends BaseContext<T>
 
     public void setParams(Object[] params) {
         this.params = params;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public void setMethod(Method method) {
+        this.method = method;
     }
 }

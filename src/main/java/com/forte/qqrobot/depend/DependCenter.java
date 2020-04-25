@@ -1,6 +1,7 @@
 package com.forte.qqrobot.depend;
 
 import com.forte.lang.Language;
+import com.forte.qqrobot.PriorityConstant;
 import com.forte.qqrobot.depend.parameter.ParamGetterManager;
 import com.forte.qqrobot.depend.parameter.ParamNameGetter;
 import com.forte.qqrobot.depend.util.DependUtil;
@@ -8,14 +9,12 @@ import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.FieldUtils;
-import com.forte.qqrobot.utils.SingleFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
 
 /**
@@ -741,7 +740,7 @@ public class DependCenter implements DependGetter, DependInjector {
                 if (t != null) {
                     return new Depend<>(type.getSimpleName(), type, true, () -> t, ti -> {
                     }, (ti, a) -> {
-                    }, false, Integer.MAX_VALUE - 1);
+                    }, false, PriorityConstant.SECOND_LAST);
                 }
             } catch (Throwable e) {
                 outDependGetterThrow = e;
@@ -763,7 +762,7 @@ public class DependCenter implements DependGetter, DependInjector {
             Class[] classes = keys.stream().filter(k -> FieldUtils.isChild(k, type)).toArray(Class[]::new);
             if (classes.length == 0) {
                 //还是没有，返回null
-                depends = null;
+                depends = Collections.emptyList();
             } else if (classes.length > 1) {
                 //　多个子类，全部获取并排序
                 Depend[] dependsByClasses = Arrays.stream(classes).flatMap(c -> classResourceWareHouse.get(c).stream()).sorted().toArray(Depend[]::new);
@@ -853,7 +852,7 @@ public class DependCenter implements DependGetter, DependInjector {
                     Class<?> type = t.getClass();
                     return new Depend(type.getSimpleName(), type, true, () -> t, ti -> {
                     }, (ti, a) -> {
-                    }, false, Integer.MAX_VALUE - 1);
+                    }, false, PriorityConstant.SECOND_LAST);
                 }
             } catch (Throwable e) {
                 outDependGetterThrow = e;

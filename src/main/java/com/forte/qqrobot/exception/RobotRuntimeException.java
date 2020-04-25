@@ -194,17 +194,19 @@ public class RobotRuntimeException extends RuntimeException {
     }
 
     /**
-     * 重写本地化描述
+     * 不再推荐使用此方法。请使用 {@link #getLangMessage()} 方法。
+     * @see #getLangMessage()
      */
     @Override
-    public String getLocalizedMessage(){
+    public String getMessage(){
         String localizedMessageTag = getLocalizedMessageTag();
         if(localizedMessageTag != null){
             return getMessageFormat(localizedMessageTag, tagFormat);
         }else{
-            return super.getLocalizedMessage();
+            return super.getMessage();
         }
     }
+
     /**
      * @return 本地化描述Tag
      */
@@ -221,15 +223,6 @@ public class RobotRuntimeException extends RuntimeException {
         return getLocalizedMessage();
     }
 
-    /**
-     * 不再推荐使用此方法。请使用 {@link #getLangMessage()} 方法。
-     * @see #getLangMessage()
-     */
-    @Override
-    @Deprecated
-    public String getMessage(){
-        return super.getMessage();
-    }
 
 
     public RobotRuntimeException() {

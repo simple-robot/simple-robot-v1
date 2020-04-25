@@ -273,11 +273,18 @@ public class MsgSender implements Sender {
 
     //**************** 构造 ****************//
 
-
     /**
      * 构造
      */
     private MsgSender(SenderList senderList, ListenerMethod listenerMethod, BotRuntime runtime) {
+        this(senderList, listenerMethod, runtime, true, true, true);
+    }
+
+    /**
+     * 构造
+     */
+    private MsgSender(SenderList senderList, ListenerMethod listenerMethod, BotRuntime runtime,
+                      boolean interceptSend, boolean interceptSet, boolean interceptGet) {
         this.runtime = runtime;
         //如果为空，直接赋值为null
         if (senderList == null) {
@@ -286,25 +293,32 @@ public class MsgSender implements Sender {
             this.GETTER = null;
         } else {
             //构建SENDER
-            this.SENDER = senderList.isSenderList() ? initSender((SenderSendList) senderList) : null;
-            this.SETTER = senderList.isSetterList() ? initSetter((SenderSetList) senderList ) : null;
-            this.GETTER = senderList.isGetterList() ? initGetter((SenderGetList) senderList ) : null;
+            this.SENDER = senderList.isSenderList() ? (interceptSend ? initSender((SenderSendList) senderList) : (SenderSendList)senderList) : null;
+            this.SETTER = senderList.isSetterList() ? (interceptSet  ? initSetter((SenderSetList) senderList ) : (SenderSetList) senderList) : null;
+            this.GETTER = senderList.isGetterList() ? (interceptGet  ? initGetter((SenderGetList) senderList ) : (SenderGetList) senderList) : null;
         }
 
         //为listenerMethod赋值
         this.LISTENER_METHOD = initListener(listenerMethod);
     }
 
+    /**
+     * 构造
+     */
+    protected MsgSender(SenderSendList sender, SenderSetList setter, SenderGetList getter, ListenerMethod listenerMethod, BotRuntime runtime) {
+        this(sender, setter, getter, listenerMethod, runtime, true, true, true);
+    }
 
     /**
      * 构造
      */
-    private MsgSender(SenderSendList sender, SenderSetList setter, SenderGetList getter, ListenerMethod listenerMethod, BotRuntime runtime) {
+    protected MsgSender(SenderSendList sender, SenderSetList setter, SenderGetList getter, ListenerMethod listenerMethod, BotRuntime runtime,
+                        boolean interceptSend, boolean interceptSet, boolean interceptGet) {
         this.runtime = runtime;
         //构建SENDER, 如果存在拦截器，则构建代理
-        this.SENDER = initSender(sender);
-        this.SETTER = initSetter(setter);
-        this.GETTER = initGetter(getter);
+        this.SENDER = interceptSend ? initSender(sender) : sender;
+        this.SETTER = interceptSet  ? initSetter(setter) : setter;
+        this.GETTER = interceptGet  ? initGetter(getter) : getter;
 
         //为listenerMethod赋值
         this.LISTENER_METHOD = initListener(listenerMethod);
@@ -541,6 +555,7 @@ public class MsgSender implements Sender {
     /**
      * 无监听函数的送信器, 便于区分
      */
+    @Deprecated
     public static class NoListenerMsgSender extends MsgSender {
 
         private NoListenerMsgSender(SenderSendList sender, SenderSetList setter, SenderGetList getter, BotRuntime runtime) {

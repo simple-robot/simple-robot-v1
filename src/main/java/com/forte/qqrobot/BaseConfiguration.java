@@ -27,8 +27,7 @@ import java.util.stream.Stream;
  * @date Created in 2019/4/4 18:02
  * @since JDK1.8
  **/
-// 从这里的话..idea配置不高亮啊........所以就先把完整的写在字段上吧
-@Conf(value = "", comment = "核心中的基础配置类")
+@Conf(value = {"", "simbot"}, comment = "核心中的基础配置类")
 public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable {
 
     @Override
@@ -45,6 +44,12 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 指定一个默认的Botinfo，没有人工指定的情况下，会默认设定为第一次注册的账号信息
      */
     private BotInfo defaultBotInfo;
+
+    /**
+     * 配置文件的读取内容
+     * 如果不是配置文件的话，此类得不到任何内容。
+     */
+    private ConfigPropertiesImpl configProperties = new ConfigPropertiesImpl(new Properties());
 
     /*
         此类是在language初始化之前使用的，故此不使用语言化
@@ -261,6 +266,9 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
             registerBot(code, path);
         }
     }
+
+    /** 部分配置过程需要使用类加载器，此处指定类加载器。默认为当前线程的类加载器。 */
+    private ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
 
     //**************************************
@@ -480,9 +488,10 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      */
     public Map<String, List<BotInfo>> getAdvanceBotInfo() {
         // 如果没有任何信息，注册一个127:5700的默认地址
-        if(advanceBotInfo.size() == 0){
-            registerBot("http://" + ip + ":" + port);
-        }
+        // 不再注册默认信息
+//        if(advanceBotInfo.size() == 0){
+//            registerBot("http://" + ip + ":" + port);
+//        }
         // 将数据转化为map，key为bot的账号（如果存在的话）
         // 不存在账号信息的，key将会为null，只有key为null的时候，list才可以有多个参数，其余情况下，一个key只能对应一个地址。
         Map<String, List<BotInfo>> botInfoMap = new HashMap<>(2);
@@ -564,9 +573,6 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 包扫描，现在的扫描已经不再仅限于监听器了
      */
     public T scanner(String packageName) {
-        //添加包路径
-//        scannerPackage.add(packageName);
-
         // 数组扩容增加
         String[] newPackageName = new String[packageName.length() + 1];
         newPackageName[this.scannerPackage.length] = packageName;
@@ -905,5 +911,25 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
 
     public void setEnableServer(Boolean enableServer) {
         this.enableServer = enableServer;
+    }
+
+    public ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    public void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+    public ConfigPropertiesImpl getConfigProperties() {
+        return configProperties;
+    }
+
+    /**
+     * 使用者不需要设置
+     * @param configProperties
+     */
+    public void setConfigProperties(ConfigPropertiesImpl configProperties) {
+        this.configProperties = configProperties;
     }
 }

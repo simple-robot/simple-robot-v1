@@ -17,7 +17,11 @@ public interface Application<CONFIG extends BaseConfiguration> {
 
     void before(CONFIG configuration);
 
-    void after(CQCodeUtil cqCodeUtil, MsgSender sender);
+    /**
+     * @param cqCodeUtil cq码工具类
+     * @param sender 不再建议使用MsgSender。如果想要主动发送消息，请试着使用{@code BotRuntime().getRuntime().getBotManager()}
+     */
+    void after(CQCodeUtil cqCodeUtil, @Deprecated MsgSender sender);
 
     /**
      * 获取启动器的包路径。默认情况下即获取当前类的包路径。

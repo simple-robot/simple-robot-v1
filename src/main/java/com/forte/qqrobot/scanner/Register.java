@@ -5,6 +5,8 @@ import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.sender.MsgSender;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -16,6 +18,15 @@ import java.util.function.Supplier;
  * @since JDK1.8
  **/
 public interface Register {
+
+    /**
+     * 追加一些额外的class
+     */
+    void addClasses(Collection<Class<?>> classes);
+
+    default void addClasses(Class<?>[] classes){
+        addClasses(Arrays.asList(classes));
+    }
 
     /** 注册监听函数, 此处一般由Base */
     void registerListener(ListenerMethodScanner scanner);

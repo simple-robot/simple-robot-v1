@@ -1,11 +1,13 @@
 package com.forte.qqrobot.bot;
 
+import java.io.Closeable;
+
 /**
  * 一个已注册的机器人的信息标注接口
  *
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
-public interface BotInfo {
+public interface BotInfo extends Closeable {
 
     /**
      * 获取Bot的账号信息

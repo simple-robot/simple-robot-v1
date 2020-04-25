@@ -1,5 +1,7 @@
 package com.forte.qqrobot.anno.depend;
 
+import com.forte.qqrobot.PriorityConstant;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -46,13 +48,18 @@ public @interface Beans {
     /** 根据参数类型列表来指定构造函数，默认为无参构造 */
     Class[] constructor() default {};
 
-    /** 是否在依赖注入流程结束后初始化一次，默认为false，即使用懒加载策略 */
+    /**
+     * 是否在依赖注入流程结束后初始化一次，默认为false，即使用懒加载策略。
+     * 此初始化操作由核心启动器控制。
+     * @since core-1.12
+     */
     boolean init() default false;
 
     /**
      * 优先级。当在获取某个依赖的时候，假如在通过类型获取的时候存在多个值，会获取优先级更高级别的依赖并摒弃其他依赖。
      * 使用jdk自带的排序规则，即升序排序。默认为优先级最低。
+     * @since core-1.12
      */
-    int priority() default Integer.MAX_VALUE;
+    int priority() default PriorityConstant.FIRST_LAST;
 
 }

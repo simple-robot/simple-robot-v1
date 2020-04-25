@@ -16,10 +16,9 @@ import com.forte.qqrobot.beans.function.VerifyFunction;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.bot.BotManager;
-import com.forte.qqrobot.bot.BotManagerImpl;
+import com.forte.qqrobot.depend.AutoDependReader;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
-import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.exception.RobotRunException;
 import com.forte.qqrobot.listener.Filterable;
 import com.forte.qqrobot.listener.MsgIntercept;
@@ -51,6 +50,7 @@ import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.*;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -119,6 +119,8 @@ public abstract class BaseApplication<
     private ListenerManager manager;
 
     private ListenerMethodScanner scanner;
+
+    private ConfigPropertiesImpl configProperties;
 
     /**
      * bot管理中心
@@ -211,26 +213,6 @@ public abstract class BaseApplication<
      */
     protected abstract void resourceInit();
 
-    //**************** 获取三种送信器 ****************//
-
-    /**
-     * 弃用
-     */
-    @Deprecated
-    protected SenderSendList getSender(){return null;}
-
-    /**
-     * 弃用
-     */
-    @Deprecated
-    protected SenderSetList getSetter(){return null;}
-
-    /**
-     * 弃用
-     */
-    @Deprecated
-    protected SenderGetList getGetter(){return null;}
-
     /**
      * 提供一个msgGet，将其转化为SendList
      * @param msgGet msgGet
@@ -250,32 +232,60 @@ public abstract class BaseApplication<
      */
     protected abstract GET getGetter(MsgGet msgGet, BotManager botManager);
 
+
     /**
-     * 获取一个组件专属的SimpleRobotContext对象
-     * @param defaultMsgSender 函数{@link #getDefaultSender(DependCenter, ListenerManager, BotManager)}的最终返回值
-     * @param manager       botManager对象
-     * @param msgParser     消息字符串转化函数
-     * @param processor     消息处理器
-     * @param dependCenter  依赖中心
-     * @return 组件的Context对象实例
+     * 提供一个BotManager，将其转化为默认的SendList。一般情况下，Default送信器只会实例化一次。
+     * @return {@link SenderSendList}
      */
-    protected abstract CONTEXT getComponentContext(MsgSender defaultMsgSender,
-                                                                                                        BotManager manager,
-                                                                                                        MsgParser msgParser,
-                                                                                                        MsgProcessor processor,
-                                                                                                        DependCenter dependCenter);
+    protected abstract SEND getDefaultSender(BotManager botManager);
+    /**
+     * 提供一个BotManager，将其转化为默认的SetList。一般情况下，Default送信器只会实例化一次。
+     * @return {@link SenderSetList}
+     */
+    protected abstract SET getDefaultSetter(BotManager botManager);
+    /**
+     * 提供一个BotManager，将其转化为默认的GetList。一般情况下，Default送信器只会实例化一次。
+     * @return {@link SenderGetList}
+     */
+    protected abstract GET getDefaultGetter(BotManager botManager);
 
 
     /**
      * 根据{@link #getSender(MsgGet, BotManager)}, {@link #getSetter(MsgGet, BotManager)}, {@link #getGetter(MsgGet, BotManager)} 三个函数构建一个RootSenderList
      * 参数分别为一个BotManager和一个MsgGet对象
      * 如果组件不是分为三个部分而构建，则可以考虑重写此函数
-     * 此函数最终会被送入组件实现的runServer中
+     * 此函数最终会被送入组件实现的{@link #runServer(DependCenter, ListenerManager, MsgProcessor, MsgParser)}中
      * @return RootSenderList构建函数
      */
     protected Function<MsgGet, RootSenderList> getRootSenderFunction(BotManager botManager){
         return m -> new ProxyRootSender(getSender(m, botManager), getSetter(m, botManager), getGetter(m, botManager));
     }
+
+    /**
+     * 根据{@link #getDefaultSender(BotManager)}, {@link #getDefaultSetter(BotManager)}, {@link #getDefaultGetter(BotManager)} 三个函数构建一个RootSenderList
+     * 参数分别为一个BotManager和一个MsgGet对象
+     * 如果组件不是分为三个部分而构建，则可以考虑重写此函数
+     * @return RootSenderList构建函数
+     */
+    protected DefaultSenders<SEND, SET, GET> getDefaultSenders(BotManager botManager){
+        return new DefaultSenders<>(getDefaultSender(botManager), getDefaultSetter(botManager), getDefaultGetter(botManager));
+    }
+
+    /**
+     * 获取一个组件专属的SimpleRobotContext对象
+     * @param defaultSenders 函数{@link #getDefaultSenders(BotManager)}的最终返回值
+     * @param manager       botManager对象
+     * @param msgParser     消息字符串转化函数
+     * @param processor     消息处理器
+     * @param dependCenter  依赖中心
+     * @return 组件的Context对象实例
+     */
+    protected abstract CONTEXT getComponentContext(DefaultSenders<SEND, SET, GET> defaultSenders,
+                                                   BotManager manager,
+                                                   MsgParser msgParser,
+                                                   MsgProcessor processor,
+                                                   DependCenter dependCenter);
+
 
     /**
      * 获取MsgParser函数, 默认根据{@link #msgParse(String)}生成
@@ -293,17 +303,12 @@ public abstract class BaseApplication<
     protected BotInfo[] verifyBot(Map<String, List<BotInfo>> confBotInfos){
         BotInfo defaultBotInfo = getConf().getDefaultBotInfo();
         return confBotInfos.entrySet().stream()
-                .flatMap(e -> {
-                    String code = e.getKey();
-                    return e.getValue().stream().map(info -> {
-                        BotInfo botInfo = verifyBot(code, info);
-                        if(defaultBotInfo.getPath().equals(botInfo.getPath())){
-                            // 如果是默认bot的地址，覆盖内容
-                            getConf().setDefaultBotInfo(botInfo);
-                        }
-                        return botInfo;
-                    });
-                }).toArray(BotInfo[]::new);
+                .flatMap(e -> e.getValue().stream().peek(info -> {
+                    if(defaultBotInfo.getPath().equals(info.getPath())){
+                        // 如果是默认bot的地址，覆盖内容
+                        getConf().setDefaultBotInfo(info);
+                    }
+                })).toArray(BotInfo[]::new);
     }
 
     /**
@@ -340,10 +345,10 @@ public abstract class BaseApplication<
      * @param dependCenter 依赖管理器，可以支持组件额外注入部分依赖。
      * @param manager      监听管理器，用于分配获取到的消息
      */
-    private StartResult start(DependCenter dependCenter, ListenerManager manager){
+    private StartResult start(DependCenter dependCenter, ListenerManager manager, BotRuntime runtime, DefaultSenders<SEND, SET, GET> senders){
         BotManager botManager = getBotManager();
         CONFIG conf = getConf();
-        this.defaultMsgSender = getDefaultSender(dependCenter, manager, botManager);
+        this.defaultMsgSender = getDefaultMsgSender(dependCenter, manager, runtime, senders.getSender(), senders.getSetter(), senders.getGetter());
         String message = "no server";
         // 如果需要启动server
         Function<MsgGet, RootSenderList> rootSenderFunction = getRootSenderFunction(botManager);
@@ -358,12 +363,15 @@ public abstract class BaseApplication<
 
     /**
      * 获取一个不使用在监听函数中的默认送信器
+     *
+     * 1.12.x: 此方法不再作为抽象方法，并默认使用BotManager中的DefaultBot进行送信
      * @param dependCenter 依赖中心
      * @param manager      监听器管理中心
-     * @param botManager   bot管理中心
      * @return
      */
-    protected abstract MsgSender getDefaultSender(DependCenter dependCenter, ListenerManager manager, BotManager botManager);
+    protected MsgSender getDefaultMsgSender(DependCenter dependCenter, ListenerManager manager, BotRuntime runtime, SenderSendList sender, SenderSetList setter, SenderGetList getter){
+        return new DefaultBotSender(sender, setter, getter, null, runtime);
+    }
 
     /**
      * 启动一个服务，这有可能是http或者是ws的监听服务
@@ -441,7 +449,7 @@ public abstract class BaseApplication<
 
 
         // 注册监听函数并构建ListenerManager
-        registerListener(config, app, scanner, dependCenter, botManager, exceptionProcessCenter);
+        manager = registerListener(config, app, scanner, dependCenter, botManager, exceptionProcessCenter);
 
 
         //**************** 加载所有的送信器拦截器 ****************//
@@ -503,20 +511,20 @@ public abstract class BaseApplication<
     private BotManager initBotManager(DependCenter dependCenter){
         // 初始化bot管理中心
         // 尝试从依赖中获取，如果获取不到，使用默认的管理中心并存入依赖
-        getLog().debug("botmanager.get.depend");
-        BotManager botManager = null;
-        try {
-            botManager = dependCenter.get(BotManager.class);
-        }catch (DependResourceException ignored){}
-        if(botManager == null){
-            PathAssembler pathAssembler = dependCenter.get(PathAssembler.class);
-            VerifyFunction verifyFunction = dependCenter.get(VerifyFunction.class);
-            botManager = new BotManagerImpl(pathAssembler, verifyFunction);
-            dependCenter.load(botManager);
-            getLog().debug("botmanager.get.default", botManager);
-        }
+//        getLog().debug("botmanager.get.depend");
+        BotManager botManager = dependCenter.get(BotManager.class);
+//        try {
+//            botManager =
+//        }catch (DependResourceException ignored){}
+//        if(botManager == null){
+//            PathAssembler pathAssembler = dependCenter.get(PathAssembler.class);
+//            VerifyFunction verifyFunction = dependCenter.get(VerifyFunction.class);
+//            botManager = new BotManagerImpl(pathAssembler, verifyFunction);
+//            dependCenter.load(botManager);
+//            getLog().debug("botmanager.get.default", botManager);
+//        }
         this.botManager = botManager;
-        getLog().debug("botmanager.load", botManager);
+//        getLog().debug("botmanager.load", botManager);
         return botManager;
     }
 
@@ -546,11 +554,12 @@ public abstract class BaseApplication<
      * 初始化Runtime对象
      * @param config config配置
      */
-    private void initRuntime(CONFIG config, DependCenter dependCenter, BotInfo[] botInfos){
+    private BotRuntime initRuntime(CONFIG config, DependCenter dependCenter, BotInfo[] botInfos){
         // 初始化BotRuntime
         try {
             BotRuntime botRuntime = BotRuntime.initRuntime(new ArrayList<>(), botInfos, config, dependCenter, this::getBotManager);
             dependCenter.load(botRuntime);
+            return botRuntime;
         } catch (CloneNotSupportedException e) {
             throw new RobotRunException("runtime.init.failed", e);
         }
@@ -710,7 +719,7 @@ public abstract class BaseApplication<
 
         // 构建监听器管理中心
         // 构建管理中心
-        manager = scanner.buildManager(botManager, exceptionProcessCenter, msgIntercepts);
+        ListenerManager manager = scanner.buildManager(botManager, exceptionProcessCenter, msgIntercepts);
 
         // 构建阻断器
         Plug plug = scanner.buildPlug();
@@ -728,8 +737,14 @@ public abstract class BaseApplication<
      * @return 依赖中心
      */
     private DependCenter scanAndInject(CONFIG config, Application<CONFIG> app) {
+        ClassLoader classLoader = config.getClassLoader();
         //包路径
-        String appPackage = app.getPackage().getName();
+        Package aPackage = app.getPackage();
+        if(aPackage == null){
+            throw new RobotRunException("packageNull");
+        }
+
+        String appPackage = aPackage.getName();
         Set<String> scanAllPackage = new HashSet<>();
 
         //配置完成后，如果没有进行扫描，则默认扫描启动类同级包
@@ -756,9 +771,33 @@ public abstract class BaseApplication<
             }};
         }
 
+
+        //**************** 追加自动装配扫描 ****************//
+        // 获取扫描路径
+        Set<Class<?>> moduleClasses = new HashSet<>();
+        try {
+            Properties[] moduleProperties = AutoDependReader.readModuleFactories(classLoader);
+            for (Properties mp : moduleProperties) {
+                // 获取scan列表
+                String[] moduleScanArray = AutoDependReader.modulePropertyScan(mp);
+                scannerPackage.addAll(Arrays.asList(moduleScanArray));
+                // 获取load列表
+                Class<?>[] moduleLoadArray = AutoDependReader.modulePropertyLoad(mp, classLoader);
+                moduleClasses.addAll(Arrays.asList(moduleLoadArray));
+            }
+        } catch (IOException e) {
+            QQLog.warning("run.module.init.failed", e, e.getLocalizedMessage());
+        }
+
+
+
+
+
         //**************** 执行扫描 ****************//
         //进行扫描并保存注册器
         this.register = scanner(scannerPackage);
+        // 追加module的Classes
+        this.register.addClasses(moduleClasses);
 
         //**************** 配置依赖注入相关 ****************//
         //配置依赖管理器
@@ -803,19 +842,21 @@ public abstract class BaseApplication<
         // ***** 注入一些其他的东西且无视异常 ***** //
 
         // 注入自己
-        dependCenter.loadIgnoreThrow(dependCenter);
+        dependCenter.load(dependCenter);
         // 注入CQCodeUtil
-        dependCenter.loadIgnoreThrow(CQCodeUtil.build());
+        dependCenter.load(CQCodeUtil.build());
         // 注入当前这个启动器
-        dependCenter.loadIgnoreThrow(this);
+        dependCenter.load(this);
         // 注入配置类 - 1.8.0 修改为Runtime初始化完成后再注入
 //        dependCenter.loadIgnoreThrow(config);
 
+        // 记录configProperties实例
+        dependCenter.load(configProperties);
 
         //如果有全局注入，先扫描并注入全局注入
         if (annotation != null) {
             //获取扫描器
-            FileScanner fileScanner = new FileScanner();
+            FileScanner fileScanner = new FileScanner(classLoader);
             //扫描
             for (String p : scanAllPackage) {
                 //全局扫描中，如果存在携带@beans的注解，则跳过.
@@ -824,6 +865,7 @@ public abstract class BaseApplication<
             }
             //获取扫描结果
             Set<Class<?>> classes = fileScanner.get();
+
             ScannerManager.getInstance(classes).registerDependCenterWithoutAnnotation(annotation.beans());
         }
 
@@ -974,11 +1016,15 @@ public abstract class BaseApplication<
         //用户进行配置
         app.before(configuration);
 
+        // 记录ConfigProperties
+        this.configProperties = configuration.getConfigProperties();
+
         //初始化
         init(app, configuration);
 
         //配置结束, 获取依赖管理器
         DependCenter dependCenter = afterConfig(configuration, app);
+
 
         // 依赖注入之后
         afterDepend(config, app, this.register, dependCenter);
@@ -989,22 +1035,29 @@ public abstract class BaseApplication<
         // > 启动之前
         beforeStart(configuration);
 
+        // 启动之前，开始初始化dependCenter的需要初始化的对象
+        dependCenter.initDependWhoNeed();
+
         //开始验证账号并连接
-        // 验证账号
+        // 获取待验证账号列表
         BotInfo[] botInfos = verifyBot(configuration.getAdvanceBotInfo());
         getLog().debug("runtime.bot.verify");
         // 初始化Runtime对象
-        initRuntime(config, dependCenter, botInfos);
+        BotRuntime botRuntime = initRuntime(config, dependCenter, botInfos);
+        getConf().setDefaultBotInfo(getBotManager().defaultBot());
         getLog().debug("runtime.init");
         // 连接/启动
-        StartResult startResult = start(dependCenter, manager);
+        DefaultSenders<SEND, SET, GET> defaultSenders = getDefaultSenders(botManager);
+        StartResult startResult = start(dependCenter, manager, botRuntime, defaultSenders);
         String name = startResult.getStartName();
 
-        CONTEXT componentContext = getComponentContext(startResult.getDefaultMsgSender(),
+        CONTEXT componentContext = getComponentContext(
+                defaultSenders,
                 botManager,
                 startResult.getMsgParser(),
                 startResult.getMsgProcessor(),
-                dependCenter);
+                dependCenter
+        );
 
         // 展示系统信息
         showSystemInfo(configuration);
@@ -1022,6 +1075,11 @@ public abstract class BaseApplication<
         // 展示连接成功的信息
         String msg = "start.success";
         getLog().info(msg, Colors.builder().add(name, Colors.FONT.DARK_GREEN).build(), e - s);
+
+        // 如果没有注册任何Bot，出现警告
+        if(botManager.bots().length == 0){
+            getLog().warning("bot.empty");
+        }
 
         //连接之后
         app.after(cqCodeUtil, this.defaultMsgSender);
@@ -1144,4 +1202,52 @@ public abstract class BaseApplication<
         };
         return RandomUtil.getRandomElement(s);
     }
+
+    /**
+     * 三个送信器的临时承载类
+     * @param <SEND>
+     * @param <SET>
+     * @param <GET>
+     */
+    protected static class DefaultSenders<
+            SEND extends SenderSendList,
+            SET extends SenderSetList,
+            GET extends SenderGetList> {
+        private SEND sender;
+        private SET setter;
+        private GET getter;
+
+        public DefaultSenders(SEND sender, SET setter, GET getter) {
+            this.sender = sender;
+            this.setter = setter;
+            this.getter = getter;
+        }
+
+        public SEND getSender() {
+            return sender;
+        }
+
+        public void setSender(SEND sender) {
+            this.sender = sender;
+        }
+
+        public SET getSetter() {
+            return setter;
+        }
+
+        public void setSetter(SET setter) {
+            this.setter = setter;
+        }
+
+        public GET getGetter() {
+            return getter;
+        }
+
+        public void setGetter(GET getter) {
+            this.getter = getter;
+        }
+
+
+    }
+
 }

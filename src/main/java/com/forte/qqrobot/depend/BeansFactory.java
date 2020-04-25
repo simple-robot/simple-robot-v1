@@ -1,6 +1,7 @@
 package com.forte.qqrobot.depend;
 
 import com.forte.lang.Language;
+import com.forte.qqrobot.PriorityConstant;
 import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.exception.AnnotationException;
@@ -288,7 +289,7 @@ public class BeansFactory {
         boolean single = true;
         // /** 类下所有字段是否都作为依赖注入 */
         boolean allDepend = false;
-        int priority = Integer.MAX_VALUE;
+        int priority = PriorityConstant.FIRST_LAST;
         // /** 实例化所需要的参数列表及其对应的name */
         // 由于实例已经确定，不需要再去获取参数
         NameTypeEntry[] instanceNeed = NameTypeEntry.getEmpty();

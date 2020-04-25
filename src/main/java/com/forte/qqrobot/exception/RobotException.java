@@ -195,25 +195,6 @@ public class RobotException extends Exception {
         return tagFormat.length;
     }
 
-    /**
-     * 重写本地化描述
-     * <br>
-     * <p>假如你不想使用语义化，可使用此代码进行重写</p>
-     * <code>
-     *     public String getLocalizedMessage() {
-     *         return super.getMessage();
-     *     }
-     * </code>
-     */
-    @Override
-    public String getLocalizedMessage() {
-        String localizedMessageTag = getLocalizedMessageTag();
-        if(localizedMessageTag != null){
-            return getMessageFormat(localizedMessageTag, tagFormat);
-        }else{
-            return super.getLocalizedMessage();
-        }
-    }
 
     /**
      * 获取语言化转化后的消息字符串
@@ -228,9 +209,13 @@ public class RobotException extends Exception {
      * @see #getLangMessage()
      */
     @Override
-    @Deprecated
     public String getMessage(){
-        return super.getMessage();
+        String localizedMessageTag = getLocalizedMessageTag();
+        if(localizedMessageTag != null){
+            return getMessageFormat(localizedMessageTag, tagFormat);
+        }else{
+            return super.getMessage();
+        }
     }
 
     /**

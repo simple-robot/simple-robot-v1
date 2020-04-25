@@ -34,13 +34,22 @@ public class FileScanner {
     /**
      * 默认使用的类加载器
      */
-    private ClassLoader classLoader = FileScanner.class.getClassLoader();   //默认使用的类加载器
+    private ClassLoader classLoader;
 
     /**
-     * 构造
+     * 构造，指定默认的类加载器为当前线程的类加载器
      */
     public FileScanner(){
+        classLoader = Thread.currentThread().getContextClassLoader();
     }
+
+    /**
+     * 使用指定的类加载器
+     */
+    public FileScanner(ClassLoader classLoader){
+        this.classLoader = classLoader;
+    }
+
 
     /**
      * 根据过滤规则查询
@@ -104,7 +113,11 @@ public class FileScanner {
         file.listFiles(chiFile -> {
             if (chiFile.isDirectory()) {
                 //如果是文件夹，递归扫描
-                set.addAll(findClassLocal(packName + "." + chiFile.getName(), classFilter));
+                if(packName.length() == 0){
+                    set.addAll(findClassLocal(chiFile.getName(), classFilter));
+                }else{
+                    set.addAll(findClassLocal(packName + "." + chiFile.getName(), classFilter));
+                }
             }
             if (chiFile.getName().endsWith(".class")) {
                 Class<?> clazz = null;

@@ -44,7 +44,7 @@ public interface BotManager {
      * @param info bot信息，作为key的code信息将会从其中获取。info中的各项参数不可为null
      * @return 是否注册成功
      */
-    boolean registerBot(BotInfo info);
+    BotInfo registerBot(BotInfo info);
 
     /**
      * 注册一个bot。
@@ -54,7 +54,7 @@ public interface BotManager {
      * @param path 请求路径
      * @return 是否注册成功
      */
-    default boolean registerBot(String code, String ip, int port, String path){
+    default BotInfo registerBot(String code, String ip, int port, String path){
         return registerBot(code, getPathAssembler().apply(ip, port, path));
     }
 
@@ -64,7 +64,7 @@ public interface BotManager {
      * @param fullPath  完整路径
      * @return 是否注册成功
      */
-    default boolean registerBot(String code, String fullPath){
+    default BotInfo registerBot(String code, String fullPath){
         return registerBot(new BotInfoImpl(code, fullPath, null, null));
     }
 
@@ -75,7 +75,7 @@ public interface BotManager {
      * @param path      请求路径
      * @return  是否注册成功
      */
-    default boolean registerBot(String ip, int port, String path){
+    default BotInfo registerBot(String ip, int port, String path){
         return registerBot(null, ip, port, path);
     }
 
@@ -84,7 +84,7 @@ public interface BotManager {
      * @param fullPath 完整路径
      * @return  是否注册成功
      */
-    default boolean registerBot(String fullPath){
+    default BotInfo registerBot(String fullPath){
         return registerBot(null, fullPath);
     }
 

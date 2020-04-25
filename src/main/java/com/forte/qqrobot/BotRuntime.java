@@ -103,14 +103,16 @@ public class BotRuntime {
         BotManager botManager = botManagerSupplier.get();
         // 注册信息
         for (BotInfo botInfo : botInfos) {
-            if (botManager.registerBot(botInfo)) {
+            BotInfo registerBotInfo = botManager.registerBot(botInfo);
+            if (registerBotInfo != null) {
+                botInfo = registerBotInfo;
                 LoginInfo info = botInfo.getInfo();
                 String name = info.getName() + "(" + info.getCode() + ")";
                 // 注册成功
                 QQLog.info("runtime.bot.register", name);
             } else {
                 // 注册失败
-                QQLog.warning("runtime.bot.register.failed", botInfo.getBotCode());
+                QQLog.warning("runtime.bot.register.failed", botInfo);
             }
         }
         runtime = new BotRuntime(listenerInfos, botManager, dependCenter, (BaseConfiguration) configuration.clone());

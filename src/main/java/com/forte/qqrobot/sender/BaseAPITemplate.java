@@ -14,21 +14,6 @@ import java.util.StringJoiner;
  */
 public class BaseAPITemplate {
 
-//    /**
-//     * 发布群公告
-//     * 目前，top、toNewMember、confirm参数是无效的
-//     * @param group 群号
-//     * @param title 标题
-//     * @param text   正文
-//     * @param top    是否置顶，默认false
-//     * @param toNewMember 是否发给新成员 默认false
-//     * @param confirm 是否需要确认 默认false
-//     * @return 是否发布成功
-//     */
-//    public void sendGroupNotice(String group, String title, String text, boolean top, boolean toNewMember, boolean confirm){
-//        throw new RuntimeException();
-//    }
-
     /**
      * 获取群详细信息
      * @param http http送信器

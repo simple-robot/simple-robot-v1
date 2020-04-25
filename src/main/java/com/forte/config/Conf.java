@@ -15,8 +15,11 @@ import java.lang.annotation.*;
 @Inherited  //可继承的
 public @interface Conf {
 
-    /** 配置名称，一般用xxx.xxx的这种格式。 */
-    String value();
+    /**
+     * 配置名称，一般用xxx.xxx的这种格式。如果配置中没有内容，则会视为无效。
+     * 尽量不要在类与字段上同时存在多个，会极大的降低效率。
+     * */
+    String[] value();
 
     /**
      * 是否只有当字段为null的时候才注入

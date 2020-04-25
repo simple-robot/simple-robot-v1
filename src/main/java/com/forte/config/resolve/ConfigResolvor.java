@@ -92,54 +92,75 @@ public class ConfigResolvor {
                     }
                 })
                 .filter(Objects::nonNull)
-                .map(fc -> {
+                .flatMap(fc -> {
                     Field field = fc.getKey();
                     Conf conf = fc.getValue();
+                    String[] confValueArray = conf.value();
+                    if(confValueArray.length == 0){
+                        return null;
+                    }
 
-                    // 对应的键名称
-                    String keyName;
-                    String baseValue = baseConf == null ? "" : baseConf.value();
-                    if (baseValue.trim().length() == 0) {
-                        keyName = conf.value();
-                    } else {
-                        keyName = baseValue + "." + conf.value();
+                    Map<String, Map.Entry<Class, BiFunction<Object, T, T>>> allResultMap = new HashMap<>(1);
+
+                    String[] baseValueArray;
+                    if(baseConf == null){
+                        baseValueArray = new String[]{""};
+                    }else{
+                        String[] baseConfValueArray = baseConf.value();
+                        baseValueArray  = baseConfValueArray.length > 0 ? baseConfValueArray : new String[]{""};
                     }
 
 
-                    // 构建函数
-                    String getterName = conf.getterName();
-                    if(getterName.trim().length() == 0){
-                        getterName = null;
-                    }
-                    // 判断是否可以注入的函数
-                    Predicate<T> canInject = canInject(type, field, conf.onlyNull(), conf.getter(), getterName);
-
-                    String setterName = conf.setterName();
-                    if(setterName.trim().length() == 0){
-                        setterName = null;
-                    }
-                    Class<?> setterParamType = conf.setterParameterType();
-                    if(setterParamType == Object.class){
-                        setterParamType = field.getType();
-                    }
-
-                    // 实际进行注入的函数, 一个实例，一个参数
-                    BiConsumer<T, Object> doInject = doInject(type, field, conf.setter(), setterName, setterParamType);
+                    // 遍历所有的conf key
+                    for (String confValue : confValueArray) {
+                        // 对应的键名称
+                        String keyName;
+                        for (String baseValue : baseValueArray) {
+                            if (baseValue.trim().length() == 0) {
+                                keyName = confValue;
+                            } else {
+                                keyName = baseValue + "." + confValue;
+                            }
 
 
-                    AbstractMap.SimpleEntry<Class, BiFunction<Object, T, T>> typeFunction
-                            = new AbstractMap.SimpleEntry<>(setterParamType, ((o, b) -> {
-                        // 如果可以注入
-                        if (canInject.test(b)) {
-                            // 执行注入
-                            doInject.accept(b, o);
+                            // 构建函数
+                            String getterName = conf.getterName();
+                            if(getterName.trim().length() == 0){
+                                getterName = null;
+                            }
+                            // 判断是否可以注入的函数
+                            Predicate<T> canInject = canInject(type, field, conf.onlyNull(), conf.getter(), getterName);
+
+                            String setterName = conf.setterName();
+                            if(setterName.trim().length() == 0){
+                                setterName = null;
+                            }
+                            Class<?> setterParamType = conf.setterParameterType();
+                            if(setterParamType == Object.class){
+                                setterParamType = field.getType();
+                            }
+
+                            // 实际进行注入的函数, 一个实例，一个参数
+                            BiConsumer<T, Object> doInject = doInject(type, field, conf.setter(), setterName, setterParamType);
+
+
+                            Map.Entry<Class, BiFunction<Object, T, T>> typeFunction
+                                    = new AbstractMap.SimpleEntry<>(setterParamType, ((o, b) -> {
+                                // 如果可以注入
+                                if (canInject.test(b)) {
+                                    // 执行注入
+                                    doInject.accept(b, o);
+                                }
+                                return b;
+                            }));
+                            // 记录
+                            allResultMap.put(keyName, typeFunction);
                         }
-                        return b;
-                    }));
+                    }
 
                     // 返回两函数的合并
-                    return new AbstractMap.SimpleEntry<>(keyName, typeFunction);
-                }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    return allResultMap.entrySet().stream();
+                }).filter(Objects::nonNull).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     }
 

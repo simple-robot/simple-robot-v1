@@ -24,8 +24,11 @@ import java.util.Objects;
  **/
 public interface TimeJob extends Job {
 
-    /** 同名方法，获取并注入两个定时任务参数 */
-    void execute(MsgSender msgSender, CQCodeUtil cqCodeUtil);
+    /**
+     * 同名方法，获取并注入两个定时任务参数
+     * 如果想要发送消息，请试着使用{@code BotRuntime().getRuntime().getBotManager()}
+     * */
+    void execute(@Deprecated MsgSender msgSender, CQCodeUtil cqCodeUtil);
 
     /** 仅用于获取定时任务参数 */
     @Override

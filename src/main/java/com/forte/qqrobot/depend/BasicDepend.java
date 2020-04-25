@@ -1,6 +1,8 @@
 package com.forte.qqrobot.depend;
 
 
+import com.forte.qqrobot.PriorityConstant;
+
 /**
  * 基础数据类型的Depend对象
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
@@ -15,7 +17,7 @@ public class BasicDepend<V> extends Depend<V> {
      * @param value 值
      */
     public BasicDepend(String name, Class<V> type, V value) {
-        super(name, type, true, () -> value, v -> {}, (v, add) -> {}, false, Integer.MAX_VALUE);
+        super(name, type, true, () -> value, v -> {}, (v, add) -> {}, false, PriorityConstant.FIRST_LAST);
     }
 
     public static <T> BasicDepend<T> getInstance(String name, T value){

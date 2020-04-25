@@ -2,12 +2,16 @@ lang.init.finished=语言已初始化完毕。
 
 # 异常相关
 
+# ModuleException
+exception.module.load=加载自动配置异常！{0}
+
 # exception.exceptionProcess
 exception.exceptionProcess.exists=已存在针对异常类型[{0}]的处理！同一个类型的异常处理不能存在多个: {1}, {2}
 
 # RobotRunException相关
 exception.robotRun.moreDepends=扫描到多个[ {0} ]的实现类。
 exception.robotRun.runtime.init.failed=Runtime初始化异常
+exception.robotRun.packageNull=启动器没有包结构！
 
 # AnnotationException相关，其中包括AnnotationUtils中出现的格式化参数
 exception.annotation.class=类[{0}]不应当使用[{1}]注解: {2}
@@ -93,6 +97,7 @@ exception.timeTask.registerWhyFailed=定时任务[{0}]注册失败: {1}
 
 # RobotApiException相关
 exception.api.notSupport=组件所不支持的API类型：[ {0} ]
+exception.api.noDefault=当前没有默认bot送信器！可能尚未注册任何Bot信息。
 
 # FilterException相关
 exception.filter.exists=已经存在自定义过滤器：{0}
@@ -140,6 +145,7 @@ run.thread.blockingFactor=线程阻塞系数：{0}
 run.thread.size=线程池核心大小：{0}
 run.thread.maxSize=线程池最大大小：{0}
 
+run.module.init.failed=module配置读取失败！{0}
 
 run.start.success={0}启动成功, 耗时 {1} ms
 run.depend.load=加载依赖 >> {0}
@@ -171,6 +177,7 @@ run.botmanager.load=加载账号管理器 {0}
 run.runtime.init=Runtime初始化完毕。
 run.runtime.bot.verify=Bot账号列表验证完成。
 run.bot.info=账号信息获取成功: 账号: {0}, 昵称: {1}, 等级: {2}
+run.bot.empty=警告！你尚未注册任何Bot信息！在你注册之前，将无法使用任何非监听函数中的送信器。
 
 # runtime
 runtime.bot.register=账号[{0}]注册成功！

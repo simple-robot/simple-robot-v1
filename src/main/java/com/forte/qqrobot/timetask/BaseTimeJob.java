@@ -11,19 +11,4 @@ import org.quartz.Job;
  **/
 public abstract class BaseTimeJob implements TimeJob, Job {
 
-//    /** 同名方法，获取并注入两个定时任务参数 */
-//    public abstract void execute(MsgSender msgSender, CQCodeUtil cqCodeUtil);
-//
-//    /** 仅用于获取定时任务参数 */
-//    @Override
-//    public void execute(JobExecutionContext context) {
-//       try{
-//           CQCodeUtil cqCodeUtil = TimeTaskContext.getCQCodeUtil(context);
-//           MsgSender msgSender = TimeTaskContext.getMsgSender(context);
-//           execute(msgSender, cqCodeUtil);
-//       }catch (Exception e){
-//           throw new TimeTaskException(e);
-//       }
-//    }
-
 }

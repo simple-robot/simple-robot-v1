@@ -56,11 +56,20 @@ public class ScannerManager implements Register {
        return new ScannerManager(classes);
     }
 
+
+
     /**
      * 直接获取实例
      */
     public static ScannerManager getInstance(Set<Class<?>> classes){
         return new ScannerManager(classes);
+    }
+
+    @Override
+    public void addClasses(Collection<Class<?>> plusClasses) {
+        if(plusClasses != null){
+            this.classes.addAll(plusClasses);
+        }
     }
 
     /**

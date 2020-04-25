@@ -101,4 +101,9 @@ public class BotInfoImpl implements BotInfo {
         return "botInfo(code=" + botCode + ", path=" + path + ", info=" + info + ")";
     }
 
+    /**
+     * nothing
+     */
+    @Override
+    public void close() { }
 }
