@@ -1,10 +1,9 @@
 package com.forte.qqrobot;
 
 /**
- * 优先级常量类，由于框架中大部分存在优先级策略的均为JDK升序排序，因此此类定义一些用于排序的常量。
- * @author ForteScarlet <[email]ForteScarlet@163.com>
- * @since JDK1.8
+ * @see {@link com.forte.qqrobot.constant.PriorityConstant}
  **/
+@Deprecated
 public class PriorityConstant {
 
     /* 优先级最低的倒数10个 */

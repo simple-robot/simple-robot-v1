@@ -1,6 +1,6 @@
 package com.forte.qqrobot.anno.depend;
 
-import com.forte.qqrobot.PriorityConstant;
+import com.forte.qqrobot.constant.PriorityConstant;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,7 +1,7 @@
 package com.forte.qqrobot.depend;
 
 import com.forte.lang.Language;
-import com.forte.qqrobot.PriorityConstant;
+import com.forte.qqrobot.constant.PriorityConstant;
 import com.forte.qqrobot.depend.parameter.ParamGetterManager;
 import com.forte.qqrobot.depend.parameter.ParamNameGetter;
 import com.forte.qqrobot.depend.util.DependUtil;

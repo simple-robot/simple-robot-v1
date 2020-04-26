@@ -1,6 +1,6 @@
 package com.forte.qqrobot.depend;
 
-import com.forte.qqrobot.PriorityConstant;
+import com.forte.qqrobot.constant.PriorityConstant;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.anno.depend.Depend;
 

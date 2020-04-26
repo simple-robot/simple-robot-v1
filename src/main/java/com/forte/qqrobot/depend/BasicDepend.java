@@ -1,7 +1,7 @@
 package com.forte.qqrobot.depend;
 
 
-import com.forte.qqrobot.PriorityConstant;
+import com.forte.qqrobot.constant.PriorityConstant;
 
 /**
  * 基础数据类型的Depend对象
