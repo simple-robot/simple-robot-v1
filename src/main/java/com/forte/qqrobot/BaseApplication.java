@@ -449,7 +449,7 @@ public abstract class BaseApplication<
 
 
         // 注册监听函数并构建ListenerManager
-        manager = registerListener(config, app, scanner, dependCenter, botManager, exceptionProcessCenter);
+        manager = registerListener(config, app, scanner, dependCenter, botManager, exceptionProcessCenter, config.getBotCheck());
 
 
         //**************** 加载所有的送信器拦截器 ****************//
@@ -693,7 +693,8 @@ public abstract class BaseApplication<
      */
     private ListenerManager registerListener(CONFIG config, Application<CONFIG> app, ListenerMethodScanner scanner,
                                   DependCenter dependCenter, BotManager botManager,
-                                  ExceptionProcessCenter exceptionProcessCenter
+                                  ExceptionProcessCenter exceptionProcessCenter,
+                                  boolean checkBot
                                   ) {
         // > 监听函数注册之前
         beforeRegisterListener(config, app, scanner, dependCenter);
@@ -719,7 +720,7 @@ public abstract class BaseApplication<
 
         // 构建监听器管理中心
         // 构建管理中心
-        ListenerManager manager = scanner.buildManager(botManager, exceptionProcessCenter, msgIntercepts);
+        ListenerManager manager = scanner.buildManager(botManager, exceptionProcessCenter, msgIntercepts, checkBot);
 
         // 构建阻断器
         Plug plug = scanner.buildPlug();

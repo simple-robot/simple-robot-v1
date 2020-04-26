@@ -246,6 +246,14 @@ public class ListenerMethodScanner {
     }
 
     /**
+     * 构建监听函数管理器实例
+     * @return 监听函数管理器实例
+     */
+    public ListenerManager buildManager(BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, MsgIntercept[] intercepts, boolean checkBot){
+        return new ListenerManager(listenerMethodSet, botManager, exceptionProcessCenter, intercepts, checkBot);
+    }
+
+    /**
      * 构建监听函数阻断器
      * @return 监听函数阻断器
      */

@@ -1,7 +1,12 @@
 ## 版本更新记录
 
+# now
+- 配置中增加一个配置项`simbot.core.checkBot`，默认为true。当为true的时候，监听函数触发前会优先判断当前消息所接收的bot是否为已注册的bot。
+- 简单优化HttpClientAble
+
+
 # 1.12.0 (beta)
-- 优化依赖工厂，并修复部分隐藏nug
+- 优化依赖工厂，并修复部分隐藏bug
 - `@Beans`增加两个参数：`boolean init() default false`和`int priority() default Integer.MAX_VALUE`
 分别代表被标注的Beans是否在依赖工厂注入流程结束后执行一次初始化和这个Beans的优先级。
 - 为`@Beans`追加优先级概念。当在通过类型获取一个Beans的时候，如果依赖工厂中存在多个此类型的实例，则会选择优先级最高的(`升序排序，即数值最小的`)使用。

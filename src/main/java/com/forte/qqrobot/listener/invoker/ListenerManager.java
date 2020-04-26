@@ -104,16 +104,24 @@ public class ListenerManager implements MsgReceiver {
     private Map<String, Object> exceptionContextGlobalMap = new ConcurrentHashMap<>(2);
 
     /**
+     * 是否验证bot
+     */
+    private boolean checkBot;
+
+    /**
      * 接收到了消息
      */
     @Override
     public ListenResult[] onMsg(MsgGet msgget, SenderSendList sender, SenderSetList setter, SenderGetList getter){
-        // 首先对bot进行判断
-        String thisCode = msgget.getThisCode();
-        // 如果thisCode为null，则可能代表组件不支持多bot的区分
-        if(thisCode != null && botManager.getBot(thisCode) == null){
-            QQLog.error("listener.bot.noVerify", thisCode);
-            return EMPTY_RESULT;
+        // 判断是否需要检测bot信息
+        if(checkBot){
+            // 首先对bot进行判断
+            String thisCode = msgget.getThisCode();
+            // 如果thisCode为null，则可能代表组件不支持多bot的区分
+            if(thisCode != null && botManager.getBot(thisCode) == null){
+                QQLog.error("listener.bot.noVerify", thisCode);
+                return EMPTY_RESULT;
+            }
         }
 
         // 构建一个监听函数上下文对象
@@ -461,19 +469,31 @@ public class ListenerManager implements MsgReceiver {
     }
 
 
+    public boolean isCheckBot() {
+        return checkBot;
+    }
 
+    public void setCheckBot(boolean checkBot) {
+        this.checkBot = checkBot;
+    }
 
-    /**
-     * 构造方法，对函数进行分组保存
-     * @param methods 函数集合
-     * @param intercepts 消息拦截器数组 nullable
-     */
     public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, MsgIntercept[] intercepts){
+        this(methods, botManager, exceptionProcessCenter, intercepts, true);
+    }
+
+        /**
+         * 构造方法，对函数进行分组保存
+         * @param methods 函数集合
+         * @param intercepts 消息拦截器数组 nullable
+         */
+    public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, MsgIntercept[] intercepts, boolean checkBot){
         // bot管理器
         this.botManager = botManager;
 
         // 异常处理中心
         this.exceptionProcessCenter = exceptionProcessCenter;
+
+        this.checkBot = true;
 
         // 排序并构建消息拦截器
         if(intercepts != null){

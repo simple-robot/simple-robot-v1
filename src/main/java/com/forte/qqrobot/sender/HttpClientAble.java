@@ -97,7 +97,7 @@ public interface HttpClientAble {
      * @return 响应结果
      */
     default String postJson(String url, String params, Map<String, String> cookies, Map<String, String> header){
-        header.put("Content-type", CONTENT_TYPE_JSON);
+        header.putIfAbsent("Content-type", CONTENT_TYPE_JSON);
         return post(url, params, cookies, header);
     }
     /**
@@ -156,7 +156,7 @@ public interface HttpClientAble {
      * @return 响应结果
      */
     default String postForm(String url, String params, Map<String, String> cookies, Map<String, String> header){
-        header.put("Content-type", CONTENT_TYPE_FORM);
+        header.putIfAbsent("Content-type", CONTENT_TYPE_FORM);
         return post(url, params, cookies, header);
     }
 
@@ -219,7 +219,7 @@ public interface HttpClientAble {
      * @return 响应结果
      */
     default String postXml(String url, String params, Map<String, String> cookies, Map<String, String> header){
-        header.put("Content-type", CONTENT_TYPE_TEXT_XML);
+        header.putIfAbsent("Content-type", CONTENT_TYPE_TEXT_XML);
         return post(url, params, cookies, header);
     }
 

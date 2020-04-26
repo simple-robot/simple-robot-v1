@@ -267,8 +267,14 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
         }
     }
 
-    /** 部分配置过程需要使用类加载器，此处指定类加载器。默认为当前线程的类加载器。 */
+    /**
+     * 部分配置过程需要使用类加载器，此处指定类加载器。默认为当前线程的类加载器。
+     * 此配置无法使用配置文件配置。
+     */
     private ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+    @Conf(value = "core.botCheck", comment = "是否在触发监听函数之前检测bot账号的注册情况。默认为true")
+    private Boolean botCheck = true;
 
 
     //**************************************
@@ -923,6 +929,14 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
 
     public ConfigPropertiesImpl getConfigProperties() {
         return configProperties;
+    }
+
+    public Boolean getBotCheck() {
+        return botCheck;
+    }
+
+    public void setBotCheck(Boolean botCheck) {
+        this.botCheck = botCheck;
     }
 
     /**
