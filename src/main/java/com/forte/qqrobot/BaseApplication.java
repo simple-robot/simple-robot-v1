@@ -7,7 +7,6 @@ import com.forte.plusutils.consoleplus.console.ColorsBuilder;
 import com.forte.plusutils.consoleplus.console.colors.BackGroundColorTypes;
 import com.forte.plusutils.consoleplus.console.colors.ColorTypes;
 import com.forte.plusutils.consoleplus.console.colors.FontColorTypes;
-import com.forte.qqrobot.anno.Config;
 import com.forte.qqrobot.anno.DIYFilter;
 import com.forte.qqrobot.anno.HttpTemplate;
 import com.forte.qqrobot.anno.depend.AllBeans;
@@ -511,20 +510,8 @@ public abstract class BaseApplication<
     private BotManager initBotManager(DependCenter dependCenter){
         // 初始化bot管理中心
         // 尝试从依赖中获取，如果获取不到，使用默认的管理中心并存入依赖
-//        getLog().debug("botmanager.get.depend");
         BotManager botManager = dependCenter.get(BotManager.class);
-//        try {
-//            botManager =
-//        }catch (DependResourceException ignored){}
-//        if(botManager == null){
-//            PathAssembler pathAssembler = dependCenter.get(PathAssembler.class);
-//            VerifyFunction verifyFunction = dependCenter.get(VerifyFunction.class);
-//            botManager = new BotManagerImpl(pathAssembler, verifyFunction);
-//            dependCenter.load(botManager);
-//            getLog().debug("botmanager.get.default", botManager);
-//        }
         this.botManager = botManager;
-//        getLog().debug("botmanager.load", botManager);
         return botManager;
     }
 
@@ -810,8 +797,7 @@ public abstract class BaseApplication<
         if (dependGetter == null) {
             dependGetter = register.performingTasks(
                     //过滤出携带者Config注解的、不是接口和抽象类的、是DependGetter的子类的
-                    c -> (AnnotationUtils.getAnnotation(c, Config.class) != null) &&
-                            (FieldUtils.notInterfaceAndAbstract(c)) && (FieldUtils.isChild(c, DependGetter.class)),
+                    c -> (FieldUtils.notInterfaceAndAbstract(c)) && (FieldUtils.isChild(c, DependGetter.class)),
                     //看看有没有，如果有，赋值。
                     cs -> {
                         if (cs.length == 1) {
@@ -1026,6 +1012,7 @@ public abstract class BaseApplication<
         //配置结束, 获取依赖管理器
         DependCenter dependCenter = afterConfig(configuration, app);
 
+        getLog().debug("depend.init.finish");
 
         // 依赖注入之后
         afterDepend(config, app, this.register, dependCenter);
@@ -1035,9 +1022,6 @@ public abstract class BaseApplication<
 
         // > 启动之前
         beforeStart(configuration);
-
-        // 启动之前，开始初始化dependCenter的需要初始化的对象
-        dependCenter.initDependWhoNeed();
 
         //开始验证账号并连接
         // 获取待验证账号列表
@@ -1060,6 +1044,12 @@ public abstract class BaseApplication<
                 dependCenter
         );
 
+        // 记录Context
+        dependCenter.load(componentContext);
+
+        // 初始化dependCenter的需要初始化的对象
+        dependCenter.initDependWhoNeed();
+
         // 展示系统信息
         showSystemInfo(configuration);
         showBotInfo(getBotManager());
@@ -1068,14 +1058,16 @@ public abstract class BaseApplication<
         afterStart(configuration);
 
         //获取CQCodeUtil实例
-        CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
+        CQCodeUtil cqCodeUtil = CQCodeUtil.build();
 
         after(configuration, startResult.getDefaultMsgSender());
 
         long e = System.currentTimeMillis();
+
         // 展示连接成功的信息
         String msg = "start.success";
         getLog().info(msg, Colors.builder().add(name, Colors.FONT.DARK_GREEN).build(), e - s);
+
 
         // 如果没有注册任何Bot，出现警告
         if(botManager.bots().length == 0){

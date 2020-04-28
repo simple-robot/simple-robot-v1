@@ -1,64 +1,17 @@
 package com.forte.qqrobot.utils;
 
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * <p>
  * 字段操作工具，提供丰富的方法，以反射的方式从对象中获取值或赋值。<br>
  * 说是字段操作工具，但是不止操作字段
- * 其中:<br>
- * - objectGetter方法可以允许使用多级字段，例如"user.child.name"<br>
- * - getExcelNum方法可以获取Excel中列的数字坐标，例如:"AA" => 27<br>
- * </p>
- * <br>
- * <p>
- * 实现了缓存优化，使得效率大幅上升
- * 由于希望将其作为一个简单的工具类使用，因此全部使用内部类实现
- * <blockquote>
- * <p>2018-12-15 多层级缓存优化-getter测试结果：</p>
- * <footer>
- * 次数：500w<br>
- * 深度：100 <br>
- * -没有缓存的:<br>
- * &nbsp;&nbsp;&nbsp;&nbsp;
- * >总用时：1635s ; 1635950ms<br>
- * &nbsp;&nbsp;&nbsp;&nbsp;
- * >平均用时：.33ms<br>
- * -有缓存的:<br>
- * &nbsp;&nbsp;&nbsp;&nbsp;
- * >总用时：18s ; 18216ms<br>
- * &nbsp;&nbsp;&nbsp;&nbsp;
- * >平均用时：.00ms<br>
- * </footer>
- * </blockquote>
- * <br>
- * <blockquote>
- * <p>2018-12-15至2018-12-16 多层级缓存优化-getter测试结果：</p>
- * <footer>
- * 次数：5亿<br>
- * 深度：200<br>
- * -没有缓存的：<br>
- * &nbsp;&nbsp;&nbsp;&nbsp;
- * >总用时：至终止程序为止，用时11 小时 50 分 13 秒
- * &nbsp;&nbsp;&nbsp;&nbsp;
- * >控制台可见进度：6.89%左右
- * &nbsp;&nbsp;&nbsp;&nbsp;
- * >未执行完成，中途终止
- * -有缓存的：<br>
- * &nbsp;&nbsp;&nbsp;&nbsp;
- * >总用时：3433s ; 3433008ms
- *
- * </footer>
- * </blockquote>
- * </p>
- *
  * @author ForteScarlet
  */
 public class FieldUtils {
@@ -149,159 +102,6 @@ public class FieldUtils {
     };
 
     /**
-     * 获取Excel中列的数字坐标<br>
-     * 例如:"AA" => 27
-     *
-     * @param colStr Excel中的列坐标
-     * @return 此列坐标对应的数字
-     * @author ForteScarlet
-     */
-    public static long getExcelNum(String colStr) {
-        //获取数组
-        char[] array = colStr.toCharArray();
-        //长度
-        int length = array.length;
-        //初始数
-        long end = 1;
-
-        //倒序遍历,从小位开始遍历
-        for (int i = array.length - 1; i >= 0; i--) {
-            //字母序号
-            int num = WORD_NUMBER.get((array[i] + "").toLowerCase());
-            //加成
-            int addBuffer = length - i - 1;
-            //结果加成
-            end += num * (int) (Math.pow(26, addBuffer));
-        }
-
-        //返回结果
-        return end;
-    }
-
-    /**
-     * 获取对象的所有字段(包括没有get方法的字段)
-     *
-     * @param tClass 对象
-     * @return
-     * @author ForteScarlet
-     */
-    public static List<Field> getFieldsWithoutGetter(Class<?> tClass) {
-        Field[] fs = tClass.getDeclaredFields();
-        return Arrays.asList(fs);
-    }
-
-
-    /**
-     * 获取对象的所有字段(包括没有get方法的字段)
-     *
-     * @param t
-     * @param <T>
-     * @return
-     */
-    public static <T> List<Field> getFieldsWithoutGetter(T t) {
-        return getFieldsWithoutGetter(t.getClass());
-    }
-
-
-    /**
-     * 获取对象的所有字段名(包括没有get方法的字段)
-     *
-     * @param t 对象
-     * @return
-     * @author ForteScarlet
-     */
-    public static <T> List<String> getFieldsNameWithoutGetter(T t) {
-        return getFieldsWithoutGetter(t).stream().map(Field::getName).collect(Collectors.toList());
-    }
-
-    /**
-     * 获取对象的所有字段
-     *
-     * @param tClass 对象
-     * @return
-     * @author ForteScarlet
-     */
-    public static List<Field> getFieldsWithGetter(Class<?> tClass) {
-        Field[] fs = tClass.getDeclaredFields();
-        //返回时过滤掉没有get方法的字段
-        return Arrays.stream(fs).filter(f -> Arrays.stream(tClass.getMethods()).anyMatch(m -> m.getName().equals("get" + headUpper(f.getName())))).collect(Collectors.toList());
-    }
-
-    /**
-     * 获取对象的所有字段
-     *
-     * @param t
-     * @param <T>
-     * @return
-     */
-    public static <T> List<Field> getFieldsWithGetter(T t) {
-        return getFieldsWithGetter(t.getClass());
-    }
-
-    /**
-     * 获取对象的所有字段名
-     *
-     * @param t 对象
-     * @return
-     * @author ForteScarlet
-     */
-    public static <T> List<String> getFieldsNameWithGetter(T t) {
-        return getFieldsWithGetter(t).stream().map(Field::getName).collect(Collectors.toList());
-    }
-
-
-    /**
-     * 获取类指定的字段对象，支持多层级获取
-     *
-     * @param c
-     * @param fieldName
-     * @return
-     */
-    public static Field fieldGetter(Class c, String fieldName) {
-        //先进行缓存判断,如果缓存中有记录，直接返回
-        CacheField cacheField = getCacheField(c, fieldName);
-        if (cacheField != null) {
-            return cacheField.getField();
-        }
-
-        //可以获取多级字段的字段对象
-        //使用'.'切割字段名
-        String[] split = fieldName.split("\\.");
-        if (split.length == 1) {
-            //如果长度为1，则说明只有一级字段，直接获取字段对象
-            return getField(c, fieldName);
-        } else {
-            //如果不是1，则说明不止1层字段值
-            //当前字段名
-            String thisFieldName = split[0];
-            //剩下的字段名称拼接
-            //移除第一个字段
-            List<String> list = Arrays.stream(split).collect(Collectors.toList());
-            list.remove(0);
-            //拼接剩余
-            String otherFieldName = String.join(".", list);
-            //递归获取
-            //多层级也计入缓存
-            Field field = fieldGetter(getFieldClass(c, thisFieldName), otherFieldName);
-            //计入缓存
-            saveSingleCacheField(c, field, null, null);
-            return field;
-        }
-    }
-
-    /**
-     * 获取字段的class类型，支持多层级获取
-     *
-     * @param c
-     * @param fieldName
-     * @return
-     */
-    public static Class fieldClassGetter(Class c, String fieldName) {
-        return fieldGetter(c, fieldName).getType();
-    }
-
-
-    /**
      * 获取字段的getter方法,单层级
      *
      * @param whereIn
@@ -338,17 +138,6 @@ public class FieldUtils {
     public static Method getFieldGetter(Class<?> whereIn, Field field) {
         //获取getter方法
         return getFieldGetter(whereIn, field.getName());
-    }
-
-    /**
-     * 获取字段的getter方法
-     *
-     * @param obj
-     * @param field
-     * @return
-     */
-    public static Method getFieldGetter(Object obj, Field field) {
-        return getFieldGetter(obj.getClass(), field);
     }
 
 
@@ -428,54 +217,6 @@ public class FieldUtils {
      */
     public static Method getFieldSetter(Object obj, String fieldName) {
         return getFieldSetter(obj.getClass(), fieldName);
-    }
-
-    /**
-     * 获取字段的setter方法
-     *
-     * @param obj
-     * @param field
-     * @return
-     */
-    public static Method getFieldSetter(Object obj, Field field) {
-        return getFieldSetter(obj.getClass(), field);
-    }
-
-
-    /**
-     * 获取字段的getter方法，支持多层级获取
-     *
-     * @param objClass
-     * @param fieldName
-     * @return
-     * @throws NoSuchMethodException
-     */
-    public static Method fieldGetterGetter(Class objClass, String fieldName) throws NoSuchMethodException {
-        //判断是否有用“.”分割
-        String[] split = fieldName.split("\\.");
-        //如果分割后只有一个字段值，说明是单层
-        if (split.length == 1) {
-            //获取其get方法,返回执行结果
-            Method getter = getFieldGetter(objClass, fieldName);
-            if (getter == null) {
-                //抛出没有此方法异常
-                throw new NoSuchMethodException("没有找到类[" + objClass + "]字段[" + fieldName + "]的getter方法");
-            }
-            //返回获取结果
-            return getter;
-        } else {
-            //否则为多层级，深入获取
-            //获取第一个字段名，拼接其余字段名并进行递归处理
-            String field = split[0];
-            //移除第一个字段
-            List<String> list = Arrays.stream(split).collect(Collectors.toList());
-            list.remove(0);
-            //拼接剩余
-            String innerFieldName = String.join(".", list);
-
-            //递归
-            return fieldGetterGetter(fieldGetterGetter(objClass, field).getReturnType(), innerFieldName);
-        }
     }
 
     /**
@@ -601,202 +342,6 @@ public class FieldUtils {
     }
 
 
-    /**
-     * 通过对象的setter为字段赋值
-     * 支持类似“user.child”这种多层级的赋值方式
-     * 赋值的字段必须有其对应的公共set方法
-     * 如果多层级对象中有非底层级字段为null，将会尝试为其创建一个新的实例
-     * <p>
-     * TODO 旧
-     *
-     * @param t         对象
-     * @param fieldName 需要赋值的字段
-     * @param value     需要赋的值
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     */
-    public static void objectSetter(Object t, String fieldName, Object value) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
-        //判断是否有用“.”分割
-        String[] split = fieldName.split("\\.");
-        //如果分割后只有一个字段值，直接进行赋值
-        if (split.length == 1) {
-
-//            //先查询缓存
-//            Method cacheFieldSetter = getCacheFieldSetter(t.getClass() , fieldName);
-//            if(cacheFieldSetter != null){
-//                //如果缓存中有这个setter，直接使用
-//                //赋值
-//                MethodUtil.invoke(t , new Object[]{value} , cacheFieldSetter);
-//            }
-
-            //获取其set方法,返回执行结果
-            String setterName = "set" + FieldUtils.headUpper(fieldName);
-            //获取字段的setter方法
-            Method setter = getFieldSetter(t, fieldName);
-
-            //如果没有setter,展示异常提醒
-            // 直接抛出异常
-            if (setter == null) {
-                String error = "没有找到[" + t.getClass() + "]中的字段[" + fieldName + "]的setter方法，无法进行赋值";
-                throw new NoSuchFieldError(error);
-            } else {
-                //计入缓存-当前
-                saveSingleCacheFieldSetter(t.getClass(), fieldName, setter);
-                //赋值
-                MethodUtil.invoke(t, new Object[]{value}, setter);
-            }
-
-        } else {
-            //否则为多层级字段,获取第一个字段名，拼接其余字段名并进行递归处理
-            String field = split[0];
-            //移除第一个字段
-            List<String> list = Arrays.stream(split).collect(Collectors.toList());
-            list.remove(0);
-            //拼接剩余
-            fieldName = String.join(".", list);
-
-            //获取下一层的对象
-            Object fieldObject = objectGetter(t, field);
-            if (fieldObject == null) {
-                //如果为null，创建一个此类型的实例
-                fieldObject = getFieldClass(t, field).newInstance();
-                //并为此对象赋值
-                objectSetter(t, field, fieldObject);
-            }
-            //寻找下一层字段
-            objectSetter(fieldObject, fieldName, value);
-        }
-    }
-
-    /**
-     * 通过对象的setter为字段赋值
-     * 支持类似“user.child”这种多层级的赋值方式
-     * 赋值的字段必须有其对应的公共set方法
-     * 如果多层级对象中有非底层级字段为null，将会尝试为其创建一个新的实例
-     *
-     * @param t
-     * @param fieldName
-     * @param param
-     * @throws NoSuchMethodException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     */
-    @Deprecated
-    public static void objectSetter2(Object t, String fieldName, Object param) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        // TODO 发现bug，此方法会导致缓存无法储存
-        objectSetter(t, t, fieldName, fieldName, 1, param);
-    }
-
-    /**
-     * 通过对象的setter为字段赋值
-     * 支持类似“user.child”这种多层级的赋值方式
-     * 赋值的字段必须有其对应的公共set方法
-     * 如果多层级对象中有非底层级字段为null，将会尝试为其创建一个新的实例
-     *
-     * @param t
-     * @param root
-     * @param fieldName
-     * @param realFieldName
-     * @param level
-     * @param param
-     */
-    @Deprecated
-    private static void objectSetter(Object t, Object root, String fieldName, String realFieldName, int level, Object param) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
-        // TODO 实现缓存的setter方法
-        // TODO 存在严重bug，此方法会导致缓存无法储存和获取，导致getter效率大幅度下降
-        //先查询缓存
-        CacheField cacheField = getCacheField(t.getClass(), fieldName);
-        if (cacheField != null) {
-            //如果有缓存，获取执行结果
-            InvokeResult invokeResult = cacheField.fieldValueSet(t, param);
-            if (invokeResult.isSuccess()) {
-                //如果赋值成功，结束方法
-                return;
-            }
-        }
-        //判断是否有用“.”分割
-        String[] split = fieldName.split("\\.");
-        //如果分割后只有一个字段值，直接进行赋值
-        if (split.length == 1) {
-            //单层字段，获取setter方法
-            Method setter = getFieldSetter(t, fieldName);
-            if (setter == null) {
-                //如果没有setter，抛出异常
-                throw new NoSuchMethodException("没有找到类[" + t.getClass() + "]字段[" + fieldName + "]的setter方法");
-            }
-
-
-            //如果有此方法，计入缓存-当前
-            SingleCacheField<?> singleCacheField = saveSingleCacheFieldSetter(t.getClass(), fieldName, setter);
-            //如果层数等级与真实字段相同且等级不为1,说明这是多层级字段的最终字段，保存
-            if (level != 1 && level == realFieldName.split("\\.").length) {
-                saveLevelCacheField(root.getClass(), realFieldName, singleCacheField);
-            }
-
-            //执行赋值
-            MethodUtil.invoke(t, new Object[]{param}, setter);
-        } else {
-            //否则为多层字段，获取第一个字段名
-            String field = split[0];
-            //移除第一个字段
-            List<String> list = Arrays.stream(split).collect(Collectors.toList());
-            list.remove(0);
-            //拼接剩余
-            String newFieldName = String.join(".", list);
-
-
-             /*
-                以下的setter获取方法均为当前字段的，即field字段
-             */
-
-            //获取其get方法和set方法,返回执行结果
-            //获取setter方法
-            Method setter = getFieldSetter(t, field);
-            if (setter == null) {
-                //抛出没有此方法异常
-                throw new NoSuchMethodException("没有找到类[" + t.getClass() + "]字段[" + field + "]的setter方法");
-            }
-
-            //计入单缓存-当前-同时将setter方法提前计入缓存
-            SingleCacheField<?> singleCacheField = saveSingleCacheFieldSetter(t.getClass(), field, setter);
-
-            //获取此字段的实例对象，使用objectGetter方法，可以省去一部计入缓存的步骤
-            Object fieldInstance = objectGetter(t, field);
-
-            //如果当前字段的值为null，赋值
-            if (fieldInstance == null) {
-                fieldInstance = getFieldClass(t, field).newInstance();
-                //为当前字段对象赋一个新的值
-                objectSetter(t, field, fieldInstance);
-
-            }
-
-            //将setter计入缓存
-            //计入多层级缓存-当前
-            //获取字段名-切割真实字段名
-            String levelFieldName = Arrays.stream(realFieldName.split("\\.")).limit(level).collect(Collectors.joining("."));
-            saveLevelCacheField(root.getClass(), levelFieldName, singleCacheField);
-
-
-            //寻找下一层字段
-            objectSetter(fieldInstance, root, newFieldName, realFieldName, level + 1, param);
-
-        }
-
-    }
-
-
-    /**
-     * 获取对象指定字段对象
-     *
-     * @param object    对象的class对象
-     * @param fieldName 字段名称
-     */
-    public static Field getField(Object object, String fieldName) {
-        return getField(object.getClass(), fieldName);
-    }
-
 
     /**
      * 获取类指定字段对象
@@ -828,29 +373,6 @@ public class FieldUtils {
 
 
     /**
-     * 获取指定类字段的类型class对象
-     *
-     * @param objectClass 类class对象
-     * @param fieldName   字段名称
-     */
-    public static Class getFieldClass(Class objectClass, String fieldName) {
-        Field field = getField(objectClass, fieldName);
-        return Optional.ofNullable(field).map(Field::getType).orElseThrow(() -> new RuntimeException(new NoSuchFieldException()));
-    }
-
-    /**
-     * 获取类指定字段的class对象
-     *
-     * @param object    类实例
-     * @param fieldName 字段名称
-     * @return
-     */
-    public static Class getFieldClass(Object object, String fieldName) {
-        return getFieldClass(object.getClass(), fieldName);
-    }
-
-
-    /**
      * 获取类中全部的字段
      *
      * @param type      Class对象
@@ -859,62 +381,6 @@ public class FieldUtils {
      */
     public static Field[] getFields(Class type, boolean withSuper) {
         return getFieldsStream(type, withSuper).toArray(Field[]::new);
-    }
-
-    /**
-     * 获取类中全部的字段，转化为list
-     *
-     * @param type      Class对象
-     * @param withSuper 是否获取父类中的全部
-     */
-    public static List<Field> getFieldsList(Class type, boolean withSuper) {
-        return getFields(type, withSuper, Collectors.toList());
-    }
-
-    ;
-
-    /**
-     * 获取类中全部的字段，转化为set
-     *
-     * @param type      Class对象
-     * @param withSuper 是否获取父类中的全部
-     */
-    public static Set<Field> getFieldsSet(Class type, boolean withSuper) {
-        return getFields(type, withSuper, Collectors.toSet());
-    }
-
-    /**
-     * 获取类中的全部字段，并根据字段名分组
-     */
-    public static Map<String, List<Field>> getFieldsGroupByName(Class type, boolean withSuper) {
-        return getFields(type, withSuper, Collectors.groupingBy(Field::getName, Collectors.toList()));
-    }
-
-    /**
-     * 自定义流转化
-     *
-     * @param type      Class对象
-     * @param withSuper 是否获取父类中的全部
-     * @param collector Stream流转化函数
-     */
-    public static <A, R> R getFields(Class type, boolean withSuper, Collector<? super Field, A, R> collector) {
-        return getFieldsStream(type, withSuper).collect(collector);
-    }
-
-    /**
-     * 自定义流转化
-     *
-     * @param type        Class对象
-     * @param withSuper   是否获取父类中的全部
-     * @param supplier    Stream流转化函数
-     * @param accumulator Stream流转化函数
-     * @param combiner    Stream流转化函数
-     */
-    public static <A, R> R getFields(Class type, boolean withSuper,
-                                     Supplier<R> supplier,
-                                     BiConsumer<R, ? super Field> accumulator,
-                                     BiConsumer<R, R> combiner) {
-        return getFieldsStream(type, withSuper).collect(supplier, accumulator, combiner);
     }
 
     /**
@@ -943,143 +409,6 @@ public class FieldUtils {
         }
     }
 
-    /**
-     * 通过Class对象判断是否存在此字段
-     *
-     * @param tClass
-     * @param field
-     * @return
-     */
-    public static boolean isFieldExist(Class<?> tClass, String field) {
-        //判断是否为多层级字段
-        String[] split = field.split("\\.");
-        if (split.length == 1) {
-            //如果只有一个，直接获取
-            Field getField = null;
-            try {
-                getField = getField(tClass, field);
-            } catch (Exception ignored) {
-            }
-            //如果存在，返回true，否则返回false
-            return getField != null;
-        } else {
-            //否则，存在多层级字段，先获取第一个字段并获得其类型，然后通过此类型的Class对象进一步判断
-            String firstField = split[0];
-            //获取字段对象
-            Field getField = null;
-            try {
-                getField = getField(tClass, firstField);
-            } catch (Exception e) {
-                throw new FieldUtilsException(e);
-            }
-            //如果获取失败，直接返回false
-            if (getField == null) {
-                return false;
-            }
-
-            Class<?> firstFieldType = getField.getType();
-            //拼接剩余
-            //移除第一个字段
-            List<String> list = Arrays.stream(split).collect(Collectors.toList());
-            list.remove(0);
-            //拼接剩余
-            String fieldName = String.join(".", list);
-            //获取当前字段的Class对象
-            Class fieldClass = getFieldClass(tClass, firstField);
-            //递归
-            return isFieldExist(fieldClass, fieldName);
-        }
-    }
-
-    /**
-     * 通过对象实例判断字段是否存在
-     *
-     * @param obj   实例对象
-     * @param field 查询字段
-     * @return
-     * @throws NoSuchFieldException
-     */
-    public static boolean isFieldExist(Object obj, String field) {
-        return isFieldExist(obj.getClass(), field);
-    }
-
-
-    /**
-     * 获取一个list字段的泛型类型<br>
-     * 这个字段必须是一个list类型的字段！
-     *
-     * @param listField 字段
-     * @throws ClassNotFoundException 如果泛型类型未找到或多于1个
-     */
-    public static Class getListFieldGeneric(Field listField) throws ClassNotFoundException {
-
-        ParameterizedType listGenericType = (ParameterizedType) listField.getGenericType();
-        Type[] listActualTypeArguments = listGenericType.getActualTypeArguments();
-        if (listActualTypeArguments.length == 0) {
-            //如果没有数据
-            return null;
-        } else if (listActualTypeArguments.length == 1) {
-            //如果只有一种类型
-            String typeName = listActualTypeArguments[0].getTypeName();
-            //如果此类型存在泛型，移除泛型
-            typeName = typeName.replaceAll("<[\\w\\.\\, ]+>", "");
-            return Class.forName(typeName);
-        } else {
-            //如果多个类型，直接返回Object类型
-            //不返回了，抛出异常
-//            return Object.class;
-            throw new ClassNotFoundException("more than one types.");
-        }
-    }
-
-    /**
-     * 获取数组的组件类型
-     *
-     * @param trr
-     * @param <T>
-     * @return
-     */
-    public static <T> Class getArrayGeneric(T[] trr) {
-        //获取组件类型
-        return trr.getClass().getComponentType();
-    }
-
-    /**
-     * 获取数组的组件类型
-     *
-     * @param <T>
-     * @return
-     */
-    public static <T> Class getArrayGeneric(Class<T> tClass) {
-        return tClass.getComponentType();
-    }
-
-
-    /**
-     * 获取一个list字段的泛型类型<br>
-     * 这个字段必须是一个list类型的字段！
-     *
-     * @param c
-     * @param fieldName
-     * @return
-     * @throws ClassNotFoundException
-     */
-    public static Class getListFieldGeneric(Class c, String fieldName) throws ClassNotFoundException {
-        return getListFieldGeneric(fieldGetter(c, fieldName));
-    }
-
-    /**
-     * 获取一个list字段的泛型类型<br>
-     * 这个字段必须是一个list类型的字段！
-     *
-     * @param obj
-     * @param fieldName
-     * @return
-     * @throws ClassNotFoundException
-     */
-    public static Class getListFieldGeneric(Object obj, String fieldName) throws ClassNotFoundException {
-        return getListFieldGeneric(obj.getClass(), fieldName);
-    }
 
 
     /**
@@ -1144,17 +473,6 @@ public class FieldUtils {
         return false;
     }
 
-
-    /**
-     * 判断一个Class对象是否为另一个对象的实现类
-     *
-     * @param child      进行寻找的子类的实现类
-     * @param findFather 被寻找的父类
-     * @return
-     */
-    public static boolean isChild(Object child, Class findFather) {
-        return isChild(child.getClass(), findFather);
-    }
 
 
     /**
@@ -1227,20 +545,6 @@ public class FieldUtils {
         return BASIS_TYPES_MAP.getOrDefault(type, type);
     }
 
-//    /**
-//     * 单词开头大写
-//     *
-//     * @param str
-//     * @return
-//     * @author ForteScarlet
-//     */
-//    public static String headUpper(String str) {
-//        //拿到第一个字母
-//        String head = (str.charAt(0) + "").toUpperCase();
-//        //拿到其他
-//        String body = str.substring(1);
-//        return head + body;
-//    }
 
     /**
      * 单词开头大写
@@ -1257,18 +561,6 @@ public class FieldUtils {
         }
     }
 
-//    /**
-//     * 单词开头小写
-//     *
-//     * @author ForteScarlet
-//     */
-//    public static String headLower(String str) {
-//        //拿到第一个字母
-//        String head = (str.charAt(0) + "").toLowerCase();
-//        //拿到其他
-//        String body = str.substring(1);
-//        return head + body;
-//    }
 
     /**
      * 单词开头小写
@@ -1283,33 +575,6 @@ public class FieldUtils {
         } else {
             return str;
         }
-    }
-
-
-    /**
-     * 获取类名
-     *
-     * @param c 类
-     * @return 类名
-     * @author ForteScarlet
-     * @deprecated 有方法直接获取的: {@link Class#getSimpleName()}
-     */
-    @Deprecated
-    public static String getClassName(Class<?> c) {
-        String name = c.getName();
-        String[] split = name.split("\\.");
-        return split[split.length - 1];
-    }
-
-    /**
-     * 通过对象获取类名
-     *
-     * @param o
-     * @return
-     * @author ForteScarlet
-     */
-    public static String getClassName(Object o) {
-        return getClassName(o.getClass());
     }
 
 
@@ -1333,52 +598,11 @@ public class FieldUtils {
         return (!clazz.isInterface()) && (!Modifier.isAbstract(clazz.getModifiers()));
     }
 
-
-    /**
-     * 获取方法名，如果是个getter规则方法名则移除get并开头小写, 与{@link #getMethodNameWithoutSetter(Method)}类似
-     *
-     * @param method 方法
-     * @return 方法名
-     */
-    public static String getMethodNameWithoutGetter(Method method) {
-        //获取方法名
-        String name = method.getName();
-        //判断是否为get开头且去掉get之后首字母大写
-        if (name.startsWith("get") && Character.isUpperCase(name.substring(3).charAt(0))) {
-            //如果是，去掉get并开头小写
-            return headLower(name.substring(3));
-        } else {
-            //否则原样返回
-            return name;
-        }
-    }
-
-    /**
-     * 获取方法名，如果是个getter规则方法名则移除get并开头小写, 与{@link #getMethodNameWithoutGetter(Method)}类似
-     *
-     * @param method 方法
-     * @return 方法名
-     */
-    public static String getMethodNameWithoutSetter(Method method) {
-        //获取方法名
-        String name = method.getName();
-        //判断是否为get开头且去掉set之后首字母大写
-        if (name.startsWith("set") && Character.isUpperCase(name.substring(3).charAt(0))) {
-            //如果是，去掉get并开头小写
-            return headLower(name.substring(3));
-        } else {
-            //否则原样返回
-            return name;
-        }
-    }
-
     /**
      * 获取方法名，如果是个getter或setter规则方法名则移除get或set并开头小写
      *
      * @param method 方法
      * @return 方法名
-     * @see #getMethodNameWithoutGetter(Method)
-     * @see #getMethodNameWithoutSetter(Method)
      */
     public static String getMethodNameWithoutGetterAndSetter(Method method) {
         //获取方法名
@@ -1392,8 +616,6 @@ public class FieldUtils {
             return name;
         }
     }
-
-
 
 
     /* —————————————————————————————————————— 缓存字段接口 ———————————————————————————————————— */

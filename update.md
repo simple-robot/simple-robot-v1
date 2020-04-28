@@ -4,6 +4,8 @@
 - 配置中增加一个配置项`simbot.core.checkBot`，默认为true。当为true的时候，监听函数触发前会优先判断当前消息所接收的bot是否为已注册的bot。
 - 简单优化HttpClientAble
 - 将常量类`com.forte.qqrobot.PriorityConstant`移动至`com.forte.qqrobot.constant.PriorityConstant`
+- 修复默认的`BotManager`实现类中，使用带账号的注册会导致无法触发验证的bug
+- 修改部分许哟啊初始化的bean的初始化流程。
 
 # 1.12.0 (beta)
 - 优化依赖工厂，并修复部分隐藏bug

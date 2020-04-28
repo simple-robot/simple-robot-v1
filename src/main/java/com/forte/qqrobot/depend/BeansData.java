@@ -1,8 +1,8 @@
 package com.forte.qqrobot.depend;
 
-import com.forte.qqrobot.constant.PriorityConstant;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.anno.depend.Depend;
+import com.forte.qqrobot.constant.PriorityConstant;
 
 import java.util.Arrays;
 

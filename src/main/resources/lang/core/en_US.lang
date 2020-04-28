@@ -181,6 +181,8 @@ run.runtime.bot.verify=Bot list verify success.
 run.bot.info=bot info: code: {0}, nick: {1}, level: {2}
 run.bot.empty=Warning! You have not registered any Bot information! Before you register, you will not be able to use any transmitters in non-listening functions.
 
+# 依赖工厂加载结束
+run.depend.init.finish=End of factory initialization
 
 # runtime
 runtime.bot.register=bot [{0}] register success！

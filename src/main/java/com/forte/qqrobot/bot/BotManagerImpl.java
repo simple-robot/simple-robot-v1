@@ -109,13 +109,18 @@ public class BotManagerImpl implements BotManager {
         String key = info.getBotCode();
         // 在注册时候锁住map对象
         synchronized (botMap) {
+            BotInfo verifyBot = null;
             if(key == null){
-                key = (info = verifyBot(info)).getBotCode();
+                verifyBot = verifyBot(info);
+                key = (info = verifyBot).getBotCode();
             }
 
             BotInfo botInfo = botMap.get(key);
             if (botInfo == null) {
-                botMap.put(key, info);
+                if(verifyBot == null){
+                    verifyBot = verifyBot(info);
+                }
+                botMap.put(key, verifyBot);
                 if (defaultBot == null) {
                     defaultBot = key;
                 }

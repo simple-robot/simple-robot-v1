@@ -8,7 +8,6 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.depend.AdditionalDepends;
-import com.forte.qqrobot.exception.ListenerException;
 import com.forte.qqrobot.exception.NoSuchExceptionHandleException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.ListenContext;
@@ -517,15 +516,7 @@ public class ListenerManager implements MsgReceiver {
             //第一层分组后
             Map<MsgGetTypes[], Set<ListenerMethod>> collect = methods.stream()
                     // 分组的同时，初始化一次所有的监听函数
-                    .peek(lm -> {
-                        final double initStart = System.currentTimeMillis();
-                        try {
-                            lm.getListener();
-                        }catch (Exception e){
-                            throw new ListenerException("init.failed", e);
-                        }
-                        QQLog.debug("listener.init", lm.getUUID(), (System.currentTimeMillis() - initStart));
-                    })
+                    // 1.12.1 2020/4/27 不再从这里初始化
                     //第一层分组
                     .collect(Collectors.groupingBy(ListenerMethod::getTypes, Collectors.toSet()));
 

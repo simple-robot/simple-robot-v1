@@ -1,9 +1,9 @@
 package com.forte.qqrobot.depend;
 
 import com.forte.lang.Language;
-import com.forte.qqrobot.constant.PriorityConstant;
 import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.anno.depend.Depend;
+import com.forte.qqrobot.constant.PriorityConstant;
 import com.forte.qqrobot.exception.AnnotationException;
 import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.utils.AnnotationUtils;

@@ -179,6 +179,8 @@ run.runtime.bot.verify=Bot账号列表验证完成。
 run.bot.info=账号信息获取成功: 账号: {0}, 昵称: {1}, 等级: {2}
 run.bot.empty=警告！你尚未注册任何Bot信息！在你注册之前，将无法使用任何非监听函数中的送信器。
 
+run.depend.init.finish=依赖工厂初始化结束
+
 # runtime
 runtime.bot.register=账号[{0}]注册成功！
 runtime.bot.register.failed=账号注册失败: {0}
