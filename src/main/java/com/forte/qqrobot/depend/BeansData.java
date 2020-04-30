@@ -35,7 +35,7 @@ public class BeansData {
     private Depend depend;
 
     /**
-     * \@Beans注解的参数：constructor
+     * \{@link Beans}注解的参数：constructor
      */
     private Class[] constructor;
 
@@ -48,6 +48,7 @@ public class BeansData {
      * 优先级，降序排序
      */
     private int priority;
+
 
     /**
      * 一个默认参数的@Beans参数

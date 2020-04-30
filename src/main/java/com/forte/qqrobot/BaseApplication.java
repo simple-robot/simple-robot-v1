@@ -119,7 +119,7 @@ public abstract class BaseApplication<
 
     private ListenerMethodScanner scanner;
 
-    private ConfigPropertiesImpl configProperties;
+    private ConfigProperties configProperties;
 
     /**
      * bot管理中心
@@ -353,6 +353,9 @@ public abstract class BaseApplication<
         Function<MsgGet, RootSenderList> rootSenderFunction = getRootSenderFunction(botManager);
         MsgProcessor msgProcessor = new MsgProcessor(conf.getResultSelectType(), manager, rootSenderFunction);
         MsgParser msgParser = getMsgParser();
+        // load
+        dependCenter.load(msgParser);
+        dependCenter.load(msgProcessor);
         if(conf.getEnableServer()){
             message = runServer(dependCenter, manager, msgProcessor, msgParser);
         }

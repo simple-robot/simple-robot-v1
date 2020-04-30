@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
-@Beans
 public class BotManagerImpl implements BotManager {
 
     /**

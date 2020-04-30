@@ -49,7 +49,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 配置文件的读取内容
      * 如果不是配置文件的话，此类得不到任何内容。
      */
-    private ConfigPropertiesImpl configProperties = new ConfigPropertiesImpl(new Properties());
+    private ConfigProperties configProperties = new ConfigProperties(new Properties());
 
     /*
         此类是在language初始化之前使用的，故此不使用语言化
@@ -927,7 +927,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
         this.classLoader = classLoader;
     }
 
-    public ConfigPropertiesImpl getConfigProperties() {
+    public ConfigProperties getConfigProperties() {
         return configProperties;
     }
 
@@ -943,7 +943,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 使用者不需要设置
      * @param configProperties
      */
-    public void setConfigProperties(ConfigPropertiesImpl configProperties) {
+    public void setConfigProperties(ConfigProperties configProperties) {
         this.configProperties = configProperties;
     }
 }

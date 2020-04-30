@@ -27,30 +27,11 @@ import java.util.function.*;
  **/
 public class DependCenter implements DependGetter, DependInjector {
 
-//    /**
-//     * 以防万一，此处对依赖资源管理中心的单例工厂进行计数
-//     */
-//    private static final AtomicInteger singleFactoryNo = new AtomicInteger(1);
-//
-//    private static int getSingleFactoryNo() {
-//        return singleFactoryNo.getAndAdd(1);
-//    }
-
     /**
      * 获取方法参数名获取器
      */
     @Deprecated
     private static ParamNameGetter paramNameGetter = ParamGetterManager.getParamNameGetter();
-
-    /*
-        String和8大基础数据类型的资源仓库
-        以Class为键的资源仓库
-        以name为键的资源仓库
-     */
-//    /**
-//     * 依赖资源管理中心所使用的单例工厂
-//     */
-//    private final SingleFactory SINGLE_FACTORY;
 
     // 以依赖名称为key的单例Map
     private final Map<String, Object> SINGLE_FACTORY;
@@ -77,29 +58,30 @@ public class DependCenter implements DependGetter, DependInjector {
      */
     private final DependGetter dependGetter;
 
-    /** 记录需要初始化的依赖的列表 */
+    /**
+     * 记录需要初始化的依赖的列表
+     */
     private Queue<Depend> initQueue = new LinkedList<>();
 
     /**
-     *　初始化一次需要被初始化的Depend
+     * 　初始化一次需要被初始化的Depend
      */
-    public void initDependWhoNeed(){
-        synchronized (this){
+    public void initDependWhoNeed() {
+        synchronized (this) {
             Depend polled;
-            do{
+            do {
                 polled = initQueue.poll();
-                if(polled != null){
+                if (polled != null) {
                     polled.getInstance();
                 }
-            }while (polled != null);
+            } while (polled != null);
         }
     }
 
-     /**
+    /**
      * 构造
      */
     public DependCenter() {
-//        SINGLE_FACTORY = SingleFactory.build(DependCenter.class + "_" + DependCenter.getSingleFactoryNo());
         SINGLE_FACTORY = new ConcurrentHashMap<>(8);
         basicResourceWarehouse = new BasicResourceWarehouse();
         nameResourceWarehouse = new ConcurrentHashMap<>();
@@ -111,7 +93,6 @@ public class DependCenter implements DependGetter, DependInjector {
      * 构造
      */
     public DependCenter(DependGetter dependGetter) {
-//        SINGLE_FACTORY = SingleFactory.build(DependCenter.class + "_" + DependCenter.getSingleFactoryNo());
         SINGLE_FACTORY = new ConcurrentHashMap<>(8);
         basicResourceWarehouse = new BasicResourceWarehouse();
         nameResourceWarehouse = new ConcurrentHashMap<>();
@@ -160,9 +141,7 @@ public class DependCenter implements DependGetter, DependInjector {
      * @param bean 实例对象
      */
     public <T> DependCenter load(String name, T bean) {
-//        Depend<T> depend =
         buildDepend(name, bean);
-//        saveDepend(depend);
         return this;
     }
 
@@ -264,12 +243,8 @@ public class DependCenter implements DependGetter, DependInjector {
     public DependCenter load(com.forte.qqrobot.anno.depend.Beans BeansAnno, Predicate<Class> classTest, Class<?>... loadsClasses) {
         //转化为Beans对象, class对象去重并根据规则过滤
         List<Beans> beans = BeansFactory.getBeans(BeansAnno, Arrays.stream(loadsClasses).distinct().filter(classTest).toArray(Class[]::new));
-
         //后遍历
         beans.forEach(this::saveBeanToDepend);
-
-        //每次加载后，尝试垃圾回收释放内存
-        System.gc();
         return this;
     }
 
@@ -336,7 +311,7 @@ public class DependCenter implements DependGetter, DependInjector {
                 return old;
             });
 
-            if(depend.isInit()){
+            if (depend.isInit()) {
                 // 需要初始化，记录至初始化队列
                 initQueue.add(depend);
             }
@@ -749,7 +724,7 @@ public class DependCenter implements DependGetter, DependInjector {
 
         // 先直接获取
         List<Depend> depends = classResourceWareHouse.get(type);
-        if(depends == null){
+        if (depends == null) {
             depends = Collections.emptyList();
         }
 
@@ -767,11 +742,13 @@ public class DependCenter implements DependGetter, DependInjector {
                 //　多个子类，全部获取并排序
                 Depend[] dependsByClasses = Arrays.stream(classes).flatMap(c -> classResourceWareHouse.get(c).stream()).sorted().toArray(Depend[]::new);
 
-                if(dependsByClasses[0].getPriority() == dependsByClasses[1].getPriority()){
+                if (dependsByClasses[0].getPriority() == dependsByClasses[1].getPriority()) {
                     //不止1个且最高优先级有多个，抛出异常
                     throw new DependResourceException("moreChildType", type, Arrays.toString(classes));
-                }else{
-                    depends = new ArrayList<Depend>(){{add(dependsByClasses[0]);}};
+                } else {
+                    depends = new ArrayList<Depend>() {{
+                        add(dependsByClasses[0]);
+                    }};
                     save = true;
                 }
             } else {
@@ -779,15 +756,17 @@ public class DependCenter implements DependGetter, DependInjector {
                 // 需要标记为重新保存
                 save = true;
             }
-        }else if(depends.size() > 1){
+        } else if (depends.size() > 1) {
             // 依赖多于1个
-            if(depends.get(0).getPriority() == depends.get(1).getPriority()){
+            if (depends.get(0).getPriority() == depends.get(1).getPriority()) {
                 //不止1个且最高优先级有多个，抛出异常
                 throw new DependResourceException("moreChildType", type, depends);
-            }else{
+            } else {
                 Depend first = depends.get(0);
                 // 否则，只留下最后一个并标记重新记录
-                depends = new ArrayList<Depend>(){{add(first);}};
+                depends = new ArrayList<Depend>() {{
+                    add(first);
+                }};
                 save = true;
 
             }
@@ -807,27 +786,29 @@ public class DependCenter implements DependGetter, DependInjector {
             // 多于一个，判断优先级
             final Depend first = depends.get(0);
             Depend second = depends.get(1);
-            if(first.getPriority() == second.getPriority()){
+            if (first.getPriority() == second.getPriority()) {
                 // 最高优先级相同，抛出异常。
                 //多于一个, 一般情况下是使用父类类型获取的时候会存在的情况
                 throw new DependResourceException("moreDepend", type);
-            }else{
+            } else {
                 // 否则仅留下第一个，并标记重新保存。
-                depends = new ArrayList<Depend>(){{add(first);}};
+                depends = new ArrayList<Depend>() {{
+                    add(first);
+                }};
                 save = true;
             }
         }
 
-            // 获取唯一的一个，即第一个
-            Depend single = depends.get(0);
-            if (save) {
-                // 需要重新保存以实现缓存
-                // 一般来讲，既然能够拿到，则说明这个依赖必定存在于name中，所以直接保存类型
-                classResourceWareHouse.put(type, new ArrayList<Depend>(1) {{
-                    add(single);
-                }});
-            }
-            return single;
+        // 获取唯一的一个，即第一个
+        Depend single = depends.get(0);
+        if (save) {
+            // 需要重新保存以实现缓存
+            // 一般来讲，既然能够拿到，则说明这个依赖必定存在于name中，所以直接保存类型
+            classResourceWareHouse.put(type, new ArrayList<Depend>(1) {{
+                add(single);
+            }});
+        }
+        return single;
     }
 
 

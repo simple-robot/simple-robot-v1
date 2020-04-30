@@ -9,6 +9,7 @@ import com.forte.qqrobot.utils.ObjectsPlus;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.function.Function;
 
 /**
@@ -22,62 +23,70 @@ import java.util.function.Function;
 public class Beans<T> {
 
     /** 名称 */
-    private final String NAME;
+    private String name;
 
     /** 类型 */
-    private final Class<T> TYPE;
+    private Class<T> type;
 
     /** 是否为单例 */
-    private final boolean single;
+    private boolean single;
 
     /** 类下所有字段是否都作为依赖注入 */
-    private final boolean allDepend;
+    private boolean allDepend;
 
     /** 实例化所需要的参数列表及其对应的name */
-    private final NameTypeEntry[] instanceNeed;
+    private NameTypeEntry[] instanceNeed;
 
     /** 获取实例对象的方法 */
-    private final Function<Object[], T> getInstanceFunction;
+    private Function<Object[], T> getInstanceFunction;
 
     /** 假如此Beans是类上的，那么children代表了其类中存在的其他Beans */
-    private final Beans[] children;
+    private Beans[] children;
 
+    /** 父类，只有方法上标注的@Beans才会有值 */
+    private Class<?> father;
+    
     /** Beans注解对象中的参数，用来代替Beans注解 */
-    private final BeansData beans;
+    private BeansData beans;
 
     /** 是否需要初始化一次 */
-    private final boolean init;
+    private boolean init;
 
     /** 优先级 */
-    private final int priority;
+    private int priority;
+
+
+
 
     /**
      * 构造
      */
-    public Beans(String NAME, Class<T> TYPE, boolean single, boolean allDepend, NameTypeEntry[] instanceNeed, Function<Object[], T> getInstanceFunction, Beans[] children,
+    public Beans(String name, Class<T> type, boolean single, boolean allDepend, NameTypeEntry[] instanceNeed,
+                 Function<Object[], T> getInstanceFunction, Beans[] children, Class<?> father,
                  BeansData beans, boolean init, int priority) {
-        this.NAME = NAME;
-        this.TYPE = TYPE;
+        this.name = name;
+        this.type = type;
         this.single = single;
         this.allDepend = allDepend;
         this.instanceNeed = instanceNeed == null ? new NameTypeEntry[0] : instanceNeed;
         this.getInstanceFunction = getInstanceFunction;
         this.children = children == null ? new Beans[0] : children;
+        this.father = father;
         this.beans = beans;
         this.init = init;
         this.priority = priority;
 
         //判断除了数组之外的类型是否存在null值
-        ObjectsPlus.allNonNull("com.forte.qqrobot.depend.Beans对象参数不可出现null值", this.NAME, this.TYPE, this.single, getInstanceFunction, this.beans);
+        ObjectsPlus.allNonNull("com.forte.qqrobot.depend.Beans对象参数不可出现null值", this.name, this.type, this.single, getInstanceFunction, this.beans);
     }
 
     //**************** 默认值参数 ****************//
 
-    private static final boolean defaultSingle = true;
-    private static final boolean defaultAllDepend = false;
+    private static boolean defaultSingle = true;
+    private static boolean defaultAllDepend = false;
 
     //实例化需要的参数列表, 默认为空
-    private static final NameTypeEntry[] defaultInstanceNeed = new NameTypeEntry[0];
+    private static NameTypeEntry[] defaultInstanceNeed = new NameTypeEntry[0];
 
     /**
      * 获取值全部为默认值的Beans对象
@@ -159,58 +168,136 @@ public class Beans<T> {
 
         }
 
-        return new Beans<>(name, type, defaultSingle, defaultAllDepend, instanceNeed, getInstanceFunction, null, BeansData.getInstance(), false, Integer.MAX_VALUE);
+        return new Beans<>(name, type, defaultSingle, defaultAllDepend, instanceNeed, getInstanceFunction, null, null, BeansData.getInstance(), false, Integer.MAX_VALUE);
     }
-
-
 
 
     public String getName() {
-        return NAME;
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Class<T> getType() {
-        return TYPE;
+        return type;
+    }
+
+    public void setType(Class<T> type) {
+        this.type = type;
     }
 
     public boolean isSingle() {
         return single;
     }
 
+    public void setSingle(boolean single) {
+        this.single = single;
+    }
+
     public boolean isAllDepend() {
         return allDepend;
+    }
+
+    public void setAllDepend(boolean allDepend) {
+        this.allDepend = allDepend;
     }
 
     public NameTypeEntry[] getInstanceNeed() {
         return instanceNeed;
     }
 
-    public Beans[] getChildren() {
-        return children;
+    public void setInstanceNeed(NameTypeEntry[] instanceNeed) {
+        this.instanceNeed = instanceNeed;
     }
 
     public Function<Object[], T> getGetInstanceFunction() {
         return getInstanceFunction;
     }
 
+    public void setGetInstanceFunction(Function<Object[], T> getInstanceFunction) {
+        this.getInstanceFunction = getInstanceFunction;
+    }
+
+    public Beans[] getChildren() {
+        return children;
+    }
+
+    public void setChildren(Beans[] children) {
+        this.children = children;
+    }
+
+    public Class<?> getFather() {
+        return father;
+    }
+
+    public void setFather(Class<?> father) {
+        this.father = father;
+    }
+
     public BeansData getBeans() {
         return beans;
+    }
+
+    public void setBeans(BeansData beans) {
+        this.beans = beans;
     }
 
     public boolean isInit() {
         return init;
     }
 
+    public void setInit(boolean init) {
+        this.init = init;
+    }
+
     public int getPriority() {
         return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public static boolean isDefaultSingle() {
+        return defaultSingle;
+    }
+
+    public static void setDefaultSingle(boolean defaultSingle) {
+        Beans.defaultSingle = defaultSingle;
+    }
+
+    public static boolean isDefaultAllDepend() {
+        return defaultAllDepend;
+    }
+
+    public static void setDefaultAllDepend(boolean defaultAllDepend) {
+        Beans.defaultAllDepend = defaultAllDepend;
+    }
+
+    public static NameTypeEntry[] getDefaultInstanceNeed() {
+        return defaultInstanceNeed;
+    }
+
+    public static void setDefaultInstanceNeed(NameTypeEntry[] defaultInstanceNeed) {
+        Beans.defaultInstanceNeed = defaultInstanceNeed;
     }
 
     @Override
     public String toString() {
         return "Beans{" +
-                "name='" + NAME + '\'' +
-                ", type=" + TYPE +
+                "name='" + name + '\'' +
+                ", type=" + type +
                 ", single=" + single +
+                ", allDepend=" + allDepend +
+                ", instanceNeed=" + Arrays.toString(instanceNeed) +
+                ", getInstanceFunction=" + getInstanceFunction +
+                ", children=" + Arrays.toString(children) +
+                ", father=" + father +
+                ", beans=" + beans +
+                ", init=" + init +
+                ", priority=" + priority +
                 '}';
     }
 }

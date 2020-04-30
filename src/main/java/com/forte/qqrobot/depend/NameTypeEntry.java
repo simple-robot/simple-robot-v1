@@ -1,5 +1,6 @@
 package com.forte.qqrobot.depend;
 
+import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.utils.FieldUtils;
 
 import java.util.Map;
@@ -43,15 +44,9 @@ public class NameTypeEntry<T> implements Map.Entry<String, Class<T>> {
      * 将开头小写后创建
      * 基本统一使用此方法创建实例
      */
+    @Deprecated
     public static NameTypeEntry getInstanceLower(String name, Class<?> type){
-        return getInstance(name == null ? null : FieldUtils.headLower(name), type);
-    }
-
-    /**
-     * 将开头大写后创建
-     */
-    public static NameTypeEntry getInstanceUpper(String name, Class<?> type){
-        return getInstance(name == null ? null : FieldUtils.headUpper(name), type);
+        return getInstance(name, type);
     }
 
     /**

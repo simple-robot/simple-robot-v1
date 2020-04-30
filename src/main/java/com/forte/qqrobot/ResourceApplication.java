@@ -67,7 +67,7 @@ public interface ResourceApplication<CONFIG extends BaseConfiguration> extends A
         QQLog.info("properties config injected.");
 
         // 设置配置properties
-        configuration.setConfigProperties(new ConfigPropertiesImpl(configProperties));
+        configuration.setConfigProperties(new ConfigProperties(configProperties));
 
         // 执行之后的before
         before(configProperties, configuration);

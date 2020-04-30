@@ -50,7 +50,6 @@ public class BeansFactory {
 
 
         Arrays.stream(classCollection)
-                //不再进行过滤，将过滤交给调用方
                 //转化为Bean对象
                 .map(c -> BeansFactory.toBeans(c, beansAnno))
                 //将children也添加进来
@@ -62,15 +61,11 @@ public class BeansFactory {
                         //出现重复的Beans，查询并获取之前的此名称的Beans
                         Beans equalsBeans = beansList.stream().filter(be -> be.getName().equals(b.getName())).findAny().orElse(null);
                         //抛出异常
-//                        throw new DependResourceException("不可出现重复的name：["+ b.getName() +"]:\n" +
-//                                b + "\n" + equalsBeans);
                         throw new DependResourceException("sameName", b.getName(), b, equalsBeans);
                     }
                     //没有抛出异常，保存对应信息
                     beansList.add(b);
         });
-
-
 
         //将beans和children进行合并
 
@@ -86,6 +81,7 @@ public class BeansFactory {
 
     /**
      * 将一个类转化为Beans对象
+     * @param clazz 类型
      */
     private static <T> Beans<T> toBeans(Class<T> clazz, com.forte.qqrobot.anno.depend.Beans beansAnno){
         //如果参数中不存在注解对象，则尝试获取类上的注解对象。获取此类上的@Beans注解
@@ -200,16 +196,18 @@ public class BeansFactory {
             };
 
         }
-
-        //参数实例完成，获取children并封装对象
-        Beans[] children = getChildren(clazz, name);
-
         //实例化需要的参数列表, 转为final类型
         final NameTypeEntry[] finalInstanceNeed = instanceNeed;
         //获取实例的函数，转为final类型
         final Function<Object[], T> finalGetInstanceFunction = getInstanceFunction;
 
-        return new Beans<>(name, clazz, single, allDepend, finalInstanceNeed, finalGetInstanceFunction, children, beansData, init, priority);
+        Beans<T> fBeans = new Beans<>(name, clazz, single, allDepend, finalInstanceNeed, finalGetInstanceFunction, null, null, beansData, init, priority);
+        //参数实例完成，获取children并封装对象
+        Beans[] children = getChildren(clazz, name, fBeans);
+
+        fBeans.setChildren(children);
+
+        return fBeans;
     }
 
 
@@ -257,12 +255,11 @@ public class BeansFactory {
         //获取实例的函数
         Function<Object[], T> getInstanceFunction = args -> bean;
 
+        // 实例对象转化不考虑child
+        Beans[] children = new  Beans[0];
 
-        //参数实例完成，获取children并封装对象
-        Beans[] children = getChildren(beanType, name);
 
-
-        return new Beans<>(name, (Class<T>) beanType, true, allDepend, instanceNeed, getInstanceFunction, children, beansData, init, beansData.priority());
+        return new Beans<>(name, (Class<T>) beanType, true, allDepend, instanceNeed, getInstanceFunction, null, null, beansData, init, beansData.priority());
     }
 
 
@@ -274,46 +271,7 @@ public class BeansFactory {
      * @return      Beans封装类
      */
     public static <T> Beans<T> getBeansSingle(String name, T bean){
-        // 首先尝试获取这个类的@Beans注解
-        Class<T> type = (Class<T>) bean.getClass();
-        com.forte.qqrobot.anno.depend.Beans beansAnnotation = AnnotationUtils.getBeansAnnotationIfListen(type);
-        if(beansAnnotation != null){
-            // 如果能直接获取到注解，使用注解参数，但是使用实例注入的时候，不论单例参数是否为true，都必然返回此对象
-            return toBeans(name, bean, beansAnnotation);
-        }
-
-        if(name == null || name.trim().length() == 0){
-            name = type.getSimpleName();
-        }
-        // /** 是否为单例 */
-        boolean single = true;
-        // /** 类下所有字段是否都作为依赖注入 */
-        boolean allDepend = false;
-        int priority = PriorityConstant.FIRST_LAST;
-        // /** 实例化所需要的参数列表及其对应的name */
-        // 由于实例已经确定，不需要再去获取参数
-        NameTypeEntry[] instanceNeed = NameTypeEntry.getEmpty();
-
-        // /** 获取实例对象的方法 */
-        // private final Function<Object[], T> getInstanceFunction;
-        Function<Object[], T> getInstanceFunction = o -> bean;
-
-        // /** 假如此Beans是类上的，那么children代表了其类中存在的其他Beans */
-        // private final Beans[] children;
-        Beans<?>[] children = getChildren(type, name);
-
-        // /** Beans注解对象中的参数，用来代替Beans注解 */
-        // private final BeansData beans;
-        BeansData instance = BeansData.getInstance();
-        instance.setAllDepend(allDepend);
-        instance.setSingle(single);
-        instance.setValue(name);
-        instance.setInit(false);
-        instance.setPriority(priority);
-
-
-        // 参数构建完成，创建实例
-        return new Beans<>(name, type, single, allDepend, instanceNeed, getInstanceFunction, children, instance, false, priority);
+        return toBeans(name, bean, null);
     }
 
 
@@ -324,7 +282,7 @@ public class BeansFactory {
      * @param faName
      * @return
      */
-    private static <T> Beans<?>[] getChildren(Class<T> clazz, String faName){
+    private static <T> Beans<?>[] getChildren(Class<T> clazz, String faName, Beans<T> fatherBean){
         //获取此类下所有标注了@Beans的方法并进行过滤
         //方法上的@Beans不可省略
         return Arrays.stream(clazz.getDeclaredMethods()).filter(m -> {
@@ -347,24 +305,32 @@ public class BeansFactory {
             //是否为静态
             final boolean isStatic = Modifier.isStatic(m.getModifiers());
             //注解信息
-//            com.forte.qqrobot.anno.depend.Beans beanAnnotation = m.getAnnotation(com.forte.qqrobot.anno.depend.Beans.class);
             com.forte.qqrobot.anno.depend.Beans beanAnnotation =
                     AnnotationUtils.getAnnotation(m, com.forte.qqrobot.anno.depend.Beans.class);
-            //转化为Beans对象
-
+            // 转化为Beans对象
+            // 值类型
             Class<?> type = m.getReturnType();
-            //如果注解没有指定名称，从方法名中进行获取而不是从类中，如果是get或set开头，去除get、set并开头小写
-            String name = beanAnnotation.value().trim().length()==0 ?
+            // 如果注解没有指定名称，从方法名中进行获取而不是从类中，如果是get或set开头，去除get、set并开头小写
+            // 并加上父类名称
+            String fatherName = fatherBean.getType().getSimpleName();
+            String name = fatherName + "#" +
+                    (beanAnnotation.value().trim().length()==0 ?
                     FieldUtils.getMethodNameWithoutGetterAndSetter(m) :
-                    beanAnnotation.value();
+                    beanAnnotation.value());
+            // 是否为单例对象
             boolean single = beanAnnotation.single();
-            boolean alldepend = beanAnnotation.allDepend();
+            // 字段是否全部标记为Depend
+            boolean allDepend = beanAnnotation.allDepend();
             //获取此方法的参数列表
             NameTypeEntry[] instanceNeed = getNameTypeArrayByParameters(m.getParameters());
             //如果不是静态的，将父类对象作为所需参数放在第一位
             if(!isStatic){
                 //在参数第一位放置为父类的nameType对象
-                instanceNeed = Stream.concat(Arrays.stream(new NameTypeEntry[]{NameTypeEntry.getInstanceLower(faName, clazz)}) , Arrays.stream(instanceNeed)).toArray(NameTypeEntry[]::new);
+                NameTypeEntry[] nInstanceNeed = new NameTypeEntry[instanceNeed.length + 1];
+                nInstanceNeed[0] = NameTypeEntry.getInstance(faName, clazz);
+                System.arraycopy(instanceNeed, 0, nInstanceNeed, 1, instanceNeed.length);
+//                instanceNeed = Stream.concat(Arrays.stream(new NameTypeEntry[]{NameTypeEntry.getInstanceLower(faName, clazz)}) , Arrays.stream(instanceNeed)).toArray(NameTypeEntry[]::new);
+                instanceNeed = nInstanceNeed;
             }
 
             //获取实例
@@ -374,7 +340,9 @@ public class BeansFactory {
                 //如果不是静态的，获取第一个父类对象，截取剩下的参数作为方法执行参数
                 if(!isStatic){
                     father = args[0];
-                    params = Arrays.stream(args).skip(1).toArray();
+                    params = new Object[args.length - 1];
+                    System.arraycopy(args, 1, params, 0, params.length);
+//                    params = Arrays.stream(args).skip(1).toArray();
                 }else{
                     father = null;
                     params = args;
@@ -387,7 +355,7 @@ public class BeansFactory {
                 }
             };
 
-            return new Beans(name, type, single, alldepend, instanceNeed, getInstanceFunction, null, BeansData.getInstance(beanAnnotation), beanAnnotation.init(), beanAnnotation.priority());
+            return new Beans(name, type, single, allDepend, instanceNeed, getInstanceFunction, null, null, BeansData.getInstance(beanAnnotation), beanAnnotation.init(), beanAnnotation.priority());
         }).toArray(Beans[]::new);
 
 

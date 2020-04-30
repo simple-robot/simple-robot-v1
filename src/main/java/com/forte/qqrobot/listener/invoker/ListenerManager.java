@@ -492,7 +492,8 @@ public class ListenerManager implements MsgReceiver {
         // 异常处理中心
         this.exceptionProcessCenter = exceptionProcessCenter;
 
-        this.checkBot = true;
+        // 是否验证bot
+        this.checkBot = checkBot;
 
         // 排序并构建消息拦截器
         if(intercepts != null){
