@@ -512,7 +512,7 @@ public abstract class BaseApplication<
      */
     private BotManager initBotManager(DependCenter dependCenter){
         // 初始化bot管理中心
-        // 尝试从依赖中获取，如果获取不到，使用默认的管理中心并存入依赖
+        // 尝试从依赖中获取
         BotManager botManager = dependCenter.get(BotManager.class);
         this.botManager = botManager;
         return botManager;
@@ -1029,9 +1029,9 @@ public abstract class BaseApplication<
         //开始验证账号并连接
         // 获取待验证账号列表
         BotInfo[] botInfos = verifyBot(configuration.getAdvanceBotInfo());
-        getLog().debug("runtime.bot.verify");
         // 初始化Runtime对象
         BotRuntime botRuntime = initRuntime(config, dependCenter, botInfos);
+        getLog().debug("runtime.bot.verify");
         getConf().setDefaultBotInfo(getBotManager().defaultBot());
         getLog().debug("runtime.init");
         // 连接/启动

@@ -82,10 +82,13 @@ public class DependCenter implements DependGetter, DependInjector {
      * 构造
      */
     public DependCenter() {
-        SINGLE_FACTORY = new ConcurrentHashMap<>(8);
         basicResourceWarehouse = new BasicResourceWarehouse();
-        nameResourceWarehouse = new ConcurrentHashMap<>();
-        classResourceWareHouse = new ConcurrentHashMap<>();
+        SINGLE_FACTORY = new ConcurrentHashMap<>(8);
+        nameResourceWarehouse = new ConcurrentHashMap<>(8);
+        classResourceWareHouse = new ConcurrentHashMap<>(8);
+//        nameResourceWarehouse = Collections.synchronizedMap(new HashMap<>(8));
+//        classResourceWareHouse = Collections.synchronizedMap(new HashMap<>(8));
+//        SINGLE_FACTORY = Collections.synchronizedMap(new HashMap<>(8));
         this.dependGetter = this;
     }
 
@@ -93,10 +96,13 @@ public class DependCenter implements DependGetter, DependInjector {
      * 构造
      */
     public DependCenter(DependGetter dependGetter) {
-        SINGLE_FACTORY = new ConcurrentHashMap<>(8);
         basicResourceWarehouse = new BasicResourceWarehouse();
-        nameResourceWarehouse = new ConcurrentHashMap<>();
-        classResourceWareHouse = new ConcurrentHashMap<>();
+        SINGLE_FACTORY = new ConcurrentHashMap<>(8);
+        nameResourceWarehouse = new ConcurrentHashMap<>(8);
+        classResourceWareHouse = new ConcurrentHashMap<>(8);
+//        nameResourceWarehouse = Collections.synchronizedMap(new HashMap<>(8));
+//        classResourceWareHouse = Collections.synchronizedMap(new HashMap<>(8));
+//        SINGLE_FACTORY = Collections.synchronizedMap(new HashMap<>(8));
         this.dependGetter = dependGetter;
     }
 
@@ -155,24 +161,7 @@ public class DependCenter implements DependGetter, DependInjector {
      */
     private <T> void buildDepend(String name, T bean) {
         Beans<T> beans = BeansFactory.getBeansSingle(name, bean);
-
         saveBeanToDepend(beans);
-//
-//        // 实例获取函数
-//        Supplier<T> getter = () -> bean;
-//
-//        //参数注入函数
-//        Consumer<T> injectDepend = getInjectDependConsumer(beans);
-//
-//        //额外参数注入函数
-//        BiConsumer<T, DependGetter> addInjectDependConsumer = getAddInjectDependConsumer(beans);
-//
-//        return new Depend<>(beans.getName(),
-//                beans.getType(),
-//                beans.isSingle(),
-//                getter,
-//                injectDepend,
-//                addInjectDependConsumer);
     }
 
 
@@ -257,11 +246,20 @@ public class DependCenter implements DependGetter, DependInjector {
         Class<?> type = b.getType();
         //判断是否为单例
         Supplier<?> supplier;
+        Function<Object[], T> beanGetInstanceFunction = b.getGetInstanceFunction();
+
         if (b.isSingle()) {
             //是单例，获取的时候先获取，如果获取失败则保存
-            supplier = () -> SINGLE_FACTORY.computeIfAbsent(b.getName(), key -> b.getGetInstanceFunction().apply(paramsGetter.get()));
+            supplier = () -> {
+                Object get = SINGLE_FACTORY.get(name);
+                if(get == null){
+                    get = beanGetInstanceFunction.apply(paramsGetter.get());
+                    SINGLE_FACTORY.put(name, get);
+                }
+                return get;
+            };
         } else {
-            supplier = () -> b.getGetInstanceFunction().apply(paramsGetter.get());
+            supplier = () -> beanGetInstanceFunction.apply(paramsGetter.get());
         }
         //参数注入函数
         Consumer<?> injectDepend = getInjectDependConsumer(b);
@@ -365,13 +363,18 @@ public class DependCenter implements DependGetter, DependInjector {
         //查找所有的字段，取到所有存在@Depend注解的字段或方法
         Class<T> type = beans.getType();
         //获取全部字段, 根据注解获取(或全部注入), 转化为字段值注入函数
+        BeansData beansData = beans.getBeans();
+
+        boolean allDepend = beansData.allDepend();
+        com.forte.qqrobot.anno.depend.Depend depend = beansData.depend();
+
         Consumer<T>[] consumerArray = Arrays.stream(FieldUtils.getFields(type, true))
-                .filter(f -> beans.getBeans().allDepend() || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
+                .filter(f -> allDepend || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
                     com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
-                    if ((beans.getBeans().allDepend()) && (dependAnnotation == null)) {
-                        dependAnnotation = beans.getBeans().depend();
+                    if (allDepend && (dependAnnotation == null)) {
+                        dependAnnotation = depend;
                     }
 
                     //字段名称
@@ -439,15 +442,16 @@ public class DependCenter implements DependGetter, DependInjector {
         //查找所有的字段，取到所有存在@Depend注解的字段或方法
         Class<T> type = beans.getType();
         //获取全部字段, 根据注解获取(或全部注入), 转化为字段值注入函数
+        BeansData beansData = beans.getBeans();
         BiConsumer<T, DependGetter>[] consumerArray = Arrays.stream(FieldUtils.getFields(type, true))
-                .filter(f -> beans.getBeans().allDepend() || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
+                .filter(f -> beansData.allDepend() || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
                     //获取字段注解
                     com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
                     //如果没有注解且allDepend为true，获取默认注解
-                    if ((beans.getBeans().allDepend()) && (dependAnnotation == null)) {
-                        dependAnnotation = beans.getBeans().depend();
+                    if ((beansData.allDepend()) && (dependAnnotation == null)) {
+                        dependAnnotation = beansData.depend();
                     }
 
                     //字段名称
@@ -457,6 +461,8 @@ public class DependCenter implements DependGetter, DependInjector {
 
                     //字段值的获取函数，获取的是Depend对象
                     Function<DependGetter, Depend> fieldGetterFunction;
+                    boolean init = beans.isInit();
+                    int priority = beans.getPriority();
                     if (name.trim().length() == 0) {
                         //如果未指定字段名称，判断是否为常量类型，如果是，尝试获取字段名，否则使用类型注入
                         if (BasicResourceWarehouse.isBasicType(f.getType())) {
@@ -484,13 +490,13 @@ public class DependCenter implements DependGetter, DependInjector {
                             //否则，是普通的类型，通过类型获取
                             fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(fieldType) : (add.get(fieldType) == null) ? this.getDepend(fieldType) : new Depend(fieldType.getSimpleName(), fieldType, false, () -> add.get(fieldType), v -> {
                             }, (v, a) -> {
-                            }, beans.isInit(), beans.getPriority());
+                            }, init, priority);
                         }
                     } else {
                         //指定了名称，直接获取
                         fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(name, fieldType) : (add.get(name, fieldType) == null) ? this.getDepend(name, fieldType) : new Depend(name, fieldType, false, () -> add.get(name, fieldType), v -> {
                         }, (v, a) -> {
-                        }, beans.isInit(), beans.getPriority());
+                        }, init, priority);
                     }
 
                     //判断字段是否可以注入的函数
@@ -827,7 +833,6 @@ public class DependCenter implements DependGetter, DependInjector {
         //优先尝试使用外部依赖获取
         if (!dependGetter.equals(this)) {
             try {
-
                 Object t = dependGetter.get(name);
                 if (t != null) {
                     Class<?> type = t.getClass();
@@ -1026,14 +1031,6 @@ public class DependCenter implements DependGetter, DependInjector {
      */
     @Override
     public Object get(String name) {
-//        //如果获取器不是自己，则优先使用获取器获取
-//        if (!dependGetter.equals(this)) {
-//            Object result = dependGetter.get(name);
-//            if (result != null) {
-//                return result;
-//            }
-//        }
-
         Object dependInstance = getDependInstance(name);
         return dependInstance == null ? getConstant(name) : dependInstance;
     }
