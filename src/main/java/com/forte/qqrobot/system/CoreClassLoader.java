@@ -4,6 +4,7 @@ package com.forte.qqrobot.system;
  * ClassLoader
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
+@Deprecated
 public class CoreClassLoader extends ClassLoader {
     private static final CoreClassLoader CORE_CLASS_LOADER = new CoreClassLoader();
     private CoreClassLoader(){ }

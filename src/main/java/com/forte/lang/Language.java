@@ -249,7 +249,7 @@ public class Language {
                 }
             }
         } catch (Exception e) {
-            QQLog.warning("default language ''{0}'' init failed. You can still use it, but some language may be missing.", DEFAULT_LOCALE);
+            QQLog.error("default language ''{0}'' init failed. You can still use it, but some language may be missing.", DEFAULT_LOCALE);
             QQLog.debug("default language ''{0}'' init failed. You can still use it, but some language may be missing.", e, DEFAULT_LOCALE);
 
         }
@@ -269,7 +269,7 @@ public class Language {
                     }
                 }
             } catch (Exception e) {
-                QQLog.warning("locale language ''{0}'' load failed. You can still use it, but some language may be missing.", locale);
+                QQLog.error("locale language ''{0}'' load failed. You can still use it, but some language may be missing.", locale);
                 QQLog.debug("locale language ''{0}'' load failed. You can still use it, but some language may be missing.", e, locale);
 
             }

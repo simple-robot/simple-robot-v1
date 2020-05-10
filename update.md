@@ -1,5 +1,19 @@
 ## 版本更新记录
 
+# 1.13.0
+- 变更监听消息拦截器的加载机制
+- 依赖加载的日志类型变更为`debug`
+- 依赖中心增加`Closeable`接口的实现，当执行close的时候，会将所有实现了`Closeable`接口的**单例**对象遍历并close，然后清除单例值。
+- 为ListenContext增加静态方法`getLocal()`，当监听函数触发的时候，会将ListenContext存入当前线程的`ThreadLocal`中, 并在监听函数全部执行结束后清除。
+
+- 增加监听函数拦截器`ListenIntercept`，使用方法即实现`ListenIntercept`接口并标注`@Beans`注解，当函数返回true即为放行，返回false即为拦截。
+- 增加context类`ListenInterceptContext`，为`ListenIntercept`中使用，提供了大量ListenMethod中可获得的参数。
+
+- `MsgSender`中增加`reply(...)`方法来支持快捷回复。此方法判断MsgGet参数的类型，如果不是`PrivateMsg`、`GroupMsg`、`DiscussMsg`三种类型其中之一则会抛出异常。
+
+- 预装一个实验性功能`runAuto()`
+
+
 # 1.12.1 (beta)
 - 配置中增加一个配置项`simbot.core.checkBot`，默认为true。当为true的时候，监听函数触发前会优先判断当前消息所接收的bot是否为已注册的bot，如果为未注册bot则其将会被拦截。
 - 简单优化HttpClientAble

@@ -102,14 +102,14 @@ public class FileScanner {
      */
     private Set<Class<?>> findClassLocal(final String packName, final Predicate<Class<?>> classFilter) {
         Set<Class<?>> set = new HashSet<>();
-        URI url;
+        URI uri;
         try {
-            url = classLoader.getResource(packName.replace(".", "/")).toURI();
+            uri = classLoader.getResource(packName.replace(".", "/")).toURI();
         } catch (URISyntaxException e1) {
             throw new RuntimeException("未找到策略资源");
         }
 
-        File file = new File(url);
+        File file = new File(uri);
         file.listFiles(chiFile -> {
             if (chiFile.isDirectory()) {
                 //如果是文件夹，递归扫描

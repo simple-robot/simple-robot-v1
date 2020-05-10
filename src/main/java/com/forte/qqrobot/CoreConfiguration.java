@@ -28,6 +28,7 @@ public class CoreConfiguration {
     private PathAssembler pathAssembler;
 
 
+
     @Beans
     public BotManager defaultBotManager(){
         return new BotManagerImpl(pathAssembler, verifyFunction);

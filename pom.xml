@@ -14,8 +14,8 @@
     <artifactId>simple-robot-core</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署需要大于1.12.1 2020/5/1 记得修改CoreSystem的版本号 -->
-    <version>1.12.1</version>
+    <!-- 下次部署需要大于1.13.0 2020/5/1 记得修改CoreSystem的版本号 -->
+    <version>1.13.0</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>
@@ -82,6 +82,12 @@
             <groupId>io.gitee.ForteScarlet.plusutils</groupId>
             <artifactId>console-plus</artifactId>
             <version>${console-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

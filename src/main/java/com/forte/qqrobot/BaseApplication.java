@@ -15,11 +15,13 @@ import com.forte.qqrobot.beans.function.VerifyFunction;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.bot.BotInfo;
 import com.forte.qqrobot.bot.BotManager;
+import com.forte.qqrobot.depend.AutoApplicationReader;
 import com.forte.qqrobot.depend.AutoDependReader;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.RobotRunException;
 import com.forte.qqrobot.listener.Filterable;
+import com.forte.qqrobot.listener.ListenIntercept;
 import com.forte.qqrobot.listener.MsgIntercept;
 import com.forte.qqrobot.listener.error.ExceptionHandle;
 import com.forte.qqrobot.listener.error.ExceptionProcessCenter;
@@ -55,6 +57,8 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -703,14 +707,21 @@ public abstract class BaseApplication<
         //根据配置类的扫描结果来构建监听器管理器和阻断器
         // 准备获取消息拦截器
         RUN_LOG.debug("intercept.msg.prepare");
-        MsgIntercept[] msgIntercepts = dependCenter.getByType(MsgIntercept.class, new MsgIntercept[0]);
-        if(msgIntercepts == null || msgIntercepts.length == 0){
+        Supplier<MsgIntercept>[] interceptsSupplier = dependCenter.getTypesBySuper(MsgIntercept.class).stream()
+                .map(c -> (Supplier<MsgIntercept>) () -> dependCenter.get(c))
+                .toArray((IntFunction<Supplier<MsgIntercept>[]>) Supplier[]::new);
+        if(interceptsSupplier.length == 0){
             RUN_LOG.debug("intercept.msg.empty");
         }
 
+        // 监听函数拦截器
+        Supplier<ListenIntercept>[] listenInterceptsSupplier = dependCenter.getTypesBySuper(ListenIntercept.class).stream()
+                .map(c -> (Supplier<ListenIntercept>) () -> dependCenter.get(c))
+                .toArray((IntFunction<Supplier<ListenIntercept>[]>) Supplier[]::new);
+
         // 构建监听器管理中心
         // 构建管理中心
-        ListenerManager manager = scanner.buildManager(botManager, exceptionProcessCenter, msgIntercepts, checkBot);
+        ListenerManager manager = scanner.buildManager(botManager, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier, checkBot);
 
         // 构建阻断器
         Plug plug = scanner.buildPlug();
@@ -985,6 +996,33 @@ public abstract class BaseApplication<
         }
     }
 
+    /**
+     * 根据启动器类和自动装载的组件启动器来自动启动
+     * @param appClass 携带{@link SimpleRobotApplication}注解的启动器类
+     * @param classLoader 使用的类加载器
+     * @param args 参数
+     * @return 标准返回值 {@link SimpleRobotContext }
+     */
+    public static SimpleRobotContext runAuto(Class appClass, ClassLoader classLoader, String... args) throws IOException {
+        // 获取配置的启动器类
+        if(classLoader == null){
+            classLoader = appClass.getClassLoader();
+        }
+        // 获取启动器
+        BaseApplication application = AutoApplicationReader.readApplicationFirst(classLoader);
+        return application.run(appClass, args);
+    }
+
+    /**
+     * 根据启动器类和自动装载的组件启动器来自动启动
+     * @param appClass 携带{@link SimpleRobotApplication}注解的启动器类
+     * @param args 参数
+     * @return 标准返回值 {@link SimpleRobotContext }
+     */
+    public static SimpleRobotContext runAuto(Class appClass, String... args) throws IOException {
+        return runAuto(appClass, null, args);
+    }
+
 
     /**
      * 执行的主程序
@@ -1141,6 +1179,13 @@ public abstract class BaseApplication<
         QQLog.changeQQLogBack(qqLogBack);
     }
 
+    /**
+     * 默认情况下会执行{@link DependCenter}的close方法。
+     */
+    @Override
+    public void close() throws IOException {
+        dependCenter.close();
+    }
 
     /**
      * 打个招呼
@@ -1180,7 +1225,7 @@ public abstract class BaseApplication<
     private ColorTypes wowThatIsRainbowToo$(){
         return RandomUtil.getRandomElement(BackGroundColorTypes.values());
     }
-    private String __$f$__(){
+    protected String __$f$__(){
         String[] s = {
                 "O(∩_∩)O",
                 "o(*￣▽￣*)o",

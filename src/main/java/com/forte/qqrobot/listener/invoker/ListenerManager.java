@@ -11,6 +11,7 @@ import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.exception.NoSuchExceptionHandleException;
 import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.ListenContext;
+import com.forte.qqrobot.listener.ListenIntercept;
 import com.forte.qqrobot.listener.MsgGetContext;
 import com.forte.qqrobot.listener.MsgIntercept;
 import com.forte.qqrobot.listener.error.ExceptionHandleContextImpl;
@@ -29,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -67,6 +69,20 @@ public class ListenerManager implements MsgReceiver {
      */
     private MsgIntercept[] intercepts;
 
+    /** 拦截器懒加载锁 */
+    private final byte[] INTERCEPTS_LOCK = new byte[0];
+
+    /** 拦截器加载函数 */
+    private Supplier<MsgIntercept>[] interceptsSupplier;
+
+
+    /** 拦截器懒加载锁 */
+    private final byte[] LISTEN_INTERCEPTS_LOCK = new byte[0];
+    /** 监听函数加载函数 */
+     private Supplier<ListenIntercept>[] listenInterceptsSupplier;
+    /** 监听函数拦截器懒加载锁 */
+     private ListenIntercept[] listenIntercepts;
+
     /**
      * 每一个manager对象内部维护一个用于msg上下文对象的全局map对象，用于初始化MsgContext
      * <br>
@@ -81,6 +97,13 @@ public class ListenerManager implements MsgReceiver {
      * 由于全局Map可能会出现线程问题，故此使用线程安全的Map
      */
     private Map<String, Object> listenContextGlobalMap = new ConcurrentHashMap<>(2);
+
+    /**
+     * 每一个manager对象内部维护一个用于listenMethod上下文对象的全局map对象，用于初始化ListenInterceptContext
+     * <br>
+     * 由于全局Map可能会出现线程问题，故此使用线程安全的Map
+     */
+    private Map<String, Object> listenInterceptContextGlobalMap = new ConcurrentHashMap<>(2);
 
     /**
      * 空的监听回执列表
@@ -108,6 +131,36 @@ public class ListenerManager implements MsgReceiver {
     private boolean checkBot;
 
     /**
+     * 检测intercepts是否已经初始化，如果没有初始化，则执行初始化。
+     */
+    private void checkAndInitIntercepts(){
+        // 双层if
+        if(intercepts == null){
+            // Lock
+            synchronized (INTERCEPTS_LOCK){
+                if(intercepts == null){
+                    intercepts = Arrays.stream(interceptsSupplier).map(Supplier::get).filter(Objects::nonNull).toArray(MsgIntercept[]::new);
+                }
+            }
+        }
+    }
+
+    /**
+     * 检测intercepts是否已经初始化，如果没有初始化，则执行初始化。
+     */
+    private void checkAndInitListenIntercepts(){
+        // 双层if
+        if(listenIntercepts == null){
+            // Lock
+            synchronized (LISTEN_INTERCEPTS_LOCK){
+                if(listenIntercepts == null){
+                    listenIntercepts = Arrays.stream(listenInterceptsSupplier).map(Supplier::get).filter(Objects::nonNull).toArray(ListenIntercept[]::new);
+                }
+            }
+        }
+    }
+
+    /**
      * 接收到了消息
      */
     @Override
@@ -122,31 +175,41 @@ public class ListenerManager implements MsgReceiver {
                 return EMPTY_RESULT;
             }
         }
+        // 构建一个监听函数上下文对象，并在try结束后清除threadLocal
+        try(
+                ListenContext context = ListenContext.getInstance(listenContextGlobalMap)
+        ){
+            // 存入ThreadLocal
+            context.setLocal();
 
-        // 构建一个监听函数上下文对象
-        ListenContext context = ListenContext.getInstance(listenContextGlobalMap);
+            // 消息拦截
+            // 构建上下文对象
+            MsgGetContext msgContext = new MsgGetContext(msgget, context, sender, setter, getter, msgContextGlobalMap);
 
-        // 消息拦截
-        // 构建上下文对象
-        MsgGetContext msgContext = new MsgGetContext(msgget, context, sender, setter, getter, msgContextGlobalMap);
-        // 遍历所有的消息拦截器
-        for (MsgIntercept intercept : intercepts) {
-            if(!intercept.intercept(msgContext)){
-                // 如果出现返回值false，返回一个空数组
-                return EMPTY_RESULT;
+            // 检测intercepts是否已经初始化
+            checkAndInitIntercepts();
+            checkAndInitListenIntercepts();
+
+            // 遍历所有的消息拦截器
+            for (MsgIntercept intercept : intercepts) {
+                if(!intercept.intercept(msgContext)){
+                    // 如果出现返回值false，返回一个空数组
+                    return EMPTY_RESULT;
+                }
             }
+
+            // 拦截结束，重新赋值MsgGet
+            msgget = msgContext.getMsgGet();
+
+            //对外接口，表示接收到了消息, 对消息进行监听分配
+            //组装参数，此参数保证全部类型全部唯一, 且参数索引2的位置为是否被at
+            Object[] params = getParams(msgget);
+            AtDetection at = (AtDetection) params[2];
+
+            //为消息分配监听函数
+            return invoke(msgget, context, params, at, sender, setter, getter);
         }
 
-        // 拦截结束，重新赋值MsgGet
-        msgget = msgContext.getMsgGet();
-
-        //对外接口，表示接收到了消息, 对消息进行监听分配
-        //组装参数，此参数保证全部类型全部唯一, 且参数索引2的位置为是否被at
-        Object[] params = getParams(msgget);
-        AtDetection at = (AtDetection) params[2];
-
-        //为消息分配监听函数
-        return invoke(msgget, context, params, at, sender, setter, getter);
     }
 
 
@@ -157,50 +220,52 @@ public class ListenerManager implements MsgReceiver {
      * @param at        是否被at
      * @return 执行的结果集，已经排序了。
      */
-    private ListenResult[] invoke(MsgGet msgGet, ListenContext context, Set<Object> args, AtDetection at,
-                                  SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+    private ListenResult[] invoke(MsgGet msgGet, ListenContext context, Object[] args, AtDetection at,
+                                  SenderSendList sender , SenderSetList setter, SenderGetList getter){
 
         //参数获取getter
-        Function<ListenerMethod, AdditionalDepends> paramGetter = buildParamGetter(msgGet, args, at, sendList, setList, getList, context);
+        Function<ListenerMethod, AdditionalDepends> paramGetter = buildParamGetter(msgGet, args, at, sender, setter, getter, context);
         //获取消息类型
         MsgGetTypes type = MsgGetTypes.getByType(msgGet.getClass());
+
 
 
         //先查看是否存在阻断函数，如果存在阻断函数则执行仅执行阻断函数
         //获取阻断器
         Plug plug = ResourceDispatchCenter.getPlug();
         Set<ListenerMethod> blockMethod = plug.getBlockMethod(type);
+
+        Function<ListenerMethod, ListenInterceptContext> contextFunction = lm -> new ListenInterceptContext(lm, context, listenInterceptContextGlobalMap, sender, setter, getter);
+
         if(blockMethod != null){
             //如果存在阻断，执行阻断
-            return invokeBlock(blockMethod, paramGetter, msgGet, at, context);
-//            ListenResult<Object> blockResult = ListenResultImpl.result(1, null, true, false, false, null);
-//            return new ListenResult[]{blockResult};
+            return invokeBlock(blockMethod, paramGetter, msgGet, at, context, contextFunction);
         }else{
             //如果不存在阻断，正常执行
             //先执行普通监听函数
 
-            Map.Entry<Integer, List<ListenResult>> normalIntResult = invokeNormal(type, paramGetter, msgGet, at, context);
+            Map.Entry<Integer, List<ListenResult>> normalIntResult = invokeNormal(type, paramGetter, msgGet, at, context, contextFunction);
             int invokeNum = normalIntResult.getKey();
 
             //如果没有普通监听函数执行成功，则尝试执行备用监听函数
             if(invokeNum <= 0){
-                Map.Entry<Integer, List<ListenResult>> spareIntList = invokeSpare(type, paramGetter, msgGet, at, context);
+                Map.Entry<Integer, List<ListenResult>> spareIntList = invokeSpare(type, paramGetter, msgGet, at, context, contextFunction);
                 normalIntResult.getValue().addAll(spareIntList.getValue());
             }
             // 将结果转化为数组并返回
             return normalIntResult.getValue().toArray(new ListenResult[0]);
         }
     }
-
-    /**
-     * 接收到了消息响应
-     * @param msgGet    接收的消息
-     * @param args      参数列表
-     * @param at        是否被at
-     */
-    private ListenResult[] invoke(MsgGet msgGet, ListenContext context, Object[] args, AtDetection at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
-        return invoke(msgGet, context, Arrays.stream(args).collect(Collectors.toSet()), at, sendList, setList, getList);
-    }
+//
+//    /**
+//     * 接收到了消息响应
+//     * @param msgGet    接收的消息
+//     * @param args      参数列表
+//     * @param at        是否被at
+//     */
+//    private ListenResult[] invoke(MsgGet msgGet, ListenContext context, Object[] args, AtDetection at, SenderSendList sendList , SenderSetList setList, SenderGetList getList){
+//        return invoke(msgGet, context, Arrays.stream(args).collect(Collectors.toSet()), at, sendList, setList, getList);
+//    }
 
     /**
      * 执行阻断函数
@@ -210,7 +275,8 @@ public class ListenerManager implements MsgReceiver {
      * @param at            是否被at
      */
     private ListenResult[] invokeBlock(Set<ListenerMethod> blockMethod, Function<ListenerMethod, AdditionalDepends> paramGetter,
-                             MsgGet msgGet, AtDetection at, ListenContext context){
+                             MsgGet msgGet, AtDetection at, ListenContext context,
+                             Function<ListenerMethod, ListenInterceptContext> listenInterceptContextFunction){
         //过滤
         //获取过滤器
         ListenerFilter filter = ResourceDispatchCenter.getListenerFilter();
@@ -221,7 +287,9 @@ public class ListenerManager implements MsgReceiver {
                 //执行函数
                 addition = paramGetter.apply(lisM);
                 addition.put("context", context);
-                return lisM.invoke(addition);
+                // context
+                ListenInterceptContext interceptContext = listenInterceptContextFunction.apply(lisM);
+                return lisM.invoke(addition, interceptContext, listenIntercepts);
             }catch (Exception e){
                 MsgSender sender = addition == null ? null : addition.get(MsgSender.class);
                 final ExceptionHandleContextImpl<Exception> exContext =
@@ -280,7 +348,7 @@ public class ListenerManager implements MsgReceiver {
      * 额外参数作为 {@link AdditionalDepends} 类进行封装
      */
     private Function<ListenerMethod, AdditionalDepends> buildParamGetter(MsgGet msgGet,
-                                                                         Set<Object> args,
+                                                                         Object[] args,
                                                                          AtDetection at,
                                                                          SenderSendList sendList ,
                                                                          SenderSetList setList,
@@ -332,7 +400,8 @@ public class ListenerManager implements MsgReceiver {
      * @return              执行成功函数数量 & 结果集合(排过序的)
      */
     private Map.Entry<Integer, List<ListenResult>> invokeNormal(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter,
-                                                                MsgGet msgGet, AtDetection at, ListenContext context){
+                                                                MsgGet msgGet, AtDetection at, ListenContext context,
+                                                                Function<ListenerMethod, ListenInterceptContext> listenInterceptContextFunction){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
         //执行结果集合
@@ -353,7 +422,8 @@ public class ListenerManager implements MsgReceiver {
                 .map(lm -> {
                     try {
                         final AdditionalDepends additionalDepends = paramGetter.apply(lm);
-                        ListenResult result = lm.invoke(additionalDepends);
+                        ListenInterceptContext interceptContext = listenInterceptContextFunction.apply(lm);
+                        ListenResult result = lm.invoke(additionalDepends, interceptContext, listenIntercepts);
                         // 如果有异常，處理或输出这个异常
                         Exception error = result.getError();
                         if(error != null){
@@ -394,7 +464,8 @@ public class ListenerManager implements MsgReceiver {
      * @param at            是否被at
      */
     private Map.Entry<Integer, List<ListenResult>> invokeSpare(MsgGetTypes msgGetTypes, Function<ListenerMethod, AdditionalDepends> paramGetter,
-                                                               MsgGet msgGet, AtDetection at, ListenContext context){
+                                                               MsgGet msgGet, AtDetection at, ListenContext context,
+                                                               Function<ListenerMethod, ListenInterceptContext> listenInterceptContextFunction){
         //执行过的方法数量
         AtomicInteger count = new AtomicInteger(0);
 
@@ -415,7 +486,8 @@ public class ListenerManager implements MsgReceiver {
                 .map(lm -> {
                     try {
                         final AdditionalDepends additionalDepends = paramGetter.apply(lm);
-                        ListenResult result = lm.invoke(additionalDepends);
+                        ListenInterceptContext interceptContext = listenInterceptContextFunction.apply(lm);
+                        ListenResult result = lm.invoke(additionalDepends, interceptContext, listenIntercepts);
                         // 如果有异常，输出这个异常
                         Exception error = result.getError();
                         if(error != null){
@@ -476,16 +548,20 @@ public class ListenerManager implements MsgReceiver {
         this.checkBot = checkBot;
     }
 
-    public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, MsgIntercept[] intercepts){
-        this(methods, botManager, exceptionProcessCenter, intercepts, true);
+    public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, Supplier<MsgIntercept>[] interceptsSupplier, Supplier<ListenIntercept>[] listenInterceptsSupplier){
+        this(methods, botManager, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier, true);
     }
 
         /**
          * 构造方法，对函数进行分组保存
          * @param methods 函数集合
-         * @param intercepts 消息拦截器数组 nullable
+         * @param interceptsSupplier 消息拦截器数组 nullable
          */
-    public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, MsgIntercept[] intercepts, boolean checkBot){
+    public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager,
+                           ExceptionProcessCenter exceptionProcessCenter,
+                           Supplier<MsgIntercept>[] interceptsSupplier,
+                           Supplier<ListenIntercept>[] listenInterceptsSupplier,
+                           boolean checkBot){
         // bot管理器
         this.botManager = botManager;
 
@@ -496,13 +572,24 @@ public class ListenerManager implements MsgReceiver {
         this.checkBot = checkBot;
 
         // 排序并构建消息拦截器
-        if(intercepts != null){
-            MsgIntercept[] msgInterceptsCopy = Arrays.copyOf(intercepts, intercepts.length);
-
+        if(interceptsSupplier != null){
+            Supplier<MsgIntercept>[] msgInterceptsCopy = Arrays.copyOf(interceptsSupplier, interceptsSupplier.length);
             Arrays.sort(msgInterceptsCopy);
-            this.intercepts = msgInterceptsCopy;
+            this.interceptsSupplier = msgInterceptsCopy;
         }else{
+            // 没有，直接给intercepts赋值
             this.intercepts = new MsgIntercept[0];
+        }
+
+        // 排序并构建j监听函数拦截器
+        if(listenInterceptsSupplier != null){
+            Supplier<ListenIntercept>[] listenInterceptsCopy = Arrays.copyOf(listenInterceptsSupplier, listenInterceptsSupplier.length);
+
+            Arrays.sort(listenInterceptsCopy);
+            this.listenInterceptsSupplier = listenInterceptsCopy;
+        }else{
+            // 没有，直接给intercepts赋值
+            this.listenIntercepts = new ListenIntercept[0];
         }
 
 
@@ -511,7 +598,7 @@ public class ListenerManager implements MsgReceiver {
          */
         //如果没有东西
         if(methods == null || methods.isEmpty()){
-            this.LISTENER_METHOD_MAP = Collections.EMPTY_MAP;
+            this.LISTENER_METHOD_MAP = new HashMap<>(1);
         }else{
             //分组后赋值
             //第一层分组后

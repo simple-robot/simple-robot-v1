@@ -1,9 +1,16 @@
 package com.forte.qqrobot.sender;
 
+import com.forte.lang.Language;
 import com.forte.qqrobot.BotRuntime;
 import com.forte.qqrobot.ResourceDispatchCenter;
+import com.forte.qqrobot.beans.cqcode.AppendList;
+import com.forte.qqrobot.beans.cqcode.CQAppendList;
 import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
+import com.forte.qqrobot.beans.messages.msgget.DiscussMsg;
+import com.forte.qqrobot.beans.messages.msgget.GroupMsg;
+import com.forte.qqrobot.beans.messages.msgget.MsgGet;
+import com.forte.qqrobot.beans.messages.msgget.PrivateMsg;
 import com.forte.qqrobot.beans.messages.result.GroupInfo;
 import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
 import com.forte.qqrobot.beans.messages.result.StrangerInfo;
@@ -55,21 +62,30 @@ public class MsgSender implements Sender {
     public final SenderGetList GETTER;
 
 
-    private static SenderSendIntercept[] senderSendIntercepts =  {};
-    private static SenderSetIntercept[]  senderSetIntercepts =   {};
-    private static SenderGetIntercept[]  senderGetIntercepts =   {};
+    private static SenderSendIntercept[] senderSendIntercepts = {};
+    private static SenderSetIntercept[] senderSetIntercepts = {};
+    private static SenderGetIntercept[] senderGetIntercepts = {};
 
     //**************** 送信器的拦截代理 ****************//
-    /** 设置send送信器拦截 */
-    public static void setSenderSendIntercepts(SenderSendIntercept... senderSendIntercepts){
+
+    /**
+     * 设置send送信器拦截
+     */
+    public static void setSenderSendIntercepts(SenderSendIntercept... senderSendIntercepts) {
         MsgSender.senderSendIntercepts = senderSendIntercepts;
     }
-    /** 设置set送信器拦截 */
-    public static void setSenderSetIntercepts(SenderSetIntercept... senderSetIntercepts){
+
+    /**
+     * 设置set送信器拦截
+     */
+    public static void setSenderSetIntercepts(SenderSetIntercept... senderSetIntercepts) {
         MsgSender.senderSetIntercepts = senderSetIntercepts;
     }
-    /** 设置get送信器拦截 */
-    public static void setSenderGetIntercepts(SenderGetIntercept... senderGetIntercepts){
+
+    /**
+     * 设置get送信器拦截
+     */
+    public static void setSenderGetIntercepts(SenderGetIntercept... senderGetIntercepts) {
         MsgSender.senderGetIntercepts = senderGetIntercepts;
     }
 
@@ -77,35 +93,39 @@ public class MsgSender implements Sender {
 
     /**
      * 获取一个指定的Bot对象
+     *
      * @param botCode botCode
      * @return {@link BotInfo} bot信息
      */
-    public BotInfo bot(String botCode){
+    public BotInfo bot(String botCode) {
         return runtime.getBotManager().getBot(botCode);
     }
 
     /**
      * 获取一个默认的Bot对象
+     *
      * @return {@link BotInfo} bot信息
      */
-    public BotInfo bot(){
+    public BotInfo bot() {
         return runtime.getBotManager().defaultBot();
     }
 
     /**
      * 获取一个指定bot的送信器
+     *
      * @param botCode bot账号
      * @return bot送信器
      */
-    public BotSender botSender(String botCode){
+    public BotSender botSender(String botCode) {
         return bot(botCode).getSender();
     }
 
     /**
      * 获取默认的Bot送信器
+     *
      * @return bot送信器
      */
-    public BotSender botSender(){
+    public BotSender botSender() {
         return bot().getSender();
     }
 
@@ -223,6 +243,37 @@ public class MsgSender implements Sender {
     }
 
 
+    /**
+     * 快速回复，根据传入的类型判断。
+     * 只支持{@link PrivateMsg}、{@link GroupMsg}、{@link DiscussMsg}三种类型。
+     *
+     * @param msg   接收到的消息
+     * @param reply 回复的正文
+     * @param at    是否要at他，默认为true，只有群消息和私信消息生效
+     */
+    public void reply(MsgGet msg, String reply, boolean at) {
+        if (msg instanceof PrivateMsg) {
+            SENDER.sendPrivateMsg((PrivateMsg) msg, reply);
+        } else if (msg instanceof GroupMsg) {
+            GroupMsg gm = (GroupMsg) msg;
+            if(at){
+                reply = "[CQ:at,qq="+ gm.getQQ() +"] " + reply;
+            }
+            SENDER.sendPrivateMsg(gm, reply);
+        } else if (msg instanceof DiscussMsg) {
+            DiscussMsg gm = (DiscussMsg) msg;
+            if(at){
+                reply = "[CQ:at,qq="+ gm.getQQ() +"] " + reply;
+            }
+            SENDER.sendPrivateMsg(gm, reply);
+        } else {
+            String err = Language.format("msgSender.reply.failed", msg.getClass());
+            throw new IllegalArgumentException(err);
+        }
+
+    }
+
+
     //**************************************
     //*             构建工厂
     //**************************************
@@ -293,9 +344,9 @@ public class MsgSender implements Sender {
             this.GETTER = null;
         } else {
             //构建SENDER
-            this.SENDER = senderList.isSenderList() ? (interceptSend ? initSender((SenderSendList) senderList) : (SenderSendList)senderList) : null;
-            this.SETTER = senderList.isSetterList() ? (interceptSet  ? initSetter((SenderSetList) senderList ) : (SenderSetList) senderList) : null;
-            this.GETTER = senderList.isGetterList() ? (interceptGet  ? initGetter((SenderGetList) senderList ) : (SenderGetList) senderList) : null;
+            this.SENDER = senderList.isSenderList() ? (interceptSend ? initSender((SenderSendList) senderList) : (SenderSendList) senderList) : null;
+            this.SETTER = senderList.isSetterList() ? (interceptSet ? initSetter((SenderSetList) senderList) : (SenderSetList) senderList) : null;
+            this.GETTER = senderList.isGetterList() ? (interceptGet ? initGetter((SenderGetList) senderList) : (SenderGetList) senderList) : null;
         }
 
         //为listenerMethod赋值
@@ -317,42 +368,52 @@ public class MsgSender implements Sender {
         this.runtime = runtime;
         //构建SENDER, 如果存在拦截器，则构建代理
         this.SENDER = interceptSend ? initSender(sender) : sender;
-        this.SETTER = interceptSet  ? initSetter(setter) : setter;
-        this.GETTER = interceptGet  ? initGetter(getter) : getter;
+        this.SETTER = interceptSet ? initSetter(setter) : setter;
+        this.GETTER = interceptGet ? initGetter(getter) : getter;
 
         //为listenerMethod赋值
         this.LISTENER_METHOD = initListener(listenerMethod);
     }
 
-    /** 初始化sender */
-    private SenderSendList initSender(SenderSendList sender){
-        if(senderSendIntercepts != null && senderSendIntercepts.length > 0){
+    /**
+     * 初始化sender
+     */
+    private SenderSendList initSender(SenderSendList sender) {
+        if (senderSendIntercepts != null && senderSendIntercepts.length > 0) {
             return SenderInterceptFactory.doSenderIntercept(sender, senderSendIntercepts);
-        }else{
+        } else {
             return sender;
         }
     }
-    /** 初始化setter */
-    private SenderSetList initSetter(SenderSetList setter){
-        if(senderSetIntercepts != null && senderSetIntercepts.length > 0){
+
+    /**
+     * 初始化setter
+     */
+    private SenderSetList initSetter(SenderSetList setter) {
+        if (senderSetIntercepts != null && senderSetIntercepts.length > 0) {
             return SenderInterceptFactory.doSetterIntercept(setter, senderSetIntercepts);
-        }else{
+        } else {
             return setter;
         }
     }
-    /** 初始化setter */
-    private SenderGetList initGetter(SenderGetList getter){
-        if(senderGetIntercepts != null && senderGetIntercepts.length > 0){
+
+    /**
+     * 初始化setter
+     */
+    private SenderGetList initGetter(SenderGetList getter) {
+        if (senderGetIntercepts != null && senderGetIntercepts.length > 0) {
             return SenderInterceptFactory.doGetterIntercept(getter, senderGetIntercepts);
-        }else{
+        } else {
             return getter;
         }
     }
-    /** 初始化所在监听函数 */
-    private ListenerMethod initListener(ListenerMethod method){
+
+    /**
+     * 初始化所在监听函数
+     */
+    private ListenerMethod initListener(ListenerMethod method) {
         return method;
     }
-
 
 
     //**************************************
@@ -549,7 +610,6 @@ public class MsgSender implements Sender {
     public String[] getOnNormalBlockNameArray() {
         return getPlug().getNormalBlockNameArray();
     }
-
 
 
     /**

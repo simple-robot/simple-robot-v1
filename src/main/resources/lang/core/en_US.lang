@@ -200,6 +200,9 @@ listener.bot.noVerify=BOT[{0}]not verify! The message has been intercepted.
 ## 当某个API被拦截器阻止，或者说拦截的时候的消息
 intercept.block=API [{0}] has been blocked.
 
+# msgSender
+msgSender.reply.failed=Parameter type is wrong! Only three types of messages [PrivateMsg], [GroupMsg], [DiscussMsg] are allowed instead of: {0}
+
 
 ## CoreSystem中使用的日志
 system.version.check=Will start version detection.Please ignore the error logs that appear before the version detection ends, they are not harmful.
@@ -208,3 +211,5 @@ system.version.check.failed=Version check failed.You can choose to go to the mav
 system.version.newest=Current core version: {0}, currently the latest version in the {1} release series.
 system.version.notnewest=Current core version: {0}, there is a more advanced version {2} in the {1} version series, you can consider switching the core version. \nNote that the core replacement needs to ensure that the first two version numbers are the same: {1} \nYou can refer to: \nReference 1: {3} \nReference 2: {4}
 
+depend.center.close=Closed [{0}]
+depend.center.close.failed=Close [{0} ({1})] failed: {2}

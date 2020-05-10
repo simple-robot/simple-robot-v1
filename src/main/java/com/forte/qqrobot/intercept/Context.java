@@ -57,6 +57,9 @@ public interface Context<T> {
      */
     void clear();
 
+    /** 清除全局上下文中的值 */
+    void clearGlobal();
+
     /**
      * 清除所有域的内容
      */

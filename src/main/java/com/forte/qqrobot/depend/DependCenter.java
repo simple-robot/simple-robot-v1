@@ -10,6 +10,8 @@ import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.AnnotationUtils;
 import com.forte.qqrobot.utils.FieldUtils;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -25,7 +27,7 @@ import java.util.function.*;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class DependCenter implements DependGetter, DependInjector {
+public class DependCenter implements DependGetter, DependInjector, Closeable {
 
     /**
      * 获取方法参数名获取器
@@ -83,12 +85,9 @@ public class DependCenter implements DependGetter, DependInjector {
      */
     public DependCenter() {
         basicResourceWarehouse = new BasicResourceWarehouse();
-        SINGLE_FACTORY = new ConcurrentHashMap<>(8);
+        SINGLE_FACTORY = new LinkedHashMap<>(8);
         nameResourceWarehouse = new ConcurrentHashMap<>(8);
         classResourceWareHouse = new ConcurrentHashMap<>(8);
-//        nameResourceWarehouse = Collections.synchronizedMap(new HashMap<>(8));
-//        classResourceWareHouse = Collections.synchronizedMap(new HashMap<>(8));
-//        SINGLE_FACTORY = Collections.synchronizedMap(new HashMap<>(8));
         this.dependGetter = this;
     }
 
@@ -97,15 +96,18 @@ public class DependCenter implements DependGetter, DependInjector {
      */
     public DependCenter(DependGetter dependGetter) {
         basicResourceWarehouse = new BasicResourceWarehouse();
-        SINGLE_FACTORY = new ConcurrentHashMap<>(8);
+        SINGLE_FACTORY = new LinkedHashMap<>(8);
         nameResourceWarehouse = new ConcurrentHashMap<>(8);
         classResourceWareHouse = new ConcurrentHashMap<>(8);
-//        nameResourceWarehouse = Collections.synchronizedMap(new HashMap<>(8));
-//        classResourceWareHouse = Collections.synchronizedMap(new HashMap<>(8));
-//        SINGLE_FACTORY = Collections.synchronizedMap(new HashMap<>(8));
         this.dependGetter = dependGetter;
     }
 
+    /** 记录一个单例 */
+    private Object putSingle(String key, Object value){
+        synchronized (SINGLE_FACTORY){
+            return SINGLE_FACTORY.put(key, value);
+        }
+    }
 
     //**************************************
     //
@@ -254,7 +256,8 @@ public class DependCenter implements DependGetter, DependInjector {
                 Object get = SINGLE_FACTORY.get(name);
                 if(get == null){
                     get = beanGetInstanceFunction.apply(paramsGetter.get());
-                    SINGLE_FACTORY.put(name, get);
+                    putSingle(name, get);
+//                    SINGLE_FACTORY.put(name, get);
                 }
                 return get;
             };
@@ -285,7 +288,7 @@ public class DependCenter implements DependGetter, DependInjector {
             throw new DependResourceException("dependExistByName", depend);
         }
 
-        QQLog.info("run.depend.load", depend);
+        QQLog.debug("run.depend.load", depend);
 
         //判断类型，如果是基础数据类型，保存到基础，否则保存至其他
         if (BasicResourceWarehouse.isBasicType(depend.getType())) {
@@ -685,15 +688,6 @@ public class DependCenter implements DependGetter, DependInjector {
      */
     public <T> List<T> getByType(Class<T> superType) {
         return getListByType(superType);
-//        List<T> list = new ArrayList<>(4);
-//        // 使用类型工厂
-//        Set<Class> keySet = classResourceWareHouse.keySet();
-//        for (Class keyClass : keySet) {
-//            if(keyClass.equals(superType) || FieldUtils.isChild(keyClass, superType)){
-//                list.add((T) get(keyClass));
-//            }
-//        }
-//        return listByType;
     }
 
     /**
@@ -1124,6 +1118,28 @@ public class DependCenter implements DependGetter, DependInjector {
         }
 
     }
+
+
+    @Override
+    public void close(){
+        // 单例工厂中，如果为closeable的，关闭
+        synchronized (SINGLE_FACTORY){
+            SINGLE_FACTORY.forEach((k, v) -> {
+                if(v instanceof Closeable){
+                    Closeable cl = (Closeable) v;
+                    try {
+                        cl.close();
+                        QQLog.debug("depend.center.close", k);
+                    } catch (IOException e) {
+                        QQLog.error("depend.center.close.failed", e, k, v.getClass(), e.getLocalizedMessage());
+                    }
+                }
+            });
+            // 清除
+            SINGLE_FACTORY.clear();
+        }
+    }
+
 
 
 }

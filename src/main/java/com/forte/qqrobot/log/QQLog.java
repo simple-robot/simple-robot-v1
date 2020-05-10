@@ -125,7 +125,6 @@ public class QQLog extends ColorSystem {
      */
     public static void log(Object msg, LogLevel level, PrintStream logStream, Throwable e, Object... formatArgs){
         String msgStr = msg.toString();
-        // 判断语言是否已经初始化完成
         msgStr = Language.format(msgStr, formatArgs);
         if(ifCan(level)){
             if(qqLogBack.onLog(msgStr, level, e)){

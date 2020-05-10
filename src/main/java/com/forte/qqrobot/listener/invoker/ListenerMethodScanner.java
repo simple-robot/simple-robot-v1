@@ -7,6 +7,7 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.depend.DependGetter;
+import com.forte.qqrobot.listener.ListenIntercept;
 import com.forte.qqrobot.listener.MsgIntercept;
 import com.forte.qqrobot.listener.error.ExceptionProcessCenter;
 import com.forte.qqrobot.listener.invoker.plug.ListenerPlug;
@@ -157,9 +158,6 @@ public class ListenerMethodScanner {
 
             //排序
             int sort = Optional.ofNullable(methodListen).map(Listen::sort).orElse(sortClass);
-            // id, 如果存在类上的id且也存在方法上的，拼接上下两id，否则使用类级别
-            // 类上的id默认是空字符
-//            String id = Optional.ofNullable(methodListen).map(l -> nameClass + "." + l.name()).orElse(nameClass + "." + method.getName());
             String id = null;
             // 没有方法上的Listen注解
             if(methodListen == null){
@@ -172,8 +170,8 @@ public class ListenerMethodScanner {
                 String methodLisName = methodListen.name();
                 // 方法上有注解
                 // 类上有name
-                id = ( nameClass.length() > 0 ? nameClass : clazz.getTypeName())
-                        + "#" +
+                id = ( nameClass.length() > 0 ? nameClass + "#" : "")
+                        +
                      ( methodLisName.trim().length() == 0 ? method.getName() : methodLisName );
             }
 
@@ -241,16 +239,18 @@ public class ListenerMethodScanner {
      * 构建监听函数管理器实例
      * @return 监听函数管理器实例
      */
-    public ListenerManager buildManager(BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, MsgIntercept[] intercepts){
-        return new ListenerManager(listenerMethodSet, botManager, exceptionProcessCenter, intercepts);
+    public ListenerManager buildManager(BotManager botManager, ExceptionProcessCenter exceptionProcessCenter,
+                                        Supplier<MsgIntercept>[] interceptsSupplier, Supplier<ListenIntercept>[] listenInterceptsSupplier){
+        return new ListenerManager(listenerMethodSet, botManager, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier);
     }
 
     /**
      * 构建监听函数管理器实例
      * @return 监听函数管理器实例
      */
-    public ListenerManager buildManager(BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, MsgIntercept[] intercepts, boolean checkBot){
-        return new ListenerManager(listenerMethodSet, botManager, exceptionProcessCenter, intercepts, checkBot);
+    public ListenerManager buildManager(BotManager botManager, ExceptionProcessCenter exceptionProcessCenter,
+                                        Supplier<MsgIntercept>[] interceptsSupplier, Supplier<ListenIntercept>[] listenInterceptsSupplier, boolean checkBot){
+        return new ListenerManager(listenerMethodSet, botManager, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier, checkBot);
     }
 
     /**
@@ -261,24 +261,6 @@ public class ListenerMethodScanner {
         return new ListenerPlug(listenerMethodSet);
     }
 
-//    /**
-//     * 构建ListenerMethod对象
-//     * @param listenerGetter 监听器实例获取函数
-//     * @param method    方法本体
-//     * @param types     监听类型
-//     * @param spare         Spare注解
-//     * @param filter        filter注解
-//     * @param blockFilter   blockFilter注解
-//     * @return  ListenerMethod实例对象
-//     */
-//    private ListenerMethod build(Supplier listenerGetter, Function<DependGetter, ?> listenerGetterWithAddition, Method method, MsgGetTypes[] types, Spare spare, Filter filter, BlockFilter blockFilter, Block block){
-//        return ListenerMethod.build(listenerGetter, listenerGetterWithAddition, method, types)
-//                             .spare(spare)
-//                             .filter(filter)
-//                             .blockFilter(blockFilter)
-//                             .block(block)
-//                             .build();
-//    }
 
     /**
      * 构建ListenerMethod对象

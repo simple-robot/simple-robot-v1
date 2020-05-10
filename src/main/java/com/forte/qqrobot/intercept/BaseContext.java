@@ -92,6 +92,11 @@ public abstract class BaseContext<T> implements Context<T> {
     }
 
     @Override
+    public void clearGlobal() {
+        getGlobalContextMap().clear();
+    }
+
+    @Override
     public void clearAll(){
         getContextMap().clear();
         getGlobalContextMap().clear();

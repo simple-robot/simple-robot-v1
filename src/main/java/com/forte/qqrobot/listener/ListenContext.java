@@ -2,6 +2,8 @@ package com.forte.qqrobot.listener;
 
 import com.forte.qqrobot.intercept.BaseContext;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,13 +14,27 @@ import java.util.Set;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class ListenContext extends BaseContext<Void> {
+public class ListenContext extends BaseContext<Void> implements Closeable {
 
 
-//    /**
-//     * 单次生效的Map, 使用懒加载，当前域
-//     */
-//    private Map<String, Object> normalMap;
+    /** 本地线程内容 */
+    private static final ThreadLocal<ListenContext> LOCAL = new ThreadLocal<>();
+
+    /** 设置一个本地线程内容 */
+    public static void setLocalValue(ListenContext listenContext){
+        LOCAL.set(listenContext);
+    }
+
+    /** 将自己存入线程LOCAL中 */
+    public void setLocal(){
+        setLocalValue(this);
+    }
+
+    /** 获取本地线程中可能存在的值 */
+    public static ListenContext getLocal(){
+        return LOCAL.get();
+    }
+
 
     public ListenContext(Map<String, Object> globalContext) {
         super(null, globalContext);
@@ -81,28 +97,6 @@ public class ListenContext extends BaseContext<Void> {
         return get(key);
     }
 
-//    /**
-//     * 从全局域中获取
-//     *
-//     * @param key key
-//     * @return 值
-//     */
-//    @Override
-//    public Object getGlobal(String key) {
-//        return globalContext.get(key);
-//    }
-
-//    /**
-//     * 默认的记录一个域值，默认记录在当前域
-//     *
-//     * @param key   键
-//     * @param value 值
-//     */
-//    @Override
-//    public Object set(String key, Object value) {
-//        return setNormal(key, value);
-//    }
-
     /**
      * 记录一个当前域值, 相当于方法{@link #set(String, Object)}
      * @param key   键
@@ -135,5 +129,19 @@ public class ListenContext extends BaseContext<Void> {
         return getGlobalContextMap().keySet();
     }
 
+    /**
+     * 清理ThreadLocal
+     */
+    @Override
+    public void close() {
+        LOCAL.remove();
+    }
+
+    /**
+     * 清理ThreadLocal
+     */
+    public static void removeLocal(){
+        LOCAL.remove();
+    }
 
 }

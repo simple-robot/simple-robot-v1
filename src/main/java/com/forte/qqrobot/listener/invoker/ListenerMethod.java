@@ -9,6 +9,8 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.depend.DependGetter;
+import com.forte.qqrobot.listener.ListenContext;
+import com.forte.qqrobot.listener.ListenIntercept;
 import com.forte.qqrobot.listener.result.BasicResultParser;
 import com.forte.qqrobot.listener.result.ListenResult;
 import com.forte.qqrobot.listener.result.ListenResultParser;
@@ -16,8 +18,7 @@ import com.forte.utils.basis.MD5Utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 /**
  * 监听器方法封装类
+ *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/25 18:28
  * @since JDK1.8
@@ -34,12 +36,19 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
     //**************** 所有字段均不可改变 ****************//
 
-    /** 为监听函数创建一个UUID */
+    /**
+     * 为监听函数创建一个UUID
+     */
     private final String UUID;
 
     /**
+     * name
+     */
+    private final String name;
+
+    /**
      * 监听函数实例对象的获取函数
-     * */
+     */
     private final Supplier<T> listenerGetter;
 
     /**
@@ -47,57 +56,82 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
      */
     private final Function<DependGetter, T> listenerGetterWithAddition;
 
-    /** 过滤器注解，如果没有则为null */
+    /**
+     * 过滤器注解，如果没有则为null
+     */
     private final Filter filter;
 
-    /** filter注解对应的封装对象 */
+    /**
+     * filter注解对应的封装对象
+     */
     private final com.forte.qqrobot.anno.data.Filter filterData;
 
-    /** 正则匹配值，提前解析好 */
+    /**
+     * 正则匹配值，提前解析好
+     */
     private final Pattern[] patternValue;
 
     private final Pattern[] patternCodeValue;
     private final Pattern[] patternGroupValue;
     private final Pattern[] patternBotValue;
 
-    /** 阻塞过滤器注解，如果没有则为null */
+    /**
+     * 阻塞过滤器注解，如果没有则为null
+     */
     private final BlockFilter blockFilter;
 
-    /** 默认方法注解，如果没有则为null */
+    /**
+     * 默认方法注解，如果没有则为null
+     */
     private final Spare spare;
 
-    /** 阻塞注解，如果没有则为null */
+    /**
+     * 阻塞注解，如果没有则为null
+     */
     private final Block block;
 
-    /** 方法本体 */
+    /**
+     * 方法本体
+     */
     private final Method method;
 
-    /** 此方法所属的监听类型, 多种类型 */
+    /**
+     * 此方法所属的监听类型, 多种类型
+     */
     private final MsgGetTypes[] type;
 
-    /** 排序索引 */
+    /**
+     * 排序索引
+     */
     private final int sort;
 
-    /** 是否监听截断, 将invoke的结果传入，返回一个结果 */
+    /**
+     * 是否监听截断, 将invoke的结果传入，返回一个结果
+     */
     private final Predicate<Object> listenBreak;
 
-    /** 是否插件截断，将invoke的结果传入，返回一个结果 */
+    /**
+     * 是否插件截断，将invoke的结果传入，返回一个结果
+     */
     private final Predicate<Object> listenBreakPlugin;
 
-    /** 结果转化器 */
+    /**
+     * 结果转化器
+     */
     private final ListenResultParser resultParser;
 
     //**************** 以下为可以动态变更的值 ****************//
-    
-    
+
+
     /**
      * 全参数构造
+     *
      * @param listenerGetter 监听器对象实例获取函数
-     * @param filter        过滤注解
-     * @param blockFilter   阻塞过滤注解
-     * @param spare         备用方法注解
-     * @param method        方法本体
-     * @param type          监听类型
+     * @param filter         过滤注解
+     * @param blockFilter    阻塞过滤注解
+     * @param spare          备用方法注解
+     * @param method         方法本体
+     * @param type           监听类型
      */
     private ListenerMethod(Supplier<T> listenerGetter,
                            Function<DependGetter, T> listenerGetterWithAddition,
@@ -112,26 +146,25 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
                            Predicate<Object> listenBreakPlugin,
                            ListenResultParser resultParser,
                            String name
-                           ) {
+    ) {
         this.listenerGetter = listenerGetter;
-        this.listenerGetterWithAddition  = listenerGetterWithAddition;
+        this.listenerGetterWithAddition = listenerGetterWithAddition;
         this.filter = filter;
 
-        if(filter == null){
+        if (filter == null) {
             this.filterData = null;
             Pattern[] emptyArray = new Pattern[0];
             this.patternValue = emptyArray;
             this.patternCodeValue = emptyArray;
             this.patternGroupValue = emptyArray;
             this.patternBotValue = emptyArray;
-        }else{
+        } else {
             this.filterData = com.forte.qqrobot.anno.data.Filter.build(filter);
             this.patternValue = filterData.patternValue();
             this.patternCodeValue = filterData.patternCodeValue();
             this.patternGroupValue = filterData.patternGroupValue();
             this.patternBotValue = filterData.patternBotValue();
         }
-
 
 
         this.blockFilter = blockFilter;
@@ -143,20 +176,13 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         this.listenBreak = listenBreak;
         this.listenBreakPlugin = listenBreakPlugin;
         this.resultParser = resultParser;
+        this.name = name;
+
         // UUID 使用 方法包路径 + (方法名 + 参数类型列表 | name)
-
-        String id;
-
-        if(name == null || name.trim().length() == 0){
-            String s1 = Arrays.toString(method.getParameterTypes());
-            String s = s1.substring(1, s1.length() - 1);
-            String fromID = method.getDeclaringClass().getTypeName() + "#" + method.getName() + "("+ s +")";
-            id = method.getName() + "#" + MD5Utils.toMD5(fromID);
-        }else{
-            id = name;
-        }
-
-        this.UUID = id;
+        String s1 = Arrays.toString(method.getParameterTypes());
+        String s = s1.substring(1, s1.length() - 1);
+        String fromID = method.getDeclaringClass().getTypeName() + "#" + method.getName() + "(" + s + ")";
+        this.UUID = method.getName() + "#" + MD5Utils.toMD5(fromID).toUpperCase();
     }
 
 
@@ -167,23 +193,22 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     /**
      * 执行方法
      * 方法执行成功与否判断：
-     *  - 如果返回值是Boolean或boolean类型，原样返回
-     *  - 如果返回值为null，则认为执行失败
-     *  - 如果为其他任意返回值，认为执行成功
-     *
-     *  反回值机制改变，或者通过增加一个动态参数来控制返回值。
+     * - 如果返回值是Boolean或boolean类型，原样返回
+     * - 如果返回值为null，则认为执行失败
+     * - 如果为其他任意返回值，认为执行成功
+     * <p>
+     * 反回值机制改变，或者通过增加一个动态参数来控制返回值。
      *
      * @param additionalDepends 可以提供的额外参数(动态参数)
+     * @param intercepts        ListenIntercept拦截器列表
      */
-    ListenResult invoke(AdditionalDepends additionalDepends) throws Exception {
+    ListenResult invoke(AdditionalDepends additionalDepends,
+                        ListenInterceptContext interceptContext,
+                        ListenIntercept... intercepts) throws Exception {
         Object invoke = null;
         Exception error = null;
 
         // 获取监听函数所在类实例
-        // 考虑到系统优化，
-        //  后期将监听函数的实例修改为单例，并且在获取监听函数实例的时候不再提供额外参数。
-        // 2019/12/27 已修改
-
         T listener = getListener();
 
         //遍历参数类型数组, 进行参数注入
@@ -192,27 +217,38 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         Object[] args = null;
         try {
             args = BotRuntime.getRuntime().getDependCenter().getMethodParameters(method, additionalDepends);
-        }catch (Exception e){
+        } catch (Exception e) {
             error = e;
         }
 
         ListenResult result;
 
+
         // 如果在参数获取阶段就出现了异常，跳过执行
-        if (error == null){
+        if (error == null) {
             // 捕获异常
             try {
+                boolean pass = true;
+                // intercept
+                interceptContext.setArgs(args);
+                for (ListenIntercept intercept : intercepts) {
+                    if (!intercept.intercept(interceptContext)) {
+                        pass = false;
+                        break;
+                    }
+                    args = interceptContext.getArgs();
+                }
                 //执行方法
-                invoke = method.invoke(listener, args);
-            }catch (Exception e){
+                invoke = pass ? method.invoke(listener, args) : interceptContext.getResult();
+            } catch (Exception e) {
                 // 出现异常，判定为执行失败
-                if(e instanceof InvocationTargetException){
+                if (e instanceof InvocationTargetException) {
                     final Throwable targetException = ((InvocationTargetException) e).getTargetException();
-                    if(targetException instanceof Exception){
+                    if (targetException instanceof Exception) {
                         error = (Exception) targetException;
                     }
                 }
-                if(error == null){
+                if (error == null) {
                     error = e;
                 }
             }
@@ -231,7 +267,7 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     /**
      * 使用ListenerMethod对象构建
      */
-    static <T> ListenerMethodBuilder<T> build(Supplier<T> listenerGetter, Function<DependGetter, T> listenerGetterWithAddition, Method method, MsgGetTypes[] type){
+    static <T> ListenerMethodBuilder<T> build(Supplier<T> listenerGetter, Function<DependGetter, T> listenerGetterWithAddition, Method method, MsgGetTypes[] type) {
         return new ListenerMethodBuilder<>(listenerGetter, listenerGetterWithAddition, method, type);
     }
 
@@ -243,28 +279,28 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     /**
      * 是否存在过滤器注解，如果存在则为true
      */
-    public boolean hasFilter(){
+    public boolean hasFilter() {
         return filter != null;
     }
 
     /**
      * 是否存在阻塞过滤器，如果存在则为true
      */
-    public boolean hasBlockFilter(){
+    public boolean hasBlockFilter() {
         return blockFilter != null;
     }
 
     /**
      * 是否为备用方法，如果是则为true
      */
-    public boolean isSpare(){
+    public boolean isSpare() {
         return spare != null;
     }
 
     /**
      * 是否为普通方法，如果是则为true
      */
-    public boolean isNormal(){
+    public boolean isNormal() {
         return spare == null;
     }
 
@@ -276,24 +312,25 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     /**
      * 获取方法本体的toString字符串
      */
-    public String getMethodToString(){
-        return method.getName() + "("+ Arrays.stream(method.getParameters()).map(p -> p.getType().getSimpleName()).collect(Collectors.joining(", ")) +")";
+    String getMethodToString() {
+        return method.getName() + "(" + Arrays.stream(method.getParameters()).map(p -> p.getType().getSimpleName()).collect(Collectors.joining(", ")) + ")";
     }
 
     /**
      * 获取实例对象的toString字符串
      */
-    public String getBeanToString(){
+    String getBeanToString() {
         return listenerGetter.get().toString();
     }
 
     /**
      * 判断方法是否为某种监听类型
+     *
      * @param isTypes 某种监听类型
      */
-    public boolean isType(MsgGetTypes isTypes){
+    public boolean isType(MsgGetTypes isTypes) {
         for (MsgGetTypes types : type) {
-            if(types.equals(isTypes)){
+            if (types.equals(isTypes)) {
                 return true;
             }
         }
@@ -303,7 +340,7 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     /**
      * 获取此方法的监听方法
      */
-    public MsgGetTypes[] getTypes(){
+    public MsgGetTypes[] getTypes() {
         return this.type;
     }
 
@@ -353,23 +390,44 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     }
 
 
-
     /**
      * 得到的是原本的数组而非复制的
-     * @return
      */
-    public Pattern[] getPatternValue(){
+
+    Pattern[] getPatternValue() {
         return patternValue;
     }
-    public Pattern[] getPatternCodeValue() {
+
+    Pattern[] getPatternCodeValue() {
         return patternCodeValue;
     }
 
-    public Pattern[] getPatternGroupValue() {
+    Pattern[] getPatternGroupValue() {
         return patternGroupValue;
     }
-    public Pattern[] getPatternBotValue(){
+
+    Pattern[] getPatternBotValue() {
         return patternBotValue;
+    }
+
+    /**
+     * 得到的是原本的数组而非复制的
+     */
+
+    public Pattern[] getPatternArray() {
+        return Arrays.copyOf(patternValue, patternValue.length);
+    }
+
+    public Pattern[] getPatternCodeArray() {
+        return Arrays.copyOf(patternCodeValue, patternCodeValue.length);
+    }
+
+    public Pattern[] getPatternGroupArray() {
+        return Arrays.copyOf(patternGroupValue, patternGroupValue.length);
+    }
+
+    public Pattern[] getPatternBotArray() {
+        return Arrays.copyOf(patternBotValue, patternBotValue.length);
     }
 
     public BlockFilter getBlockFilter() {
@@ -398,36 +456,64 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         return filterData;
     }
 
+    public String getName() {
+        return name;
+    }
 
     /**
      * 内部类，对象构建类
      */
     static class ListenerMethodBuilder<T> {
-        /** 监听器对象实例，用于执行方法 */
+        /**
+         * 监听器对象实例，用于执行方法
+         */
         private final Supplier<T> listenerGetter;
-        /** 提供额外参数来获取监听器实例 */
+        /**
+         * 提供额外参数来获取监听器实例
+         */
         private final Function<DependGetter, T> listenerGetterWithAddition;
-        /** 方法本体 */
+        /**
+         * 方法本体
+         */
         private final Method method;
-        /** 此方法所属的监听类型 */
+        /**
+         * 此方法所属的监听类型
+         */
         private final MsgGetTypes[] type;
-        /** 过滤器注解，如果没有则为null */
+        /**
+         * 过滤器注解，如果没有则为null
+         */
         private Filter filter = null;
-        /** 阻塞过滤器注解，如果没有则为null */
+        /**
+         * 阻塞过滤器注解，如果没有则为null
+         */
         private BlockFilter blockFilter = null;
-        /** 默认方法注解，如果没有则为null */
+        /**
+         * 默认方法注解，如果没有则为null
+         */
         private Spare spare = null;
-        /** 阻塞注解，如果没有则为null */
+        /**
+         * 阻塞注解，如果没有则为null
+         */
         private Block block = null;
         private int sort = 1;
-        /** 是否监听截断，默认为false - 不截断 */
+        /**
+         * 是否监听截断，默认为false - 不截断
+         */
         private Predicate<Object> listenBreak = BreakType.ALWAYS_BREAK.getResultTest();
-        /** 是否插件截断，默认为false - 不截断 */
+        /**
+         * 是否插件截断，默认为false - 不截断
+         */
         private Predicate<Object> listenBreakPlugin = BreakType.ALWAYS_BREAK.getResultTest();
-        /** 结果转化器，默认为特殊转化器 */
+        /**
+         * 结果转化器，默认为特殊转化器
+         */
         private ListenResultParser resultParser = BasicResultParser.getInstance();
-        /** id, 默认使用内部自动创建 */
+        /**
+         * id, 默认使用内部自动创建
+         */
         private String id = "";
+
         /**
          * 构造
          */
@@ -438,57 +524,56 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
             this.type = type;
         }
 
-        public ListenerMethodBuilder filter(Filter filter){
+        public ListenerMethodBuilder filter(Filter filter) {
             this.filter = filter;
             return this;
         }
 
-        public ListenerMethodBuilder blockFilter(BlockFilter blockFilter){
+        public ListenerMethodBuilder blockFilter(BlockFilter blockFilter) {
             this.blockFilter = blockFilter;
             return this;
         }
 
-        public ListenerMethodBuilder spare(Spare spare){
+        public ListenerMethodBuilder spare(Spare spare) {
             this.spare = spare;
             return this;
         }
 
-        public ListenerMethodBuilder block(Block block){
+        public ListenerMethodBuilder block(Block block) {
             this.block = block;
             return this;
         }
 
-        public ListenerMethodBuilder sort(int sort){
+        public ListenerMethodBuilder sort(int sort) {
             this.sort = sort;
             return this;
         }
 
-        public ListenerMethodBuilder listenBreak(Predicate<Object> toBreak){
+        public ListenerMethodBuilder listenBreak(Predicate<Object> toBreak) {
             this.listenBreak = toBreak;
             return this;
         }
 
-        public ListenerMethodBuilder listenBreakPlugin(Predicate<Object> toBreakPlugin){
+        public ListenerMethodBuilder listenBreakPlugin(Predicate<Object> toBreakPlugin) {
             this.listenBreakPlugin = toBreakPlugin;
             return this;
         }
 
-        public ListenerMethodBuilder resultParser(ListenResultParser parser){
+        public ListenerMethodBuilder resultParser(ListenResultParser parser) {
             this.resultParser = parser;
             return this;
         }
 
-        public ListenerMethodBuilder id(String id){
+        public ListenerMethodBuilder id(String id) {
             this.id = id;
             return this;
         }
 
 
-
         /**
          * 构建对象
          */
-        public ListenerMethod build(){
+        public ListenerMethod build() {
             return new ListenerMethod<>(
                     listenerGetter,
                     listenerGetterWithAddition,
@@ -529,10 +614,6 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
             return Objects.hash(method);
         }
     }
-
-
-
-
 
 
 }

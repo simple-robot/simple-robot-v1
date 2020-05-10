@@ -193,10 +193,14 @@ listener.init=监听函数[{0}]初始化尝试成功。{1} ms
 listener.run.error=监听函数[{0}]执行异常! {1}
 listener.bot.noVerify=BOT[{0}]未认证! 消息已被拦截。
 
-
 # 送信拦截器
 ## 当某个API被拦截器阻止，或者说拦截的时候的消息
 intercept.block=API[{0}]已被阻止
+
+# msgSender
+msgSender.reply.failed=参数类型错误！只允许[PrivateMsg]、[GroupMsg]、[DiscussMsg]三种类型的消息，而不是：{0}
+
+
 
 ## CoreSystem中使用的日志
 system.version.check=将要开始版本检测。请无视版本检测结束前所出现的错误日志，他们没有什么危害。
@@ -204,6 +208,12 @@ system.version.check.url=检测网址：{0}
 system.version.check.failed=版本检测失败。你可以选择自行前往maven仓库进行查看。
 system.version.newest=当前核心版本: {0}, 目前为{1}版本系列中的最新版。
 system.version.notnewest=当前核心版本: {0}, 在{1}版本系列中存在更高级的版本{2}, 可以考虑切换核心版本。\n注意，核心替换需要保证前两个版本号位相相同：{1}\n你可以参考：\n参考一: {3}\n参考二：{4}
+
+depend.center.close=已关闭[{0}]
+depend.center.close.failed=关闭[{0} ({1})]失败：{2}
+
+
+
 
 
 
