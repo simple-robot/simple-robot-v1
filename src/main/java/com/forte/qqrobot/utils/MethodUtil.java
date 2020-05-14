@@ -1,6 +1,6 @@
 package com.forte.qqrobot.utils;
 
-import org.apache.commons.beanutils.ConvertUtils;
+import cn.hutool.core.convert.Convert;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -47,7 +47,8 @@ public class MethodUtil {
         for (int i = 0; i < parameters.length; i++) {
             //使用BeanUtils的数据类型器对参数的数据类型进行转化
             //保存至新的参数集
-            newArr[i] = ConvertUtils.convert(args[i], parameters[i].getType());
+//            newArr[i] = ConvertUtils.convert(args[i], parameters[i].getType());
+            newArr[i] = Convert.convert(parameters[i].getType(), args[i]);
         }
 
         //返回方法的执行结果

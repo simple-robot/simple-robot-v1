@@ -1,11 +1,11 @@
 package com.forte.qqrobot.beans.cqcode;
 
+import cn.hutool.core.io.FileUtil;
 import com.forte.qqrobot.beans.types.CQCodeTypes;
 import com.forte.qqrobot.exception.CQParamsException;
 import com.forte.qqrobot.exception.CQParseException;
 import com.forte.qqrobot.utils.CQUtils;
 import com.forte.qqrobot.utils.StringListReader;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +60,8 @@ public class ImageCQCode extends CQCode {
         this.IMAGE_FILE = CQUtils.getImageFile(fileId);
 
         //获取文件中的参数并赋值
-        List<String> datas = FileUtils.readLines(this.IMAGE_FILE, this.ENCODING);
+        List<String> datas = FileUtil.readLines(this.IMAGE_FILE, this.ENCODING);
+//        List<String> datas = FileUtils.readLines(this.IMAGE_FILE, this.ENCODING);
         //使用properties接收参数，则将字符串集合转化为Reader流对象
 
                                                 //跳过第一行的数据

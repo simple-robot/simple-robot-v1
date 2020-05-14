@@ -1,6 +1,6 @@
 package com.forte.config;
 
-import org.apache.commons.beanutils.ConvertUtils;
+import cn.hutool.core.convert.Convert;
 
 import java.util.Map;
 import java.util.Properties;
@@ -48,7 +48,8 @@ public class InjectableConfiguration<T> implements InjectableConfig<T> {
                 Map.Entry<Class, BiFunction<Object, T, T>> entry = injectFunctionMap.get(key);
                 if (entry != null) {
                     // 如果存在这个entry，获取值并注入
-                    Object convertValue = ConvertUtils.convert(value, entry.getKey());
+                    Object convertValue = Convert.convert(entry.getKey(), value);
+//                    Object convertValue = ConvertUtils.convert(value, entry.getKey());
                     // 执行注入并为config重新赋值
                     // 虽然本质上应该是不会变化config对象的
                     configRe.set(entry.getValue().apply(convertValue, config));
@@ -69,7 +70,8 @@ public class InjectableConfiguration<T> implements InjectableConfig<T> {
                 Map.Entry<Class, BiFunction<Object, T, T>> entry = injectFunctionMap.get(key);
                 if(entry != null){
                     // 如果存在这个entry，获取值并注入
-                    Object convertValue = ConvertUtils.convert(value, entry.getKey());
+                    Object convertValue = Convert.convert(entry.getKey(), value);
+//                    Object convertValue = ConvertUtils.convert(value, entry.getKey());
                     // 执行注入并为config重新赋值
                     // 虽然本质上应该是不会变化config对象的
                     configRe.set(entry.getValue().apply(convertValue, config));
@@ -85,7 +87,8 @@ public class InjectableConfiguration<T> implements InjectableConfig<T> {
         Map.Entry<Class, BiFunction<Object, T, T>> entry = injectFunctionMap.get(name);
         if (entry != null) {
             // 如果存在这个entry，获取值并注入
-            Object convertValue = ConvertUtils.convert(value, entry.getKey());
+            Object convertValue = Convert.convert(entry.getKey(), value);
+//            Object convertValue = ConvertUtils.convert(value, entry.getKey());
             // 执行注入
             entry.getValue().apply(convertValue, config);
         }

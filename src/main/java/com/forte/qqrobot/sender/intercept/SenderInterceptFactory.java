@@ -1,5 +1,6 @@
 package com.forte.qqrobot.sender.intercept;
 
+import cn.hutool.core.convert.Convert;
 import com.forte.qqrobot.anno.Ignore;
 import com.forte.qqrobot.beans.function.ExFunction;
 import com.forte.qqrobot.intercept.Interceptor;
@@ -8,7 +9,6 @@ import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
-import org.apache.commons.beanutils.ConvertUtils;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.*;
@@ -147,7 +147,8 @@ public class SenderInterceptFactory {
                             return null;
                         } else {
                             // 根据注解值返回
-                            return ConvertUtils.convert(deValue.value(), returnType);
+                            return Convert.convert(returnType, deValue.value());
+//                            return ConvertUtils.convert(deValue.value(), returnType);
                         }
                     }
                 }
