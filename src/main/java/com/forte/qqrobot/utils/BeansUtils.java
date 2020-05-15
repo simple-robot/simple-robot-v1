@@ -23,7 +23,6 @@ public class BeansUtils {
     public static <T> T getInstance(Class<T> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         Method[] methods = Arrays.stream(clazz.getMethods())
                 //找到携带@Constr注解的且又是公共静态的方法
-//                .filter(m -> (m.getAnnotation(Constr.class) != null) &&
                 .filter(m -> (AnnotationUtils.getAnnotation(m, Constr.class) != null) &&
                         (Modifier.isStatic(m.getModifiers()))
                 )

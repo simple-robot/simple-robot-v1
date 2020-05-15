@@ -23,6 +23,7 @@ import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
+import com.forte.qqrobot.utils.BooleanMap;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.util.*;
@@ -598,7 +599,7 @@ public class ListenerManager implements MsgReceiver {
          */
         //如果没有东西
         if(methods == null || methods.isEmpty()){
-            this.LISTENER_METHOD_MAP = new HashMap<>(1);
+            this.LISTENER_METHOD_MAP = new HashMap<>(8);
         }else{
             //分组后赋值
             //第一层分组后
@@ -631,7 +632,9 @@ public class ListenerManager implements MsgReceiver {
             this.LISTENER_METHOD_MAP = firstMap.entrySet().stream().flatMap(e -> {
                 //准备数据
                 Map<MsgGetTypes, Map<Boolean, List<ListenerMethod>>> result = new HashMap<>(firstMap.size() / 2);
-                Map<Boolean, List<ListenerMethod>> groupBySpare = e.getValue().stream().collect(Collectors.groupingBy(lm -> !lm.isSpare()));
+                // 使用BooleanMap代替HashMap
+                Map<Boolean, List<ListenerMethod>> groupBySpare = e.getValue().stream()
+                        .collect(Collectors.groupingBy(lm -> !lm.isSpare(), BooleanMap::new, Collectors.toList()));
                 // 将结果集进行排序
                 groupBySpare.forEach((k, v) -> Collections.sort(v));
                 result.put(e.getKey(), groupBySpare);

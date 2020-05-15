@@ -1,5 +1,6 @@
 package com.forte.qqrobot.depend.util;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.DependResourceException;

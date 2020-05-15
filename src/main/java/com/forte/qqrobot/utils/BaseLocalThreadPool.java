@@ -26,6 +26,7 @@ public abstract class BaseLocalThreadPool {
     /**
      * 本线程用的线程池
      */
+    @Deprecated
     private static ThreadLocal<Executor> localExecutorThread;
 
     /**
@@ -180,6 +181,7 @@ public abstract class BaseLocalThreadPool {
     /**
      * 清除本线程中的线程池
      */
+    @Deprecated
     public static boolean removeLocalThreadPool() {
         Boolean b = true;
         try {
@@ -248,6 +250,7 @@ public abstract class BaseLocalThreadPool {
      *
      * @return
      */
+    @Deprecated
     private static Executor createLocalThreadPool() {
         Executor executor = localExecutorThread.get();
         if (executor == null) {

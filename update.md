@@ -1,7 +1,10 @@
 ## 版本更新记录
 
 # now 
-- `beanUtils`修改为`hutool-core`
+- `beanUtils`替换为`hutool-core`
+- `IOUtils`替换为`hutool-core`
+- `ListenerManager`中尝试使用新的紧凑map
+
 
 # 1.13.0
 - 变更监听消息拦截器的加载机制
