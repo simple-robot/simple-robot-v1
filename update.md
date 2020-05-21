@@ -5,6 +5,7 @@
 - `IOUtils`替换为`hutool-core`
 - `ListenerManager`中尝试使用新的紧凑map
 - 修复`botManager`中可能会导致无法获取info的情况
+- `SimpleRobotContext`实现`Closeable`接口
 
 # 1.13.0
 - 变更监听消息拦截器的加载机制

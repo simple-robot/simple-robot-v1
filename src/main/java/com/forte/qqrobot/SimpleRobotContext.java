@@ -6,6 +6,9 @@ import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 /**
  *
  * <pre> SimpleRobotContext,  在启动器执行run方法后所得到的结果
@@ -19,15 +22,16 @@ import com.forte.qqrobot.sender.senderlist.SenderSetList;
  *     <li>默认的三大送信器</li>
  * </ul>
  *
+ * 1.13.1开始实现{@link Closeable}接口
  *
  * @author ForteScarlet <[email]ForteScarlet@163.com>
- * @since JDK1.8a
+ * @since JDK1.8
  **/
 public class SimpleRobotContext<
         SEND extends SenderSendList,
         SET extends SenderSetList,
         GET extends SenderGetList
-        > {
+        > implements Closeable {
 
     //**************** 三大送信器 ****************//
 
@@ -106,4 +110,9 @@ public class SimpleRobotContext<
         return dependCenter;
     }
 
+    /**
+     * closeable
+     */
+    @Override
+    public void close() throws IOException { }
 }
