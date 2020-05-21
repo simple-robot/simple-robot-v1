@@ -123,7 +123,7 @@ public class BotManagerImpl implements BotManager {
                 if (defaultBot == null) {
                     defaultBot = key;
                 }
-                return info;
+                return verifyBot;
             } else {
                 // 已经存在, 不放入并关闭info
                 try {
