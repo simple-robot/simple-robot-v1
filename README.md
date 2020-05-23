@@ -35,7 +35,7 @@ https://apidoc.gitee.com/ForteScarlet/simple-coolQ
 | 酷Q  | HTTP TO CQ插件  | https://github.com/ForteScarlet/simple-robot-component-httpapi |
 | 酷Q  | CQ HTTP API插件 | https://github.com/ForteScarlet/simple-robot-component-coolHttpApi |
 | 酷Q  | JCQ插件 | https://github.com/ForteScarlet/simple-robot-component-JCQ |
- 
+| JVM  | Mirai   | https://github.com/ForteScarlet/simple-robot-component-mirai | 
 <br>
 <br>
 <br>
@@ -93,7 +93,8 @@ https://apidoc.gitee.com/ForteScarlet/simple-coolQ
 - 酷Q应用下的LEMOC插件(插件作者弃坑)
 - 酷Q应用下的HTTP API插件(插件作者仍在更新)
 - 酷Q应用下的CQ HTTP API插件(插件作者处于活跃状态)
-- 酷Q应用下的JCQ插件(使用原生函数)
+- 酷Q应用下的JCQ插件(使用酷Q原生函数)
+- Mirai(JVM平台，原生高效，功能较少)
 
 > 如果你根据核心开发了组件框架，可以告知我，我会更新在此处与下文处。
 

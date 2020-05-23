@@ -71,6 +71,35 @@ public enum MsgGetTypes {
     groupFileUpload(GroupFileUpload.class),
 
     /**
+     * 事件-群消息撤回
+     */
+    groupMsgDelete(GroupMsgDelete.class),
+
+    /**
+     * 私聊消息撤回
+     */
+    privateMsgDelete(PrivateMsgDelete.class),
+
+    //**************** 1.7.0增加，一些期望中可能存在的监听API ****************//
+
+    /**
+     * 群消息撤回事件
+     * 目前只有mirai组件支持
+     * @since 1.13.2 or .. 1.14?
+     */
+//    @Deprecated
+    groupMsgDeleted(GroupMsgDelete.class),
+
+    /**
+     * 私信消息撤回事件
+     * 目前只有mirai组件支持
+     * @since 1.13.2 or .. 1.14?
+     */
+//    @Deprecated
+    privateMsgDeleted(PrivateMsgDelete.class),
+
+
+    /**
      * 其他未知的类型，可尝试用于其他自定义监听
      * ※ 用处不大了，提供了枚举的自定义实例，此元素后期考虑删除。
      */
@@ -87,21 +116,6 @@ public enum MsgGetTypes {
             return JSON.parseObject(json);
         }
     },
-
-    //**************** 1.7.0增加，一些期望中可能存在的监听API ****************//
-
-    /**
-     * 群消息撤回事件
-      */
-    @Deprecated
-    groupMsgDeleted(null),
-
-    /**
-     * 私信消息撤回事件
-     */
-    @Deprecated
-    privateMsgDeleted(null),
-
 
 //
 //    MsgDeleted(null),

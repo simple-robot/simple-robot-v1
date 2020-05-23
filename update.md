@@ -1,5 +1,9 @@
 ## 版本更新记录
 
+# 1.13.2
+- 修改`BaseConfiguation`一些字段的访问权限
+- 开放`MsgGetTypes`的群撤回与私信撤回
+
 # 1.13.1
 - `beanUtils`替换为`hutool-core`
 - `IOUtils`替换为`hutool-core`

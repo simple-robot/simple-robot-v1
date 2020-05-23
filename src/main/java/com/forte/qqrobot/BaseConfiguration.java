@@ -38,18 +38,18 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
     /**
      * 用于对多账号进行注册，先是只保存部分信息
      */
-    private List<Map.Entry<String, BotInfo>> advanceBotInfo = new ArrayList<>();
+    protected List<Map.Entry<String, BotInfo>> advanceBotInfo = new ArrayList<>();
 
     /**
      * 指定一个默认的Botinfo，没有人工指定的情况下，会默认设定为第一次注册的账号信息
      */
-    private BotInfo defaultBotInfo;
+    protected BotInfo defaultBotInfo;
 
     /**
      * 配置文件的读取内容
      * 如果不是配置文件的话，此类得不到任何内容。
      */
-    private ConfigProperties configProperties = new ConfigProperties(new Properties());
+    protected ConfigProperties configProperties = new ConfigProperties(new Properties());
 
     /*
         此类是在language初始化之前使用的，故此不使用语言化
