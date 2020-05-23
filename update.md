@@ -2,11 +2,10 @@
 
 # 1.13.2
 - 修改`BaseConfiguation`一些字段的访问权限
-- 开放`MsgGetTypes`的群撤回与私信撤回
 
 # 1.13.1
-- `beanUtils`替换为`hutool-core`
-- `IOUtils`替换为`hutool-core`
+- `BeanUtils`替换为`hutool-core`的
+- `IOUtils`替换为`hutool-core`的
 - `ListenerManager`中尝试使用新的紧凑map
 - 修复`botManager`中可能会导致无法获取info的情况
 - `SimpleRobotContext`实现`Closeable`接口
