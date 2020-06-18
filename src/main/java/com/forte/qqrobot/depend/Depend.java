@@ -27,7 +27,7 @@ public class Depend<V> implements Comparable<Depend<?>> {
     /** 传入一个实例对象并对其中的参数进行注入 */
     private final Consumer<V> injectDepend;
 
-    /** 使用额外参数对实例对象进行注入，需要保证额外参数内不存在更深一级的额参数 */
+    /** 使用额外参数对实例对象进行注入，需要保证额外参数内不存在更深一级的参数 */
     private final BiConsumer<V, DependGetter> injectAdditionalDepend;
 
     /** 优先级，升序排序 */

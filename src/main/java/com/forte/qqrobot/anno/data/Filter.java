@@ -76,7 +76,7 @@ public class Filter {
         this.value = value;
         this.patternValue = new Pattern[value.length];
         for (int i = 0; i < value.length; i++) {
-            patternValue[i] = Pattern.compile(value[i]);
+            patternValue[i] = keywordMatchType.toPattern(value[i]);
         }
         this.keywordMatchType = keywordMatchType;
         this.mostType = mostType;
@@ -86,7 +86,7 @@ public class Filter {
         this.code = code;
         this.patternCodeValue = new Pattern[code.length];
         for (int i = 0; i < code.length; i++) {
-            patternCodeValue[i] = Pattern.compile(code[i]);
+            patternCodeValue[i] = keywordMatchType.toPattern(code[i]);
         }
         this.codeKeywordMatchType = codeKeywordMatchType;
         this.mostCodeType = mostCodeType;
@@ -94,7 +94,7 @@ public class Filter {
         this.group = group;
         this.patternGroupValue = new Pattern[group.length];
         for (int i = 0; i < group.length; i++) {
-            patternGroupValue[i] = Pattern.compile(group[i]);
+            patternGroupValue[i] = keywordMatchType.toPattern(group[i]);
         }
         this.groupKeywordMatchType = groupKeywordMatchType;
         this.mostGroupType = mostGroupType;
@@ -102,7 +102,7 @@ public class Filter {
         this.bot = bot;
         this.patternBotValue = new Pattern[bot.length];
         for (int i = 0; i < bot.length; i++) {
-            patternBotValue[i] = Pattern.compile(bot[i]);
+            patternBotValue[i] = keywordMatchType.toPattern(bot[i]);
         }
         this.botKeywordMatchType = botKeywordMatchType;
         this.mostBotType = mostBotType;

@@ -21,7 +21,6 @@ public class KeywordMatchTypeFactory extends BaseFactory<KeywordMatchType> {
     private static final Class<KeywordMatchType> ENUM_TYPE = KeywordMatchType.class;
 
     /** constructor types */
-    // BiPredicate<String, String> filter
     private static final Class<?>[] CONSTRUCTOR_TYPES = {BiPredicate.class};
 
     /** function to array */

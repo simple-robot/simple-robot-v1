@@ -3,8 +3,6 @@ package com.forte.qqrobot.sender;
 import com.forte.lang.Language;
 import com.forte.qqrobot.BotRuntime;
 import com.forte.qqrobot.ResourceDispatchCenter;
-import com.forte.qqrobot.beans.cqcode.AppendList;
-import com.forte.qqrobot.beans.cqcode.CQAppendList;
 import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.msgget.DiscussMsg;

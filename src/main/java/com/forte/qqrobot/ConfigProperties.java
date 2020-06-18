@@ -3,6 +3,9 @@ package com.forte.qqrobot;
 import com.forte.config.ConfigurationHelper;
 import com.forte.config.InjectableConfig;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -14,11 +17,36 @@ import java.util.function.BiConsumer;
  **/
 public class ConfigProperties extends Properties {
 
-    public ConfigProperties(){    }
+    /** 使用流读取的时候，默认使用utf-8编码读取 */
+    private static final Charset defaultCharset = StandardCharsets.UTF_8;
+
+    public ConfigProperties(){
+    }
     public ConfigProperties(Properties p){
         for (String k : p.stringPropertyNames()) {
             setProperty(k, p.getProperty(k));
         }
+    }
+
+    /**
+     * override this load method
+     */
+    @Override
+    public void load(Reader reader) throws IOException {
+        super.load(new BufferedReader(reader));
+    }
+    /**
+     * override this load method
+     */
+    @Override
+    public void load(InputStream inputStream) throws IOException {
+        load(new BufferedReader(new InputStreamReader(inputStream, defaultCharset)));
+    }
+    /**
+     * override this load method
+     */
+    public void load(InputStream inputStream, String charset) throws IOException {
+        load(new BufferedReader(new InputStreamReader(inputStream, charset)));
     }
 
     /**
@@ -30,7 +58,6 @@ public class ConfigProperties extends Properties {
             foreachConsumer.accept(key, getProperty(key));
         }
     }
-
 
     /**
      * 根据{@link com.forte.config.Conf}的注解信息以及配置文件中的内容将配置信息注入到此类中。

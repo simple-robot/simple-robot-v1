@@ -1,6 +1,5 @@
 package com.forte.qqrobot.bot;
 
-import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.beans.function.PathAssembler;
 import com.forte.qqrobot.beans.function.VerifyFunction;
 import com.forte.qqrobot.exception.BotVerifyException;

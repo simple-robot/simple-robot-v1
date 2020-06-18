@@ -11,6 +11,7 @@ import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.log.LogLevel;
 import com.forte.qqrobot.system.CoreSystem;
+import com.forte.qqrobot.system.RunParameters;
 import com.forte.qqrobot.utils.BaseLocalThreadPool;
 
 import java.util.*;
@@ -28,12 +29,28 @@ import java.util.stream.Stream;
  * @since JDK1.8
  **/
 @Conf(value = {"", "simbot"}, comment = "核心中的基础配置类")
-public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable {
+public class BaseConfiguration<T extends BaseConfiguration> {
 
+    /**
+     * 不再使用clone，保留是为了兼容
+     * @return
+     */
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    @Deprecated
+    public BaseConfiguration<T> clone() {
+        return this;
     }
+
+    private RunParameters parameters;
+
+    RunParameters getParameters() {
+        return parameters;
+    }
+
+    void setParameters(RunParameters parameters) {
+        this.parameters = parameters;
+    }
+
 
     /**
      * 用于对多账号进行注册，先是只保存部分信息
@@ -49,7 +66,7 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
      * 配置文件的读取内容
      * 如果不是配置文件的话，此类得不到任何内容。
      */
-    protected ConfigProperties configProperties = new ConfigProperties(new Properties());
+    protected ConfigProperties configProperties = new ConfigProperties();
 
     /*
         此类是在language初始化之前使用的，故此不使用语言化
@@ -66,6 +83,9 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
         this.configuration = (T) this;
     }
 
+
+    @Conf(value = {"profiles.active", "spring.profiles.active"}, comment = "启动额外的配置文件，只有当使用配置文件启动的时候生效。")
+    private String[] active = new String[0];
 
     /**
      * 服务器ip，默认为127.0.0.1
@@ -939,11 +959,19 @@ public class BaseConfiguration<T extends BaseConfiguration> implements Cloneable
         this.botCheck = botCheck;
     }
 
+    public String[] getActive() {
+        return active;
+    }
+
+    public void setActive(String[] active) {
+        this.active = active;
+    }
+
     /**
      * 使用者不需要设置
      * @param configProperties
      */
-    public void setConfigProperties(ConfigProperties configProperties) {
+    protected void setConfigProperties(ConfigProperties configProperties) {
         this.configProperties = configProperties;
     }
 }

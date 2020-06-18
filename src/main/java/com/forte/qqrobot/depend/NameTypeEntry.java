@@ -1,8 +1,5 @@
 package com.forte.qqrobot.depend;
 
-import com.forte.qqrobot.anno.depend.Depend;
-import com.forte.qqrobot.utils.FieldUtils;
-
 import java.util.Map;
 import java.util.Objects;
 

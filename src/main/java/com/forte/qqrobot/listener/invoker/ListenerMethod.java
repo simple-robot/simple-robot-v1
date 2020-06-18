@@ -9,7 +9,6 @@ import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.depend.DependGetter;
-import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.listener.ListenIntercept;
 import com.forte.qqrobot.listener.result.BasicResultParser;
 import com.forte.qqrobot.listener.result.ListenResult;
@@ -18,7 +17,10 @@ import com.forte.utils.basis.MD5Utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -70,6 +72,11 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
      * 正则匹配值，提前解析好
      */
     private final Pattern[] patternValue;
+
+    /**
+     * 参数匹配，可能为null
+     */
+    private final FilterParameterMatcher[] filterParameterMatchers;
 
     private final Pattern[] patternCodeValue;
     private final Pattern[] patternGroupValue;
@@ -158,14 +165,23 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
             this.patternCodeValue = emptyArray;
             this.patternGroupValue = emptyArray;
             this.patternBotValue = emptyArray;
+            this.filterParameterMatchers = new FilterParameterMatcher[0];
+
         } else {
             this.filterData = com.forte.qqrobot.anno.data.Filter.build(filter);
             this.patternValue = filterData.patternValue();
             this.patternCodeValue = filterData.patternCodeValue();
             this.patternGroupValue = filterData.patternGroupValue();
             this.patternBotValue = filterData.patternBotValue();
-        }
 
+            final String[] values = filterData.value();
+            List<FilterParameterMatcher> tempFilterParameterMatchers = new ArrayList<>();
+            for (String v : values) {
+                tempFilterParameterMatchers.add(filterData.keywordMatchType().toMatcher(v));
+            }
+            this.filterParameterMatchers = tempFilterParameterMatchers.toArray(new FilterParameterMatcher[0]);
+
+        }
 
         this.blockFilter = blockFilter;
         this.spare = spare;
@@ -181,8 +197,8 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         // UUID 使用 方法包路径 + (方法名 + 参数类型列表 | name)
         String s1 = Arrays.toString(method.getParameterTypes());
         String s = s1.substring(1, s1.length() - 1);
-        String fromID = method.getDeclaringClass().getTypeName() + "#" + method.getName() + "(" + s + ")";
-        this.UUID = method.getName() + "#" + MD5Utils.toMD5(fromID).toUpperCase();
+        String id = method.getDeclaringClass().getTypeName() + "#" + method.getName() + "(" + s + ")";
+        this.UUID = method.getName() + "#" + MD5Utils.toMD5(id).toUpperCase();
     }
 
 
@@ -275,6 +291,11 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     //**************************************
     //*               获取、判断等方法
     //**************************************
+
+
+    public FilterParameterMatcher[] getFilterParameterMatchers() {
+        return filterParameterMatchers;
+    }
 
     /**
      * 是否存在过滤器注解，如果存在则为true
@@ -458,6 +479,23 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ListenerMethod<?> that = (ListenerMethod<?>) o;
+        return Objects.equals(method, that.method);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(method);
     }
 
     /**

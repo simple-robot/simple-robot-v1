@@ -30,7 +30,8 @@ import java.io.IOException;
 public class SimpleRobotContext<
         SEND extends SenderSendList,
         SET extends SenderSetList,
-        GET extends SenderGetList
+        GET extends SenderGetList,
+        CONFIG extends BaseConfiguration
         > implements Closeable {
 
     //**************** 三大送信器 ****************//
@@ -50,6 +51,8 @@ public class SimpleRobotContext<
     /** 依赖中心 */
     private DependCenter dependCenter;
 
+    private CONFIG configuration;
+
     /**
      * 构造函数
      * @param sender sender送信器
@@ -65,7 +68,8 @@ public class SimpleRobotContext<
                               BotManager manager,
                               MsgParser msgParser,
                               MsgProcessor processor,
-                              DependCenter dependCenter
+                              DependCenter dependCenter,
+                              CONFIG configuration
                               ){
         this.SENDER = sender;
         this.SETTER = setter;
@@ -74,6 +78,7 @@ public class SimpleRobotContext<
         this.msgParser = msgParser;
         this.processor = processor;
         this.dependCenter = dependCenter;
+        this.configuration = configuration;
     }
 
     /**
@@ -108,6 +113,10 @@ public class SimpleRobotContext<
      */
     public DependCenter getDependCenter(){
         return dependCenter;
+    }
+
+    public CONFIG getConfiguration() {
+        return configuration;
     }
 
     /**

@@ -6,8 +6,11 @@ import com.forte.qqrobot.anno.ByNameType;
 import com.forte.qqrobot.anno.Constr;
 import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.anno.depend.Beans;
+import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.exception.AnnotationException;
+import com.forte.utils.reflect.ProxyUtils;
 
+import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
@@ -16,7 +19,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.BiFunction;
 
 /**
  * 对于一些注解的获取等相关的工具类
@@ -34,9 +37,13 @@ public class AnnotationUtils {
 
     /**
      * 注解缓存，记录曾经保存过的注解与其所在类
-     *
      */
-    private static final Map<AnnotatedElement, Set<Annotation>> ANNOTATION_CACHE = new ConcurrentHashMap<>(32);
+    private static final Map<AnnotatedElement, Set<Annotation>> ANNOTATION_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * 记录已经证实不存在的注解信息
+     */
+    private static final Map<AnnotatedElement, Set<Class<Annotation>>> NULL_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 此工具类中使用到的异常的语言前缀
@@ -50,6 +57,60 @@ public class AnnotationUtils {
      */
     private static String getLang(String tag, Object... format){
         return Language.format(LANG_EX_TAG_HEAD, tag, format);
+    }
+
+
+
+
+    /**
+     * 获取Depend注解。
+     * 如果获取不到Depend, 则尝试获取{@link javax.annotation.Resource}
+     * @param from
+     * @return
+     */
+    public static Depend getDepend(AnnotatedElement from){
+//        ProxyUtils.annotationProxyByDefault()
+        // 先获取depend
+        final Depend depend = getAnnotation(from, Depend.class);
+        if(depend != null){
+            return depend;
+        }else{
+            try {
+                final Resource resource = getAnnotation(from, Resource.class);
+                if(resource == null){
+                    return null;
+                }else{
+                    final String name = resource.name();
+                    final Class<?> type = resource.type();
+
+                    Map<String, BiFunction<Method, Object[], Object>> proxyMap = new HashMap<>();
+                    proxyMap.put("value", (m, o) -> name);
+                    proxyMap.put("type", (m, o) -> type);
+                    proxyMap.put("equals", (m, o) -> {
+                       final Object other = o[0];
+                       if(other instanceof Annotation){
+                           if(((Annotation) other).annotationType() != Depend.class){
+                               return false;
+                           }else{
+                               return resource.hashCode() == other.hashCode();
+                           }
+                       }else{
+                           return false;
+                       }
+                    });
+                    proxyMap.put("toString", (m, o) -> "@Depend->" + resource.toString() + "("+ resource.hashCode() +")");
+                    proxyMap.put("hashCode", (m, o) -> resource.hashCode());
+                    proxyMap.put("annotationType", (m, o) -> Depend.class);
+                    final Depend proxyDepend = ProxyUtils.annotationProxyByDefault(Depend.class, proxyMap);
+                    // 计入缓存
+                    boolean b = saveCache(from, proxyDepend);
+                    return proxyDepend;
+                }
+            }catch (Throwable e){
+                e.printStackTrace();
+                return null;
+            }
+        }
     }
 
 
@@ -107,6 +168,10 @@ public class AnnotationUtils {
             return cache;
         }
 
+        if(isNull(from, annotationType)){
+            return null;
+        }
+
 
         //先尝试直接获取
         T annotation = from.getAnnotation(annotationType);
@@ -148,6 +213,8 @@ public class AnnotationUtils {
         // 如果最终不是null，计入缓存
         if(annotation != null){
             saveCache(from, annotation);
+        }else{
+            nullCache(from, annotationType);
         }
 
         return annotation;
@@ -330,21 +397,42 @@ public class AnnotationUtils {
     }
 
     /**
+     * 记录一个得不到的缓存
+     * @param from {@link AnnotatedElement}
+     * @param annotatedType annotation class
+     */
+    private static <T extends Annotation> void nullCache(AnnotatedElement from, Class<T> annotatedType){
+        final Set<Class<Annotation>> classes = NULL_CACHE.computeIfAbsent(from, k -> new HashSet<>());
+        classes.add((Class<Annotation>) annotatedType);
+    }
+
+    /**
+     * 判断是否获取不到
+     * @param from {@link AnnotatedElement}
+     * @param annotatedType annotation class
+     */
+    private static <T extends Annotation> boolean isNull(AnnotatedElement from, Class<T> annotatedType){
+        final Set<Class<Annotation>> classes = NULL_CACHE.get(from);
+        if(classes == null || classes.isEmpty()){
+            return false;
+        }
+        return classes.contains(annotatedType);
+    }
+
+
+
+    /**
      * 记录一条缓存记录。
      */
     private static boolean saveCache(AnnotatedElement from, Annotation annotation){
-        Set<Annotation> list;
+        Set<Annotation> set;
         synchronized (ANNOTATION_CACHE) {
-            list = ANNOTATION_CACHE.get(from);
+            set = ANNOTATION_CACHE.computeIfAbsent(from, k -> new HashSet<>());
             // 如果为空，新建一个并保存
-            if(list == null){
-                list = new CopyOnWriteArraySet<>();
-                ANNOTATION_CACHE.put(from, list);
-            }
         }
-
         // 记录这个注解
-        return list.add(annotation);
+        final boolean add = set.add(annotation);
+        return add;
     }
 
     /**

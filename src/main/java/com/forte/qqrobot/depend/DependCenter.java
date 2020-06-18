@@ -1,6 +1,8 @@
 package com.forte.qqrobot.depend;
 
+import cn.hutool.core.convert.Convert;
 import com.forte.lang.Language;
+import com.forte.qqrobot.anno.depend.FilterValue;
 import com.forte.qqrobot.constant.PriorityConstant;
 import com.forte.qqrobot.depend.parameter.ParamGetterManager;
 import com.forte.qqrobot.depend.parameter.ParamNameGetter;
@@ -102,9 +104,11 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
         this.dependGetter = dependGetter;
     }
 
-    /** 记录一个单例 */
-    private Object putSingle(String key, Object value){
-        synchronized (SINGLE_FACTORY){
+    /**
+     * 记录一个单例
+     */
+    private Object putSingle(String key, Object value) {
+        synchronized (SINGLE_FACTORY) {
             return SINGLE_FACTORY.put(key, value);
         }
     }
@@ -254,7 +258,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
             //是单例，获取的时候先获取，如果获取失败则保存
             supplier = () -> {
                 Object get = SINGLE_FACTORY.get(name);
-                if(get == null){
+                if (get == null) {
                     get = beanGetInstanceFunction.apply(paramsGetter.get());
                     putSingle(name, get);
 //                    SINGLE_FACTORY.put(name, get);
@@ -372,10 +376,12 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
         com.forte.qqrobot.anno.depend.Depend depend = beansData.depend();
 
         Consumer<T>[] consumerArray = Arrays.stream(FieldUtils.getFields(type, true))
-                .filter(f -> allDepend || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
+//                .filter(f -> allDepend || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
+                .filter(f -> allDepend || AnnotationUtils.getDepend(f) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
-                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
+//                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
+                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getDepend(f);
                     if (allDepend && (dependAnnotation == null)) {
                         dependAnnotation = depend;
                     }
@@ -447,11 +453,13 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
         //获取全部字段, 根据注解获取(或全部注入), 转化为字段值注入函数
         BeansData beansData = beans.getBeans();
         BiConsumer<T, DependGetter>[] consumerArray = Arrays.stream(FieldUtils.getFields(type, true))
-                .filter(f -> beansData.allDepend() || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
+//                .filter(f -> beansData.allDepend() || AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class) != null)
+                .filter(f -> beansData.allDepend() || AnnotationUtils.getDepend(f) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
                     //获取字段注解
-                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
+//                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
+                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getDepend(f);
                     //如果没有注解且allDepend为true，获取默认注解
                     if ((beansData.allDepend()) && (dependAnnotation == null)) {
                         dependAnnotation = beansData.depend();
@@ -563,7 +571,21 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
      */
     public Object[] getMethodParameters(Parameter[] parameters, AdditionalDepends addParams) {
         //优先从额外参数中获取
-        return Arrays.stream(parameters).map(p -> getParameter(p, addParams == null ? AdditionalDepends.getEmpty() : addParams)).toArray();
+        return Arrays.stream(parameters).map(p -> {
+            if (addParams != null) {
+                // 如果存在filterValue, 先尝试直接通过Additional获取并转化类型
+                final FilterValue filterValue = AnnotationUtils.getAnnotation(p, FilterValue.class);
+                if (filterValue != null) {
+                    final String name = filterValue.value();
+                    final Object addGet = addParams.get(name);
+                    // 获取到了
+                    if (addGet != null) {
+                        return Convert.convert(p.getType(), addGet);
+                    }
+                }
+            }
+            return getParameter(p, addParams == null ? AdditionalDepends.getEmpty() : addParams);
+        }).toArray();
     }
 
     /**
@@ -590,7 +612,9 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
      */
     private Object getParameter(Parameter parameter, AdditionalDepends additionalDepends) {
         //获取注解
-        com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(parameter, com.forte.qqrobot.anno.depend.Depend.class);
+//        com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(parameter, com.forte.qqrobot.anno.depend.Depend.class);
+        com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getDepend(parameter);
+        FilterValue filterValueAnnotation = AnnotationUtils.getAnnotation(parameter, FilterValue.class);
 
         //获取到的参数
         Object param;
@@ -600,8 +624,17 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
             //存在注解， 获取信息
             String name = dependAnnotation.value();
             if (name.trim().length() == 0) {
+                if (filterValueAnnotation != null) {
+                    final String filterValueName = filterValueAnnotation.value();
+                    if (filterValueName.trim().length() > 0) {
+                        name = filterValueName;
+                    }
+                }
+            }
+
+            if (name.trim().length() == 0) {
                 //没有名称，优先使用额外参数获取，其次使用类型查询
-                Class type = dependAnnotation.type().length == 0 ? parameter.getType() : dependAnnotation.type()[0];
+                Class<?> type = dependAnnotation.type().length == 0 ? parameter.getType() : dependAnnotation.type()[0];
                 type = FieldUtils.basicToBox(type);
                 Object addParamGet = additionalDepends.get(type);
                 if (addParamGet != null) {
@@ -626,25 +659,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
             if (addParamGet != null) {
                 param = addParamGet;
             } else {
-                //通过获取参数名获取（如果能获取到的话）
-                //如果获取不到则使用类型查询
-//                String name = paramNameGetter.getParameterName(parameter);
-//                if (name != null) {
-//                    Object addGet = additionalDepends.get(name);
-//                    if (addGet != null) {
-//                        param = addGet;
-//                    } else {
-//                        Object o = this.get(name, additionalDepends);
-//                        //如果通过名称获取的对象为null或者类型并非参数的子类，通过类型获取
-//                        if (o == null || !FieldUtils.isChild(o, pt)) {
-//                            param = this.get(pt, additionalDepends);
-//                        } else {
-//                            param = o;
-//                        }
-//                    }
-//                } else {
                 param = this.get(pt, additionalDepends);
-//                }
             }
         }
 
@@ -985,14 +1000,6 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
      */
     @Override
     public <T> T get(Class<T> type) {
-//        //如果获取器不是自己，则优先使用获取器获取
-//        if (!dependGetter.equals(this)) {
-//            T result = dependGetter.get(type);
-//            if (result != null) {
-//                return result;
-//            }
-//        }
-
         if (BasicResourceWarehouse.isBasicType(type)) {
             throw new DependResourceException("basicGet", type);
         } else {
@@ -1006,13 +1013,6 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
     @Override
     public <T> T get(String name, Class<T> type) {
 //        //如果获取器不是自己，则优先使用获取器获取
-//        if (!dependGetter.equals(this)) {
-//            T result = dependGetter.get(name, type);
-//            if (result != null) {
-//                return result;
-//            }
-//        }
-
         if (BasicResourceWarehouse.isBasicType(type)) {
             return getConstant(name, type);
         } else {
@@ -1121,11 +1121,11 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
 
 
     @Override
-    public void close(){
+    public void close() {
         // 单例工厂中，如果为closeable的，关闭
-        synchronized (SINGLE_FACTORY){
+        synchronized (SINGLE_FACTORY) {
             SINGLE_FACTORY.forEach((k, v) -> {
-                if(v instanceof Closeable){
+                if (v instanceof Closeable) {
                     Closeable cl = (Closeable) v;
                     try {
                         cl.close();
@@ -1139,7 +1139,6 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
             SINGLE_FACTORY.clear();
         }
     }
-
 
 
 }

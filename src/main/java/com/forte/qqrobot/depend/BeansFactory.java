@@ -3,7 +3,6 @@ package com.forte.qqrobot.depend;
 import com.forte.lang.Language;
 import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.anno.depend.Depend;
-import com.forte.qqrobot.constant.PriorityConstant;
 import com.forte.qqrobot.exception.AnnotationException;
 import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.utils.AnnotationUtils;
@@ -368,7 +367,7 @@ public class BeansFactory {
     static NameTypeEntry[] getNameTypeArrayByParameters(Parameter[] parameters){
         return Arrays.stream(parameters).map(p -> {
             //判断参数上是否存在@Depend注解
-            Depend dependAnnotation = AnnotationUtils.getAnnotation(p, Depend.class);
+            Depend dependAnnotation = AnnotationUtils.getDepend(p);
 //            String pName = paramNameGetter.getParameterName(p);
             Class<?> pType = p.getType();
             if(dependAnnotation != null){

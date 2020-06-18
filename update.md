@@ -1,5 +1,58 @@
 ## 版本更新记录
 
+# now(1.14.0)
+- 修改配置信息覆盖规则，现在的优先级是：启动参数 > 配置文件 > 注解 
+- configuration类中增加runParameter相关, 即启动参数相关。
+- 启动参数中，使用'--xxx'来通过启动参数向配置中追加参数。
+- 增加一个配置项：`simbot.profiles.active` （或兼容spring：`spring.profiles.active`）, 其值可以允许加载额外的配置文件。类似于Spring。
+例如, 你的配置文件是`conf.properties`, 其中你写了一个`simbot.profiles.active=dev,test`, 则除了当前配置文件以外，还会加载`conf-dev.properties`文件和`conf-test.properties`文件。
+之后加载的配置信息会覆盖原先的配置信息。你可以结合启动参数`--simbot.profiles.active=`来实现不同环境的多配置文件，例如线上默认是8080端口，本地则是8877端口啥的。
+
+- KeywordMatchType中追加一些正则相关的匹配规则：`FIND`、`TRIM_FIND`、`RE_CQCODE_FIND`、`RE_CQCODE_TRIM_FIND`、`FIND_0`、`TRIM_FIND_0`、`RE_CQCODE_FIND_0`、`RE_CQCODE_TRIM_FIND_0`
+其中，结尾为`FIND`的，使用正则的`find()`进行匹配，结尾为`FIND_0`的，使用`find(0)`进行匹配。
+
+- 所有`KeywordMatchType`下的正则相关的匹配规则（例如`REGEX`、`FIND`等），全部支持动态参数提取。
+动态参数提取的语法：
+`{{name[,regex]}}`，其中，name为动态提取参数的名称，regex为其匹配正则。
+例如：
+```java
+@Beans
+public class Test{
+    /** 监听正则为 'number is (\\d+)'的消息，并提取\\d+为number参数 */
+    @Listen(MsgGetTypes.privateMsg)
+    @Filter("number is {{number,\\d+}}")
+    public void test1(PrivateMsg msg, MsgSender sender, @FilterValue("number") Long number){
+        sender.SENDER.sendPrivateMsg(msg, "您的号码为：" + number);
+    }
+    // ...
+}
+```
+其中`@Filter`默认匹配规则为`REGEX`,因此可以使用动态参数提取，然后再方法参数中添加了`@FilterValue("number") Long number`，
+其中`@FilterValue("number")`的参数`number`就是上述@Filter注解中的number参数，number的匹配规则为`\\d+`，即数字。
+而@Filter中真正的匹配规则会变成：`number is (\\d+)`。
+参数提取语法中，regex可以省略，变成{{name}}，此时匹配规则默认为`.+`。
+如果要使用普通的`'{'`字符串，使用反斜杠转义。
+
+- 追加模板注解：
+    - @OnDiscuss
+    - @OnFriendAdd
+    - @OnFriendAddRequest
+    - @OnGroup
+    - @OnGroupAddRequest
+    - @OnGroupAdminChange
+    - @OnGroupBan
+    - @OnGroupFileUpload
+    - @OnGroupMemberIncrease
+    - @OnGroupMemberReduce
+    - @OnGroupMsgDelete
+    - @OnPrivate
+    - @OnPrivateMsgDelete
+其代表各个对应的监听类型，例如`@OnPrivate` 等同于 `@Listen(MsgGetTypes.privateMsg)`
+
+- 兼容注解`@Resource`, `@Resource`中的`name`与`type`参数分别对应`@Depend`的`value`和`type`
+
+- ListenerManager类开放方法`getListenerMethods()`，你可以通过注入此类并通过此方法得到所有的监听函数实例，配合一些自定义注解即可实现基于监听函数的动态菜单信息。
+
 # 1.13.2
 - 修改`BaseConfiguation`一些字段的访问权限
 

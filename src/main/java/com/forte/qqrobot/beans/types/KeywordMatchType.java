@@ -1,8 +1,11 @@
 package com.forte.qqrobot.beans.types;
 
+import com.forte.qqrobot.listener.invoker.FilterParameterMatcher;
+import com.forte.qqrobot.listener.invoker.FilterParameterMatcherImpl;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
@@ -15,17 +18,36 @@ public enum KeywordMatchType {
 
     //**************** 正则匹配相关 ****************//
 
-    /** 使用正则规则匹配 */
+    /*
+        正则相关的匹配均支持匹配参数提取，但是其他的方法不支持。
+     */
+
+    /** 使用正则matches规则匹配 */
     REGEX((msg, regex) -> regex.matcher(msg).matches()),
 
-    /** 首尾去空后正则匹配 */
+    /** 首尾去空后正则matches匹配 */
     TRIM_REGEX((msg, regex) -> regex.matcher(msg.trim()).matches()),
 
-    /** 移除掉所有CQ码后正则匹配 */
+    /** 移除掉所有CQ码后正则matches匹配 */
     RE_CQCODE_REGEX((msg, regex) -> regex.matcher(CQCodeUtil.build().removeCQCodeFromMsg(msg)).matches()),
 
-    /** 移除掉所有CQ码并首尾去空后正则匹配 */
+    /** 移除掉所有CQ码并首尾去空后正则matches匹配 */
     RE_CQCODE_TRIM_REGEX((msg, regex) -> regex.matcher(CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()).matches()),
+
+
+    /** 使用正则find规则匹配 */
+    FIND((msg, regex) -> regex.matcher(msg).find(0)),
+
+    /** 首尾去空后正则find匹配 */
+    TRIM_FIND((msg, regex) -> regex.matcher(msg.trim()).find(0)),
+
+    /** 移除掉所有CQ码后正则find匹配 */
+    RE_CQCODE_FIND((msg, regex) -> regex.matcher(CQCodeUtil.build().removeCQCodeFromMsg(msg)).find(0)),
+
+    /** 移除掉所有CQ码并首尾去空后正则find匹配 */
+    RE_CQCODE_TRIM_FIND((msg, regex) -> regex.matcher(CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()).find(0)),
+
+
 
     //**************** 相同匹配相关 ****************//
 
@@ -100,10 +122,57 @@ public enum KeywordMatchType {
         return msg != null && filter.test(msg, Pattern.compile(keyword));
     }
 
+
+
+    /**
+     * 将字符串转化为 {@link Pattern} 对象
+     * @param regex 消息字符串
+     * @return {@link Pattern}
+     */
+    public Pattern toPattern(String regex){
+        return toMatcher.apply(regex).getPattern();
+    }
+
+
+    public FilterParameterMatcher toMatcher(String regex){
+        return toMatcher.apply(regex);
+    }
+
     /**
      * 根据规则而对字符串进行过滤
      */
     final BiPredicate<String, Pattern> filter;
+
+    /**
+     * 根据规则而对字符串进行过滤
+     */
+    final Function<String, FilterParameterMatcher> toMatcher;
+
+    /**
+     * 根据规则而对字符串进行过滤
+     */
+    final Function<String, Pattern> toPattern;
+
+
+    /**
+     * 构造
+     * @param filter 匹配规则
+     */
+    KeywordMatchType(BiPredicate<String, Pattern> filter, Function<String, FilterParameterMatcher> toMatcher, Function<String, Pattern> toPattern){
+        this.filter = filter;
+        this.toMatcher = toMatcher;
+        this.toPattern = toPattern;
+    }
+
+    /**
+     * 构造
+     * @param filter 匹配规则
+     */
+    KeywordMatchType(BiPredicate<String, Pattern> filter, Function<String, FilterParameterMatcher> toMatcher){
+        this.filter = filter;
+        this.toMatcher = toMatcher;
+        this.toPattern = s -> this.toMatcher.apply(s).getPattern();
+    }
 
     /**
      * 构造
@@ -111,5 +180,7 @@ public enum KeywordMatchType {
      */
     KeywordMatchType(BiPredicate<String, Pattern> filter){
         this.filter = filter;
+        this.toMatcher = FilterParameterMatcherImpl::compile;
+        this.toPattern = s -> this.toMatcher.apply(s).getPattern();
     }
 }

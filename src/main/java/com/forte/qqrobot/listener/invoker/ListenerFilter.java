@@ -176,7 +176,7 @@ public class ListenerFilter {
         return     botFilter(listenerMethod, msgGet)
                 && groupFilter(listenerMethod, msgGet)
                 && codeFilter(listenerMethod, msgGet)
-                && wordsFilter(listenerMethod, msgGet)
+                && msgFilter(listenerMethod, msgGet)
                 // 自定义过滤
                 && diyFilter(listenerMethod, msgGet, at, context)
                 ;
@@ -219,12 +219,13 @@ public class ListenerFilter {
      * @param msgGet         消息封装
      * @return 是否通过
      */
-    private boolean wordsFilter(ListenerMethod listenerMethod, MsgGet msgGet) {
+    private boolean msgFilter(ListenerMethod listenerMethod, MsgGet msgGet) {
         //获取过滤注解
         Filter filter = listenerMethod.getFilter();
 
         //获取关键词组
         Pattern[] patternValue = listenerMethod.getPatternValue();
+        boolean test = true;
         //如果关键词数量大于1，则进行关键词过滤
         if (patternValue.length > 0) {
             if (patternValue.length == 1) {
@@ -232,12 +233,13 @@ public class ListenerFilter {
                 Pattern singleValue = patternValue[0];
                 //如果需要被at，判断的时候移除at的CQ码
                 //2019/10/25 不再移除CQ码
-                return filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
+                test = filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
             } else {
                 //如果有多个参数，按照规则判断
                 //根据获取规则匹配
-                return filter.mostType().test(msgGet.getMsg(), patternValue, filter.keywordMatchType());
+                test = filter.mostType().test(msgGet.getMsg(), patternValue, filter.keywordMatchType());
             }
+            return test;
         } else {
             return true;
         }

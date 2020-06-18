@@ -73,12 +73,12 @@ public class BotRuntime {
     public static synchronized BotRuntime initRuntime(Collection<ListenerInfo> listenerInfos,
                                                       BaseConfiguration configuration,
                                                       DependCenter dependCenter,
-                                                      BotManager botManager) throws CloneNotSupportedException {
+                                                      BotManager botManager) {
         // 已经初始化过了
         if (runtime != null) {
             throw new RobotRuntimeException(0, "botRuntime has already initialized!");
         }
-        runtime = new BotRuntime(listenerInfos, botManager, dependCenter, (BaseConfiguration) configuration.clone());
+        runtime = new BotRuntime(listenerInfos, botManager, dependCenter, configuration);
         return runtime;
     }
 
@@ -93,7 +93,7 @@ public class BotRuntime {
             // 部分数据存放资源
             // botManager获取器
             Supplier<BotManager> botManagerSupplier
-    ) throws CloneNotSupportedException {
+    ){
         // 已经初始化过了
         if (runtime != null) {
             throw new RobotRuntimeException(0, "botRuntime has already initialized!");
@@ -115,7 +115,7 @@ public class BotRuntime {
                 QQLog.warning("runtime.bot.register.failed", botInfo);
             }
         }
-        runtime = new BotRuntime(listenerInfos, botManager, dependCenter, (BaseConfiguration) configuration.clone());
+        runtime = new BotRuntime(listenerInfos, botManager, dependCenter, configuration);
         return runtime;
     }
 

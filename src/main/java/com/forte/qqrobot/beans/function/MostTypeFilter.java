@@ -21,8 +21,9 @@ public interface MostTypeFilter {
      * @param msg       文本消息
      * @param keywords  我想要进行过滤的词或者想要匹配的正则的数组
      * @param filter    单个规则匹配的匹配规则
-     * @return 是否匹配
+     * @return 是否匹配 (旧版本
+     * @return 匹配的元素的索引，如果没有匹配，返回小于0的值，比如说-1
      */
-    boolean test(String msg, Pattern[] keywords, BiPredicate<String, Pattern> filter);
+    int test(String msg, Pattern[] keywords, BiPredicate<String, Pattern> filter);
 
 }

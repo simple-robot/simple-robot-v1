@@ -2,7 +2,6 @@ package com.forte.qqrobot.beans.types;
 
 import com.forte.qqrobot.beans.function.MostTypeFilter;
 
-import java.util.function.BiPredicate;
 import java.util.regex.Pattern;
 
 /**
@@ -16,41 +15,32 @@ public enum MostType {
     /** 需要全部匹配 */
     EVERY_MATCH((msg, kw, filter) -> {
         boolean b = true;
-        for (Pattern k : kw) {
-            b &= filter.test(msg, k);
+        for (int i = 0; i < kw.length; i++) {
+            if(!filter.test(msg, kw[i])){
+                return -1;
+            }
         }
-        return b;
+        return kw.length-1;
     }),
     /** 任意一个匹配 */
     ANY_MATCH((msg, kw, filter) -> {
-        for (Pattern k : kw) {
-            if(filter.test(msg, k)){
-                return true;
+        for (int i = 0; i < kw.length; i++) {
+            if(filter.test(msg, kw[i])){
+                return i;
             }
         }
-        return false;
+        return -1;
     }),
     /** 没有匹配 */
     NONE_MATCH((msg, kw, filter) -> {
-        for (Pattern k : kw) {
-            if (filter.test(msg, k)) {
-                return false;
+        for (int i = 0; i < kw.length; i++) {
+            if (filter.test(msg, kw[i])) {
+                return -1;
             }
         }
-        return true;
+        return kw.length-1;
     })
     ;
-
-    /**
-     * 传入信息、关键词数组、匹配规则进行匹配
-     * @param msg       消息
-     * @param keywords  关键词数组
-     * @param filter    关键词匹配方法
-     * @return  是否匹配
-     */
-    public boolean test(String msg, Pattern[] keywords,  BiPredicate<String, Pattern> filter){
-        return moreFilter.test(msg, keywords, filter);
-    }
 
     /**
      * 传入信息、关键词数组
@@ -60,6 +50,18 @@ public enum MostType {
      * @return  是否匹配
      */
     public boolean test(String msg, Pattern[] keywords, KeywordMatchType keywordMatchType){
+        return moreFilter.test(msg, keywords, keywordMatchType.filter) >= 0;
+    }
+
+    /**
+     * 传入信息、关键词数组
+     * @param msg       消息
+     * @param keywords  关键词数据
+     * @param keywordMatchType 关键词匹配类型
+     * @return 所匹配的是哪一个索引。如果mostType类型为{@link MostType#ANY_MATCH}，则返回值为对应匹配索引，
+     * 其余，返回值要么是数组最后一位（成功），要么是-1（失败）
+     */
+    public int testMatch(String msg, Pattern[] keywords, KeywordMatchType keywordMatchType){
         return moreFilter.test(msg, keywords, keywordMatchType.filter);
     }
 

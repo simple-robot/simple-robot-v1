@@ -4,8 +4,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.*;
 
 /**
  * 使用此注解对字段进行注入
@@ -21,11 +20,16 @@ import static java.lang.annotation.ElementType.PARAMETER;
  * @since JDK1.8
  **/
 @Retention(RetentionPolicy.RUNTIME)	//注解会在class字节码文件中存在，在运行时可以通过反射获取到
-@Target({FIELD, PARAMETER})
+@Target({FIELD, PARAMETER, ANNOTATION_TYPE})
 public @interface Depend {
 
     /** 使用名称对依赖进行注入，如果为空字符串则使用类型进行注入 */
     String value() default "";
+
+    /**
+     * 如果获取不到，使用null代替。默认会抛出异常。
+     */
+    boolean orNull() default false;
 
     /**
      * 如果要使用字段类型进行注入，但是此类型可能存在多个（不同实现类），<br>

@@ -7,7 +7,8 @@ import com.forte.qqrobot.utils.ReaderProperties;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Properties;
 
 /**
  * 自动装配配置读取器，静态方法即可。

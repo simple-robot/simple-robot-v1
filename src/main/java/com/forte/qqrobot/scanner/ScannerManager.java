@@ -16,6 +16,7 @@ import org.quartz.Job;
 import org.quartz.SchedulerException;
 
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
@@ -87,7 +88,7 @@ public class ScannerManager implements Register {
                 //扫描
                 Set<ListenerMethod> scanSet = scanner.scanner(c);
                 if(!scanSet.isEmpty()){
-                    scanSet.forEach(lm -> QQLog.info("run.listen.load.success", lm.getUUID()));
+                    scanSet.forEach(lm -> QQLog.info("run.listen.load.success", lm.getUUID() + " " + Arrays.toString(lm.getTypes())));
                 }
             } catch (Exception e) {
                 throw new RobotRuntimeException(e);

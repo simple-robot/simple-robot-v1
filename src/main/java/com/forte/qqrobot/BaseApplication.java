@@ -47,6 +47,9 @@ import com.forte.qqrobot.sender.senderlist.SenderGetList;
 import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.system.CoreSystem;
+import com.forte.qqrobot.system.RunParameter;
+import com.forte.qqrobot.system.RunParameterUtils;
+import com.forte.qqrobot.system.RunParameters;
 import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.*;
 
@@ -78,7 +81,7 @@ public abstract class BaseApplication<
         SEND extends SenderSendList,
         SET extends SenderSetList,
         GET extends SenderGetList,
-        CONTEXT extends SimpleRobotContext<SEND, SET, GET>
+        CONTEXT extends SimpleRobotContext<SEND, SET, GET, CONFIG>
         > implements Closeable {
 
     /**
@@ -118,6 +121,7 @@ public abstract class BaseApplication<
      * 执行参数，执行run方法后被初始化
      */
     private String[] args;
+    private RunParameter[] parameters;
 
     private ListenerManager manager;
 
@@ -287,7 +291,9 @@ public abstract class BaseApplication<
                                                    BotManager manager,
                                                    MsgParser msgParser,
                                                    MsgProcessor processor,
-                                                   DependCenter dependCenter);
+                                                   DependCenter dependCenter,
+                                                   CONFIG config
+                                                   );
 
 
     /**
@@ -550,13 +556,9 @@ public abstract class BaseApplication<
      */
     private BotRuntime initRuntime(CONFIG config, DependCenter dependCenter, BotInfo[] botInfos){
         // 初始化BotRuntime
-        try {
-            BotRuntime botRuntime = BotRuntime.initRuntime(new ArrayList<>(), botInfos, config, dependCenter, this::getBotManager);
-            dependCenter.load(botRuntime);
-            return botRuntime;
-        } catch (CloneNotSupportedException e) {
-            throw new RobotRunException("runtime.init.failed", e);
-        }
+        BotRuntime botRuntime = BotRuntime.initRuntime(new ArrayList<>(), botInfos, config, dependCenter, this::getBotManager);
+        dependCenter.load(botRuntime);
+        return botRuntime;
     }
 
     /**
@@ -1041,6 +1043,10 @@ public abstract class BaseApplication<
         //获取配置对象
         CONFIG configuration = getConf();
 
+        // 配置启动参数
+        configuration.setParameters(new RunParameters(this.parameters));
+
+
         //用户进行配置
         app.before(configuration);
 
@@ -1082,7 +1088,8 @@ public abstract class BaseApplication<
                 botManager,
                 startResult.getMsgParser(),
                 startResult.getMsgProcessor(),
-                dependCenter
+                dependCenter,
+                configuration
         );
 
         // 记录Context
@@ -1127,6 +1134,7 @@ public abstract class BaseApplication<
      */
     protected void setArgs(String[] args){
         this.args = args;
+        this.parameters = RunParameterUtils.parseToParameters(args);
     }
 
     /**

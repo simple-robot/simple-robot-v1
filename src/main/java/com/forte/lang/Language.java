@@ -1,19 +1,21 @@
 package com.forte.lang;
 
 
+import cn.hutool.core.io.resource.NoResourceException;
+import cn.hutool.core.io.resource.Resource;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.ReaderProperties;
+import com.forte.qqrobot.utils.ResourcesUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * 语言类，用于读取lang文件
@@ -54,7 +56,7 @@ public class Language {
     /**
      * 编码使用默认编码
      */
-    private static Charset charset = Charset.defaultCharset();
+    private static Charset charset = StandardCharsets.UTF_8;
 
     /**
      * 默认的语言使用英文
@@ -345,25 +347,35 @@ public class Language {
      * @throws Exception
      */
     private static InputStream getResourcesInputStream(ClassLoader loader, String path, Function<String, Exception> ifNull) throws Exception {
-        InputStream localeLangStream = loader.getResourceAsStream(path);
+        Resource resource = ResourcesUtils.getResource(path, loader);
 
-        // 如果为null， 尝试在开头加个'/'
-        if (localeLangStream == null) {
-            // 尝试携带一个/路径在开头
-            String newPath = "/" + path;
-            localeLangStream = loader.getResourceAsStream(newPath);
-            // 如果语言文件流为null
-            if (localeLangStream == null) {
-                if (ifNull != null) {
-                    Exception err = ifNull.apply(path);
-                    if (err != null) {
-                        throw err;
-                    }
-                }
-                return null;
+        InputStream localeLangStream = null;
+        try {
+            localeLangStream = resource.getStream();
+        }catch (NoResourceException e){
+            Exception ifNullEx = ifNull.apply(path);
+            if(ifNullEx != null){
+                throw ifNullEx;
             }
         }
         return localeLangStream;
+
+        // 如果为null， 尝试在开头加个'/'
+//        if (localeLangStream == null) {
+//            // 尝试携带一个/路径在开头
+//            String newPath = "/" + path;
+//            localeLangStream = loader.getResourceAsStream(newPath);
+//            // 如果语言文件流为null
+//            if (localeLangStream == null) {
+//                if (ifNull != null) {
+//                    Exception err = ifNull.apply(path);
+//                    if (err != null) {
+//                        throw err;
+//                    }
+//                }
+//                return null;
+//            }
+//        }
     }
 
     /**
@@ -375,12 +387,8 @@ public class Language {
      * @return 输入流列表
      * @throws IOException
      */
-    private static Stream<InputStream> getResourcesInputStreams(ClassLoader loader, String path, Consumer<Exception> ifThrow) throws IOException {
-        final Enumeration<URL> resources = loader.getResources(path);
-        return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(Iterators.iter(resources), Spliterator.ORDERED | Spliterator.NONNULL),
-                false
-        ).map(url -> {
+    private static Stream<InputStream> getResourcesInputStreams(ClassLoader loader, String path, Consumer<Exception> ifThrow) {
+        return ResourcesUtils.getResources(path, loader).stream().map(url -> {
             try {
                 return url.openStream();
             } catch (IOException e) {
@@ -456,13 +464,26 @@ public class Language {
         try {
             // 加载可能存在的用户自定义语言
             loadLang(loader, LANG_PATH_HEAD + DEFAULT_LOCALE + PATH_END, DEFAULT_LOCALE, null);
-//            loadLang(loader, LANG_PATH_HEAD + DEFAULT_LOCALE + PATH_END, DEFAULT_LOCALE, p -> new NullPointerException("can not find language resources file in : '"+ p +"'"));
         } catch (Exception e) {
             QQLog.debug("can not find language resources file in : ''{0}''", LANG_PATH_HEAD + DEFAULT_LOCALE + PATH_END);
         }
         return exceptions.toArray(new Exception[0]);
     }
 
+    /**
+     * 获取当前全部语言信息
+     */
+    public static Map<String, MessageFormat> getLangMap(){
+        return new HashMap<>(languageFormat);
+    }
+
+    /**
+     * 获取指定tag的信息
+     * @param tag 指定tag
+     */
+    public static MessageFormat getLang(String tag){
+        return languageFormat.get(tag);
+    }
 
     /**
      * 注册或覆盖一些额外的语言映射，其最终会覆盖语言映射

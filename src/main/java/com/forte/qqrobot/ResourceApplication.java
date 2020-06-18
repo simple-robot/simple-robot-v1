@@ -1,11 +1,17 @@
 package com.forte.qqrobot;
 
+import cn.hutool.core.io.resource.ResourceUtil;
 import com.forte.config.ConfigurationHelper;
 import com.forte.config.InjectableConfig;
 import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.log.QQLog;
+import com.forte.qqrobot.system.RunParameter;
+import com.forte.qqrobot.system.RunParameters;
+import com.forte.qqrobot.utils.EmptyInputStream;
+import com.forte.qqrobot.utils.ResourcesUtils;
 
 import java.io.*;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -20,13 +26,31 @@ import java.util.Properties;
  **/
 public interface ResourceApplication<CONFIG extends BaseConfiguration> extends Application<CONFIG> {
 
+    /**
+     * 资源路径
+     */
+    String resourceName();
 
     /**
      * 获取配置文件的文件输入流对象，并根据此对象对配置对象进行自动装填。
      * 获取到的流在使用完成后会自动关闭。
      * @return 配置文件流对象（properties
      */
-    InputStream getStream();
+    default InputStream getStream(){
+        // 如果资源路径为空字符串，则读取一个空值，即不进行文件读取
+        final String resourceName = resourceName();
+        if(resourceName.length() == 0){
+            return EmptyInputStream.INSTANCE;
+        }
+        InputStream stream = ResourceUtil.getStream(resourceName);
+        if(stream == null){
+            try {
+                stream = new BufferedInputStream(new FileInputStream(resourceName));
+            } catch (FileNotFoundException ignored) { }
+        }
+
+        return Objects.requireNonNull(stream, "resource inputstream is null: " + resourceName);
+    }
 
     /**
      * 获取Reader对象。
@@ -44,7 +68,7 @@ public interface ResourceApplication<CONFIG extends BaseConfiguration> extends A
      */
     @Override
     default void before(CONFIG configuration) {
-        Properties configProperties = new Properties();
+        ConfigProperties configProperties = new ConfigProperties();
 
         // 获取流并自动关闭
         try (Reader reader = getReader()) {
@@ -59,15 +83,39 @@ public interface ResourceApplication<CONFIG extends BaseConfiguration> extends A
         Class<CONFIG> configType = (Class<CONFIG>) configuration.getClass();
         InjectableConfig<CONFIG> injectableConfig = ConfigurationHelper.toInjectable(configType);
 
+        // 读取启动参数
+        //[spring|simbot].profiles.active.
+        final RunParameters parameters = configuration.getParameters();
+
+        // 追加所有开头为'--'的参数
+        for (RunParameter runParameter : parameters.getParameters()) {
+            configProperties.setProperty(runParameter.getName(), String.join(",", runParameter.getParameters()));
+        }
+
+        String activeString = configProperties.getProperty("spring.profiles.active");
+        if(activeString == null || activeString.length() == 0){
+            activeString = configProperties.getProperty("simbot.profiles.active");
+        }
+
+        String[] actives = null;
+        if(activeString != null){
+            actives = activeString.split(", *");
+        }
+
+        if(actives != null && actives.length > 0){
+            ResourcesUtils.resourceActive(resourceName(), actives, configProperties, null);
+        }
+
         // 额外操作
         plus(configProperties);
+
 
         // 注入配置
         injectableConfig.inject(configuration, configProperties);
         QQLog.info("properties config injected.");
 
         // 设置配置properties
-        configuration.setConfigProperties(new ConfigProperties(configProperties));
+        configuration.setConfigProperties(configProperties);
 
         // 执行之后的before
         before(configProperties, configuration);
@@ -86,6 +134,7 @@ public interface ResourceApplication<CONFIG extends BaseConfiguration> extends A
      * @param configuration 配置好的配置文件
      */
     void before(Properties args, CONFIG configuration);
+
 
 
 }

@@ -3,14 +3,8 @@ package com.forte.qqrobot;
 import com.forte.qqrobot.exception.ConfigurationException;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
-import com.forte.qqrobot.utils.EmptyInputStream;
 import com.forte.qqrobot.utils.FieldUtils;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -40,7 +34,6 @@ class AutoResourceApplication<CONFIG extends BaseConfiguration> implements Resou
                                                                                          Class<?> baseClass){
         String resources = applicationAnnotation.resources().trim();
         Properties properties = new Properties();
-
         // load config
         if(configurationAnnotation != null){
             ConfigurationProperty[] value = configurationAnnotation.value();
@@ -112,6 +105,7 @@ class AutoResourceApplication<CONFIG extends BaseConfiguration> implements Resou
         this.baseApplication = baseApplication;
     }
 
+    @Override
     public String resourceName(){
         return resources;
     }
@@ -133,35 +127,39 @@ class AutoResourceApplication<CONFIG extends BaseConfiguration> implements Resou
         return baseClass;
     }
 
-    /**
-     * 获取配置文件的文件输入流对象，并根据此对象对配置对象进行自动装填。
-     * 获取到的流在使用完成后会自动关闭。
-     *
-     * @return 配置文件流对象（properties
-     */
-    @Override
-    public InputStream getStream() {
-        // 如果资源路径为空字符串，则读取一个空值，即不进行文件读取
-        if(resources.length() == 0){
-            return EmptyInputStream.INSTANCE;
-        }
-        InputStream stream = this.getClass().getResourceAsStream(resourceName());
-        if(stream == null){
-            try {
-                stream = new BufferedInputStream(new FileInputStream(resourceName()));
-            } catch (FileNotFoundException ignored) { }
-        }
-
-        return Objects.requireNonNull(stream, "resource inputstream is null: " + resources);
-    }
+//    /**
+//     * 获取配置文件的文件输入流对象，并根据此对象对配置对象进行自动装填。
+//     * 获取到的流在使用完成后会自动关闭。
+//     *
+//     * @return 配置文件流对象（properties
+//     */
+//    @Override
+//    public InputStream getStream() {
+//        // 如果资源路径为空字符串，则读取一个空值，即不进行文件读取
+//        if(resources.length() == 0){
+//            return EmptyInputStream.INSTANCE;
+//        }
+//        InputStream stream = ResourceUtil.getStream(resourceName());
+//        if(stream == null){
+//            try {
+//                stream = new BufferedInputStream(new FileInputStream(resourceName()));
+//            } catch (FileNotFoundException ignored) { }
+//        }
+//
+//        return Objects.requireNonNull(stream, "resource inputstream is null: " + resources);
+//    }
 
     @Override
     public void plus(Properties configProperties){
         // 追加参数
+        final Set<String> configPropertiesNames = configProperties.stringPropertyNames();
         if(properties != null){
             Set<String> keys = properties.stringPropertyNames();
             for (String key : keys) {
-                configProperties.setProperty(key, properties.getProperty(key));
+                // 追加操作不覆盖原有配置
+                if(!configPropertiesNames.contains(key)){
+                    configProperties.setProperty(key, properties.getProperty(key));
+                }
             }
         }
     }
