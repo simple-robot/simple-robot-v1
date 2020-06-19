@@ -2,6 +2,7 @@ package com.forte.qqrobot.depend;
 
 import com.forte.qqrobot.exception.ModuleException;
 import com.forte.qqrobot.utils.ReaderProperties;
+import com.forte.qqrobot.utils.ResourcesUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

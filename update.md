@@ -1,8 +1,8 @@
 ## 版本更新记录
 
-# now
-修改`@SimpleRobotApplication`的resource参数默认值，由`/simple-robot-conf.properties` 改为 `simple-robot-conf.properties`
-修复listenerManager中出现的排序异常bug
+# 1.14.1
+- 修改`@SimpleRobotApplication`的resource参数默认值，由`/simple-robot-conf.properties` 改为 `simple-robot-conf.properties`
+- **修复listenerManager中出现的排序异常bug**
 
 
 

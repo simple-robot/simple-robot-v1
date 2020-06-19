@@ -19,7 +19,7 @@ import java.util.Properties;
  * @author ForteScarlet
  * @version  1.7.0
  */
-@Version(version = "1.14.0",
+@Version(version = "1.14.1",
         versionFamily = "1.14")
 public final class CoreSystem {
 
