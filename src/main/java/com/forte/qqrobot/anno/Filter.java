@@ -28,9 +28,9 @@ public @interface Filter {
     String[] value() default {};
 
     /**
-     * 如果上面的关键词过滤有内容，那么此处为匹配规则，默认为正则匹配
+     * 如果上面的关键词过滤有内容，那么此处为匹配规则，默认为 trim+正则匹配
      */
-    KeywordMatchType keywordMatchType() default KeywordMatchType.REGEX;
+    KeywordMatchType keywordMatchType() default KeywordMatchType.TRIM_REGEX;
 
     /**
      * 如果上面的关键词过滤有多数内容，那么此处为多数匹配规则，是一个匹配的就好还是全部匹配才行之类的

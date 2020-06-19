@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,10 +33,17 @@ public class FilterParameterMatcherImpl implements FilterParameterMatcher {
      */
     private final int pointSize;
 
-    private FilterParameterMatcherImpl(String original, Pattern pattern, Point point){
+    /**
+     * 在对消息匹配之前，此处为前置处理器
+     */
+    private final Function<String, String> textHandler;
+
+
+    private FilterParameterMatcherImpl(String original, Pattern pattern, Function<String, String> textHandler, Point point){
         this.original = original;
         this.pattern = pattern;
         this.point = point;
+        this.textHandler = textHandler;
 
         if(point != null){
             int i = 0;
@@ -51,13 +59,19 @@ public class FilterParameterMatcherImpl implements FilterParameterMatcher {
 
     }
 
+    public static FilterParameterMatcherImpl compile(String string){
+        return compile(string, s -> s);
+    }
+
     /**
      * 将一串字符串解析为{@link FilterParameterMatcherImpl}
      * @param string 字符串
      * @return {@link FilterParameterMatcherImpl}
      */
-    public static FilterParameterMatcherImpl compile(String string){
+    public static FilterParameterMatcherImpl compile(String string, Function<String, String> textHandler){
         Objects.requireNonNull(string);
+        Objects.requireNonNull(textHandler);
+
         String text = encode(string);
         final int textLength = text.length();
         boolean on = false;
@@ -131,11 +145,11 @@ public class FilterParameterMatcherImpl implements FilterParameterMatcher {
         }
 
         if(point == null){
-            return new FilterParameterMatcherImpl(string, Pattern.compile(string), null);
+            return new FilterParameterMatcherImpl(string, Pattern.compile(string), textHandler, null);
         }
 
         final Pattern pattern = point.toPattern();
-        return new FilterParameterMatcherImpl(string, pattern, point.first());
+        return new FilterParameterMatcherImpl(string, pattern, textHandler, point.first());
     }
 
 
@@ -201,6 +215,7 @@ public class FilterParameterMatcherImpl implements FilterParameterMatcher {
      */
     @Override
     public Map<String, String> getParams(String text) {
+        text = textHandler.apply(text);
         if(point == null){
             return null;
         }

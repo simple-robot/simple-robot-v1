@@ -153,7 +153,7 @@ public class ListenerManager implements MsgReceiver {
             // Lock
             synchronized (INTERCEPTS_LOCK){
                 if(intercepts == null){
-                    intercepts = Arrays.stream(interceptsSupplier).map(Supplier::get).filter(Objects::nonNull).toArray(MsgIntercept[]::new);
+                    intercepts = Arrays.stream(interceptsSupplier).map(Supplier::get).filter(Objects::nonNull).sorted().toArray(MsgIntercept[]::new);
                 }
             }
         }
@@ -168,7 +168,7 @@ public class ListenerManager implements MsgReceiver {
             // Lock
             synchronized (LISTEN_INTERCEPTS_LOCK){
                 if(listenIntercepts == null){
-                    listenIntercepts = Arrays.stream(listenInterceptsSupplier).map(Supplier::get).filter(Objects::nonNull).toArray(ListenIntercept[]::new);
+                    listenIntercepts = Arrays.stream(listenInterceptsSupplier).map(Supplier::get).filter(Objects::nonNull).sorted().toArray(ListenIntercept[]::new);
                 }
             }
         }
@@ -674,9 +674,7 @@ public class ListenerManager implements MsgReceiver {
 
         // 排序并构建消息拦截器
         if(interceptsSupplier != null){
-            Supplier<MsgIntercept>[] msgInterceptsCopy = Arrays.copyOf(interceptsSupplier, interceptsSupplier.length);
-            Arrays.sort(msgInterceptsCopy);
-            this.interceptsSupplier = msgInterceptsCopy;
+            this.interceptsSupplier = Arrays.copyOf(interceptsSupplier, interceptsSupplier.length);
         }else{
             // 没有，直接给intercepts赋值
             this.intercepts = new MsgIntercept[0];
@@ -684,10 +682,8 @@ public class ListenerManager implements MsgReceiver {
 
         // 排序并构建j监听函数拦截器
         if(listenInterceptsSupplier != null){
-            Supplier<ListenIntercept>[] listenInterceptsCopy = Arrays.copyOf(listenInterceptsSupplier, listenInterceptsSupplier.length);
 
-            Arrays.sort(listenInterceptsCopy);
-            this.listenInterceptsSupplier = listenInterceptsCopy;
+            this.listenInterceptsSupplier = Arrays.copyOf(listenInterceptsSupplier, listenInterceptsSupplier.length);
         }else{
             // 没有，直接给intercepts赋值
             this.listenIntercepts = new ListenIntercept[0];

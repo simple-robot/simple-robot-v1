@@ -612,7 +612,6 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
      */
     private Object getParameter(Parameter parameter, AdditionalDepends additionalDepends) {
         //获取注解
-//        com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(parameter, com.forte.qqrobot.anno.depend.Depend.class);
         com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getDepend(parameter);
         FilterValue filterValueAnnotation = AnnotationUtils.getAnnotation(parameter, FilterValue.class);
 

@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 public enum KeywordMatchType {
 
     //**************** 正则匹配相关 ****************//
-
     /*
         正则相关的匹配均支持匹配参数提取，但是其他的方法不支持。
      */
@@ -26,26 +25,26 @@ public enum KeywordMatchType {
     REGEX((msg, regex) -> regex.matcher(msg).matches()),
 
     /** 首尾去空后正则matches匹配 */
-    TRIM_REGEX((msg, regex) -> regex.matcher(msg.trim()).matches()),
+    TRIM_REGEX((msg, regex) -> regex.matcher(msg).matches(), String::trim),
 
     /** 移除掉所有CQ码后正则matches匹配 */
-    RE_CQCODE_REGEX((msg, regex) -> regex.matcher(CQCodeUtil.build().removeCQCodeFromMsg(msg)).matches()),
+    RE_CQCODE_REGEX((msg, regex) -> regex.matcher(msg).matches(), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
 
     /** 移除掉所有CQ码并首尾去空后正则matches匹配 */
-    RE_CQCODE_TRIM_REGEX((msg, regex) -> regex.matcher(CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()).matches()),
+    RE_CQCODE_TRIM_REGEX((msg, regex) -> regex.matcher(msg).matches(), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
 
 
     /** 使用正则find规则匹配 */
     FIND((msg, regex) -> regex.matcher(msg).find(0)),
 
     /** 首尾去空后正则find匹配 */
-    TRIM_FIND((msg, regex) -> regex.matcher(msg.trim()).find(0)),
+    TRIM_FIND((msg, regex) -> regex.matcher(msg).find(0), String::trim),
 
     /** 移除掉所有CQ码后正则find匹配 */
-    RE_CQCODE_FIND((msg, regex) -> regex.matcher(CQCodeUtil.build().removeCQCodeFromMsg(msg)).find(0)),
+    RE_CQCODE_FIND((msg, regex) -> regex.matcher(msg).find(0), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
 
     /** 移除掉所有CQ码并首尾去空后正则find匹配 */
-    RE_CQCODE_TRIM_FIND((msg, regex) -> regex.matcher(CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()).find(0)),
+    RE_CQCODE_TRIM_FIND((msg, regex) -> regex.matcher(msg).find(0), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
 
 
 
@@ -55,13 +54,13 @@ public enum KeywordMatchType {
     EQUALS((msg, regex) -> msg.equals(regex.toString())),
 
     /** 首尾去空后相同匹配  */
-    TRIM_EQUALS((msg, regex) -> msg.trim().equals(regex.toString())),
+    TRIM_EQUALS((msg, regex) -> msg.equals(regex.toString()), String::trim),
 
     /** 移除掉所有CQ码后相同匹配 */
-    RE_CQCODE_EQUALS((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).equals(regex.toString())),
+    RE_CQCODE_EQUALS((msg, regex) -> msg.equals(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
 
     /** 移除掉所有CQ码并首尾去空后相同匹配 */
-    RE_CQCODE_TRIM_EQUALS((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim().equals(regex.toString())),
+    RE_CQCODE_TRIM_EQUALS((msg, regex) -> msg.equals(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
 
     //**************** 包含匹配相关 ****************//
 
@@ -69,35 +68,35 @@ public enum KeywordMatchType {
     CONTAINS((msg, regex) -> msg.contains(regex.toString())),
 
     /** 去空的包含匹配 */
-    TRIM_CONTAINS((msg, regex) -> msg.trim().contains(regex.toString())),
+    TRIM_CONTAINS((msg, regex) -> msg.contains(regex.toString()), String::trim),
 
     /** 移除掉所有CQ码后包含匹配 */
-    RE_CQCODE_CONTAINS((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).contains(regex.toString())),
+    RE_CQCODE_CONTAINS((msg, regex) -> msg.contains(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
 
     /** 移除掉所有CQ码并首尾去空后包含匹配 */
-    RE_CQCODE_TRIM_CONTAINS((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim().contains(regex.toString())),
+    RE_CQCODE_TRIM_CONTAINS((msg, regex) -> msg.contains(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
 
     //**************** 开头匹配 ****************//
 
     /** 首部匹配 */
     STARTS_WITH((msg, regex) -> msg.startsWith(regex.toString())),
     /** 去空的首部匹配 */
-    TRIM_STARTS_WITH((msg, regex) -> msg.trim().startsWith(regex.toString())),
+    TRIM_STARTS_WITH((msg, regex) -> msg.trim().startsWith(regex.toString()), String::trim),
     /** 移除掉所有CQ码后首部匹配 */
-    RE_CQCODE_STARTS_WITH((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).startsWith(regex.toString())),
+    RE_CQCODE_STARTS_WITH((msg, regex) -> msg.startsWith(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
     /** 移除掉所有CQ码并首尾去空后首部匹配 */
-    RE_CQCODE_TRIM_STARTS_WITH((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim().startsWith(regex.toString())),
+    RE_CQCODE_TRIM_STARTS_WITH((msg, regex) -> msg.startsWith(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
 
     //**************** 结尾匹配 ****************//
 
     /** 尾部匹配 */
     ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString())),
     /** 去空的尾部匹配 */
-    TRIM_ENDS_WITH((msg, regex) -> msg.trim().endsWith(regex.toString())),
+    TRIM_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), String::trim),
     /** 移除掉所有CQ码后尾部匹配 */
-    RE_CQCODE_ENDS_WITH((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).endsWith(regex.toString())),
+    RE_CQCODE_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
     /** 移除掉所有CQ码并首尾去空后尾部匹配 */
-    RE_CQCODE_TRIM_ENDS_WITH((msg, regex) -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim().endsWith(regex.toString())),
+    RE_CQCODE_TRIM_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
 
 
     ;
@@ -139,17 +138,22 @@ public enum KeywordMatchType {
     }
 
     /**
+     * 字符串消息的前置处理器
+     */
+    final Function<String, String> msgHandler;
+
+    /**
      * 根据规则而对字符串进行过滤
      */
     final BiPredicate<String, Pattern> filter;
 
     /**
-     * 根据规则而对字符串进行过滤
+     * 将@Filter的value参数解析为{@link FilterParameterMatcher}
      */
     final Function<String, FilterParameterMatcher> toMatcher;
 
     /**
-     * 根据规则而对字符串进行过滤
+     * 将@Filter的value参数解析为{@link Pattern}
      */
     final Function<String, Pattern> toPattern;
 
@@ -158,29 +162,22 @@ public enum KeywordMatchType {
      * 构造
      * @param filter 匹配规则
      */
-    KeywordMatchType(BiPredicate<String, Pattern> filter, Function<String, FilterParameterMatcher> toMatcher, Function<String, Pattern> toPattern){
-        this.filter = filter;
-        this.toMatcher = toMatcher;
-        this.toPattern = toPattern;
-    }
-
-    /**
-     * 构造
-     * @param filter 匹配规则
-     */
-    KeywordMatchType(BiPredicate<String, Pattern> filter, Function<String, FilterParameterMatcher> toMatcher){
-        this.filter = filter;
-        this.toMatcher = toMatcher;
-        this.toPattern = s -> this.toMatcher.apply(s).getPattern();
-    }
-
-    /**
-     * 构造
-     * @param filter 匹配规则
-     */
     KeywordMatchType(BiPredicate<String, Pattern> filter){
+        this.msgHandler = s -> s;
         this.filter = filter;
         this.toMatcher = FilterParameterMatcherImpl::compile;
         this.toPattern = s -> this.toMatcher.apply(s).getPattern();
+    }
+
+    /**
+     * 构造
+     * @param filter 匹配规则
+     * @param msgHandler 对消息字符串的前置处理器
+     */
+    KeywordMatchType(BiPredicate<String, Pattern> filter, Function<String, String> msgHandler){
+        this.msgHandler = msgHandler;
+        this.filter = (s, p) -> filter.test(msgHandler.apply(s), p);
+        this.toMatcher = s -> FilterParameterMatcherImpl.compile(s, msgHandler);
+        this.toPattern = s -> this.toMatcher.apply(msgHandler.apply(s)).getPattern();
     }
 }

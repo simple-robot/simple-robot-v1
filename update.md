@@ -1,6 +1,12 @@
 ## 版本更新记录
 
-# now(1.14.0)
+# now
+修改`@SimpleRobotApplication`的resource参数默认值，由`/simple-robot-conf.properties` 改为 `simple-robot-conf.properties`
+修复listenerManager中出现的排序异常bug
+
+
+
+# 1.14.0
 - 修改配置信息覆盖规则，现在的优先级是：启动参数 > 配置文件 > 注解 
 - configuration类中增加runParameter相关, 即启动参数相关。
 - 启动参数中，使用'--xxx'来通过启动参数向配置中追加参数。
@@ -9,7 +15,7 @@
 之后加载的配置信息会覆盖原先的配置信息。你可以结合启动参数`--simbot.profiles.active=`来实现不同环境的多配置文件，例如线上默认是8080端口，本地则是8877端口啥的。
 
 - KeywordMatchType中追加一些正则相关的匹配规则：`FIND`、`TRIM_FIND`、`RE_CQCODE_FIND`、`RE_CQCODE_TRIM_FIND`、`FIND_0`、`TRIM_FIND_0`、`RE_CQCODE_FIND_0`、`RE_CQCODE_TRIM_FIND_0`
-其中，结尾为`FIND`的，使用正则的`find()`进行匹配，结尾为`FIND_0`的，使用`find(0)`进行匹配。
+其中，结尾为`FIND`的，使用正则的`find(0)`进行匹配。
 
 - 所有`KeywordMatchType`下的正则相关的匹配规则（例如`REGEX`、`FIND`等），全部支持动态参数提取。
 动态参数提取的语法：

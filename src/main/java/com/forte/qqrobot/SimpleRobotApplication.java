@@ -19,11 +19,11 @@ public @interface SimpleRobotApplication {
     Class<? extends Application> application() default Application.class;
 
     /**
-     * <pre> 配置文件所在的resources资源路径下的读取路径，默认为"/simple-robot-conf.properties".
+     * <pre> 配置文件所在的resources资源路径下的读取路径，默认为"simple-robot-conf.properties".
      * <pre> 如果值为空字符的话在不会读取文件。
      * @return 资源路径
      */
-    String resources() default "/simple-robot-conf.properties";
+    String resources() default "simple-robot-conf.properties";
 
 //    /**
 //     * <pre> 此处为额外的配置信息。使用注解来覆盖、代替文件形式的配置。
