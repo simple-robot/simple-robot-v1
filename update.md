@@ -1,5 +1,18 @@
 ## 版本更新记录
 
+# 1.15.0
+- 修改接口定义，为一些接口增加获取昵称和备注的方法（例如群消息等）
+昵称和备注的获取通过三个接口`NicknameAble`、`RemarkAble`、`NickOrRemark`控制，可用于在自定义过滤器中进行各种判断。
+- 为Configuration中增加一些方法：
+`putValue(String, Object)`、`getValue(String)`、`clearValue()`、`getValueEntrySet()`
+使得Configuration支持存入任何自定义信息了。
+- `HttpClientHelper`类增加静态方法`clear()`以清除所有保存的http模板。
+- `ListenerFilter`类的自定义过滤器不再是静态了。
+- 完善close机制，现在你可以通过组件的Application实例或者run方法所返回的Context实例的close()方法来关闭当前的服务，并通过构建一个新的Application实例来再次启动。
+不过一般情况下，我不推荐频繁关闭开启服务。
+
+
+
 # 1.14.1
 - 修改`@SimpleRobotApplication`的resource参数默认值，由`/simple-robot-conf.properties` 改为 `simple-robot-conf.properties`
 - **修复listenerManager中出现的排序异常bug**

@@ -120,6 +120,14 @@ public class BotRuntime {
     }
 
     /**
+     * 清除runtime
+     * @see BaseApplication#close()
+     */
+    static synchronized void close(){
+        runtime = null;
+    }
+
+    /**
      * 获取Runtime，如果尚未初始化则抛出异常。
      *
      * @return

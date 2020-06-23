@@ -1,5 +1,6 @@
 package com.forte.qqrobot.beans.messages.result.inner;
 
+import com.forte.qqrobot.beans.messages.NickOrRemark;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.result.ResultInner;
 import com.forte.qqrobot.beans.messages.types.PowerType;
@@ -8,31 +9,21 @@ import com.forte.qqrobot.beans.messages.types.SexType;
 /**
  * 群成员信息
  */
-public interface GroupMember extends ResultInner, QQCodeAble {
+public interface GroupMember extends ResultInner, QQCodeAble, NickOrRemark {
     /** 群号 */
     String getGroup();
     /** QQ号 */
     String getQQ();
-    /** QQ名 */
-    String getName();
-    /** 获取群昵称 */
-    String getNickName();
-
     @Override
     default String getQQCode() {
         return getQQ();
     }
-
     /**
-     * 获取昵称，如果没有设置昵称那么获取QQ名
+     * @see #getRemarkOrNickname()
      */
+    @Deprecated
     default String getNickOrName(){
-        String nick = getNickName();
-        if(nick==null||nick.length() == 0){
-            return getName();
-        }else{
-            return nick;
-        }
+       return getRemarkOrNickname();
     }
 
     /** 获取性别 */

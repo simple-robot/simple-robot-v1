@@ -8,6 +8,7 @@ import com.forte.qqrobot.beans.messages.result.LoginQQInfo;
  */
 public interface LoginInfo extends LoginQQInfo {
 
+    @Override
     default String getCode(){
         return getQQ();
     }

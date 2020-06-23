@@ -14,6 +14,7 @@ import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.FieldUtils;
 import org.quartz.Job;
 import org.quartz.SchedulerException;
+import org.quartz.impl.StdSchedulerFactory;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -106,17 +107,14 @@ public class ScannerManager implements Register {
     /**
      * 注册定时器
      */
-    private void registerTimeTask(Set<Class<?>> classes, MsgSender sender){
-        //获取定时任务管理器
-        TimeTaskManager timeTaskManager = ResourceDispatchCenter.getTimeTaskManager();
-
+    private void registerTimeTask(Set<Class<?>> classes, MsgSender sender, TimeTaskManager timeTaskManager, StdSchedulerFactory factory){
         //过滤出继承了Job接口的
         //遍历并尝试注册
-        classes.stream().filter(c -> FieldUtils.isChild(c, Job.class)).forEach(c -> timeTaskManager.register((Class<? extends Job>)c, sender));
+        classes.stream().filter(c -> FieldUtils.isChild(c, Job.class)).forEach(c -> timeTaskManager.register((Class<? extends Job>)c, sender, factory));
 
         //全部注册完毕后，启动定时任务
         try {
-            timeTaskManager.start();
+            timeTaskManager.start(factory);
         } catch (SchedulerException e) {
             throw new TimeTaskException("startFailed", e);
         }
@@ -125,17 +123,14 @@ public class ScannerManager implements Register {
     /**
      * 注册定时器
      */
-    private void registerTimeTask(Set<Class<?>> classes, Supplier<MsgSender> senderSupplier){
-        //获取定时任务管理器
-        TimeTaskManager timeTaskManager = ResourceDispatchCenter.getTimeTaskManager();
-
+    private void registerTimeTask(Set<Class<?>> classes, Supplier<MsgSender> senderSupplier, TimeTaskManager timeTaskManager, StdSchedulerFactory factory){
         //过滤出继承了Job接口的
         //遍历并尝试注册
-        classes.stream().filter(c -> FieldUtils.isChild(c, Job.class)).forEach(c -> timeTaskManager.register((Class<? extends Job>)c, senderSupplier));
+        classes.stream().filter(c -> FieldUtils.isChild(c, Job.class)).forEach(c -> timeTaskManager.register((Class<? extends Job>)c, senderSupplier, factory));
 
         //全部注册完毕后，启动定时任务
         try {
-            timeTaskManager.start();
+            timeTaskManager.start(factory);
         } catch (SchedulerException e) {
             throw new TimeTaskException("startFailed", e);
         }
@@ -145,16 +140,16 @@ public class ScannerManager implements Register {
      * 注册定时任务
      */
     @Override
-    public void registerTimeTask(MsgSender sender){
-        registerTimeTask(classes, sender);
+    public void registerTimeTask(MsgSender sender, TimeTaskManager timeTaskManager, StdSchedulerFactory factory){
+        registerTimeTask(classes, sender, timeTaskManager, factory);
     }
 
     /**
      * 注册定时任务
      */
     @Override
-    public void registerTimeTask(Supplier<MsgSender> senderSupplier){
-        registerTimeTask(classes, senderSupplier);
+    public void registerTimeTask(Supplier<MsgSender> senderSupplier, TimeTaskManager timeTaskManager, StdSchedulerFactory factory){
+        registerTimeTask(classes, senderSupplier, timeTaskManager, factory);
     }
 
     /**

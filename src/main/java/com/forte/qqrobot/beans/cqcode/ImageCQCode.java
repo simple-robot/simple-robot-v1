@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+@Deprecated
 public class ImageCQCode extends CQCode {
 
     /** 本类对象固定为image类型 */

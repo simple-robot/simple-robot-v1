@@ -8,12 +8,13 @@ import com.forte.qqrobot.beans.messages.types.PrivateMsgType;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class AbstractPrivateMsg extends AbstractMsgGet implements PrivateMsg {
+public abstract class AbstractPrivateMsg extends AbstractMsgGet implements PrivateMsg {
 
     private String qq;
     private PrivateMsgType type;
     private String thisCode;
-
+    private String nick;
+    private String remark;
 
     public String getQq() {
         return qq;
@@ -23,6 +24,7 @@ public class AbstractPrivateMsg extends AbstractMsgGet implements PrivateMsg {
         this.qq = qq;
     }
 
+    @Override
     public String getQQ() {
         return qq;
     }
@@ -40,14 +42,6 @@ public class AbstractPrivateMsg extends AbstractMsgGet implements PrivateMsg {
         this.type = type;
     }
 
-    @Override
-    public String toString() {
-        return "PrivateMsg{" +
-                "qq='" + getQQ() + '\'' +
-                ", type=" + getType() +
-                "} " + super.toString();
-    }
-
     /**
      * 此消息获取的时候，代表的是哪个账号获取到的消息。
      *
@@ -56,5 +50,53 @@ public class AbstractPrivateMsg extends AbstractMsgGet implements PrivateMsg {
     @Override
     public String getThisCode() {
         return thisCode;
+    }
+
+    /**
+     * 可以获取昵称
+     *
+     * @return nickname
+     */
+    @Override
+    public String getNickname() {
+        return nick;
+    }
+
+    /**
+     * 获取备注信息，例如群备注，或者好友备注。
+     *
+     * @return 备注信息
+     */
+    @Override
+    public String getRemark() {
+        return remark;
+    }
+
+    @Override
+    public void setThisCode(String thisCode) {
+        this.thisCode = thisCode;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    @Override
+    public String toString() {
+        return "PrivateMsg{" +
+                "qq='" + qq + '\'' +
+                ", type=" + type +
+                ", thisCode='" + thisCode + '\'' +
+                ", nick='" + nick + '\'' +
+                ", remark='" + remark + '\'' +
+                "} " + super.toString();
     }
 }

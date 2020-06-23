@@ -239,18 +239,9 @@ public class ListenerMethodScanner {
      * 构建监听函数管理器实例
      * @return 监听函数管理器实例
      */
-    public ListenerManager buildManager(BotManager botManager, ExceptionProcessCenter exceptionProcessCenter,
-                                        Supplier<MsgIntercept>[] interceptsSupplier, Supplier<ListenIntercept>[] listenInterceptsSupplier){
-        return new ListenerManager(listenerMethodSet, botManager, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier);
-    }
-
-    /**
-     * 构建监听函数管理器实例
-     * @return 监听函数管理器实例
-     */
-    public ListenerManager buildManager(BotManager botManager, ExceptionProcessCenter exceptionProcessCenter,
+    public ListenerManager buildManager(BotManager botManager, ListenerFilter listenerFilter, ExceptionProcessCenter exceptionProcessCenter,
                                         Supplier<MsgIntercept>[] interceptsSupplier, Supplier<ListenIntercept>[] listenInterceptsSupplier, boolean checkBot){
-        return new ListenerManager(listenerMethodSet, botManager, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier, checkBot);
+        return new ListenerManager(listenerMethodSet, botManager, listenerFilter, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier, checkBot);
     }
 
     /**

@@ -116,6 +116,11 @@ public class ListenerManager implements MsgReceiver {
     private BotManager botManager;
 
     /**
+     * 过滤管理器
+     */
+    private ListenerFilter listenerFilter;
+
+    /**
      * 异常处理中心
      */
     private ExceptionProcessCenter exceptionProcessCenter;
@@ -283,7 +288,7 @@ public class ListenerManager implements MsgReceiver {
                              Function<ListenerMethod, ListenInterceptContext> listenInterceptContextFunction){
         //过滤
         //获取过滤器
-        ListenerFilter filter = ResourceDispatchCenter.getListenerFilter();
+        ListenerFilter filter = this.listenerFilter;
         return blockMethod.stream().filter(lisM -> filter.blockFilter(lisM, msgGet, at, context)).map(lisM -> {
             //剩下的为过滤好的监听函数
             AdditionalDepends addition = null;
@@ -326,7 +331,7 @@ public class ListenerManager implements MsgReceiver {
         String code = msgGet.getThisCode();
         //配置参数
         //获取cqCodeUtil
-        CQCodeUtil cqCodeUtil = ResourceDispatchCenter.getCQCodeUtil();
+        CQCodeUtil cqCodeUtil = CQCodeUtil.build();
         //判断是否at自己
         //获取本机QQ号
         // 获取AT判断函数
@@ -417,7 +422,7 @@ public class ListenerManager implements MsgReceiver {
         List<ListenResult> results = new ArrayList<>();
 
         //获取监听函数过滤器
-        ListenerFilter listenerFilter = ResourceDispatchCenter.getListenerFilter();
+        ListenerFilter listenerFilter = this.listenerFilter;
 
         //获取这个消息分类下的普通方法
         List<ListenerMethod> normalMethods = getNormalMethods(msgGetTypes);
@@ -518,7 +523,7 @@ public class ListenerManager implements MsgReceiver {
         List<ListenResult> results = new ArrayList<>();
 
         //获取监听函数过滤器
-        ListenerFilter listenerFilter = ResourceDispatchCenter.getListenerFilter();
+        ListenerFilter listenerFilter = this.listenerFilter;
 
         //获取这个消息分类下的备用方法
         List<ListenerMethod> spareMethods = getSpareMethods(msgGetTypes);
@@ -649,8 +654,8 @@ public class ListenerManager implements MsgReceiver {
         this.checkBot = checkBot;
     }
 
-    public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager, ExceptionProcessCenter exceptionProcessCenter, Supplier<MsgIntercept>[] interceptsSupplier, Supplier<ListenIntercept>[] listenInterceptsSupplier){
-        this(methods, botManager, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier, true);
+    public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager, ListenerFilter listenerFilter,ExceptionProcessCenter exceptionProcessCenter, Supplier<MsgIntercept>[] interceptsSupplier, Supplier<ListenIntercept>[] listenInterceptsSupplier){
+        this(methods, botManager, listenerFilter, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier, true);
     }
 
         /**
@@ -659,12 +664,15 @@ public class ListenerManager implements MsgReceiver {
          * @param interceptsSupplier 消息拦截器数组 nullable
          */
     public ListenerManager(Collection<ListenerMethod> methods, BotManager botManager,
+                           ListenerFilter listenerFilter,
                            ExceptionProcessCenter exceptionProcessCenter,
                            Supplier<MsgIntercept>[] interceptsSupplier,
                            Supplier<ListenIntercept>[] listenInterceptsSupplier,
                            boolean checkBot){
         // bot管理器
         this.botManager = botManager;
+
+        this.listenerFilter = listenerFilter;
 
         // 异常处理中心
         this.exceptionProcessCenter = exceptionProcessCenter;

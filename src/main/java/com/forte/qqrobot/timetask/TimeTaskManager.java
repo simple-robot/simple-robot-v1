@@ -11,7 +11,9 @@ import com.forte.qqrobot.exception.TimeTaskException;
 import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.AnnotationUtils;
+import com.forte.qqrobot.utils.CQCodeUtil;
 import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -40,21 +42,21 @@ public class TimeTaskManager {
     private int registerNum = 0;
 
     /** 尝试加载一个疑似是定时任务的类 */
-    public void register(Class<? extends Job> timeTaskClass, MsgSender sender){
+    public void register(Class<? extends Job> timeTaskClass, MsgSender sender, StdSchedulerFactory factory){
         List<Annotation> timeTaskAnnos = isTimeTask(timeTaskClass);
         if(timeTaskAnnos.size() > 0){
             //遍历
-            timeTaskAnnos.forEach(a -> register(timeTaskClass, a, sender));
+            timeTaskAnnos.forEach(a -> register(timeTaskClass, a, sender, factory));
             registerNum += timeTaskAnnos.size();
         }
     }
 
     /** 尝试加载一个疑似是定时任务的类 */
-    public void register(Class<? extends Job> timeTaskClass, Supplier<MsgSender> senderSupplier){
+    public void register(Class<? extends Job> timeTaskClass, Supplier<MsgSender> senderSupplier, StdSchedulerFactory factory){
         List<Annotation> timeTaskAnnos = isTimeTask(timeTaskClass);
         if(timeTaskAnnos.size() > 0){
             //遍历
-            timeTaskAnnos.forEach(a -> register(timeTaskClass, a, senderSupplier.get()));
+            timeTaskAnnos.forEach(a -> register(timeTaskClass, a, senderSupplier.get(), factory));
             registerNum += timeTaskAnnos.size();
         }
     }
@@ -62,10 +64,10 @@ public class TimeTaskManager {
     /**
      * 启动定时任务
      */
-    public void start() throws SchedulerException {
+    public void start(StdSchedulerFactory factory) throws SchedulerException {
         // 只有注册量在0以上的时候才初始化定时任务框架
         if(registerNum > 0){
-            ResourceDispatchCenter.getStdSchedulerFactory().getScheduler().start();
+            factory.getScheduler().start();
         }
     }
 
@@ -91,11 +93,11 @@ public class TimeTaskManager {
     /**
      * 注册至定时任务调度器
      */
-    private static void register(Class<? extends Job> clazz, Annotation annotation, MsgSender sender){
+    private static void register(Class<? extends Job> clazz, Annotation annotation, MsgSender sender, StdSchedulerFactory factory){
         //判断注解类型
         Scheduler scheduler;
         try {
-            scheduler = ResourceDispatchCenter.getStdSchedulerFactory().getScheduler();
+            scheduler = factory.getScheduler();
             scheduler.start();
         } catch (SchedulerException e) {
             throw new TimeTaskException("schedulerInitFailed", e);
@@ -147,7 +149,7 @@ public class TimeTaskManager {
                 //保存一个送信器实例
                 TimeTaskContext.giveMsgSender(jobDataMap, sender);
                 //保存一个cq工具类实例
-                TimeTaskContext.giveCQCodeUtil(jobDataMap, ResourceDispatchCenter.getCQCodeUtil());
+                TimeTaskContext.giveCQCodeUtil(jobDataMap, CQCodeUtil.build());
                 //保存一个依赖工厂，以实现定时任务内的依赖注入。
                 TimeTaskContext.giveDependCenter(jobDataMap, ResourceDispatchCenter.getDependCenter());
 

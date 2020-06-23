@@ -1,5 +1,6 @@
 package com.forte.qqrobot.beans.messages.msgget;
 
+import com.forte.qqrobot.beans.messages.NickOrRemark;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
 
 /**

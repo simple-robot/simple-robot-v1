@@ -32,6 +32,11 @@ import java.util.stream.Stream;
 public class BaseConfiguration<T extends BaseConfiguration> {
 
     /**
+     * 可以追加一些额外的配置对象到config中。
+     */
+    private Map<String, Object> configMap = new HashMap<>();
+
+    /**
      * 不再使用clone，保留是为了兼容
      * @return
      */
@@ -90,7 +95,8 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     /**
      * 服务器ip，默认为127.0.0.1
      */
-    @Conf(value = "core.ip", comment = "服务器的IP地址，一般代表为上报地址.1.8.0后弃用")
+    @Deprecated
+    @Conf(value = "core.ip", comment = "弃用")
     private String ip = "127.0.0.1";
 
     /**
@@ -737,38 +743,9 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      */
     @Deprecated
     public T setIp(String ip) {
-        // 验证IP，首先假如上来就是个xxx.xxx.xxx.xxx，直接报错
-        if (ip.equals("xxx.xxx.xxx.xxx")) {
-            throw new ConfigurationException("are you sure 'xxx.xxx.xxx.xxx' is an ip value ?");
-        }
-
-        // 当然，有可能是域名的情况，所以只有当符合\d+.\d+.\d+.\d+的时候才验证
-        // ip: 0-255
-
-        // 是否跳过。一些情况下，直接跳过检测
-        // 例如ip是本地ip
-        boolean breakMatch = ip.equals("127.0.0.1") || ip.equals("localhost");
-
-        if (!breakMatch) {
-            if (ip.matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
-                // 是ip的格式，验证IP是不是都在0~255范围内
-                // 切割并验证
-                for (String s : ip.split("\\.")) {
-                    try {
-                        int number = Integer.parseInt(s);
-                        if (number < 0 || number > 255) {
-                            throw new ConfigurationException("ip number can not use '" + s + "'");
-                        }
-                    } catch (NumberFormatException ignored) {
-                    }
-                }
-            }
-        }
-
-        // 其他情况的话，不管了，万一是个域名呢
-
-        this.ip = ip;
-        return configuration;
+        throw new ConfigurationException("Dont use method'setIp(...)', this method was Deprecated. see 'registerBot(...)'.");
+//        this.ip = ip;
+//        return configuration;
     }
 
     /**
@@ -974,4 +951,41 @@ public class BaseConfiguration<T extends BaseConfiguration> {
     protected void setConfigProperties(ConfigProperties configProperties) {
         this.configProperties = configProperties;
     }
+
+    //**************** 可追加额外的配置信息 ****************//
+
+    /**
+     * 存入额外配置
+     * @param key key
+     * @param value value
+     */
+    public T putValue(String key, Object value){
+        configMap.put(key, value);
+        return configuration;
+    }
+
+    /**
+     * 取得额外配置
+     * @param key key
+     */
+    public Object getValue(String key){
+        return configMap.get(key);
+    }
+
+    /**
+     * 清除额外配置
+     */
+    public T clearValue(){
+        configMap.clear();
+        return configuration;
+    }
+
+    /**
+     * 获取额外配置的entry set
+     */
+    public Set<Map.Entry<String, Object>> getValueEntrySet(){
+        return configMap.entrySet();
+    }
+
+
 }

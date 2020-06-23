@@ -5,7 +5,7 @@ package com.forte.qqrobot.beans.messages.result;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public class AbstractLoginQQInfo extends AbstractInfoResult implements LoginQQInfo {
+public abstract class AbstractLoginQQInfo extends AbstractInfoResult implements LoginQQInfo {
     private String name;
     private String qq;
     private String headUrl;

@@ -31,7 +31,8 @@ public class SimpleRobotContext<
         SEND extends SenderSendList,
         SET extends SenderSetList,
         GET extends SenderGetList,
-        CONFIG extends BaseConfiguration
+        CONFIG extends BaseConfiguration,
+        APPLICATION extends BaseApplication
         > implements Closeable {
 
     //**************** 三大送信器 ****************//
@@ -53,6 +54,8 @@ public class SimpleRobotContext<
 
     private CONFIG configuration;
 
+    private APPLICATION application;
+
     /**
      * 构造函数
      * @param sender sender送信器
@@ -69,7 +72,8 @@ public class SimpleRobotContext<
                               MsgParser msgParser,
                               MsgProcessor processor,
                               DependCenter dependCenter,
-                              CONFIG configuration
+                              CONFIG configuration,
+                              APPLICATION application
                               ){
         this.SENDER = sender;
         this.SETTER = setter;
@@ -79,6 +83,7 @@ public class SimpleRobotContext<
         this.processor = processor;
         this.dependCenter = dependCenter;
         this.configuration = configuration;
+        this.application = application;
     }
 
     /**
@@ -119,9 +124,15 @@ public class SimpleRobotContext<
         return configuration;
     }
 
+    public APPLICATION getApplication() {
+        return application;
+    }
+
     /**
      * closeable
      */
     @Override
-    public void close() throws IOException { }
+    public void close() throws IOException {
+        application.close();
+    }
 }

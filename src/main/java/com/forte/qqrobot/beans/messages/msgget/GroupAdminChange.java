@@ -26,6 +26,7 @@ public interface GroupAdminChange extends EventGet, CodesAble {
     String getBeOperatedQQ();
 
     /** 使用的是被操作者的QQ */
+    @Override
     default String getQQCode(){
         return getBeOperatedQQ();
     }

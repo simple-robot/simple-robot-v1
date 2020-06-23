@@ -20,6 +20,7 @@ import com.forte.qqrobot.depend.AutoDependReader;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.depend.DependGetter;
 import com.forte.qqrobot.exception.RobotRunException;
+import com.forte.qqrobot.exception.RobotRuntimeException;
 import com.forte.qqrobot.listener.Filterable;
 import com.forte.qqrobot.listener.ListenIntercept;
 import com.forte.qqrobot.listener.MsgIntercept;
@@ -52,6 +53,9 @@ import com.forte.qqrobot.system.RunParameterUtils;
 import com.forte.qqrobot.system.RunParameters;
 import com.forte.qqrobot.timetask.TimeTaskManager;
 import com.forte.qqrobot.utils.*;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -81,8 +85,14 @@ public abstract class BaseApplication<
         SEND extends SenderSendList,
         SET extends SenderSetList,
         GET extends SenderGetList,
-        CONTEXT extends SimpleRobotContext<SEND, SET, GET, CONFIG>
+        APPLICATION extends BaseApplication,
+        CONTEXT extends SimpleRobotContext<SEND, SET, GET, CONFIG, APPLICATION>
         > implements Closeable {
+
+    /**
+     * 是否已经关闭
+     */
+    private boolean closed = false;
 
     /**
      * 启动器使用的日志，前缀为“run”
@@ -123,11 +133,17 @@ public abstract class BaseApplication<
     private String[] args;
     private RunParameter[] parameters;
 
+    private ListenerFilter listenerFilter;
+
+    private TimeTaskManager timeTaskManager;
+
     private ListenerManager manager;
 
     private ListenerMethodScanner scanner;
 
     private ConfigProperties configProperties;
+
+    private StdSchedulerFactory stdSchedulerFactory;
 
     /**
      * bot管理中心
@@ -164,7 +180,7 @@ public abstract class BaseApplication<
         scanner = new ListenerMethodScanner();
         ResourceDispatchCenter.saveListenerMethodScanner(scanner);
         //将ListenerFilter放入资源调度中心
-        ResourceDispatchCenter.saveListenerFilter(new ListenerFilter());
+        listenerFilter = new ListenerFilter();
     }
 
     /**
@@ -172,7 +188,8 @@ public abstract class BaseApplication<
      */
     private void timeTaskInit() {
         //将定时任务类添加到资源调度中心
-        ResourceDispatchCenter.saveTimeTaskManager(new TimeTaskManager());
+        timeTaskManager = new TimeTaskManager();
+        this.stdSchedulerFactory = new StdSchedulerFactory();
     }
 
     /**
@@ -433,8 +450,8 @@ public abstract class BaseApplication<
      * @param app      启动器接口实现类
      * @param register 注册器
      */
-    protected void beforeDepend(CONFIG config, Application<CONFIG> app, Register register) {
-    }
+    protected void beforeDepend(CONFIG config, Application<CONFIG> app, Register register) { }
+
 
     /**
      * 依赖扫描之后
@@ -449,9 +466,9 @@ public abstract class BaseApplication<
         // 初始化bot验证函数与路径拼接函数
         //**************** 注册PathAssembler和VerifyFunction ****************//
         VerifyFunction verifyFunction = verifyBot();
-        dependCenter.load(verifyFunction);
+        dependCenter.load("verifyFunction", verifyFunction);
         PathAssembler pathAssembler = config.getPathAssembler();
-        dependCenter.load(pathAssembler);
+        dependCenter.load("pathAssembler", pathAssembler);
 
         // 初始化bot管理中心
         BotManager botManager = initBotManager(dependCenter);
@@ -459,6 +476,8 @@ public abstract class BaseApplication<
         // 初始化异常处理器
         final ExceptionProcessCenter exceptionProcessCenter = initListenExceptionHandler(dependCenter);
 
+        // load some
+        loadSome();
 
         // 注册监听函数并构建ListenerManager
         manager = registerListener(config, app, scanner, dependCenter, botManager, exceptionProcessCenter, config.getBotCheck());
@@ -468,10 +487,16 @@ public abstract class BaseApplication<
         loadMsgSenderIntercept(config, dependCenter);
 
         //**************** 加载所有存在于依赖中的DIYFilter ****************//
-        loadDIYFilter(config, dependCenter);
+        loadDIYFilter(dependCenter);
 
     }
 
+    private void loadSome(){
+        // load some
+        dependCenter.load("listenerFilter", this.listenerFilter);
+        dependCenter.load("timeTaskManager", this.timeTaskManager);
+        dependCenter.load("stdSchedulerFactory", this.stdSchedulerFactory);
+    }
 
     /**
      * 初始化异常处理器
@@ -661,7 +686,7 @@ public abstract class BaseApplication<
     /**
      * 加载所有的DIYFilter
      */
-    private void loadDIYFilter(CONFIG config, DependCenter dependCenter){
+    private void loadDIYFilter(DependCenter dependCenter){
         Filterable[] filterables = dependCenter.getByType(Filterable.class, new Filterable[0]);
         for (Filterable filterable : filterables) {
             Class<? extends Filterable> filterClass = filterable.getClass();
@@ -674,7 +699,7 @@ public abstract class BaseApplication<
                 }
             }
             name = name == null ? FieldUtils.headLower(filterClass.getSimpleName()) : name;
-            ListenerFilter.registerFilter(name, filterable);
+            this.listenerFilter.registerFilter(name, filterable);
         }
     }
 
@@ -723,7 +748,7 @@ public abstract class BaseApplication<
 
         // 构建监听器管理中心
         // 构建管理中心
-        ListenerManager manager = scanner.buildManager(botManager, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier, checkBot);
+        ListenerManager manager = scanner.buildManager(botManager, this.listenerFilter, exceptionProcessCenter, interceptsSupplier, listenInterceptsSupplier, checkBot);
 
         // 构建阻断器
         Plug plug = scanner.buildPlug();
@@ -884,12 +909,13 @@ public abstract class BaseApplication<
      */
     private void after(CONFIG config, MsgSender defaultMsgSender) {
         // 注册定时任务
-        registerTimeTask(defaultMsgSender);
+        registerTimeTask(defaultMsgSender, this.timeTaskManager, this.stdSchedulerFactory);
     }
 
-    private void registerTimeTask(MsgSender defaultMsgSender){
+
+    private void registerTimeTask(MsgSender defaultMsgSender, TimeTaskManager timeTaskManager, StdSchedulerFactory factory){
         //注册定时任务
-        this.register.registerTimeTask(defaultMsgSender);
+        this.register.registerTimeTask(defaultMsgSender, timeTaskManager, factory);
     }
 
     /**
@@ -1191,9 +1217,39 @@ public abstract class BaseApplication<
      * 默认情况下会执行{@link DependCenter}的close方法。
      */
     @Override
-    public void close() throws IOException {
-        dependCenter.close();
+    public final void close(){
+        if(!closed){
+            doClose();
+            HttpClientHelper.clear();
+            this.listenerFilter.close();
+            dependCenter.close();
+            BotRuntime.close();
+            final Collection<Scheduler> allSchedulers;
+            try {
+                allSchedulers = this.stdSchedulerFactory.getAllSchedulers();
+                for (Scheduler scheduler : allSchedulers) {
+                    scheduler.shutdown(true);
+                }
+            } catch (SchedulerException e) {
+                throw new RobotRuntimeException(e);
+            }
+            closed = true;
+            System.gc();
+        }
     }
+
+    /**
+     * 判断是否已经关闭了
+     * @return
+     */
+    public boolean isClosed(){
+        return closed;
+    }
+
+    /**
+     * do for close
+     */
+    public abstract void doClose();
 
     /**
      * 打个招呼

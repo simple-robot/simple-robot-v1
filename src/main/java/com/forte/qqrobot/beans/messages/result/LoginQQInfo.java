@@ -1,6 +1,7 @@
 package com.forte.qqrobot.beans.messages.result;
 
 import com.forte.qqrobot.beans.messages.QQCodeAble;
+import com.forte.qqrobot.beans.messages.NicknameAble;
 
 /**
  * 登录的QQ的信息
@@ -8,12 +9,17 @@ import com.forte.qqrobot.beans.messages.QQCodeAble;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface LoginQQInfo extends InfoResult, QQCodeAble {
+public interface LoginQQInfo extends InfoResult, QQCodeAble, NicknameAble {
 
     /**
      * 昵称
      */
     String getName();
+
+    @Override
+    default String getNickname(){
+        return getName();
+    }
 
     /**
      * QQ号
@@ -21,14 +27,6 @@ public interface LoginQQInfo extends InfoResult, QQCodeAble {
      * @see #getCode()
      */
     String getQQ();
-
-//    /**
-//     * 将会取代方法：getQQ()
-//     */
-//    default String getCode() {
-//        return getQQ();
-//    }
-
 
     /**
      * 头像地址

@@ -16,9 +16,9 @@ public abstract class AbstractGroupMember extends AbstractResultInner implements
 
     private String qq;
 
-    private String name;
+    private String nickname;
 
-    private String nickName;
+    private String remark;
 
     private SexType sex;
 
@@ -43,6 +43,32 @@ public abstract class AbstractGroupMember extends AbstractResultInner implements
     private String headUrl;
 
     @Override
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    @Override
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public Boolean getBlack() {
+        return black;
+    }
+
+    public Boolean getAllowChangeNick() {
+        return allowChangeNick;
+    }
+
+    @Override
     public String getGroup() {
         return group;
     }
@@ -59,30 +85,13 @@ public abstract class AbstractGroupMember extends AbstractResultInner implements
         this.qq = qq;
     }
 
+    @Override
     public String getQQ() {
         return qq;
     }
 
     public void setQQ(String qq) {
         this.qq = qq;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
     }
 
     @Override
@@ -190,8 +199,8 @@ public abstract class AbstractGroupMember extends AbstractResultInner implements
         return "GroupMember{" +
                 "group='" + getGroup() + '\'' +
                 ", qq='" + getQQ() + '\'' +
-                ", name='" + getName() + '\'' +
-                ", nickName='" + getNickName() + '\'' +
+                ", nickname='" + getNickname() + '\'' +
+                ", remark='" + getRemark() + '\'' +
                 ", sex=" + getSex() +
                 ", city='" + getCity() + '\'' +
                 ", joinTime=" + getJoinTime() +

@@ -11,9 +11,8 @@ import com.forte.qqrobot.beans.messages.types.SexType;
 public abstract class AbstractGroupMemberInfo extends AbstractInfoResult implements GroupMemberInfo {
     private String code;
     private String qq;
-    private String name;
-    private String nickName;
-    private String card;
+    private String nickname;
+    private String remark;
     private SexType sex;
     private String city;
     private Long joinTime;
@@ -28,6 +27,24 @@ public abstract class AbstractGroupMemberInfo extends AbstractInfoResult impleme
     private Long banTime;
 
     @Override
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    @Override
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    @Override
     public String getCode() {
         return code;
     }
@@ -40,39 +57,13 @@ public abstract class AbstractGroupMemberInfo extends AbstractInfoResult impleme
         return qq;
     }
 
+    @Override
     public String getQQ(){
         return qq;
     }
 
     public void setQq(String qq) {
         this.qq = qq;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    @Override
-    public String getCard() {
-        return card;
-    }
-
-    public void setCard(String card) {
-        this.card = card;
     }
 
     @Override
@@ -196,8 +187,8 @@ public abstract class AbstractGroupMemberInfo extends AbstractInfoResult impleme
         return "GroupMemberInfo{" +
                 "code='" + getCode() + '\'' +
                 ", qq='" + getQQ() + '\'' +
-                ", name='" + getName() + '\'' +
-                ", nickName='" + getNickName() + '\'' +
+                ", nickname='" + getNickname() + '\'' +
+                ", remark='" + getRemark() + '\'' +
                 ", card='" + getCard() + '\'' +
                 ", sex=" + getSex() +
                 ", city='" + getCity() + '\'' +

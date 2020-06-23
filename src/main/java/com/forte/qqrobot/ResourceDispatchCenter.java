@@ -103,14 +103,6 @@ public abstract class ResourceDispatchCenter {
     }
 
     /**
-     * 保存一个StdSchedulerFactory定时任务工厂
-     * @param stdSchedulerFactory 定时任务工厂
-     */
-    static void saveStdSchedulerFactory(StdSchedulerFactory stdSchedulerFactory){
-        save(stdSchedulerFactory);
-    }
-
-    /**
      * 保存一个依赖管理中心
      * @param dependCenter 依赖管理中心
      */
@@ -135,41 +127,8 @@ public abstract class ResourceDispatchCenter {
     /**
      * 获取基础配置类
      */
-    public static BaseConfiguration getBaseConfigration(){
+    public static BaseConfiguration getBaseConfiguration(){
         return get(configType);
-    }
-
-    /**
-     * 获得一个CQCodeUtil单例对象
-     * @return  CQCodeUtil单例对象
-     */
-    public static CQCodeUtil getCQCodeUtil(){
-        return get(CQCodeUtil.class);
-    }
-
-    /**
-     * 获取一个ListenerInvoker单例对象
-     * @return ListenerInvoker单例对象
-     */
-    public static ListenerManager getListenerManager(){
-        return get(ListenerManager.class);
-    }
-
-    /**
-     * 获取一个ListenerFilter单例对象
-     * @return ListenerFilter单例对象
-     */
-    public static ListenerFilter getListenerFilter(){
-        return get(ListenerFilter.class);
-    }
-
-
-    /**
-     * 获取一个ListenerMethodScanner单例对象
-     * @return ListenerMethodScanner单例对象
-     */
-    public static ListenerMethodScanner getListenerMethodScanner(){
-        return get(ListenerMethodScanner.class);
     }
 
     /**
@@ -178,28 +137,6 @@ public abstract class ResourceDispatchCenter {
      */
     public static Plug getPlug(){
         return get(ListenerPlug.class);
-    }
-
-    /**
-     * 获取一个TimeTaskManager单例对象
-     * @return TimeTaskManager单例对象
-     */
-    public static TimeTaskManager getTimeTaskManager(){
-        return get(TimeTaskManager.class);
-    }
-
-    /**
-     * 获取一个StdSchedulerFactory单例对象
-     * 这个比较特殊，为了优化，只有在获取不到的时候才会实例化。
-     * @return  StdSchedulerFactory单例对象
-     */
-    public static StdSchedulerFactory getStdSchedulerFactory(){
-        StdSchedulerFactory stdSchedulerFactory = get(StdSchedulerFactory.class);
-        if(stdSchedulerFactory == null){
-            stdSchedulerFactory = new StdSchedulerFactory();
-            saveStdSchedulerFactory(stdSchedulerFactory);
-        }
-        return stdSchedulerFactory;
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.forte.qqrobot.beans.messages.result;
 
 import com.forte.qqrobot.beans.messages.CodesAble;
+import com.forte.qqrobot.beans.messages.NickOrRemark;
 import com.forte.qqrobot.beans.messages.types.PowerType;
 import com.forte.qqrobot.beans.messages.types.SexType;
 
@@ -9,27 +10,13 @@ import com.forte.qqrobot.beans.messages.types.SexType;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface GroupMemberInfo extends InfoResult, CodesAble {
+public interface GroupMemberInfo extends InfoResult, CodesAble, NickOrRemark {
 
     /** 获取群号 */
+    @Override
     String getCode();
     /** 成员QQ号 */
     String getQQ();
-    /** qq昵称 */
-    String getName();
-    /** 群昵称 */
-    String getNickName();
-    /**
-     * 获取昵称，如果没有设置昵称那么获取QQ名
-     */
-    default String getNickOrName(){
-        String nick = getNickName();
-        if(nick==null||nick.length() == 0){
-            return getName();
-        }else{
-            return nick;
-        }
-    }
     /** 群名片 */
     String getCard();
     /** 获取性别 -1:男，1:女，0:未知  */

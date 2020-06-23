@@ -15,7 +15,6 @@ public interface QQCodeAble {
      * TODO 将会被{@link #getCode()} 所取代
      * @see #getCode()
      */
-//    @Deprecated
     String getQQCode();
 
     /**
@@ -44,14 +43,8 @@ public interface QQCodeAble {
      * @throws NumberFormatException 存在数字转化隐患
      * @see #getCodeNumber()
      */
-    @Deprecated
     default Long getQQCodeNumber(){
-        String qqCode = getQQCode();
-        if(qqCode == null || qqCode.trim().length() == 0){
-            return 0L;
-        }else{
-            return Long.parseLong(qqCode);
-        }
+       return getCodeNumber();
     }
     /**
      * 将{@link #getCode()} ()} 获取到的值转化为long类型
@@ -59,7 +52,7 @@ public interface QQCodeAble {
      * @throws NumberFormatException 存在数字转化隐患
      */
     default Long getCodeNumber(){
-        String qqCode = getQQCode();
+        String qqCode = getCode();
         if(qqCode == null || qqCode.trim().length() == 0){
             return 0L;
         }else{

@@ -12,6 +12,10 @@ public abstract class AbstractDiscussMsg extends AbstractMsgGet implements Discu
 
     private String qq;
 
+    private String nick;
+
+    private String remark;
+
     @Override
     public String getGroup() {
         return group;
@@ -39,11 +43,30 @@ public abstract class AbstractDiscussMsg extends AbstractMsgGet implements Discu
         this.qq = qq;
     }
 
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    @Override
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     @Override
     public String toString() {
         return "DiscussMsg{" +
-                "group='" + getGroup() + '\'' +
-                ", qq='" + getQQ() + '\'' +
+                "group='" + group + '\'' +
+                ", qq='" + qq + '\'' +
+                ", nick='" + nick + '\'' +
+                ", remark='" + remark + '\'' +
                 "} " + super.toString();
     }
 }

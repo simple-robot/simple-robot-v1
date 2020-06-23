@@ -58,7 +58,7 @@ public class CQUtils {
      * @throws ConfigurationException 如果没有配置酷q路径，抛出此异常
      */
     private static String getRootPath(){
-        String cqPath = ResourceDispatchCenter.getBaseConfigration().getCqPath();
+        String cqPath = ResourceDispatchCenter.getBaseConfiguration().getCqPath();
         return Optional.ofNullable(cqPath).orElseThrow(() -> new ConfigurationException("您未配置酷Q根路径！"));
     }
 

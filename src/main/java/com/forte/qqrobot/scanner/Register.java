@@ -4,6 +4,8 @@ import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.depend.DependCenter;
 import com.forte.qqrobot.listener.invoker.ListenerMethodScanner;
 import com.forte.qqrobot.sender.MsgSender;
+import com.forte.qqrobot.timetask.TimeTaskManager;
+import org.quartz.impl.StdSchedulerFactory;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,10 +34,10 @@ public interface Register {
     void registerListener(ListenerMethodScanner scanner);
 
     /** 注册定时任务 */
-    void registerTimeTask(MsgSender sender);
+    void registerTimeTask(MsgSender sender, TimeTaskManager timeTaskManager, StdSchedulerFactory factory);
 
     /** 注册定时任务 */
-    void registerTimeTask(Supplier<MsgSender> senderSupplier);
+    void registerTimeTask(Supplier<MsgSender> senderSupplier, TimeTaskManager timeTaskManager, StdSchedulerFactory factory);
 
     /** 进行依赖注入 */
     void registerDependCenter(DependCenter dependCenter);

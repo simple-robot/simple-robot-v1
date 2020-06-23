@@ -16,6 +16,9 @@ public abstract class AbstractGroupMsg extends AbstractMsgGet implements GroupMs
 
     private GroupMsgType type;
 
+    private String nick;
+    private String remark;
+
     public String getQq() {
         return qq;
     }
@@ -51,12 +54,31 @@ public abstract class AbstractGroupMsg extends AbstractMsgGet implements GroupMs
         this.type = type;
     }
 
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    @Override
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     @Override
     public String toString() {
         return "GroupMsg{" +
-                "qq='" + getQQ() + '\'' +
-                ", group='" + getGroup() + '\'' +
-                ", type=" + getType() +
+                "qq='" + qq + '\'' +
+                ", group='" + group + '\'' +
+                ", type=" + type +
+                ", nick='" + nick + '\'' +
+                ", remark='" + remark + '\'' +
                 "} " + super.toString();
     }
 }

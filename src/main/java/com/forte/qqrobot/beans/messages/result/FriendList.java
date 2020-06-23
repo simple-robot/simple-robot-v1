@@ -3,6 +3,7 @@ package com.forte.qqrobot.beans.messages.result;
 import com.forte.qqrobot.beans.messages.result.inner.Friend;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -29,13 +30,11 @@ public interface FriendList extends InfoResult {
      */
     default Friend[] getAllFriends(){
         Map<String, Friend[]> friendList = getFriendList();
-        // size * 4
-        List<Friend> friends = new ArrayList<>(friendList.size() << 2);
+        // size * 2
+        List<Friend> friends = new ArrayList<>(friendList.size() << 1);
         friendList.forEach((k, v) -> {
             if(v != null){
-                for (Friend f : v) {
-                    friends.add(f);
-                }
+                friends.addAll(Arrays.asList(v));
             }
         });
         return friends.toArray(new Friend[0]);

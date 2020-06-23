@@ -12,6 +12,7 @@ import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.log.QQLogLang;
 import com.forte.qqrobot.utils.CQCodeUtil;
 
+import java.io.Closeable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
  * @date Created in 2019/3/12 14:36
  * @since JDK1.8
  **/
-public class ListenerFilter {
+public class ListenerFilter implements Closeable {
 
     private static final QQLogLang LOG_LANG = new QQLogLang("filter");
     private static QQLogLang getLog(){
@@ -36,7 +37,7 @@ public class ListenerFilter {
     /**
      * 用户全部自定义的Filter
      */
-    private static final Map<String, Filterable> DIY_FILTERS = new ConcurrentHashMap<>(4);
+    private final Map<String, Filterable> diyFilters = new ConcurrentHashMap<>(4);
 
     /**
      * at判断器, 默认情况下即使用CQ码作为判断
@@ -75,8 +76,8 @@ public class ListenerFilter {
      * @param filter 过滤规则
      * @return put进去的filter
      */
-    public static Filterable registerFilter(String name, Filterable filter) {
-        Filterable exists = DIY_FILTERS.merge(name, filter, (old, val) -> {
+    public Filterable registerFilter(String name, Filterable filter) {
+        Filterable exists = diyFilters.merge(name, filter, (old, val) -> {
             throw new FilterException("exists", name);
         });
         getLog().debug("register", name);
@@ -89,8 +90,8 @@ public class ListenerFilter {
      * @param name
      * @return
      */
-    public static Filterable getFilter(String name) {
-        return DIY_FILTERS.get(name);
+    public Filterable getFilter(String name) {
+        return diyFilters.get(name);
     }
 
     /**
@@ -98,7 +99,7 @@ public class ListenerFilter {
      * @param names 名称列表
      * @return 最终结果
      */
-    public static Filterable[] getFilters(String... names){
+    public Filterable[] getFilters(String... names){
         if(names.length == 0){
             return new Filterable[0];
         }
@@ -373,4 +374,11 @@ public class ListenerFilter {
         }
     }
 
+    /**
+     * close
+     */
+    @Override
+    public void close() {
+        this.diyFilters.clear();
+    }
 }

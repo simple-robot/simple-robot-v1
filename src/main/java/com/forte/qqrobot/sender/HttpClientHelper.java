@@ -85,6 +85,13 @@ public class HttpClientHelper implements HttpClientAble {
         }
     }
 
+    /**
+     * clear
+     */
+    public static synchronized void clear(){
+        clientMap.clear();
+    }
+
     //**************** 此类本身也可以直接使用，默认为新建时默认http模板的使用 ****************//
 
     private HttpClientAble httpTemplate;
