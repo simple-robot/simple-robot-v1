@@ -141,7 +141,7 @@ public class FilterParameterMatcherImpl implements FilterParameterMatcher {
         }
 
         if(builder.length() > 0){
-            point = nextPoint(builder, index, point, on);
+            point = nextPoint(builder, -1, point, on);
         }
 
         if(point == null){
