@@ -27,16 +27,6 @@ https://apidoc.gitee.com/ForteScarlet/simple-coolQ
 
 点击`star`后即可申请加入QQ群聊，QQ群号：**782930037**
 
-已经存在的**组件框架**：
-
-| 平台 |      依赖       |                           项目地址                           |
-| :--: | :-------------: | :----------------------------------------------------------: |
-| 酷Q  |    LEMOC插件    | https://github.com/ForteScarlet/simple-robot-component-lemoc |
-| 酷Q  | HTTP TO CQ插件  | https://github.com/ForteScarlet/simple-robot-component-httpapi |
-| 酷Q  | CQ HTTP API插件 | https://github.com/ForteScarlet/simple-robot-component-coolHttpApi |
-| 酷Q  | JCQ插件 | https://github.com/ForteScarlet/simple-robot-component-JCQ |
-| JVM  | Mirai   | https://github.com/ForteScarlet/simple-robot-component-mirai | 
-<br>
 <br>
 <br>
 
@@ -62,8 +52,8 @@ https://apidoc.gitee.com/ForteScarlet/simple-coolQ
 
 <br>
 
-## 有何优劣？
-### 优点
+### 有何优点？
+
 - 有着极高的扩展性。任何人都可以根据核心框架，并针对某一个应用或者接口来开发组件框架，并投入使用。
 - 核心提供了极其丰富的功能，例如
     - 注解开发风格
@@ -79,22 +69,46 @@ https://apidoc.gitee.com/ForteScarlet/simple-coolQ
 - 有虽然没有完全写完但是已经很全面了的中文文档
 - 已上传Maven中央仓库，支持Maven、gradle等项目架构方式        
   
-    
-### 缺点
-- 功能丰富，使用便利，但是解释起来却并不容易。
-- 核心框架中依赖库较多，此问题会尝试逐步改善
-- 视频教程很少，仅文字文档有时候阅读起来还是有些困难。（目前可以考虑入群咨询）
-  - 目前只有[cqhttp组件](https://github.com/ForteScarlet/simple-robot-component-coolHttpApi)有视频教程，不过对于其他组件来讲变化也不大。
-- 作者才疏学浅
+
 
 
 
 ## 现在已经存在的应用？
-- 酷Q应用下的LEMOC插件(插件作者弃坑)
-- 酷Q应用下的HTTP API插件(插件作者仍在更新)
-- 酷Q应用下的CQ HTTP API插件(插件作者处于活跃状态)
-- 酷Q应用下的JCQ插件(使用酷Q原生函数)
-- Mirai(JVM平台，原生高效，功能较少)
+
+#### 已经存在的**组件框架**：
+
+| 平台 |      依赖       |                           项目地址                           |
+| :--: | :-------------: | :----------------------------------------------------------: |
+| 酷Q  |    LEMOC插件    | https://github.com/ForteScarlet/simple-robot-component-lemoc |
+| 酷Q  | HTTP TO CQ插件  | https://github.com/ForteScarlet/simple-robot-component-httpapi |
+| 酷Q  | CQ HTTP API插件 | https://github.com/ForteScarlet/simple-robot-component-coolHttpApi |
+| 酷Q  | JCQ插件 | https://github.com/ForteScarlet/simple-robot-component-JCQ |
+| JVM  | Mirai   | https://github.com/ForteScarlet/simple-robot-component-mirai | 
+
+#### 已经存在的**模组**：
+
+| 名称 |      描述       |                           项目地址                           |
+| :--: | :-------------: | :----------------------------------------------------------: |
+| cqcodeutils模组  |    提供高效的cq码操作工具。可独立依赖、使用。    | https://github.com/ForteScarlet/simple-robot-module-cqcodeutils |
+| delay-task模组  |    提供基于携程的异步延时任务功能。可独立依赖、使用。    | https://github.com/ForteScarlet/simple-robot-module-delay-task |
+| redis-bot-manager模组  |    提供使用redis统一管理bot账号的功能。    | 暂无仓库，文档：http://simple-robot-doc.forte.love/1672448 |
+| debugger模组  |    提供一系列便于本地、远程debug的功能的模组。    | https://github.com/ForteScarlet/simple-robot-module-debuger-common |
+
+
+#### 已经存在的**Springboot-starter**
+
+| 名称 |      描述       |                           项目地址                           | 
+| :--: | :-------------: | :----------------------------------------------------------: | 
+|   core-starter  |    starter项目的父项目，提供一些基础配置    | https://github.com/ForteScarlet/simple-robot-core-springboot-starter |
+|   cqhttp-starter  |    cqhttp组件的starter  | https://github.com/ForteScarlet/simple-robot-component-cqhttp-springboot-starter |
+|   mirai-starter  |    mirai组件的starter    | https://github.com/ForteScarlet/simple-robot-component-mirai-springboot-starter |
+
+
+### 公开Demo
+
+如果你想要尝试一下，不妨在阅读过文档的快速开始的情况下，去[公开Demo项目(gitee)](https://gitee.com/ForteScarlet/simple-robot-demo-project)看一看。
+
+
 
 > 如果你根据核心开发了组件框架，可以告知我，我会更新在此处与下文处。
 
