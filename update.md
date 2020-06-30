@@ -1,6 +1,6 @@
 ## 版本更新记录
 
-# now
+# 1.15.2
 修复botManager实现类中refreshBot逻辑错误的问题
 
 

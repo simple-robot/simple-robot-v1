@@ -92,6 +92,8 @@ public class Language {
     private static boolean ready = false;
 
 
+    private static Consumer<Exception> IF_THROW_IGNORE = e -> {};
+
     /**
      * 是否初始化完毕。
      */
@@ -304,19 +306,28 @@ public class Language {
      * @param ifNull 如果获取不到inputStream，则执行此函数
      * @throws IOException
      */
-    private static void loadLang(ClassLoader loader, String path, Locale locale, Function<String, Exception> ifNull) throws Exception {
-        InputStream localeLangStream = getResourcesInputStream(loader, path, ifNull);
-
-
-        // 读取语言数据, 覆盖en中已经存在的语言文件
-        ReaderProperties localeLangProperties = new ReaderProperties();
-        localeLangProperties.load(localeLangStream);
-        // 进行格式转化
-        Set<String> names = localeLangProperties.stringPropertyNames();
-        // 使用传统方式遍历properties
-        for (String key : names) {
-            languageFormat.put(key, new MessageFormat(localeLangProperties.getProperty(key), locale));
+    private static void loadLang(ClassLoader loader, String path, Locale locale, Consumer<Exception> ifThrow) {
+        if(ifThrow == null){
+            ifThrow = IF_THROW_IGNORE;
         }
+
+        Stream<InputStream> localeLangStreams = getResourcesInputStreams(loader, path, ifThrow);
+
+        localeLangStreams.forEach(localeLangStream -> {
+            // 读取语言数据, 覆盖en中已经存在的语言文件
+            ReaderProperties localeLangProperties = new ReaderProperties();
+            try {
+                localeLangProperties.load(localeLangStream);
+            } catch (IOException e) {
+                throw new LanguageInitException(e);
+            }
+            // 进行格式转化
+            Set<String> names = localeLangProperties.stringPropertyNames();
+            // 使用传统方式遍历properties
+            for (String key : names) {
+                languageFormat.put(key, new MessageFormat(localeLangProperties.getProperty(key), locale));
+            }
+        });
     }
 
 
@@ -326,14 +337,10 @@ public class Language {
      * @param loader 类加载器
      * @param path   resources资源路径，开头请不要带'/'，其内部会进行尝试
      * @param locale 加载的对应语言
-     * @param ifThrow 如果出现异常
      * @throws IOException
      */
-    private static void loadLangResources(ClassLoader loader, String path, Locale locale, Consumer<Exception> ifThrow) throws Exception {
-        if(ifThrow == null){
-            ifThrow = e -> {};
-        }
-        final Stream<InputStream> resourcesInputStreams = getResourcesInputStreams(loader, path, ifThrow);
+    private static void loadLangResources(ClassLoader loader, String path, Locale locale) {
+        final Stream<InputStream> resourcesInputStreams = getResourcesInputStreams(loader, path, IF_THROW_IGNORE);
         // 读取语言数据, 覆盖en中已经存在的语言文件
         ReaderProperties localeLangProperties = new ReaderProperties();
 
@@ -422,19 +429,24 @@ public class Language {
         List<Exception> exceptions = new ArrayList<>();
         try {
             // 加载核心的本地语言
-            loadLang(loader, CORE_PATH_HEAD + locale + PATH_END, locale, path -> new NullPointerException("can not find language resources file in : '" + path + "'"));
+//            loadLang(loader, CORE_PATH_HEAD + locale + PATH_END, locale, e -> new NullPointerException("can not find language resources file"));
+            loadLang(loader, CORE_PATH_HEAD + locale + PATH_END, locale, e -> {
+                throw new LanguageInitException(e);
+            });
         } catch (Exception e) {
             exceptions.add(e);
         }
         try {
             // 加载组件的本地语言
-            loadLang(loader, COMPONENT_PATH_HEAD + locale + PATH_END, locale, path -> new NullPointerException("can not find language resources file in : '" + path + "'"));
+            loadLang(loader, COMPONENT_PATH_HEAD + locale + PATH_END, locale, e -> {
+                throw new LanguageInitException(e);
+            });
         } catch (Exception e) {
             exceptions.add(e);
         }
         try {
             // 加载modules语言
-            loadLangResources(loader, MODULES_PATH_HEAD + locale + PATH_END, locale, null);
+            loadLangResources(loader, MODULES_PATH_HEAD + locale + PATH_END, locale);
         } catch (Exception e) {
             QQLog.debug("can not find language resources file in : ''{0}''", LANG_PATH_HEAD + locale + PATH_END);
         }
@@ -458,19 +470,23 @@ public class Language {
         List<Exception> exceptions = new ArrayList<>();
         try {
             // 加载核心的本地语言
-            loadLang(loader, CORE_PATH_HEAD + DEFAULT_LOCALE + PATH_END, DEFAULT_LOCALE, path -> new LanguageInitException("can not find language resources file in : " + path));
+            loadLang(loader, CORE_PATH_HEAD + DEFAULT_LOCALE + PATH_END, DEFAULT_LOCALE, e -> {
+                throw new LanguageInitException(e);
+            });
         } catch (Exception e) {
             exceptions.add(e);
         }
         try {
             // 加载组件的本地语言
-            loadLang(loader, COMPONENT_PATH_HEAD + DEFAULT_LOCALE + PATH_END, DEFAULT_LOCALE, path -> new LanguageInitException("can not find language resources file in : " + path));
+            loadLang(loader, COMPONENT_PATH_HEAD + DEFAULT_LOCALE + PATH_END, DEFAULT_LOCALE, e -> {
+                throw new LanguageInitException(e);
+            });
         } catch (Exception e) {
             exceptions.add(e);
         }
         try {
             // 加载modules语言
-            loadLangResources(loader, MODULES_PATH_HEAD + DEFAULT_LOCALE + PATH_END, DEFAULT_LOCALE, null);
+            loadLangResources(loader, MODULES_PATH_HEAD + DEFAULT_LOCALE + PATH_END, DEFAULT_LOCALE);
         } catch (Exception e) {
             QQLog.debug("can not find language resources file in : ''{0}''", LANG_PATH_HEAD + DEFAULT_LOCALE + PATH_END);
         }
@@ -552,4 +568,8 @@ public class Language {
     public static void registerLang(ClassLoader loader, String langName) throws Exception {
         registerLang(loader, langName, SYSTEM_DEFAULT_LOCALE);
     }
+
+
+
+
 }
