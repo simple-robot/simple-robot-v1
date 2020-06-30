@@ -1,3 +1,16 @@
+#
+# Copyright (c) 2020. ForteScarlet All rights reserved.
+# Project  simple-robot-core
+# File     en_US.lang
+#
+# You can contact the author through the following channels:
+# github https://github.com/ForteScarlet
+# gitee  https://gitee.com/ForteScarlet
+# email  ForteScarlet@163.com
+# QQ     1149159218
+#
+#
+
 lang.init.finished=language has already init finished. All non-Chinese languages are from Google Translate.
 
 
@@ -109,6 +122,8 @@ exception.botVerify.failed=bot[{0}]verify failed: {1}
 exception.botVerify.failed.mismatch=bot[{0}]verify failed: code mismatch: {1}
 exception.botVerify.notExists=Account [{0}] does not exist
 exception.botVerify.null=Account [{0}] verification result is null
+exception.botVerify.close.failed=Account [{0}] logout failed!
+
 
 # ListenerException
 exception.listener.init.failed=listener initialization error!

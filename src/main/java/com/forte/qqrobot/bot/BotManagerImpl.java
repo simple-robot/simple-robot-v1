@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2020. ForteScarlet All rights reserved.
+ * Project  simple-robot-core
+ * File     BotManagerImpl.java
+ *
+ * You can contact the author through the following channels:
+ * github https://github.com/ForteScarlet
+ * gitee  https://gitee.com/ForteScarlet
+ * email  ForteScarlet@163.com
+ * QQ     1149159218
+ *
+ */
+
 package com.forte.qqrobot.bot;
 
 import com.forte.qqrobot.beans.function.PathAssembler;
@@ -108,14 +121,14 @@ public class BotManagerImpl implements BotManager {
         // 在注册时候锁住map对象
         synchronized (botMap) {
             BotInfo verifyBot = null;
-            if(key == null){
+            if (key == null) {
                 verifyBot = verifyBot(info);
                 key = (info = verifyBot).getBotCode();
             }
 
             BotInfo botInfo = botMap.get(key);
             if (botInfo == null) {
-                if(verifyBot == null){
+                if (verifyBot == null) {
                     verifyBot = verifyBot(info);
                 }
                 botMap.put(key, verifyBot);
@@ -148,7 +161,6 @@ public class BotManagerImpl implements BotManager {
 
     /**
      * 注销掉一个bot，将其从bot列表中移除。
-     * 注意现成安全问题。
      *
      * @param code 要注销掉的bot账号
      */
@@ -156,21 +168,23 @@ public class BotManagerImpl implements BotManager {
     public BotInfo logOutBot(String code) {
         // 移除掉一个bot的信息
         // 先锁住botMap
+        final BotInfo remove;
         synchronized (botMap) {
-            BotInfo remove = botMap.remove(code);
-            if(remove != null){
-                try {
-                    remove.close();
-                } catch (IOException e) {
-                    throw new BotVerifyException(e);
-                }
-            }
-            return remove;
+            remove = botMap.remove(code);
         }
+        if (remove != null) {
+            try {
+                remove.close();
+            } catch (IOException e) {
+                throw new BotVerifyException(e);
+            }
+        }
+        return remove;
     }
 
     /**
      * 刷新一个Bot的账号信息
+     *
      * @param code 要刷新的bot账号的信息
      */
     @Override
@@ -180,13 +194,19 @@ public class BotManagerImpl implements BotManager {
         if (botInfo == null) {
             throw new BotVerifyException("notExists", code);
         }
+        // close bot
+        try {
+            botInfo.close();
+        } catch (Exception e) {
+            throw new BotVerifyException("close.failed", e, code);
+        }
         // 通过当前的botInfo获取新注册的botInfo
         final BotInfo newBotInfo = verifyBot(botInfo);
-        if(newBotInfo != null){
+        if (newBotInfo != null) {
             synchronized (botMap) {
-                botMap.put(code, botInfo);
+                botMap.put(code, newBotInfo);
             }
-        }else{
+        } else {
             throw new BotVerifyException("null");
         }
     }
