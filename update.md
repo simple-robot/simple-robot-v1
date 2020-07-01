@@ -1,8 +1,11 @@
 ## 版本更新记录
 
+# now
+quartz 版本更新到2.3.2
+
 # 1.15.2
-修复botManager实现类中refreshBot逻辑错误的问题
-优化国际化语言加载机制
+- 修复botManager实现类中refreshBot逻辑错误的问题
+- 优化国际化语言加载机制
 
 
 # 1.15.1
