@@ -19,6 +19,7 @@ import com.forte.qqrobot.beans.function.PathAssembler;
 import com.forte.qqrobot.beans.function.VerifyFunction;
 import com.forte.qqrobot.bot.BotManager;
 import com.forte.qqrobot.bot.BotManagerImpl;
+import com.forte.qqrobot.system.limit.LimitIntercept;
 
 /**
  * 核心的配置注入类
@@ -47,5 +48,10 @@ public class CoreConfiguration {
         return new BotManagerImpl(pathAssembler, verifyFunction);
     }
 
+
+    @Beans
+    public LimitIntercept limitIntercept(){
+        return new LimitIntercept();
+    }
 
 }

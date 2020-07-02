@@ -13,6 +13,8 @@
 
 package com.forte.qqrobot.intercept;
 
+import com.forte.qqrobot.constant.PriorityConstant;
+
 /**
  *
  * 拦截器跟接口，定义拦截器接口规范。
@@ -24,12 +26,12 @@ package com.forte.qqrobot.intercept;
 public interface Interceptor<T, C extends Context<T>> extends Comparable<Interceptor<T, C>> {
 
     /**
-     * 排序方法，默认为1。
+     * 排序方法，默认为{@link PriorityConstant#FIRST_LAST}。
      * 无特殊排序需求则不用重写此方法。
      * @return 优先级，值越小优先级越高。目前理论上支持负值。
      */
     default int sort(){
-        return 1;
+        return PriorityConstant.FIRST_LAST;
     }
 
     /**

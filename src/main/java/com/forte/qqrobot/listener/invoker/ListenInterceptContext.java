@@ -13,6 +13,7 @@
 
 package com.forte.qqrobot.listener.invoker;
 
+import com.forte.qqrobot.beans.messages.msgget.MsgGet;
 import com.forte.qqrobot.intercept.BaseContext;
 import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.sender.senderlist.SenderGetList;
@@ -32,21 +33,26 @@ public class ListenInterceptContext extends BaseContext<ListenerMethod> {
     public final SenderSetList SETTER;
     public final SenderGetList GETTER;
 
+    private final MsgGet msgGet;
+
     public ListenInterceptContext(ListenerMethod value, ListenContext listenContext, Map<String, Object> globalContextMap,
-                                  SenderSendList sender, SenderSetList setter, SenderGetList getter) {
+                                  SenderSendList sender, SenderSetList setter, SenderGetList getter,
+                                  MsgGet msgGet) {
         super(value, globalContextMap);
         this.listenContext = listenContext;
         this.SENDER = sender;
         this.SETTER = setter;
         this.GETTER = getter;
+        this.msgGet = msgGet;
     }
     public ListenInterceptContext(ListenerMethod value, ListenContext listenContext, Map<String, Object> globalContextMap, Map<String, Object> contextMap,
-                                  SenderSendList sender, SenderSetList setter, SenderGetList getter) {
+                                  SenderSendList sender, SenderSetList setter, SenderGetList getter, MsgGet msgGet) {
         super(value, globalContextMap, contextMap);
         this.listenContext = listenContext;
         this.SENDER = sender;
         this.SETTER = setter;
         this.GETTER = getter;
+        this.msgGet = msgGet;
     }
 
     /** listenContext */
@@ -82,5 +88,9 @@ public class ListenInterceptContext extends BaseContext<ListenerMethod> {
 
     void setArgs(Object[] args) {
         this.args = args;
+    }
+
+    public MsgGet getMsgGet() {
+        return msgGet;
     }
 }

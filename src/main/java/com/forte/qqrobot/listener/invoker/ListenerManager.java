@@ -267,7 +267,7 @@ public class ListenerManager implements MsgReceiver {
         Plug plug = ResourceDispatchCenter.getPlug();
         Set<ListenerMethod> blockMethod = plug.getBlockMethod(type);
 
-        Function<ListenerMethod, ListenInterceptContext> contextFunction = lm -> new ListenInterceptContext(lm, context, listenInterceptContextGlobalMap, sender, setter, getter);
+        Function<ListenerMethod, ListenInterceptContext> contextFunction = lm -> new ListenInterceptContext(lm, context, listenInterceptContextGlobalMap, sender, setter, getter, msgGet);
 
         if(blockMethod != null){
             //如果存在阻断，执行阻断

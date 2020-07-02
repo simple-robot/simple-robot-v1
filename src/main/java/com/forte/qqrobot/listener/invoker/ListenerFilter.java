@@ -237,9 +237,11 @@ public class ListenerFilter implements Closeable {
         //获取过滤注解
         Filter filter = listenerMethod.getFilter();
 
+        String msg = msgGet.getMsg();
+
         //获取关键词组
         Pattern[] patternValue = listenerMethod.getPatternValue();
-        boolean test = true;
+        boolean test;
         //如果关键词数量大于1，则进行关键词过滤
         if (patternValue.length > 0) {
             if (patternValue.length == 1) {
@@ -247,11 +249,11 @@ public class ListenerFilter implements Closeable {
                 Pattern singleValue = patternValue[0];
                 //如果需要被at，判断的时候移除at的CQ码
                 //2019/10/25 不再移除CQ码
-                test = filter.keywordMatchType().test(msgGet.getMsg(), singleValue);
+                test = filter.keywordMatchType().test(msg, singleValue);
             } else {
                 //如果有多个参数，按照规则判断
                 //根据获取规则匹配
-                test = filter.mostType().test(msgGet.getMsg(), patternValue, filter.keywordMatchType());
+                test = filter.mostType().test(msg, patternValue, filter.keywordMatchType());
             }
             return test;
         } else {

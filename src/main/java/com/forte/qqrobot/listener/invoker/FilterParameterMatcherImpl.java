@@ -138,7 +138,12 @@ public class FilterParameterMatcherImpl implements FilterParameterMatcher {
                     if(last != null && last.equals('{')){
                         if(builder.length() > 0){
                             point = nextPoint(builder, -1, point, false);
+                            final int groups = point.pointPattern.matcher("").groupCount();
+                            if(groups > 0){
+                                index += groups;
+                            }
                         }
+
                         builder.delete(0, builder.length());
                         on = true;
                     }

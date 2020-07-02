@@ -14,14 +14,12 @@
 package com.forte.qqrobot.listener.invoker;
 
 import com.forte.qqrobot.BotRuntime;
-import com.forte.qqrobot.anno.Block;
-import com.forte.qqrobot.anno.BlockFilter;
-import com.forte.qqrobot.anno.Filter;
-import com.forte.qqrobot.anno.Spare;
+import com.forte.qqrobot.anno.*;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.beans.types.BreakType;
 import com.forte.qqrobot.depend.AdditionalDepends;
 import com.forte.qqrobot.depend.DependGetter;
+import com.forte.qqrobot.exception.ListenerException;
 import com.forte.qqrobot.listener.ListenIntercept;
 import com.forte.qqrobot.listener.result.BasicResultParser;
 import com.forte.qqrobot.listener.result.ListenResult;
@@ -34,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -42,6 +41,8 @@ import java.util.stream.Collectors;
 
 /**
  * 监听器方法封装类
+ *
+ * TODO 急需重构
  *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/25 18:28
@@ -116,6 +117,16 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
     private final Method method;
 
     /**
+     * 线程池。可以为null，当为null的时候，异步任务默认是使用新线程执行。
+     */
+    private final ExecutorService executorService;
+
+    /**
+     * 是否异步执行。
+     */
+    private final Async async;
+
+    /**
      * 此方法所属的监听类型, 多种类型
      */
     private final MsgGetTypes[] type;
@@ -160,6 +171,11 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
                            Spare spare,
                            Block block,
                            Method method,
+
+                           // 线程池
+                           ExecutorService executorService, // null able
+                           Async async, // 是否异步
+
                            MsgGetTypes[] type,
                            int sort,
                            Predicate<Object> listenBreak,
@@ -170,6 +186,9 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
         this.listenerGetter = listenerGetter;
         this.listenerGetterWithAddition = listenerGetterWithAddition;
         this.filter = filter;
+
+        this.executorService = executorService;
+        this.async = async;
 
         if (filter == null) {
             this.filterData = null;
@@ -233,7 +252,7 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
      */
     ListenResult invoke(AdditionalDepends additionalDepends,
                         ListenInterceptContext interceptContext,
-                        ListenIntercept... intercepts) throws Exception {
+                        ListenIntercept... intercepts) {
         Object invoke = null;
         Exception error = null;
 
@@ -268,7 +287,22 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
                     args = interceptContext.getArgs();
                 }
                 //执行方法
-                invoke = pass ? method.invoke(listener, args) : interceptContext.getResult();
+                if(async != null){
+                    final boolean threadPass = pass;
+                    final Object[] threadArgs = args;
+                    executorService.execute(() -> {
+                        try {
+                            Object threadInv = threadPass ? method.invoke(listener, threadArgs) : interceptContext.getResult();
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            throw new ListenerException("async", e, e.getLocalizedMessage());
+                        }
+                    });
+                    invoke = async.success();
+                }else{
+                    invoke = pass ? method.invoke(listener, args) : interceptContext.getResult();
+                }
+
+
             } catch (Exception e) {
                 // 出现异常，判定为执行失败
                 if (e instanceof InvocationTargetException) {
@@ -527,6 +561,14 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
          * 方法本体
          */
         private final Method method;
+
+        // 线程池
+        private ExecutorService executorService = null;
+
+        // 是否要异步
+        private Async async = null;
+
+
         /**
          * 此方法所属的监听类型
          */
@@ -620,6 +662,21 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
             return this;
         }
 
+        public ExecutorService executorService() {
+            return executorService;
+        }
+
+        public void executorService(ExecutorService executorService) {
+            this.executorService = executorService;
+        }
+
+        public Async async() {
+            return async;
+        }
+
+        public void async(Async async) {
+            this.async = async;
+        }
 
         /**
          * 构建对象
@@ -633,6 +690,8 @@ public class ListenerMethod<T> implements Comparable<ListenerMethod> {
                     spare,
                     block,
                     method,
+                    executorService,
+                    async,
                     type,
                     sort,
                     listenBreak,

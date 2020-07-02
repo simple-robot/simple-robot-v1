@@ -40,12 +40,12 @@ public abstract class BaseLocalThreadPool {
      * 本线程用的线程池
      */
     @Deprecated
-    private static ThreadLocal<Executor> localExecutorThread;
+    private static ThreadLocal<ExecutorService> localExecutorThread;
 
     /**
      * 线程池仓库，保管保存了的线程池
      */
-    private static Map<String, Executor> poolWarehouse;
+    private static Map<String, ExecutorService> poolWarehouse;
 
     ///////////////////////////线程池参数///////////////////////////////
 
@@ -131,7 +131,7 @@ public abstract class BaseLocalThreadPool {
      * @param poolName 创建的线程池的名称
      * @return
      */
-    public static Executor getThreadPool(String poolName) {
+    public static ExecutorService getThreadPool(String poolName) {
         return createThreadPool(poolName);
     }
 
@@ -221,8 +221,8 @@ public abstract class BaseLocalThreadPool {
      * 创建线程池
      *  通过配置类创建
      */
-    private static Executor createThreadPool(String poolName, PoolConfig config) {
-        Executor executor = null;
+    private static ExecutorService createThreadPool(String poolName, PoolConfig config) {
+        ExecutorService executor = null;
 
         //如果名称为null，获取默认
         if (poolName == null) {
@@ -234,7 +234,7 @@ public abstract class BaseLocalThreadPool {
             }
         } else {
             //存在,若有则直接获取，没有则创建
-            Executor executorGet = poolWarehouse.get(poolName);
+            ExecutorService executorGet = poolWarehouse.get(poolName);
             if (executorGet == null) {
                 //获取不到,创建新的并保存
                 //创建并赋值
@@ -253,7 +253,7 @@ public abstract class BaseLocalThreadPool {
     /**
      * 创建线程池, 默认配置
      */
-    private static Executor createThreadPool(String poolName){
+    private static ExecutorService createThreadPool(String poolName){
         return createThreadPool(poolName, null);
     }
 
@@ -264,8 +264,8 @@ public abstract class BaseLocalThreadPool {
      * @return
      */
     @Deprecated
-    private static Executor createLocalThreadPool() {
-        Executor executor = localExecutorThread.get();
+    private static ExecutorService createLocalThreadPool() {
+        ExecutorService executor = localExecutorThread.get();
         if (executor == null) {
             //如果没有，创建
             executor = createExecutor();
@@ -279,7 +279,7 @@ public abstract class BaseLocalThreadPool {
      * 创建一个新的线程池对象
      * 使用默认参数
      */
-    private static Executor createExecutor() {
+    private static ExecutorService createExecutor() {
         return new ThreadPoolExecutor(corePoolSize,
                 maximumPoolSize,
                 keepAliveTime,
@@ -292,7 +292,7 @@ public abstract class BaseLocalThreadPool {
     /**
      * 根据配置对象创建一个新的线程
      */
-    private static Executor createExecutor(PoolConfig config){
+    private static ExecutorService createExecutor(PoolConfig config){
         return new ThreadPoolExecutor(
                 config.getCorePoolSize(),
                 config.getMaximumPoolSize(),

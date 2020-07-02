@@ -25,6 +25,7 @@ import com.forte.qqrobot.utils.CQCodeUtil;
 import com.forte.qqrobot.utils.SingleFactory;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * 资源调度中心抽象类，基本是静态方法，开发者可以实现此类并增加方法
@@ -171,7 +172,7 @@ public abstract class ResourceDispatchCenter {
      * 获取线程池
      * @return  线程池单例
      */
-    public static Executor getThreadPool(){
+    public static ExecutorService getThreadPool(){
         return BaseLocalThreadPool.getThreadPool(THREAD_POOL_NAME);
     }
 
@@ -179,7 +180,7 @@ public abstract class ResourceDispatchCenter {
      * 获取指定名称的线程池
      * @return  线程池单例
      */
-    public static Executor getThreadPool(String threadPoolName){
+    public static ExecutorService getThreadPool(String threadPoolName){
         return BaseLocalThreadPool.getThreadPool(threadPoolName);
     }
 

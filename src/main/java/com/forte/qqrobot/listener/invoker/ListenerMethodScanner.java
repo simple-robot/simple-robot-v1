@@ -31,6 +31,7 @@ import com.forte.qqrobot.utils.MethodUtil;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -45,6 +46,12 @@ import java.util.stream.Stream;
  **/
 public class ListenerMethodScanner {
 
+
+    private ExecutorService executorService;
+
+    public ListenerMethodScanner(ExecutorService executorService){
+        this.executorService = executorService;
+    }
 
     /**
      * 全部的监听函数set集合
@@ -218,6 +225,10 @@ public class ListenerMethodScanner {
             if(thisBody != null){
                 builder.resultParser(BodyResultParser.getInstance());
             }
+
+
+            builder.executorService(executorService);
+            builder.async(AnnotationUtils.getAnnotation(method, Async.class));
 
             return builder.build();
         }).filter(Objects::nonNull).collect(Collectors.toSet());

@@ -1,3 +1,4 @@
+# suppress inspection "UnusedProperty" for whole file
 #
 # Copyright (c) 2020. ForteScarlet All rights reserved.
 # Project  simple-robot-core
@@ -92,6 +93,9 @@ exception.dependResource.fieldValueGetFailed=Field [{1}] value of class [{0}] ge
 exception.dependResource.noFieldSetter=Could not get setter method for field [{1}] of class [{0}]
 exception.dependResource.CannotSetValue=Unable to assign value to field [{2}] of class [{1}] via setter [{0}]!
 exception.dependResource.fieldValueSetFailed=Field [{1}] value assignment of class [{0}] is abnormal!
+
+# ListenerException
+exception.listener.async=An exception occurred in the asynchronous listener: {0}
 
 # RobotDevException异常
 ### dynamicParamRepeat: 动态参数类型出现重复!

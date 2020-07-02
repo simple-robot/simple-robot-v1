@@ -75,6 +75,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -158,6 +159,8 @@ public abstract class BaseApplication<
 
     private StdSchedulerFactory stdSchedulerFactory;
 
+    private ExecutorService executorService;
+
     /**
      * bot管理中心
      */
@@ -178,9 +181,11 @@ public abstract class BaseApplication<
     /**
      * 线程工厂初始化
      */
-    protected void threadPoolInit(CONFIG config) {
+    protected ExecutorService threadPoolInit(CONFIG config) {
         //创建并保存线程池
         ResourceDispatchCenter.saveThreadPool(config.getPoolConfig());
+        executorService = ResourceDispatchCenter.getThreadPool();
+        return executorService;
     }
 
     /**
@@ -190,7 +195,7 @@ public abstract class BaseApplication<
         //将CQCodeUtil放入资源调度中心
         ResourceDispatchCenter.saveCQCodeUtil(CQCodeUtil.build());
         //将ListenerMethodScanner放入资源调度中心
-        scanner = new ListenerMethodScanner();
+        scanner = new ListenerMethodScanner(executorService);
         ResourceDispatchCenter.saveListenerMethodScanner(scanner);
         //将ListenerFilter放入资源调度中心
         listenerFilter = new ListenerFilter();
@@ -620,10 +625,10 @@ public abstract class BaseApplication<
         coreCheckVersion(config);
         //配置fastJson
         fastJsonInit();
-        //公共资源初始化
-        baseResourceInit();
         //线程工厂初始化
         threadPoolInit(config);
+        //公共资源初始化
+        baseResourceInit();
         //定时任务初始化
         timeTaskInit();
         //资源初始化
