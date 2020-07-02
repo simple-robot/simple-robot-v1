@@ -25,10 +25,15 @@ import java.util.stream.Stream;
 /**
  * <pre> CQCode封装类
  * <pre> 从核心1.10.2开始，不再进行权限认证。
+ *
+ * @deprecated 集成cqCodeUtils模组后，此类与KQCode功能一致，因此弃用此类。
+ * @see com.simplerobot.modules.utils.KQCode
+ *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/9 11:42
  * @since JDK1.8
  **/
+@Deprecated
 public class CQCode
         implements Map<String, String>,
         CharSequence,

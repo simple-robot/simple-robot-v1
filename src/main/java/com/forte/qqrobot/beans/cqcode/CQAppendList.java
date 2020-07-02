@@ -29,9 +29,13 @@ import java.util.stream.Stream;
 /**
  * 多个CQCode或者字符串信息的链接体
  *
+ * @deprecated 集成了KQCodeUtils后，此类与{@link com.simplerobot.modules.utils.Msgs}类功能一致，因此同时弃用此类
+ * @see com.simplerobot.modules.utils.Msgs
+ *
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+@Deprecated
 public class CQAppendList implements AppendList {
 
     /**

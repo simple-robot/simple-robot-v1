@@ -15,7 +15,7 @@ package com.forte.qqrobot.beans.types;
 
 import com.forte.qqrobot.listener.invoker.FilterParameterMatcher;
 import com.forte.qqrobot.listener.invoker.FilterParameterMatcherImpl;
-import com.forte.qqrobot.utils.CQCodeUtil;
+import com.simplerobot.modules.utils.KQCodeUtils;
 
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -41,10 +41,10 @@ public enum KeywordMatchType {
     TRIM_REGEX((msg, regex) -> regex.matcher(msg).matches(), String::trim),
 
     /** 移除掉所有CQ码后正则matches匹配 */
-    RE_CQCODE_REGEX((msg, regex) -> regex.matcher(msg).matches(), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
+    RE_CQCODE_REGEX((msg, regex) -> regex.matcher(msg).matches(), KQCodeUtils.INSTANCE::remove),
 
     /** 移除掉所有CQ码并首尾去空后正则matches匹配 */
-    RE_CQCODE_TRIM_REGEX((msg, regex) -> regex.matcher(msg).matches(), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
+    RE_CQCODE_TRIM_REGEX((msg, regex) -> regex.matcher(msg).matches(), msg -> KQCodeUtils.INSTANCE.remove(msg).trim()),
 
 
     /** 使用正则find规则匹配 */
@@ -54,10 +54,10 @@ public enum KeywordMatchType {
     TRIM_FIND((msg, regex) -> regex.matcher(msg).find(0), String::trim),
 
     /** 移除掉所有CQ码后正则find匹配 */
-    RE_CQCODE_FIND((msg, regex) -> regex.matcher(msg).find(0), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
+    RE_CQCODE_FIND((msg, regex) -> regex.matcher(msg).find(0), KQCodeUtils.INSTANCE::remove),
 
     /** 移除掉所有CQ码并首尾去空后正则find匹配 */
-    RE_CQCODE_TRIM_FIND((msg, regex) -> regex.matcher(msg).find(0), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
+    RE_CQCODE_TRIM_FIND((msg, regex) -> regex.matcher(msg).find(0), msg -> KQCodeUtils.INSTANCE.remove(msg).trim()),
 
 
 
@@ -70,10 +70,10 @@ public enum KeywordMatchType {
     TRIM_EQUALS((msg, regex) -> msg.equals(regex.toString()), String::trim),
 
     /** 移除掉所有CQ码后相同匹配 */
-    RE_CQCODE_EQUALS((msg, regex) -> msg.equals(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
+    RE_CQCODE_EQUALS((msg, regex) -> msg.equals(regex.toString()), KQCodeUtils.INSTANCE::remove),
 
     /** 移除掉所有CQ码并首尾去空后相同匹配 */
-    RE_CQCODE_TRIM_EQUALS((msg, regex) -> msg.equals(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
+    RE_CQCODE_TRIM_EQUALS((msg, regex) -> msg.equals(regex.toString()), msg -> KQCodeUtils.INSTANCE.remove(msg).trim()),
 
     //**************** 包含匹配相关 ****************//
 
@@ -84,10 +84,10 @@ public enum KeywordMatchType {
     TRIM_CONTAINS((msg, regex) -> msg.contains(regex.toString()), String::trim),
 
     /** 移除掉所有CQ码后包含匹配 */
-    RE_CQCODE_CONTAINS((msg, regex) -> msg.contains(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
+    RE_CQCODE_CONTAINS((msg, regex) -> msg.contains(regex.toString()), KQCodeUtils.INSTANCE::remove),
 
     /** 移除掉所有CQ码并首尾去空后包含匹配 */
-    RE_CQCODE_TRIM_CONTAINS((msg, regex) -> msg.contains(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
+    RE_CQCODE_TRIM_CONTAINS((msg, regex) -> msg.contains(regex.toString()), msg -> KQCodeUtils.INSTANCE.remove(msg).trim()),
 
     //**************** 开头匹配 ****************//
 
@@ -96,9 +96,9 @@ public enum KeywordMatchType {
     /** 去空的首部匹配 */
     TRIM_STARTS_WITH((msg, regex) -> msg.trim().startsWith(regex.toString()), String::trim),
     /** 移除掉所有CQ码后首部匹配 */
-    RE_CQCODE_STARTS_WITH((msg, regex) -> msg.startsWith(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
+    RE_CQCODE_STARTS_WITH((msg, regex) -> msg.startsWith(regex.toString()), KQCodeUtils.INSTANCE::remove),
     /** 移除掉所有CQ码并首尾去空后首部匹配 */
-    RE_CQCODE_TRIM_STARTS_WITH((msg, regex) -> msg.startsWith(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
+    RE_CQCODE_TRIM_STARTS_WITH((msg, regex) -> msg.startsWith(regex.toString()), msg -> KQCodeUtils.INSTANCE.remove(msg).trim()),
 
     //**************** 结尾匹配 ****************//
 
@@ -107,9 +107,9 @@ public enum KeywordMatchType {
     /** 去空的尾部匹配 */
     TRIM_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), String::trim),
     /** 移除掉所有CQ码后尾部匹配 */
-    RE_CQCODE_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg)),
+    RE_CQCODE_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), KQCodeUtils.INSTANCE::remove),
     /** 移除掉所有CQ码并首尾去空后尾部匹配 */
-    RE_CQCODE_TRIM_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), msg -> CQCodeUtil.build().removeCQCodeFromMsg(msg).trim()),
+    RE_CQCODE_TRIM_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), msg -> KQCodeUtils.INSTANCE.remove(msg).trim()),
 
 
     ;

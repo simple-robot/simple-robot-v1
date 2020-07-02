@@ -700,7 +700,7 @@ public enum CQCodeTypes {
         //遍历完成，生成字符串
         this.matchRegex = joiner.toString();
         //创建封装类
-        this.matchRegexPattern = RegexUtil.getPattern(matchRegex);
+        this.matchRegexPattern = Pattern.compile(matchRegex);
 
         // 生成参数匹配字符串
         // 大概规则：

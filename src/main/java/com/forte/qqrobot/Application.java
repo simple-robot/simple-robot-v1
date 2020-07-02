@@ -28,13 +28,17 @@ import com.forte.qqrobot.utils.CQCodeUtil;
  **/
 public interface Application<CONFIG extends BaseConfiguration> {
 
+    /**
+     * 启动之前的配置方法
+     * @param configuration
+     */
     void before(CONFIG configuration);
 
     /**
      * @param cqCodeUtil cq码工具类
      * @param sender 不再建议使用MsgSender。如果想要主动发送消息，请试着使用{@code BotRuntime().getRuntime().getBotManager()}
      */
-    void after(CQCodeUtil cqCodeUtil, @Deprecated MsgSender sender);
+    void after(CQCodeUtil cqCodeUtil, MsgSender sender);
 
     /**
      * 获取启动器的包路径。默认情况下即获取当前类的包路径。

@@ -36,20 +36,43 @@ public class AnnotationException extends RobotRuntimeException {
     public AnnotationException() {
     }
 
-
     public AnnotationException(String message, Object... format) {
         super(message, format);
+    }
+
+    public AnnotationException(String message) {
+        super(message);
     }
 
     public AnnotationException(String message, Throwable cause, Object... format) {
         super(message, cause, format);
     }
 
+    public AnnotationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public AnnotationException(Throwable cause) {
         super(cause);
     }
 
+    public AnnotationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
     public AnnotationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... format) {
         super(message, cause, enableSuppression, writableStackTrace, format);
+    }
+
+    public AnnotationException(int pointless, String message) {
+        super(pointless, message);
+    }
+
+    public AnnotationException(int pointless, String message, Throwable cause) {
+        super(pointless, message, cause);
+    }
+
+    public AnnotationException(int pointless, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(pointless, message, cause, enableSuppression, writableStackTrace);
     }
 }

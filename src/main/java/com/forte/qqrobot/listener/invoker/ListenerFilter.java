@@ -23,7 +23,7 @@ import com.forte.qqrobot.exception.FilterException;
 import com.forte.qqrobot.listener.Filterable;
 import com.forte.qqrobot.listener.ListenContext;
 import com.forte.qqrobot.log.QQLogLang;
-import com.forte.qqrobot.utils.CQCodeUtil;
+import com.simplerobot.modules.utils.KQCodeUtils;
 
 import java.io.Closeable;
 import java.util.Map;
@@ -43,7 +43,8 @@ import java.util.regex.Pattern;
 public class ListenerFilter implements Closeable {
 
     private static final QQLogLang LOG_LANG = new QQLogLang("filter");
-    private static QQLogLang getLog(){
+
+    private static QQLogLang getLog() {
         return LOG_LANG;
     }
 
@@ -55,30 +56,40 @@ public class ListenerFilter implements Closeable {
     /**
      * at判断器, 默认情况下即使用CQ码作为判断
      */
-    private static volatile AtomicReference<Function<MsgGet, AtDetection>> AT_DETECTION_FUNCTION = new AtomicReference<>(msg -> () -> CQCodeUtil.build().isAt(msg));
+    private static volatile AtomicReference<Function<MsgGet, AtDetection>> AT_DETECTION_FUNCTION = new AtomicReference<>(msg -> () -> {
+        if (msg == null) {
+            return false;
+        }
+        final String atBot = KQCodeUtils.INSTANCE.getStringTemplate().at(msg.getThisCode());
+        final String getMsg = msg.getMsg();
+        return getMsg != null && getMsg.contains(atBot);
+    });
 
 
     /**
      * 获取当前的at判断函数
+     *
      * @return 当前的at判断函数
      */
-    public static Function<MsgGet, AtDetection> getAtDetectionFunction(){
+    public static Function<MsgGet, AtDetection> getAtDetectionFunction() {
         return AT_DETECTION_FUNCTION.get();
     }
 
     /**
      * 注册一个新的at判断函数，替换当前函数
+     *
      * @param atDetectionFunction at判断函数
      */
-    public static void registerAtDetectionFunction(Function<MsgGet, AtDetection> atDetectionFunction){
+    public static void registerAtDetectionFunction(Function<MsgGet, AtDetection> atDetectionFunction) {
         AT_DETECTION_FUNCTION.updateAndGet(old -> atDetectionFunction);
     }
 
     /**
      * 根据当前的at判断函数来更新一个at判断函数
+     *
      * @param updateFunction at判断函数的更新函数
      */
-    public static void updateAtDetectionFunction(UnaryOperator<Function<MsgGet, AtDetection>> updateFunction){
+    public static void updateAtDetectionFunction(UnaryOperator<Function<MsgGet, AtDetection>> updateFunction) {
         AT_DETECTION_FUNCTION.updateAndGet(updateFunction);
     }
 
@@ -109,18 +120,19 @@ public class ListenerFilter implements Closeable {
 
     /**
      * 根据名称列表获取结果
+     *
      * @param names 名称列表
      * @return 最终结果
      */
-    public Filterable[] getFilters(String... names){
-        if(names.length == 0){
+    public Filterable[] getFilters(String... names) {
+        if (names.length == 0) {
             return new Filterable[0];
         }
 
         Filterable[] filterables = new Filterable[names.length];
         for (int i = 0; i < names.length; i++) {
             Filterable filter = getFilter(names[i]);
-            if(filter == null){
+            if (filter == null) {
                 throw new FilterException("notfound", names[i]);
             }
             filterables[i] = filter;
@@ -144,14 +156,14 @@ public class ListenerFilter implements Closeable {
 
         boolean shouldAt = filter.at();
         //根据是否需要被at判断
-        if (shouldAt && !at.test()) {
-            //如果需要被at，而at不为true，则返回false
+        if (msgGet instanceof GroupCodeAble && shouldAt && !at.test()) {
+            //如果是可获得群号的消息，需要被at，而at不为true，则返回false
             return false;
         }
 
         //**************** 正常判断 ****************//
 
-        return allFilter(listenerMethod, msgGet, at, context);
+        return allFilter(listenerMethod, msgGet, at, context, shouldAt);
     }
 
 
@@ -172,55 +184,53 @@ public class ListenerFilter implements Closeable {
 
         boolean shouldAt = filter.at();
         //根据是否需要被at判断
-        if (shouldAt && !at.test()) {
+        if (msgGet instanceof GroupCodeAble && shouldAt && !at.test()) {
             //如果需要被at，而at不为true，则返回false
             return false;
         }
 
         //**************** 正常判断 ****************//
 
-        return allFilter(listenerMethod, msgGet, at, context);
+        return allFilter(listenerMethod, msgGet, at, context, shouldAt);
     }
 
     /**
      * 全部的普配流程都走一遍，通过了才行
      */
-    private boolean allFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at, ListenContext context) {
+    private boolean allFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at, ListenContext context, boolean shouldAt) {
         // 基础过滤
-        return     botFilter(listenerMethod, msgGet)
+        return botFilter(listenerMethod, msgGet)
                 && groupFilter(listenerMethod, msgGet)
                 && codeFilter(listenerMethod, msgGet)
-                && msgFilter(listenerMethod, msgGet)
+                && msgFilter(listenerMethod, msgGet, shouldAt)
                 // 自定义过滤
                 && diyFilter(listenerMethod, msgGet, at, context)
                 ;
-
-
-
 
 
     }
 
     /**
      * 使用自定义过滤规则过滤
+     *
      * @param listenerMethod 监听函数对象
      * @param msgGet         接收到的消息
      * @param at             是否被at了的判断器
      * @return 过滤结果
      */
-    private boolean diyFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at, ListenContext context){
+    private boolean diyFilter(ListenerMethod listenerMethod, MsgGet msgGet, AtDetection at, ListenContext context) {
         Filter filter = listenerMethod.getFilter();
         String[] names = filter.diyFilter();
-        if(names.length == 0){
+        if (names.length == 0) {
             return true;
         }
         // 封装对象
         com.forte.qqrobot.anno.data.Filter filterData = listenerMethod.getFilterData();
 
         Filterable[] filters = getFilters(names);
-        if(filters.length == 1){
+        if (filters.length == 1) {
             return filters[0].filter(filterData, msgGet, at, context);
-        }else{
+        } else {
             // 有多个
             return filter.mostDIYType().test(filterData, msgGet, at, context, filters);
         }
@@ -233,11 +243,15 @@ public class ListenerFilter implements Closeable {
      * @param msgGet         消息封装
      * @return 是否通过
      */
-    private boolean msgFilter(ListenerMethod listenerMethod, MsgGet msgGet) {
+    private boolean msgFilter(ListenerMethod listenerMethod, MsgGet msgGet, boolean shouldAt) {
         //获取过滤注解
         Filter filter = listenerMethod.getFilter();
-
         String msg = msgGet.getMsg();
+
+        if (shouldAt) {
+            // 如果需要被at，msg移除掉at相关的CQ码
+            msg = KQCodeUtils.INSTANCE.removeByType("at", msg);
+        }
 
         //获取关键词组
         Pattern[] patternValue = listenerMethod.getPatternValue();
@@ -362,7 +376,7 @@ public class ListenerFilter implements Closeable {
     private boolean botFilter(ListenerMethod listenerMethod, MsgGet msgGet) {
         // 如果获取到的thisCode为null，直接放行
         String thisCode = msgGet.getThisCode();
-        if(thisCode == null){
+        if (thisCode == null) {
             return true;
         }
 

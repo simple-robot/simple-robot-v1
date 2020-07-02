@@ -14,10 +14,7 @@
 package com.forte.qqrobot.utils;
 
 import com.forte.lang.Language;
-import com.forte.qqrobot.anno.ByNameFrom;
-import com.forte.qqrobot.anno.ByNameType;
-import com.forte.qqrobot.anno.Constr;
-import com.forte.qqrobot.anno.Listen;
+import com.forte.qqrobot.anno.*;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.exception.AnnotationException;
@@ -28,6 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -116,7 +114,7 @@ public class AnnotationUtils {
                     proxyMap.put("annotationType", (m, o) -> Depend.class);
                     final Depend proxyDepend = ProxyUtils.annotationProxyByDefault(Depend.class, proxyMap);
                     // 计入缓存
-                    boolean b = saveCache(from, proxyDepend);
+                    boolean b = mappingAndSaveCache(null, from, proxyDepend);
                     return proxyDepend;
                 }
             }catch (Throwable e){
@@ -175,6 +173,22 @@ public class AnnotationUtils {
      * @return 获取到的第一个注解对象
      */
     public static <T extends Annotation> T getAnnotation(AnnotatedElement from, Class<T> annotationType, Class<T>... ignored) {
+        return getAnnotation(null, from, annotationType, ignored);
+    }
+
+
+    /**
+     * 从某个类上获取注解对象，注解可以深度递归
+     * 如果存在多个继承注解，则优先获取浅层第一个注解，如果浅层不存在，则返回第一个获取到的注解
+     * 请尽可能保证仅存在一个或者一种继承注解，否则获取到的类型将不可控
+     *
+     * @param fromInstance    from的实例类，一般都是注解才需要。
+     * @param from           获取注解的某个类
+     * @param annotationType 想要获取的注解类型
+     * @param ignored        获取注解列表的时候的忽略列表
+     * @return 获取到的第一个注解对象
+     */
+    private static <T extends Annotation> T getAnnotation(Annotation fromInstance, AnnotatedElement from, Class<T> annotationType, Class<T>... ignored) {
         // 首先尝试获取缓存
         T cache = getCache(from, annotationType);
         if(cache != null){
@@ -191,7 +205,7 @@ public class AnnotationUtils {
 
         //如果存在直接返回，否则查询
         if (annotation != null) {
-            saveCache(from, annotation);
+            mappingAndSaveCache(fromInstance, from, annotation);
             return annotation;
         }
 
@@ -209,7 +223,7 @@ public class AnnotationUtils {
         }
 
         Annotation[] annotations = from.getAnnotations();
-        annotation = annotationable ? getAnnotationFromArrays(annotations, annotationType, ignored) : null;
+        annotation = annotationable ? getAnnotationFromArrays(fromInstance, annotations, annotationType, ignored) : null;
 
 
         // 如果还是获取不到，看看查询的注解类型有没有对应的ByNameType
@@ -225,14 +239,13 @@ public class AnnotationUtils {
 
         // 如果最终不是null，计入缓存
         if(annotation != null){
-            saveCache(from, annotation);
+            mappingAndSaveCache(fromInstance, from, annotation);
         }else{
             nullCache(from, annotationType);
         }
 
         return annotation;
     }
-
 
 
     /**
@@ -279,18 +292,20 @@ public class AnnotationUtils {
     }
 
     /**
+     *
+     * @param from 如果是来自与另一个注解的, 此处是来源。可以为null
      * @param array
      * @param annotationType
      * @param <T>
      * @return
      */
-    private static <T extends Annotation> T getAnnotationFromArrays(Annotation[] array, Class<T> annotationType, Class<T>... ignored) {
+    private static <T extends Annotation> T getAnnotationFromArrays(Annotation from, Annotation[] array, Class<T> annotationType, Class<T>... ignored) {
         //先浅查询第一层
         //全部注解
         Annotation[] annotations = Arrays.stream(array)
                 .filter(a -> {
-                    for (Class<? extends Annotation> atype : ignored) {
-                        if (a.annotationType().equals(atype)) {
+                    for (Class<? extends Annotation> aType : ignored) {
+                        if (a.annotationType().equals(aType)) {
                             return false;
                         }
                     }
@@ -306,10 +321,11 @@ public class AnnotationUtils {
                     }
                     //否则，过滤掉java原生注解对象
                     //通过包路径判断
-                    if (JAVA_ANNOTATION_PACKAGE.equals(a.annotationType().getPackage())) {
-                        return false;
+                    return !JAVA_ANNOTATION_PACKAGE.equals(a.annotationType().getPackage());
+                }).peek(a -> {
+                    if(from != null){
+                        mapping(from, a);
                     }
-                    return true;
                 }).toArray(Annotation[]::new);
 
 
@@ -327,17 +343,18 @@ public class AnnotationUtils {
         System.arraycopy(annotationTypes, 0, newIgnored, ignored.length, annotationTypes.length);
 
         //遍历
-        for (Annotation a : annotations) {
-            T annotationGet = a.annotationType().getAnnotation(annotationType);
-            if (annotationGet != null) {
-                return annotationGet;
-            }
-        }
+//        for (Annotation a : annotations) {
+//            T annotationGet = a.annotationType().getAnnotation(annotationType);
+//            if (annotationGet != null) {
+//                return annotationGet;
+//            }
+//        }
 
         //如果浅层查询还是没有，递归查询
         //再次遍历
+
         for (Annotation a : annotations) {
-            T annotationGet = getAnnotation(a.annotationType(), annotationType, newIgnored);
+            T annotationGet = getAnnotation(a, a.annotationType(), annotationType, newIgnored);
             if (annotationGet != null) {
                 return annotationGet;
             }
@@ -444,9 +461,46 @@ public class AnnotationUtils {
             // 如果为空，新建一个并保存
         }
         // 记录这个注解
-        final boolean add = set.add(annotation);
-        return add;
+        return set.add(annotation);
     }
+
+    /**
+     * 执行注解映射
+     */
+    private static void mapping(Annotation from, Annotation to){
+        final Class<? extends Annotation> fromAnnotationType = from.annotationType();
+        final Method[] methods = fromAnnotationType.getMethods();
+        Map<String, Object> mapping = new HashMap<>(4);
+        for (Method method : methods) {
+            final AnnotateMapping annotateMapping = method.getAnnotation(AnnotateMapping.class);
+            if(annotateMapping != null){
+                if(annotateMapping.type().equals(to.annotationType())){
+                    String name = annotateMapping.name();
+                    if(name.length() == 0){
+                        name = method.getName();
+                    }
+                    try {
+                        Object value = method.invoke(from);
+                        AnnotationValueUtils.setValue(to, name, value);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new AnnotationException(e);
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * 进行注解值映射，并缓存，返回
+     */
+    private static boolean mappingAndSaveCache(Annotation fromInstance, AnnotatedElement from, Annotation annotation){
+        // 如果from是一个注解
+        if(fromInstance != null && from instanceof Class && ((Class) from).isAnnotation()){
+            mapping(fromInstance, annotation);
+        }
+        return saveCache(from, annotation);
+    }
+
 
     /**
      * 清除缓存

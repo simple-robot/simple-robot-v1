@@ -38,6 +38,7 @@ import com.forte.qqrobot.sender.senderlist.SenderSendList;
 import com.forte.qqrobot.sender.senderlist.SenderSetList;
 import com.forte.qqrobot.utils.BooleanMap;
 import com.forte.qqrobot.utils.CQCodeUtil;
+import com.simplerobot.modules.utils.KQCodeUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -338,18 +339,19 @@ public class ListenerManager implements MsgReceiver {
      * @return 参数集合
      */
     private Object[] getParams(MsgGet msgGet){
-        List<Object> plist = new ArrayList<>();
-        String msg = msgGet.getMsg();
+        final List<Object> plist = new ArrayList<>();
+        final String msg = msgGet.getMsg();
         // 获取当前接收到消息的Code
-        String code = msgGet.getThisCode();
+        final String code = msgGet.getThisCode();
         //配置参数
         //获取cqCodeUtil
-        CQCodeUtil cqCodeUtil = CQCodeUtil.build();
+        final CQCodeUtil cqCodeUtil = CQCodeUtil.build();
+        final KQCodeUtils kqCodeUtils = KQCodeUtils.INSTANCE;
         //判断是否at自己
         //获取本机QQ号
         // 获取AT判断函数
         final Function<MsgGet, AtDetection> atDetectionFunction = ListenerFilter.getAtDetectionFunction();
-        AtDetection atDetection = atDetectionFunction.apply(msgGet);
+        final AtDetection atDetection = atDetectionFunction.apply(msgGet);
         //0 : msgGet
         plist.add(msgGet);
         //1 : codeUtil
@@ -362,6 +364,7 @@ public class ListenerManager implements MsgReceiver {
             BotInfo bot = BotRuntime.getRuntime().getBotManager().getBot(msgGet.getThisCode());
             plist.add(bot);
         }
+        plist.add(kqCodeUtils);
         return plist.toArray(new Object[0]);
     }
 

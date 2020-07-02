@@ -28,12 +28,20 @@ import java.util.stream.Collectors;
 /**
  * CQ码生成器
  *
+ *
  * 你可以试着换成CQCodeUtils模组：http://simple-robot-doc.forte.love/1644790
  * 而不是用这个内置的类
+ *
+ * @deprecated v1.16.0中默认集成了{@link KQCodeUtils}模组，并弃用原版工具类
+ *
+ * @see com.simplerobot.modules.utils.KQCodeUtils
+ * @see http://simple-robot-doc.forte.love/1644790
+ *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/8 14:37
  * @since JDK1.8
  **/
+@Deprecated
 public class CQCodeUtil {
 
     /**
