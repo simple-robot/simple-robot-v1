@@ -1,5 +1,8 @@
 ## 版本更新记录
 
+# 1.16.1
+- 更新cqCodeUtils模组至`1.5.1-1.15`以解决其remove的bug
+
 # 1.16.0
 - `quartz` 版本更新到2.3.2
 - 集成cqCodeUtils模组，现在开始推荐使用`KQCodeUtils`并弃用原版的`CQCodeUtil`（依旧能用，但是不再维护）。
