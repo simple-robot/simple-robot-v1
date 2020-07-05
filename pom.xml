@@ -14,8 +14,8 @@
     <artifactId>simple-robot-core</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署需要大于1.16.1 2020/7/5 记得修改CoreSystem的版本号 -->
-    <version>1.16.1</version>
+    <!-- 下次部署需要大于1.16.2 2020/7/5 记得修改CoreSystem的版本号 -->
+    <version>1.16.2</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>
@@ -36,7 +36,7 @@
         <httpcomponents.version>4.5</httpcomponents.version>
         <console-plus.version>1.2.1</console-plus.version>
 
-        <mod-cqcodeutils.version>1.5.1-1.15</mod-cqcodeutils.version>
+        <mod-cqcodeutils.version>1.6.0</mod-cqcodeutils.version>
 
     </properties>
 
