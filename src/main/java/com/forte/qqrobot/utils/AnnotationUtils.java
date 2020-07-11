@@ -20,7 +20,6 @@ import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.exception.AnnotationException;
 import com.forte.utils.reflect.ProxyUtils;
 
-import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
@@ -62,6 +61,11 @@ public class AnnotationUtils {
     private static final String LANG_EX_TAG_HEAD = "exception.annotation";
 
     /**
+     * 是否可以将 {@link Depend} 兼容为 {@link javax.annotation.Resource}
+     */
+    private static volatile boolean resourceAble = true;
+
+    /**
      * 获取语言结果字符串
      * @param tag       tag
      * @param format    格式化参数
@@ -86,8 +90,18 @@ public class AnnotationUtils {
         if(depend != null){
             return depend;
         }else{
+            if(!resourceAble){
+                return null;
+            }
+            Class resourceClass;
             try {
-                final Resource resource = getAnnotation(from, Resource.class);
+                resourceClass = Class.forName("javax.annotation.Resource");
+            } catch (ClassNotFoundException e) {
+                resourceAble = false;
+                return null;
+            }
+            try {
+                final javax.annotation.Resource resource = (javax.annotation.Resource) getAnnotation(from, resourceClass);
                 if(resource == null){
                     return null;
                 }else{
@@ -114,13 +128,13 @@ public class AnnotationUtils {
                     proxyMap.put("annotationType", (m, o) -> Depend.class);
                     final Depend proxyDepend = ProxyUtils.annotationProxyByDefault(Depend.class, proxyMap);
                     // 计入缓存
-                    boolean b = mappingAndSaveCache(null, from, proxyDepend);
+                    mappingAndSaveCache(null, from, proxyDepend);
                     return proxyDepend;
                 }
             }catch (Throwable e){
-                e.printStackTrace();
-                return null;
-            }
+            e.printStackTrace();
+            return null;
+        }
         }
     }
 
