@@ -27,19 +27,41 @@ public class Iterators {
      * @return Iterator
      */
     public static <T> Iterator<T> iter(Enumeration<T> enumeration){
-        return new Iterator<T>() {
-            @Override
-            public boolean hasNext() {
-                return enumeration.hasMoreElements();
-            }
-
-            @Override
-            public T next() {
-                return enumeration.nextElement();
-            }
-        };
+        return new EnumerateIterator<>(enumeration);
     }
 
+
+
+    static final class EnumerateIterator<T> implements Iterator<T>, Enumeration<T> {
+        private final Enumeration<T> enumeration;
+        EnumerateIterator(Enumeration<T> enumeration){
+            this.enumeration = enumeration;
+        }
+        @Override
+        public boolean hasNext() {
+            return enumeration.hasMoreElements();
+        }
+
+        @Override
+        public T next() {
+            return enumeration.nextElement();
+        }
+
+        @Override
+        public boolean hasMoreElements() {
+            return enumeration.hasMoreElements();
+        }
+
+        @Override
+        public T nextElement() {
+            return enumeration.nextElement();
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + "("+ enumeration.toString() +")";
+        }
+    }
 
 
 }
