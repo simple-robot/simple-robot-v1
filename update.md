@@ -3,7 +3,8 @@
 # now
 - 更新`cqCodeUtils`模组至`1.6.1`
 - 尝试优化`javax.annotation.Resource`带来的JDK版本兼容问题
-- 改变限流`@Limit`拦截器的key值计算方式。
+- 改变限流拦截器的key值计算方式。
+- 修复限流拦截器中无法根据code分类限流的bug。
 - 增加一些待实现的功能代码
 
 
