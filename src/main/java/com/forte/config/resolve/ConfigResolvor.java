@@ -47,10 +47,6 @@ public class ConfigResolvor {
 
     /**
      * 转化为可注入的
-     *
-     * @param type
-     * @param <T>
-     * @return
      */
     public static <T> InjectableConfig<T> toInjectable(Class<T> type) {
         // 先获取
@@ -179,8 +175,6 @@ public class ConfigResolvor {
 
     /**
      * 根据参数构建函数用于判断是否可以进行注入
-     * @param <T>
-     * @return
      */
     private static <T> Predicate<T> canInject(Class<T> type, Field field, boolean onlyNull, boolean getter, String getterName){
         // 实际值获取的方法
