@@ -28,5 +28,4 @@ import static java.lang.annotation.ElementType.PARAMETER;
 @Target({PARAMETER, ANNOTATION_TYPE})
 public @interface FilterValue {
     String value();
-
 }
