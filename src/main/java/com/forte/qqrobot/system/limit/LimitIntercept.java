@@ -13,6 +13,7 @@
 
 package com.forte.qqrobot.system.limit;
 
+import cn.hutool.core.lang.UUID;
 import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
@@ -39,16 +40,10 @@ public class LimitIntercept implements ListenIntercept {
     /**
      * limit map
      */
-    private Map<Integer, ListenLimit> limitMap = new ConcurrentHashMap<>();
+    private Map<String, ListenLimit> limitMap = new ConcurrentHashMap<>();
 
     /**
-     * 缓存记录不需要拦截的函数。
-     * 记录函数的hashcode
-     */
-    private final Set<Integer> skipSet = new HashSet<>();
-
-    /**
-     * 优先级为正3
+     * 优先级为+3
      */
     @Override
     public int sort() {
@@ -66,37 +61,37 @@ public class LimitIntercept implements ListenIntercept {
         final ListenerMethod listenerMethod = context.getValue();
         final Method method = listenerMethod.getMethod();
 
-        if(skipSet.contains(Objects.hashCode(method))){
-            return true;
-        }
-
         final Limit limit = AnnotationUtils.getAnnotation(method, Limit.class);
         if(limit == null){
-            synchronized (skipSet){
-                skipSet.add(Objects.hashCode(method));
-            }
             return true;
         }else{
             final MsgGet msgGet = context.getMsgGet();
             final long time = limit.timeUnit().toMillis(limit.value());
-            List<Object> hashList = new ArrayList<Object>(6){{
-                add(limit);
-                add(method);
-            }};
+            StringBuilder uuidStringBuilder = new StringBuilder();
+//            List<String> hashList = new ArrayList<String>(6){{
+//                add(limit.toString());
+//                add(method.toString());
+//            }};
+            uuidStringBuilder.append(limit.toString()).append(method.toString());
             if(limit.group() && msgGet instanceof GroupCodeAble){
-                hashList.add(((GroupCodeAble) msgGet).getGroupCode());
+                uuidStringBuilder.append(((GroupCodeAble) msgGet).getGroupCode());
+//                hashList.add(((GroupCodeAble) msgGet).getGroupCode());
             }
             if(limit.group() && msgGet instanceof QQCodeAble){
-                hashList.add(((QQCodeAble) msgGet).getCode());
+                uuidStringBuilder.append(((QQCodeAble) msgGet).getCode());
+//                hashList.add(((QQCodeAble) msgGet).getCode());
             }
             if(limit.bot()){
-                hashList.add(msgGet.getThisCode());
+                uuidStringBuilder.append(msgGet.getThisCode());
+//                hashList.add(msgGet.getThisCode());
             }
 
             // hash
-            final int hash = Objects.hash(hashList);
+//            final int hash = Objects.hash(hashList);
+            // uuid
+            final String uuid = UUID.fromString(uuidStringBuilder.toString()).toString(true);
 
-            final ListenLimit listenLimit = limitMap.computeIfAbsent(hash, h -> new ListenLimit(time));
+            final ListenLimit listenLimit = limitMap.computeIfAbsent(uuid, h -> new ListenLimit(time));
             return listenLimit.expired();
         }
     }

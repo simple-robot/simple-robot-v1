@@ -41,7 +41,9 @@ public @interface Depend {
 
     /**
      * 如果获取不到，使用null代替。默认会抛出异常。
+     * 尚未实现
      */
+    @Deprecated
     boolean orNull() default false;
 
     /**

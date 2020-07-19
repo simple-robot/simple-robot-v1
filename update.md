@@ -3,6 +3,9 @@
 # now
 - 更新`cqCodeUtils`模组至`1.6.1`
 - 尝试优化`javax.annotation.Resource`带来的JDK版本兼容问题
+- 改变限流`@Limit`拦截器的key值计算方式。
+- 增加一些待实现的功能代码
+
 
 # 1.16.2
 - 更新`cqCodeUtils`模组至`1.6.0`以解决接收at全体的时候可能会报错的问题

@@ -17,8 +17,6 @@ import cn.hutool.core.convert.Convert;
 import com.forte.lang.Language;
 import com.forte.qqrobot.anno.depend.FilterValue;
 import com.forte.qqrobot.constant.PriorityConstant;
-import com.forte.qqrobot.depend.parameter.ParamGetterManager;
-import com.forte.qqrobot.depend.parameter.ParamNameGetter;
 import com.forte.qqrobot.depend.util.DependUtil;
 import com.forte.qqrobot.exception.DependResourceException;
 import com.forte.qqrobot.log.QQLog;
@@ -42,13 +40,15 @@ import java.util.function.*;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+@SuppressWarnings({"WeakerAccess", "unchecked", "UnusedReturnValue", "JavaDoc"})
 public class DependCenter implements DependGetter, DependInjector, Closeable {
 
     /**
      * 获取方法参数名获取器
      */
-    @Deprecated
-    private static ParamNameGetter paramNameGetter = ParamGetterManager.getParamNameGetter();
+//    @Deprecated
+//    private static ParamNameGetter paramNameGetter = ParamGetterManager.getParamNameGetter();
+
 
     // 以依赖名称为key的单例Map
     private final Map<String, Object> SINGLE_FACTORY;
@@ -323,6 +323,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
             classResourceWareHouse.merge(depend.getType(), new ArrayList<Depend>(2) {{
                 add(depend);
             }}, (old, val) -> {
+                //noinspection ConstantConditions
                 old.add(val.get(0));
                 // 根据优先级排序
                 Collections.sort(old);
@@ -393,13 +394,13 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
                 .filter(f -> allDepend || AnnotationUtils.getDepend(f) != null)
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
-//                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
                     com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getDepend(f);
                     if (allDepend && (dependAnnotation == null)) {
                         dependAnnotation = depend;
                     }
 
                     //字段名称
+                    //noinspection ConstantConditions
                     String name = dependAnnotation.value();
                     //字段类型
                     Class<?> fieldType = dependAnnotation.type().length == 0 ? f.getType() : dependAnnotation.type()[0];
@@ -471,7 +472,6 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
                 //将字段转化为Supplier函数，以获取字段值
                 .map(f -> {
                     //获取字段注解
-//                    com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getAnnotation(f, com.forte.qqrobot.anno.depend.Depend.class);
                     com.forte.qqrobot.anno.depend.Depend dependAnnotation = AnnotationUtils.getDepend(f);
                     //如果没有注解且allDepend为true，获取默认注解
                     if ((beansData.allDepend()) && (dependAnnotation == null)) {
@@ -479,6 +479,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
                     }
 
                     //字段名称
+                    //noinspection ConstantConditions
                     String name = dependAnnotation.value();
                     //字段类型
                     Class<?> fieldType = dependAnnotation.type().length == 0 ? f.getType() : dependAnnotation.type()[0];
@@ -730,6 +731,18 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
     }
 
     /**
+     * TODO orNull
+     * @param type
+     * @param orNull
+     * @param <T>
+     * @return
+     */
+    @Deprecated
+    public <T> Depend<T> getDepend(Class<T> type, boolean orNull){
+        return getDepend(type);
+    }
+
+    /**
      * 通过类型获取依赖对象
      */
     public <T> Depend<T> getDepend(Class<T> type) {
@@ -845,6 +858,17 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
 
 
     /**
+     * TODO orNull
+     * @param name
+     * @param orNull
+     * @return
+     */
+    @Deprecated
+    public Depend getDepend(String name, boolean orNull){
+        return getDepend(name);
+    }
+
+    /**
      * 通过名称获取依赖对象
      *
      * @param name 名称
@@ -906,6 +930,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
      *
      * @throws ClassCastException
      */
+    @SuppressWarnings("unused")
     public <T> T getDependInstance(String name, Class<T> type) {
         return (T) getDependInstance(name);
     }

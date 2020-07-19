@@ -49,6 +49,9 @@ public class CoreConfiguration {
     }
 
 
+    /**
+     * 限流拦截器
+     */
     @Beans
     public LimitIntercept limitIntercept(){
         return new LimitIntercept();
