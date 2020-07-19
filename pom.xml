@@ -298,12 +298,14 @@
                     <additionalJOption>-Xdoclint:none</additionalJOption>
                     <doclint>none</doclint>
                 </configuration>
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>jar</goal>-->
-<!--                        </goals>-->
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
 <!--                        <configuration>-->
 <!--                            <charset>UTF-8</charset>-->
 <!--                            <encoding>UTF-8</encoding>-->
