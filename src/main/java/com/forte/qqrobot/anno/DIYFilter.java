@@ -31,8 +31,19 @@ public @interface DIYFilter {
 
     /**
      * 自定义filter的名称。如果不填或者使用的是@Beans注解，则使用类名小写作为名称。
-     * @return
+     * 此名称也同样会映射为{@link Beans}的依赖名称
      */
     String value() default "";
+
+    /** 是否为单例，默认为单例 */
+    @AnnotateMapping(type = Beans.class)
+    boolean single() default true;
+
+
+    /** 根据参数类型列表来指定构造函数，默认为无参构造。仅标注在类上的时候有效 */
+    @AnnotateMapping(type = Beans.class)
+    Class[] constructor() default {};
+
+
 
 }

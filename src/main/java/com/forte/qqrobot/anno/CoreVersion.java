@@ -17,6 +17,7 @@ import java.lang.annotation.*;
 
 /**
  * 核心版本注解，内部使用
+ * 然而实际上压根没使用
  *
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
