@@ -295,7 +295,10 @@
                 <configuration>
                     <charset>UTF-8</charset>
                     <encoding>UTF-8</encoding>
-                    <additionalJOption>-Xdoclint:none</additionalJOption>
+                    <additionalJOptions>
+                        <additionalJOption>-Xdoclint:none</additionalJOption>
+                        <additionalJOption>--allow-script-in-comments</additionalJOption>
+                    </additionalJOptions>
                     <doclint>none</doclint>
                 </configuration>
                 <executions>
