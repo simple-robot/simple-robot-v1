@@ -34,7 +34,6 @@ public @interface Async {
      * 默认认为其执行成功。
      *
      * 此值会直接作为返回值返回，因此请不要标记{@link ListenBody}注解
-     *
      */
     boolean success() default true;
 
