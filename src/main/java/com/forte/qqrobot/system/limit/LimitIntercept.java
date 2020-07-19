@@ -67,31 +67,30 @@ public class LimitIntercept implements ListenIntercept {
         }else{
             final MsgGet msgGet = context.getMsgGet();
             final long time = limit.timeUnit().toMillis(limit.value());
-            StringBuilder uuidStringBuilder = new StringBuilder();
+            StringBuilder keyStringBuilder = new StringBuilder();
 //            List<String> hashList = new ArrayList<String>(6){{
 //                add(limit.toString());
 //                add(method.toString());
 //            }};
-            uuidStringBuilder.append(limit.toString()).append(method.toString());
+            keyStringBuilder.append(limit.toString()).append(method.toString());
             if(limit.group() && msgGet instanceof GroupCodeAble){
-                uuidStringBuilder.append(((GroupCodeAble) msgGet).getGroupCode());
+                keyStringBuilder.append(((GroupCodeAble) msgGet).getGroupCode());
 //                hashList.add(((GroupCodeAble) msgGet).getGroupCode());
             }
             if(limit.group() && msgGet instanceof QQCodeAble){
-                uuidStringBuilder.append(((QQCodeAble) msgGet).getCode());
+                keyStringBuilder.append(((QQCodeAble) msgGet).getCode());
 //                hashList.add(((QQCodeAble) msgGet).getCode());
             }
             if(limit.bot()){
-                uuidStringBuilder.append(msgGet.getThisCode());
+                keyStringBuilder.append(msgGet.getThisCode());
 //                hashList.add(msgGet.getThisCode());
             }
 
             // hash
 //            final int hash = Objects.hash(hashList);
-            // uuid
-            final String uuid = UUID.fromString(uuidStringBuilder.toString()).toString(true);
+            final String key = keyStringBuilder.toString();
 
-            final ListenLimit listenLimit = limitMap.computeIfAbsent(uuid, h -> new ListenLimit(time));
+            final ListenLimit listenLimit = limitMap.computeIfAbsent(key, h -> new ListenLimit(time));
             return listenLimit.expired();
         }
     }
