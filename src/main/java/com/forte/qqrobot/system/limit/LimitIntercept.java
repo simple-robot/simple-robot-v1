@@ -58,6 +58,7 @@ public class LimitIntercept implements ListenIntercept {
      */
     @Override
     public boolean intercept(ListenInterceptContext context) {
+        // 啥？为啥下面的东西都不写注释？懒。这次是真的懒了。
         final ListenerMethod listenerMethod = context.getValue();
         final Method method = listenerMethod.getMethod();
 
@@ -67,31 +68,28 @@ public class LimitIntercept implements ListenIntercept {
         }else{
             final MsgGet msgGet = context.getMsgGet();
             final long time = limit.timeUnit().toMillis(limit.value());
-            StringBuilder keyStringBuilder = new StringBuilder();
-//            List<String> hashList = new ArrayList<String>(6){{
-//                add(limit.toString());
-//                add(method.toString());
-//            }};
+            StringBuilder keyStringBuilder = new StringBuilder(estimatedLength(limit, method));
             keyStringBuilder.append(limit.toString()).append(method.toString());
             if(limit.group() && msgGet instanceof GroupCodeAble){
                 keyStringBuilder.append(((GroupCodeAble) msgGet).getGroupCode());
-//                hashList.add(((GroupCodeAble) msgGet).getGroupCode());
             }
             if(limit.group() && msgGet instanceof QQCodeAble){
                 keyStringBuilder.append(((QQCodeAble) msgGet).getCode());
-//                hashList.add(((QQCodeAble) msgGet).getCode());
             }
             if(limit.bot()){
                 keyStringBuilder.append(msgGet.getThisCode());
-//                hashList.add(msgGet.getThisCode());
             }
 
             // hash
-//            final int hash = Objects.hash(hashList);
             final String key = keyStringBuilder.toString();
 
             final ListenLimit listenLimit = limitMap.computeIfAbsent(key, h -> new ListenLimit(time));
             return listenLimit.expired();
         }
     }
+
+    private static int estimatedLength(Limit limit, Method method){
+
+    }
+
 }
