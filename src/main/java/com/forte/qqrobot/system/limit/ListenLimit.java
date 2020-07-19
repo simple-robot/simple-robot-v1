@@ -13,8 +13,6 @@
 
 package com.forte.qqrobot.system.limit;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 /**
  *
  * 用于记录limit的时长

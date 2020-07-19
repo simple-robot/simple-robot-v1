@@ -13,7 +13,6 @@
 
 package com.forte.qqrobot.system.limit;
 
-import cn.hutool.core.lang.UUID;
 import com.forte.qqrobot.beans.messages.GroupCodeAble;
 import com.forte.qqrobot.beans.messages.QQCodeAble;
 import com.forte.qqrobot.beans.messages.msgget.MsgGet;
@@ -24,7 +23,7 @@ import com.forte.qqrobot.listener.invoker.ListenerMethod;
 import com.forte.qqrobot.utils.AnnotationUtils;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -82,10 +81,7 @@ public class LimitIntercept implements ListenIntercept {
             if(isBot){
                 keyStringBuilder.append(msgGet.getThisCode());
             }
-
-            // hash
             final String key = keyStringBuilder.toString();
-
             final ListenLimit listenLimit = limitMap.computeIfAbsent(key, h -> new ListenLimit(time));
             return listenLimit.expired();
         }

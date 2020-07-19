@@ -13,8 +13,8 @@
 
 package com.forte.qqrobot.anno.template;
 
-import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.anno.AnnotateMapping;
+import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 
 import java.lang.annotation.ElementType;

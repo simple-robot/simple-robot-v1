@@ -14,7 +14,6 @@
 package com.forte.qqrobot.beans.types;
 
 import com.forte.qqrobot.utils.EnumValues;
-import com.forte.utils.regex.RegexUtil;
 
 import java.util.*;
 import java.util.function.Function;
