@@ -61,22 +61,25 @@ public class LimitIntercept implements ListenIntercept {
         // 啥？为啥下面的东西都不写注释？懒。这次是真的懒了。
         final ListenerMethod listenerMethod = context.getValue();
         final Method method = listenerMethod.getMethod();
-
         final Limit limit = AnnotationUtils.getAnnotation(method, Limit.class);
         if(limit == null){
             return true;
         }else{
             final MsgGet msgGet = context.getMsgGet();
             final long time = limit.timeUnit().toMillis(limit.value());
-            StringBuilder keyStringBuilder = new StringBuilder(estimatedLength(limit, method));
+            final boolean isGroup = limit.group() && msgGet instanceof GroupCodeAble;
+            final boolean isCode = limit.code() && msgGet instanceof QQCodeAble;
+            final boolean isBot = limit.bot();
+
+            final StringBuilder keyStringBuilder = new StringBuilder(estimatedLength(method, isGroup, isCode, isBot));
             keyStringBuilder.append(limit.toString()).append(method.toString());
-            if(limit.group() && msgGet instanceof GroupCodeAble){
+            if(isGroup){
                 keyStringBuilder.append(((GroupCodeAble) msgGet).getGroupCode());
             }
-            if(limit.group() && msgGet instanceof QQCodeAble){
+            if(isCode){
                 keyStringBuilder.append(((QQCodeAble) msgGet).getCode());
             }
-            if(limit.bot()){
+            if(isBot){
                 keyStringBuilder.append(msgGet.getThisCode());
             }
 
@@ -88,8 +91,21 @@ public class LimitIntercept implements ListenIntercept {
         }
     }
 
-    private static int estimatedLength(Limit limit, Method method){
-
+    /**
+     * 预估一个StringBuilder的长度
+     */
+    private static int estimatedLength(Method method, boolean group, boolean code, boolean bot){
+        int len = 100 + method.toString().length();
+        if(group){
+            len += 10;
+        }
+        if(code){
+            len += 10;
+        }
+        if(bot){
+            len += 10;
+        }
+        return len;
     }
 
 }
