@@ -299,8 +299,12 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-
-                            <additionalJOption>-Xdoclint:none</additionalJOption>
+                            <charset>UTF-8</charset>
+                            <encoding>UTF-8</encoding>
+                            <additionalJOptions>
+                                <additionalJOption>-Xdoclint:none</additionalJOption>
+                            </additionalJOptions>
+<!--                            <additionalJOption>-Xdoclint:none</additionalJOption>-->
                         </configuration>
                     </execution>
                 </executions>
