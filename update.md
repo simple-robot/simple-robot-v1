@@ -8,7 +8,7 @@
 - 增加一些待实现的功能代码
 
 - 增加对（被）好友删除事件: `FriendDelete`和对应的注解：`@Listen(MsgGetTypes.friendDelete)` 和 `@OnFriendDelete`
-
+- 删除部分多余、过时内容
 
 # 1.16.2
 - 更新`cqCodeUtils`模组至`1.6.0`以解决接收at全体的时候可能会报错的问题
