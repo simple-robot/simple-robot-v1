@@ -79,11 +79,11 @@ https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 
 | 平台 |      依赖       |                           项目地址                           |
 | :--: | :-------------: | :----------------------------------------------------------: |
-| 酷Q  |    LEMOC插件    | https://github.com/ForteScarlet/simple-robot-component-lemoc |
-| 酷Q  | HTTP TO CQ插件  | https://github.com/ForteScarlet/simple-robot-component-httpapi |
-| 酷Q  | CQ HTTP API插件 | https://github.com/ForteScarlet/simple-robot-component-coolHttpApi |
-| 酷Q  | JCQ插件 | https://github.com/ForteScarlet/simple-robot-component-JCQ |
-| JVM  | Mirai   | https://github.com/ForteScarlet/simple-robot-component-mirai | 
+| 酷Q（停止）  |    LEMOC插件    | https://github.com/ForteScarlet/simple-robot-component-lemoc |
+| 酷Q（停止）  | HTTP TO CQ插件  | https://github.com/ForteScarlet/simple-robot-component-httpapi |
+| 酷Q（停止）  | CQ HTTP API插件 | https://github.com/ForteScarlet/simple-robot-component-coolHttpApi |
+| 酷Q（停止）  | JCQ插件 | https://github.com/ForteScarlet/simple-robot-component-JCQ |
+| JVM          | Mirai   | https://github.com/ForteScarlet/simple-robot-component-mirai | 
 
 #### 已经存在的**模组**：
 
