@@ -13,6 +13,7 @@
 
 package com.forte.qqrobot;
 
+import com.forte.common.annotation.Comment;
 import com.forte.config.Conf;
 import com.forte.lang.Language;
 import com.forte.qqrobot.beans.function.PathAssembler;
@@ -110,6 +111,7 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      */
     @Deprecated
     @Conf(value = "core.ip", comment = "弃用")
+    @Comment("ip已经被弃用了，请参考registerBot方法。")
     private String ip = "127.0.0.1";
 
     /**
@@ -755,10 +757,9 @@ public class BaseConfiguration<T extends BaseConfiguration> {
      * 不再进行单一ip地址配置
      */
     @Deprecated
+    @Comment("ip已经被弃用了，请参考registerBot方法。")
     public T setIp(String ip) {
         throw new ConfigurationException("Dont use method'setIp(...)', this method was Deprecated. see 'registerBot(...)'.");
-//        this.ip = ip;
-//        return configuration;
     }
 
     /**
@@ -883,6 +884,14 @@ public class BaseConfiguration<T extends BaseConfiguration> {
 
     public void setDefaultThreadFactory(ThreadFactory defaultThreadFactory) {
         this.defaultThreadFactory = defaultThreadFactory;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public void setPoolConfig(BaseLocalThreadPool.PoolConfig poolConfig) {

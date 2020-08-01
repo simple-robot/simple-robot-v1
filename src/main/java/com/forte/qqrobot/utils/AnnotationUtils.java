@@ -18,6 +18,7 @@ import com.forte.qqrobot.anno.*;
 import com.forte.qqrobot.anno.depend.Beans;
 import com.forte.qqrobot.anno.depend.Depend;
 import com.forte.qqrobot.exception.AnnotationException;
+import com.forte.qqrobot.log.QQLog;
 import com.forte.utils.reflect.ProxyUtils;
 
 import java.lang.annotation.Annotation;
@@ -101,12 +102,17 @@ public class AnnotationUtils {
                 return null;
             }
             try {
-                final javax.annotation.Resource resource = (javax.annotation.Resource) getAnnotation(from, resourceClass);
+//                final javax.annotation.Resource resource = (javax.annotation.Resource) getAnnotation(from, resourceClass);
+                final Annotation resource = getAnnotation(from, resourceClass);
                 if(resource == null){
                     return null;
                 }else{
-                    final String name = resource.name();
-                    final Class<?> type = resource.type();
+                    Class<? extends Annotation> annotationType = resource.annotationType();
+                    Method nameMethod = annotationType.getMethod("name");
+                    Method typeMethod = annotationType.getMethod("type");
+
+                    final String name = (String) nameMethod.invoke(resource);
+                    final Class<?> type = (Class<?>) typeMethod.invoke(resource);
 
                     Map<String, BiFunction<Method, Object[], Object>> proxyMap = new HashMap<>();
                     proxyMap.put("value", (m, o) -> name);
@@ -132,8 +138,8 @@ public class AnnotationUtils {
                     return proxyDepend;
                 }
             }catch (Throwable e){
-            e.printStackTrace();
-            return null;
+                QQLog.warning("exception.annotation.resource.error", e, e.getLocalizedMessage());
+                return null;
         }
         }
     }

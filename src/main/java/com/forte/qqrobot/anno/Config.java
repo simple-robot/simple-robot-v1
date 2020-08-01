@@ -24,6 +24,8 @@ import java.lang.annotation.Target;
  * 仅用作标记，无参数
  * 使用在类上
  *
+ * @deprecated 未实现
+ *
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/

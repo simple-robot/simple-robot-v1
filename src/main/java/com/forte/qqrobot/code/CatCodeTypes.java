@@ -19,13 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * <pre> CodeType, 用来指定CatCode的Code类型。
- * <pre> 不再使用枚举，而是静态注册的形式，并模仿枚举的格式。
- * <pre> 使用的时候请不要自行创建实例，而是使用静态方法进行注册，并通过注册名称来获取，就像枚举那样子。否则在equals的判断下可能会出现错误。
- * <pre> 此类用来取代枚举类型，并作为一个可注册的假枚举类型使用。
- *
- * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
+ * 直接使用CQ码即可。
+ * @deprecated 此类无用
  */
+@Deprecated
 public class CatCodeTypes implements Comparable<CatCodeTypes> {
     public static final String HEAD = "[CAT:";
     public static final String END = "]";

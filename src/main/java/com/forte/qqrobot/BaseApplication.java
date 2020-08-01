@@ -103,6 +103,10 @@ public abstract class BaseApplication<
         CONTEXT extends SimpleRobotContext<SEND, SET, GET, CONFIG, APPLICATION>
         > implements Closeable {
 
+    /*
+        TODO 耦合性太强，后期将会进行拆分
+     */
+
     /**
      * 是否已经关闭
      */

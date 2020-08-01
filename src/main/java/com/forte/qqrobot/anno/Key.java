@@ -21,6 +21,10 @@ import java.lang.annotation.Target;
 /**
  * 此注解主要用于简化开发者的开发，使用在方法参数上
  * 通过对一个接口进行代理，将会根据返回值与参数构建一个Bean或者一个JSON字符串
+ *
+ * @see com.forte.qqrobot.utils.proxyhelper.JSONParameterCreatorHelper
+ * @see com.forte.qqrobot.utils.proxyhelper.UrlParameterCreatorHelper
+ *
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/

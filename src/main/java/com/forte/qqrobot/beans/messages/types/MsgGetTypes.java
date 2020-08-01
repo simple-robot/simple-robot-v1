@@ -54,6 +54,11 @@ public enum MsgGetTypes {
     friendAdd(FriendAdd.class),
 
     /**
+     * 事件-（被）好友删除
+     */
+    friendDelete(FriendDelete.class),
+
+    /**
      * 事件-管理员变动
      */
     groupAdminChange(GroupAdminChange.class),

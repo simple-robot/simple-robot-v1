@@ -14,8 +14,8 @@
     <artifactId>simple-robot-core</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署需要大于1.16.2 2020/7/5 记得修改CoreSystem的版本号 -->
-    <version>1.16.2</version>
+    <!-- 下次部署需要大于1.16.3 2020/8/1 记得修改CoreSystem的版本号 -->
+    <version>1.16.3</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>
@@ -36,7 +36,7 @@
         <httpcomponents.version>4.5</httpcomponents.version>
         <console-plus.version>1.2.1</console-plus.version>
 
-        <mod-cqcodeutils.version>1.6.0</mod-cqcodeutils.version>
+        <mod-cqcodeutils.version>1.6.1</mod-cqcodeutils.version>
 
     </properties>
 
@@ -61,7 +61,10 @@
             <artifactId>hutool-core</artifactId>
             <version>${hutool.versin}</version>
         </dependency>
-        <!-- 增加个人工具扩展 -->
+        <!--
+         增加个人工具扩展
+         抽空删了
+         -->
         <dependency>
             <groupId>io.github.ForteScarlet.plusutils</groupId>
             <artifactId>simple-plusutils</artifactId>
@@ -92,6 +95,15 @@
             <scope>test</scope>
         </dependency>
 
+
+        <!-- 测试用 -->
+        <dependency>
+            <groupId>love.forte.simple-robot-module</groupId>
+            <artifactId>simple-robot-module-debugger-common</artifactId>
+            <version>1.1-1.15</version>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
 
     </dependencies>
 

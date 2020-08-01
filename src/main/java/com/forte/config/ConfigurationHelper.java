@@ -15,6 +15,9 @@ package com.forte.config;
 
 import com.forte.config.resolve.ConfigResolvor;
 
+import java.util.Map;
+import java.util.Properties;
+
 /**
  *
  * 工具入口
@@ -32,6 +35,47 @@ public class ConfigurationHelper {
      */
     public static <T> InjectableConfig<T> toInjectable(Class<T> type){
         return ConfigResolvor.toInjectable(type);
+    }
+
+    /**
+     * 为一个类注入配置信息
+     * @param config            配置类
+     * @param configProperties  配置信息
+     */
+    public static <T> void inject(T config, Properties configProperties){
+        Class<T> configClass = getClass(config);
+        InjectableConfig<T> injectableConfig = toInjectable(configClass);
+        injectableConfig.inject(config, configProperties);
+    }
+
+    /**
+     * 为一个类注入配置信息
+     * @param config            配置类
+     * @param configMap  配置信息
+     */
+    public static <T> void inject(T config, Map<String, Object> configMap){
+        Class<T> configClass = getClass(config);
+        InjectableConfig<T> injectableConfig = toInjectable(configClass);
+        injectableConfig.inject(config, configMap);
+    }
+
+    /**
+     * 为一个类注入配置信息
+     * @param config            配置类
+     * @param key    配置信息的key
+     * @param value  配置信息的值
+     */
+    public static <T> void inject(T config, String key, Object value){
+        Class<T> configClass = getClass(config);
+        InjectableConfig<T> injectableConfig = toInjectable(configClass);
+        injectableConfig.inject(config, key, value);
+    }
+
+    /**
+     * 获取对应的Class
+     */
+    private static <T> Class<T> getClass(T obj){
+        return (Class<T>) obj.getClass();
     }
 
 }

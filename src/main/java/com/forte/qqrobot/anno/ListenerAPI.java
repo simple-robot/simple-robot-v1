@@ -24,10 +24,13 @@ import java.lang.annotation.Target;
  * 仅能使用在method上, 且只有被注册的ListenMethod生效
  * 就算此注解不存在，也会生成相应信息，但是所有信息均为默认值
  *
+ * 没有什么实际意义。类似的api统计功能会考虑通过模组形式来实现
+ *
  * @author ForteScarlet
  */
 @Retention(RetentionPolicy.RUNTIME)	//注解会在class字节码文件中存在，在运行时可以通过反射获取到
 @Target({ElementType.METHOD}) //接口、类、枚举、注解、方法
+@Deprecated
 public @interface ListenerAPI {
 
     /**

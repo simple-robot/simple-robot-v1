@@ -15,9 +15,7 @@ package com.forte.qqrobot.code;
 
 import com.forte.qqrobot.beans.cqcode.CQCode;
 
-/**
- * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
- */
+@Deprecated
 public interface CodeConversionable<T extends CQCode> {
 
     /**

@@ -46,8 +46,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * @author H__D
- * @date 2016年10月19日 上午11:27:25
+ * @see DefaultHttpClientTemplate
  */
 @Deprecated
 public class HttpClientUtil {

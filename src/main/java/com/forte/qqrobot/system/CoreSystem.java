@@ -32,7 +32,7 @@ import java.util.Properties;
  * @author ForteScarlet
  * @version  1.7.0
  */
-@Version(version = "1.16.2",
+@Version(version = "1.16.3",
         versionFamily = "1.16")
 public final class CoreSystem {
 

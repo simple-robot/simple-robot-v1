@@ -1,12 +1,13 @@
 ## 版本更新记录
 
-# now
+# 1.16.3
 - 更新`cqCodeUtils`模组至`1.6.1`
 - 尝试优化`javax.annotation.Resource`带来的JDK版本兼容问题
 - 改变限流拦截器的key值计算方式。
 - 修复限流拦截器中无法根据code分类限流的bug。
 - 增加一些待实现的功能代码
 
+- 增加对（被）好友删除事件: `FriendDelete`和对应的注解：`@Listen(MsgGetTypes.friendDelete)` 和 `@OnFriendDelete`
 
 
 # 1.16.2

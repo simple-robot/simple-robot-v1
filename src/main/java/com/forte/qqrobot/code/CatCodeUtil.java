@@ -14,7 +14,11 @@
 package com.forte.qqrobot.code;
 
 /**
+ *
+ * 直接使用CQ码了。此类无用
+ *
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
+@Deprecated
 public class CatCodeUtil {
 }

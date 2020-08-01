@@ -35,6 +35,7 @@ exception.annotation.method=类[{0}]的方法[{1}]不应当使用[{2}]注解: {3
 exception.annotation.notStatic=不是静态
 exception.annotation.needReturn=需要返回值
 exception.annotation.returnTypeWrong=返回值非该类或该类的子类类型
+exception.annotation.resource.error=无法正确代理@Resource注解为@Depend类型: {0}
 
 # BlockException及其子类相关
 exception.block.indexOut=超出索引!

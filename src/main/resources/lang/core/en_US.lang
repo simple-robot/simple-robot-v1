@@ -35,6 +35,7 @@ exception.annotation.method=the method [{1}] in class [{0}] should not use annot
 exception.annotation.notStatic=not static
 exception.annotation.needReturn=Need return value
 exception.annotation.returnTypeWrong=the return value's type is not instanceof this class type.
+exception.annotation.resource.error=Cannot correctly proxy @Resource annotation to @Depend type: {0}
 
 # BlockException及其子类相关
 exception.block.indexOut=out of index!
