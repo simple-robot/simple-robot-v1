@@ -1,5 +1,8 @@
 ## 版本更新记录
 
+# now(1.17.0)
+- 实现`@Depend`的`orNull`参数。当`orNull=true`的时候，如果注入的值不存在，则会为其注入null。（默认情况下依旧会报错）
+
 # 1.16.3
 - 更新`cqCodeUtils`模组至`1.6.1`
 - 尝试优化`javax.annotation.Resource`带来的JDK版本兼容问题

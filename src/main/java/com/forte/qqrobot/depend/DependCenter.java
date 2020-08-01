@@ -402,6 +402,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
                     //字段名称
                     //noinspection ConstantConditions
                     String name = dependAnnotation.value();
+                    boolean orNull = dependAnnotation.orNull();
                     //字段类型
                     Class<?> fieldType = dependAnnotation.type().length == 0 ? f.getType() : dependAnnotation.type()[0];
 
@@ -415,11 +416,11 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
                             fieldGetter = () -> constant == null ? null : (new BasicDepend(f.getName(), constant.getClass(), constant));
                         } else {
                             //否则，是普通的类型，通过类型获取
-                            fieldGetter = () -> getDepend(fieldType);
+                            fieldGetter = () -> getDepend(fieldType, orNull);
                         }
                     } else {
                         //指定了名称，直接获取
-                        fieldGetter = () -> getDepend(name, fieldType);
+                        fieldGetter = () -> getDepend(name, fieldType, orNull);
                     }
 
                     //判断字段是否可以注入的函数
@@ -450,9 +451,11 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
 
         //全部字段赋值
         return b -> {
-            //遍历全部字段值赋值函数并赋值
-            for (Consumer<T> inj : consumerArray) {
-                inj.accept(b);
+            if(b != null){
+                //遍历全部字段值赋值函数并赋值
+                for (Consumer<T> inj : consumerArray) {
+                    inj.accept(b);
+                }
             }
         };
     }
@@ -487,6 +490,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
                     //字段值的获取函数，获取的是Depend对象
                     Function<DependGetter, Depend> fieldGetterFunction;
                     boolean init = beans.isInit();
+                    boolean orNull = dependAnnotation.orNull();
                     int priority = beans.getPriority();
                     if (name.trim().length() == 0) {
                         //如果未指定字段名称，判断是否为常量类型，如果是，尝试获取字段名，否则使用类型注入
@@ -513,13 +517,13 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
                             };
                         } else {
                             //否则，是普通的类型，通过类型获取
-                            fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(fieldType) : (add.get(fieldType) == null) ? this.getDepend(fieldType) : new Depend(fieldType.getSimpleName(), fieldType, false, () -> add.get(fieldType), v -> {
+                            fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(fieldType, orNull) : (add.get(fieldType) == null) ? this.getDepend(fieldType, orNull) : new Depend(fieldType.getSimpleName(), fieldType, false, () -> add.get(fieldType), v -> {
                             }, (v, a) -> {
                             }, init, priority);
                         }
                     } else {
                         //指定了名称，直接获取
-                        fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(name, fieldType) : (add.get(name, fieldType) == null) ? this.getDepend(name, fieldType) : new Depend(name, fieldType, false, () -> add.get(name, fieldType), v -> {
+                        fieldGetterFunction = (add) -> (add.equals(this)) ? this.getDepend(name, fieldType, orNull) : (add.get(name, fieldType) == null) ? this.getDepend(name, fieldType, orNull) : new Depend(name, fieldType, false, () -> add.get(name, fieldType), v -> {
                         }, (v, a) -> {
                         }, init, priority);
                     }
@@ -552,9 +556,11 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
 
         //全部字段赋值
         return (b, add) -> {
-            //遍历全部字段值赋值函数并赋值
-            for (BiConsumer<T, DependGetter> inj : consumerArray) {
-                inj.accept(b, add);
+            if(b != null){
+                //遍历全部字段值赋值函数并赋值
+                for (BiConsumer<T, DependGetter> inj : consumerArray) {
+                    inj.accept(b, add);
+                }
             }
         };
     }
@@ -731,28 +737,19 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
     }
 
     /**
-     * TODO orNull
      * @param type
      * @param orNull
      * @param <T>
      * @return
      */
-    @Deprecated
     public <T> Depend<T> getDepend(Class<T> type, boolean orNull){
-        return getDepend(type);
-    }
-
-    /**
-     * 通过类型获取依赖对象
-     */
-    public <T> Depend<T> getDepend(Class<T> type) {
         Throwable outDependGetterThrow = null;
         //优先尝试使用外部依赖获取
         if (!dependGetter.equals(this)) {
             try {
-
                 T t = dependGetter.get(type);
                 if (t != null) {
+                    // 或许可以考虑做个缓存？
                     return new Depend<>(type.getSimpleName(), type, true, () -> t, ti -> {
                     }, (ti, a) -> {
                     }, false, PriorityConstant.SECOND_LAST);
@@ -816,8 +813,10 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
         if (depends.size() == 0) {
             //如果还是没有，返回null
             // 2020/4/5 v1.11.0 改为抛出异常
-//            return null;
             if (outDependGetterThrow == null) {
+                if(orNull){
+                    return NullDepend.INSTANCE;
+                }
                 throw new DependResourceException("noDepend", type);
             } else {
                 throw new DependResourceException("noDependAndOut", outDependGetterThrow, type, outDependGetterThrow.getLocalizedMessage());
@@ -849,8 +848,20 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
             }});
         }
         return single;
+
     }
 
+    /**
+     * 通过类型获取依赖对象
+     */
+    public <T> Depend<T> getDepend(Class<T> type) {
+        return getDepend(type, false);
+    }
+
+
+    public <T> Depend<T> getDepend(String name, Class<T> type, boolean orNull) {
+        return getDepend(name, orNull);
+    }
 
     public <T> Depend<T> getDepend(String name, Class<T> type) {
         return getDepend(name);
@@ -865,15 +876,6 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
      */
     @Deprecated
     public Depend getDepend(String name, boolean orNull){
-        return getDepend(name);
-    }
-
-    /**
-     * 通过名称获取依赖对象
-     *
-     * @param name 名称
-     */
-    public Depend getDepend(String name) {
         Throwable outDependGetterThrow = null;
         //优先尝试使用外部依赖获取
         if (!dependGetter.equals(this)) {
@@ -893,6 +895,9 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
 
         if (depend == null) {
             if (outDependGetterThrow == null) {
+                if(orNull){
+                    return NullDepend.INSTANCE;
+                }
                 throw new DependResourceException("noDepend", "'" + name + "'");
             } else {
                 throw new DependResourceException("noDependAndOut", outDependGetterThrow, "'" + name + "'", outDependGetterThrow.getLocalizedMessage());
@@ -900,6 +905,15 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
         }
 
         return depend;
+    }
+
+    /**
+     * 通过名称获取依赖对象
+     *
+     * @param name 名称
+     */
+    public Depend getDepend(String name) {
+        return getDepend(name, false);
     }
 
     /**
@@ -1177,5 +1191,17 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
         }
     }
 
+    /**
+     * 值为null的depend
+     */
+    static class NullDepend extends Depend {
+        public static final NullDepend INSTANCE = new NullDepend();
+        /**
+         * 构造
+         */
+        private NullDepend() {
+            super("", NullDepend.class, true, () -> null, b -> {}, (a,b) -> {}, false, 0);
+        }
+    }
 
 }
