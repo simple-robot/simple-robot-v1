@@ -31,7 +31,7 @@ https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 <br>
 
 ## 这是什么？
-这是一个基于网络通讯接口的通讯机器人(例如QQ机器人)开发框架，可以对接例如酷Q机器人等一系列通讯机器人应用。
+这是一个基于网络通讯接口的通讯机器人开发框架，可以对接例如酷Q机器人等一系列通讯机器人应用。
 此框架分有两个部分：核心框架与组件框架，当前仓库为核心框架。
 
 ### 核心框架？
@@ -71,8 +71,6 @@ https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
   
 
 
-
-
 ## 现在已经存在的应用？
 
 #### 已经存在的**组件框架**：
@@ -83,7 +81,11 @@ https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 | 酷Q（停止）  | HTTP TO CQ插件  | https://github.com/ForteScarlet/simple-robot-component-httpapi |
 | 酷Q（停止）  | CQ HTTP API插件 | https://github.com/ForteScarlet/simple-robot-component-coolHttpApi |
 | 酷Q（停止）  | JCQ插件 | https://github.com/ForteScarlet/simple-robot-component-JCQ |
-| JVM          | Mirai   | https://github.com/ForteScarlet/simple-robot-component-mirai | 
+| JVM          | Mirai（停止维护）   | https://github.com/ForteScarlet/simple-robot-component-mirai | 
+
+> `酷Q已停止服务。R.I.P.`
+
+> `Mirai已停止维护。`
 
 #### 已经存在的**模组**：
 
