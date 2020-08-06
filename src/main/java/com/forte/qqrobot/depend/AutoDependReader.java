@@ -14,6 +14,7 @@
 package com.forte.qqrobot.depend;
 
 import com.forte.qqrobot.exception.ModuleException;
+import com.forte.qqrobot.log.QQLog;
 import com.forte.qqrobot.utils.ReaderProperties;
 
 import java.io.IOException;
@@ -37,8 +38,10 @@ public class AutoDependReader {
 
         Enumeration<URL> resources = loader.getResources(resourcePath);
 
+
         while (resources.hasMoreElements()){
             URL nextResource = resources.nextElement();
+            QQLog.debug("resources.module.load", nextResource);
             ReaderProperties moduleProperties = new ReaderProperties();
             try(InputStream inputStream = nextResource.openStream()) {
                 moduleProperties.load(inputStream);
@@ -65,6 +68,7 @@ public class AutoDependReader {
             return Arrays.stream(scanPackages.split(","))
                     .map(String::trim)
                     .filter(p -> p.length() > 0)
+                    .peek(p -> QQLog.debug("resources.module.load.scan", p))
             .toArray(String[]::new);
         }
     }
@@ -89,7 +93,7 @@ public class AutoDependReader {
                         } catch (ClassNotFoundException e) {
                             throw new ModuleException("load", e, c);
                         }
-                    }).toArray(Class[]::new);
+                    }).peek(c -> QQLog.debug("resources.module.load.bean", c)).toArray(Class[]::new);
         }
     }
 

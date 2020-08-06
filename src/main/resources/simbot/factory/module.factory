@@ -1,3 +1,1 @@
-# 定义需要自动加载类与扫描的包
-# 1 默认的botManager
 load.bean=com.forte.qqrobot.CoreConfiguration

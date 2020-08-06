@@ -24,7 +24,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 /**
- * 自动装配配置读取器，静态方法即可。
+ * 自动装配配置读取器。
  *
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8

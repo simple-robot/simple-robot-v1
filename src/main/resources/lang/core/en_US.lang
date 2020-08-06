@@ -12,7 +12,7 @@
 #
 #
 
-lang.init.finished=language has already init finished. All non-Chinese languages are from Google Translate.
+lang.init.finished=Language has already init finished. All non-Chinese languages are from Google Translate.
 
 
 # 异常相关
@@ -30,21 +30,21 @@ exception.robotRun.runtime.init.failed=Runtime init failed.
 exception.robotRun.packageNull=The launcher has no package structure!
 
 # AnnotationException相关，其中包括AnnotationUtils中出现的格式化参数
-exception.annotation.class=class [{0}] should not use annotation [{1}] : {2}
-exception.annotation.method=the method [{1}] in class [{0}] should not use annotation [{2}]: {3}
-exception.annotation.notStatic=not static
+exception.annotation.class=Class [{0}] should not use annotation [{1}] : {2}
+exception.annotation.method=The method [{1}] in class [{0}] should not use annotation [{2}]: {3}
+exception.annotation.notStatic=Not static
 exception.annotation.needReturn=Need return value
-exception.annotation.returnTypeWrong=the return value's type is not instanceof this class type.
+exception.annotation.returnTypeWrong=The return value's type is not instanceof this class type.
 exception.annotation.resource.error=Cannot correctly proxy @Resource annotation to @Depend type: {0}
 
 # BlockException及其子类相关
-exception.block.indexOut=out of index!
+exception.block.indexOut=Out of index!
 exception.noSuchBlockName.indexOut=Out of index!
 
 # CQParamsException相关
-exception.CQParams.noParam=cannot get param[{0}]
-exception.CQParams.paramCannotIgnore=the param[{1}] in CQ code type[{0}] cannot be ignore;
-exception.CQParams.paramMismatch=the param[{1}] in CQ code type [{0}] should match a regular match: {2} , not: {3}
+exception.CQParams.noParam=Cannot get param[{0}]
+exception.CQParams.paramCannotIgnore=The param[{1}] in CQ code type[{0}] cannot be ignore;
+exception.CQParams.paramMismatch=The param[{1}] in CQ code type [{0}] should match a regular match: {2} , not: {3}
 
 # CQParseException相关
 exception.CQParse.cannotParse=[{0}] Cannot resolve to CQ code.
@@ -105,7 +105,7 @@ exception.listener.async=An exception occurred in the asynchronous listener: {0}
 ### value-new: new
 exception.dev.dynamicParamTypeRepeat=The dynamic parameter type is duplicated! {0}, {1}, {2}
 exception.dev.dynamicParamNameRepeat=Duplicate dynamic parameter names! {0}, {1}, {2}
-xception.dev.configClone=configuration clone failed!
+xception.dev.configClone=Configuration clone failed!
 
 # TimeTaskException相关
 exception.timeTask.startFailed=Scheduled task failed to start!
@@ -119,27 +119,27 @@ exception.api.noDefault=There is currently no default bot sender! There may not 
 
 
 # FilterException相关
-exception.filter.exists=filter [{0}] has already exists.
+exception.filter.exists=Filter [{0}] has already exists.
 exception.filter.notfound=DIY filter [{0}] not found.
 
 # verifyException相关
-exception.botVerify.failed=bot[{0}]verify failed: {1}
-exception.botVerify.failed.mismatch=bot[{0}]verify failed: code mismatch: {1}
+exception.botVerify.failed=Bot[{0}]verify failed: {1}
+exception.botVerify.failed.mismatch=Bot[{0}]verify failed: code mismatch: {1}
 exception.botVerify.notExists=Account [{0}] does not exist
 exception.botVerify.null=Account [{0}] verification result is null
 exception.botVerify.close.failed=Account [{0}] logout failed!
 
 
 # ListenerException
-exception.listener.init.failed=listener initialization error!
+exception.listener.init.failed=Listener initialization error!
 
 # clientHelper
-exception.httpClientHelper.nameExists=http template named [{0}] is already exists!
-exception.httpClientHelper.notExists=http template named [{0}] is not exists!
-exception.httpClientHelper.noDefault=there are no default name.
+exception.httpClientHelper.nameExists=Http template named [{0}] is already exists!
+exception.httpClientHelper.notExists=Http template named [{0}] is not exists!
+exception.httpClientHelper.noDefault=There are no default name.
 
 # httpResponse
-exception.httpResponse.code=response code: {0} because: {1}
+exception.httpResponse.code=Response code: {0} because: {1}
 
 # 其他异常
 
@@ -171,7 +171,7 @@ run.module.init.failed=Module configuration failed to read! {0}
 
 run.start.success={0} successfully started, took {1} ms
 run.depend.load=Loading dependencies >> {0}
-run.listen.load.success=listener loaded successfully! [{0}]
+run.listen.load.success=Listener loaded successfully! [{0}]
 run.timeTask.loadSuccess=Loading scheduled tasks successfully! [ {0} ]
 
 # 拦截器的各种准备
@@ -195,25 +195,25 @@ run.intercept.getter.load=Load getter interceptor: {0}
 # botManager
 run.botmanager.get.depend=Try to get BotManager instance object from dependency center
 run.botmanager.get.default=Use the default BotManager {0}
-run.botmanager.load=load BotManager {0}
+run.botmanager.load=Load BotManager {0}
 run.runtime.init=Runtime initialized.
 run.runtime.bot.verify=Bot list verify success.
-run.bot.info=bot info: code: {0}, nick: {1}, level: {2}
+run.bot.info=Bot info: code: {0}, nick: {1}, level: {2}
 run.bot.empty=Warning! You have not registered any Bot information! Before you register, you will not be able to use any transmitters in non-listening functions.
 
 # 依赖工厂加载结束
 run.depend.init.finish=End of factory initialization
 
 # runtime
-runtime.bot.register=bot [{0}] register success！
-runtime.bot.register.failed=bot register failed: {0}
+runtime.bot.register=Bot [{0}] register success！
+runtime.bot.register.failed=Bot register failed: {0}
 
 # filter
-filter.register=register filter: {0}
+filter.register=Register filter: {0}
 
 # listen
-listener.init=listener [{0}] initialization attempt was successful. {1} ms
-listener.run.error=listener [{0}] invoke failed! {1}
+listener.init=Listener [{0}] initialization attempt was successful. {1} ms
+listener.run.error=Listener [{0}] invoke failed! {1}
 listener.bot.noVerify=BOT[{0}]not verify! The message has been intercepted.
 
 # 送信拦截器
@@ -226,10 +226,15 @@ msgSender.reply.failed=Parameter type is wrong! Only three types of messages [Pr
 
 ## CoreSystem中使用的日志
 system.version.check=Will start version detection.Please ignore the error logs that appear before the version detection ends, they are not harmful.
-system.version.check.url=check url: {0}
+system.version.check.url=Check url: {0}
 system.version.check.failed=Version check failed.You can choose to go to the maven repository to view it by yourself.
 system.version.newest=Current core version: {0}, currently the latest version in the {1} release series.
 system.version.notnewest=Current core version: {0}, there is a more advanced version {2} in the {1} version series, you can consider switching the core version. \nNote that the core replacement needs to ensure that the first two version numbers are the same: {1} \nYou can refer to: \nReference 1: {3} \nReference 2: {4}
 
 depend.center.close=Closed [{0}]
 depend.center.close.failed=Close [{0} ({1})] failed: {2}
+
+
+resources.module.load=Module resource file loading: [{0}]
+resources.module.load.scan=Module scan: [{0}]
+resources.module.load.bean=Module load: [{0}]

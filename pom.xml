@@ -14,8 +14,10 @@
     <artifactId>simple-robot-core</artifactId>
 
     <!-- 版本号 -->
-    <!-- 下次部署需要大于1.16.3 2020/8/1 记得修改CoreSystem的版本号 -->
-    <version>1.17.0-TEST</version>
+    <!-- 下次部署需要大于1.16.3-BETA
+          DEBUG用的部署版本
+    2020/8/6 记得修改CoreSystem的版本号 -->
+    <version>1.16.3-BETA</version>
 
     <packaging>jar</packaging>
     <name>simple-robot</name>

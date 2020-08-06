@@ -233,7 +233,8 @@ depend.center.close=已关闭[{0}]
 depend.center.close.failed=关闭[{0} ({1})]失败：{2}
 
 
-
-
+resources.module.load=模组资源文件加载: [{0}]
+resources.module.load.scan=模组扫描：[{0}]
+resources.module.load.bean=模组加载：[{0}]
 
 
