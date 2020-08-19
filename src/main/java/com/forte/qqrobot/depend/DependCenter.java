@@ -40,6 +40,7 @@ import java.util.function.*;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
+// TODO 代码重构重灾区
 @SuppressWarnings({"WeakerAccess", "unchecked", "UnusedReturnValue", "JavaDoc"})
 public class DependCenter implements DependGetter, DependInjector, Closeable {
 

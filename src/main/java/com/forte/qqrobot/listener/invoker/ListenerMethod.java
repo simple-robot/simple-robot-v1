@@ -42,12 +42,11 @@ import java.util.stream.Collectors;
 /**
  * 监听器方法封装类
  *
- * TODO 急需重构
- *
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @date Created in 2019/3/25 18:28
  * @since JDK1.8
  **/
+// TODO 代码重构重灾区
 public class ListenerMethod<T> implements Comparable<ListenerMethod> {
 
     //**************** 所有字段均不可改变 ****************//

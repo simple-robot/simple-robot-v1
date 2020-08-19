@@ -94,6 +94,7 @@ import java.util.stream.Collectors;
  * @date Created in 2019/3/29 10:18
  * @since JDK1.8
  **/
+// TODO 代码重构重灾区，过于强耦合
 public abstract class BaseApplication<
         CONFIG extends BaseConfiguration,
         SEND extends SenderSendList,
