@@ -14,6 +14,7 @@
 package com.forte.qqrobot.depend;
 
 import cn.hutool.core.convert.Convert;
+import com.forte.common.annotation.SimbotTODO;
 import com.forte.lang.Language;
 import com.forte.qqrobot.anno.depend.FilterValue;
 import com.forte.qqrobot.constant.PriorityConstant;
@@ -40,7 +41,8 @@ import java.util.function.*;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-// TODO 代码重构重灾区
+
+@SimbotTODO("代码重构重灾区")// TODO
 @SuppressWarnings({"WeakerAccess", "unchecked", "UnusedReturnValue", "JavaDoc"})
 public class DependCenter implements DependGetter, DependInjector, Closeable {
 

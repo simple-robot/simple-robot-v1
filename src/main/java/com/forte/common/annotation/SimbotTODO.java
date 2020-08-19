@@ -6,16 +6,20 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
 
 /**
- * 用来给那些没下载源码的人看注释用的
- * 虽然并不一定每个地方都会用这个注释，用不用主要看心情
- * @author ForteScarlet <ForteScarlet@163.com>
- * @date 2020/8/1
+ *
+ * 给开发者我自己看的。
+ * 标注一些可能需要大改的地方。
+ *
+ * Created by lcy on 2020/8/19.
+ *
+ * @author lcy
  */
 @Documented
 @Retention(RetentionPolicy.CLASS)
 @Target({FIELD, TYPE, METHOD, PARAMETER, PACKAGE, CONSTRUCTOR})
-public @interface Comment {
-    String[] value() default {};
+public @interface SimbotTODO {
+	String[] value() default {};
 }
