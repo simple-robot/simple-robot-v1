@@ -270,7 +270,7 @@ public class MsgSender implements Sender {
             if(at){
                 reply = "[CQ:at,qq="+ gm.getQQ() +"] " + reply;
             }
-            SENDER.sendPrivateMsg(gm, reply);
+            SENDER.sendGroupMsg(gm, reply);
         } else if (msg instanceof DiscussMsg) {
             DiscussMsg gm = (DiscussMsg) msg;
             if(at){
