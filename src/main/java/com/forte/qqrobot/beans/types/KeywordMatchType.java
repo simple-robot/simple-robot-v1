@@ -102,14 +102,20 @@ public enum KeywordMatchType {
 
     //**************** 结尾匹配 ****************//
 
-    /** 尾部匹配 */
-    ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString())),
     /** 去空的尾部匹配 */
     TRIM_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), String::trim),
     /** 移除掉所有CQ码后尾部匹配 */
     RE_CQCODE_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), KQCodeUtils.INSTANCE::remove),
     /** 移除掉所有CQ码并首尾去空后尾部匹配 */
     RE_CQCODE_TRIM_ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString()), msg -> KQCodeUtils.INSTANCE.remove(msg).trim()),
+    /** 尾部匹配 */
+    ENDS_WITH((msg, regex) -> msg.endsWith(regex.toString())),
+
+
+    // **************** //
+    // TODO hutool FDA查找匹配
+    // https://www.bookstack.cn/read/hutool/453b51ee888bfc31.md
+    // **************** //
 
 
     ;
