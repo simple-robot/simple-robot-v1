@@ -15,6 +15,9 @@ package com.forte.qqrobot.beans.messages;
 
 /**
  * 可以获取昵称
+ *
+ *  一般来讲，能得到qq号的地方，就能拿到昵称。
+ *
  * @author <a href="https://github.com/ForteScarlet"> ForteScarlet </a>
  */
 public interface NicknameAble {
