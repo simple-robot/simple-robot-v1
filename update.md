@@ -1,7 +1,9 @@
 ## 版本更新记录
 
-# now(1.17.0)
+# now(1.17.+)
 - 实现`@Depend`的`orNull`参数。当`orNull=true`的时候，如果注入的值不存在，则会为其注入null。（默认情况下依旧会报错）
+- 将`NicknameAble`和`RemarkAble`整合到`codeAble`相关接口内
+- 调整`GroupAddRequest`, 增加部分可获取的属性
 
 # 1.16.3-BETA
 - 为资源加载流程增加部分debug日志

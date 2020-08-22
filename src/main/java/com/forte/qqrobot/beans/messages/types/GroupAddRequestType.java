@@ -20,9 +20,13 @@ package com.forte.qqrobot.beans.messages.types;
  **/
 public enum GroupAddRequestType {
 
-    /** 邀请 */
+    /**
+     * 邀请 ，此处一般指bot被邀请进入某些群
+     */
     INVITE(1),
-    /** 添加 */
+    /**
+     * 添加，此处一般指群里有人加群或者被邀请加群。
+     */
     ADD(-1);
 
     public final int TYPE;
