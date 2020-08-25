@@ -29,6 +29,9 @@ public class AbstractGroupBan extends AbstractEventGet implements GroupBan {
     private String operatorQQ;
     private String beOperatedQQ;
     private Long time;
+    private String nickname;
+    private String remark;
+
 
     @Override
     public GroupBanType getBanType() {
@@ -101,5 +104,23 @@ public class AbstractGroupBan extends AbstractEventGet implements GroupBan {
                 ", beOperatedQQ='" + beOperatedQQ + '\'' +
                 ", time=" + time +
                 "} " + super.toString();
+    }
+
+    @Override
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    @Override
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

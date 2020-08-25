@@ -20,7 +20,7 @@ package com.forte.qqrobot.beans.messages;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface QQCodeAble {
+public interface QQCodeAble extends NicknameAble {
 
     /**
      * 获取QQ号信息。

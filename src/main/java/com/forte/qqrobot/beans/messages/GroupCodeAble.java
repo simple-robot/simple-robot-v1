@@ -18,7 +18,7 @@ package com.forte.qqrobot.beans.messages;
  * @author ForteScarlet <[email]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-public interface GroupCodeAble {
+public interface GroupCodeAble extends RemarkAble {
 
     /**
      * 获取消息中存在的群号信息
