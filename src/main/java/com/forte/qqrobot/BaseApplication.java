@@ -95,6 +95,7 @@ import java.util.stream.Collectors;
  * @date Created in 2019/3/29 10:18
  * @since JDK1.8
  **/
+@SuppressWarnings("unused")
 @SimbotTODO("代码重构重灾区，过于强耦合")// TODO
 public abstract class BaseApplication<
         CONFIG extends BaseConfiguration,
@@ -984,6 +985,7 @@ public abstract class BaseApplication<
      * @param appClass 启动类
      * @param args      参数
      */
+    @SuppressWarnings("unchecked")
     public CONTEXT run(Class<?> appClass, String... args){
         SimpleRobotApplication applicationAnno = AnnotationUtils.getAnnotation(appClass, SimpleRobotApplication.class);
         if(applicationAnno == null){
@@ -995,12 +997,13 @@ public abstract class BaseApplication<
             // is child ?
             if(FieldUtils.isChild(appClass, Application.class)){
                 // yes, child.
+                Application<CONFIG> newInstance;
                 try {
-                    Application<CONFIG> newInstance = (Application<CONFIG>) appClass.newInstance();
-                    return run(newInstance, args);
+                    newInstance = (Application<CONFIG>) appClass.newInstance();
                 } catch (Exception e) {
                     throw new RobotRunException(1, appClass + "can not be a simple-robot-application: cannot get newInstance.", e);
                 }
+                return run(newInstance, args);
             }else{
                 throw new RobotRunException(1, appClass + "can not be a simple-robot-application: cannot found @SimpleRobotApplication, and not implement Application interface.");
 
@@ -1031,6 +1034,7 @@ public abstract class BaseApplication<
      * @param app　　启动器实例
      * @param args   java执行参数
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public CONTEXT runWithApplication(Application<CONFIG> app, String... args){
         Class<? extends Application> appClass = app.getClass();
         SimpleRobotApplication applicationAnno = AnnotationUtils.getAnnotation(appClass, SimpleRobotApplication.class);
@@ -1055,6 +1059,7 @@ public abstract class BaseApplication<
      * @param args 参数
      * @return 标准返回值 {@link SimpleRobotContext }
      */
+    @SuppressWarnings("rawtypes")
     public static SimpleRobotContext runAuto(Class appClass, ClassLoader classLoader, String... args) throws IOException {
         // 获取配置的启动器类
         if(classLoader == null){
