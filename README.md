@@ -81,7 +81,7 @@ https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 | 酷Q（停止）  | HTTP TO CQ插件  | https://github.com/ForteScarlet/simple-robot-component-httpapi |
 | 酷Q（停止）  | CQ HTTP API插件 | https://github.com/ForteScarlet/simple-robot-component-coolHttpApi |
 | 酷Q（停止）  | JCQ插件 | https://github.com/ForteScarlet/simple-robot-component-JCQ |
-| JVM          | Mirai（停止维护）   | https://github.com/ForteScarlet/simple-robot-component-mirai | 
+| JVM          | Mirai   | https://github.com/ForteScarlet/simple-robot-component-mirai | 
 
 > `酷Q已停止服务。R.I.P.`
 
