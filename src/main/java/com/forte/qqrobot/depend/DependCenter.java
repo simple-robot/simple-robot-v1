@@ -455,7 +455,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
 
         //全部字段赋值
         return b -> {
-            if(b != null){
+            if (b != null) {
                 //遍历全部字段值赋值函数并赋值
                 for (Consumer<T> inj : consumerArray) {
                     inj.accept(b);
@@ -560,7 +560,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
 
         //全部字段赋值
         return (b, add) -> {
-            if(b != null){
+            if (b != null) {
                 //遍历全部字段值赋值函数并赋值
                 for (BiConsumer<T, DependGetter> inj : consumerArray) {
                     inj.accept(b, add);
@@ -746,7 +746,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
      * @param <T>
      * @return
      */
-    public <T> Depend<T> getDepend(Class<T> type, boolean orNull){
+    public <T> Depend<T> getDepend(Class<T> type, boolean orNull) {
         Throwable outDependGetterThrow = null;
         //优先尝试使用外部依赖获取
         if (!dependGetter.equals(this)) {
@@ -817,7 +817,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
             //如果还是没有，返回null
             // 2020/4/5 v1.11.0 改为抛出异常
             if (outDependGetterThrow == null) {
-                if(orNull){
+                if (orNull) {
                     return NullDepend.INSTANCE;
                 }
                 throw new DependResourceException("noDepend", type);
@@ -834,7 +834,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
                 throw new DependResourceException("moreDepend", type);
             } else {
                 // 否则仅留下第一个，并标记重新保存。
-                depends = new ArrayList<>() ;
+                depends = new ArrayList<>();
                 depends.add(first);
                 save = true;
             }
@@ -872,12 +872,13 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
 
     /**
      * TODO orNull
+     *
      * @param name
      * @param orNull
      * @return
      */
     @Deprecated
-    public Depend getDepend(String name, boolean orNull){
+    public Depend getDepend(String name, boolean orNull) {
         Throwable outDependGetterThrow = null;
         //优先尝试使用外部依赖获取
         if (!dependGetter.equals(this)) {
@@ -897,7 +898,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
 
         if (depend == null) {
             if (outDependGetterThrow == null) {
-                if(orNull){
+                if (orNull) {
                     return NullDepend.INSTANCE;
                 }
                 throw new DependResourceException("noDepend", "'" + name + "'");
@@ -1198,11 +1199,14 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
      */
     static class NullDepend extends Depend {
         public static final NullDepend INSTANCE = new NullDepend();
+
         /**
          * 构造
          */
         private NullDepend() {
-            super("", NullDepend.class, true, () -> null, b -> {}, (a,b) -> {}, false, 0);
+            super("", NullDepend.class, true, () -> null, b -> {
+            }, (a, b) -> {
+            }, false, 0);
         }
     }
 
