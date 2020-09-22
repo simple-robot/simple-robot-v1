@@ -64,13 +64,13 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
     /**
      * 以名称为key的资源仓库
      */
-    private final Map<String, Depend> nameResourceWarehouse;
+    private final Map<String, Depend<?>> nameResourceWarehouse;
 
     /**
      * 以Class为key的资源仓库
      * 一般来讲，应当只存在一个。但是如果名称唯一则是有可能存在多个的。
      */
-    private final Map<Class, List<Depend>> classResourceWareHouse;
+    private final Map<Class<?>, List<Depend<?>>> classResourceWareHouse;
 
     /**
      * 获取资源对象实例接口实例
@@ -81,14 +81,14 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
     /**
      * 记录需要初始化的依赖的列表
      */
-    private Queue<Depend> initQueue = new LinkedList<>();
+    private final Queue<Depend<?>> initQueue = new LinkedList<>();
 
     /**
      * 　初始化一次需要被初始化的Depend
      */
     public void initDependWhoNeed() {
         synchronized (this) {
-            Depend polled;
+            Depend<?> polled;
             do {
                 polled = initQueue.poll();
                 if (polled != null) {
@@ -323,9 +323,10 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
                 throw new DependResourceException("dependExistByName", depend.getName());
             }
 
-            classResourceWareHouse.merge(depend.getType(), new ArrayList<Depend>(2) {{
-                add(depend);
-            }}, (old, val) -> {
+            List<Depend<?>> list = new ArrayList<Depend<?>>();
+            list.add(depend);
+
+            classResourceWareHouse.merge(depend.getType(), list, (old, val) -> {
                 //noinspection ConstantConditions
                 old.add(val.get(0));
                 // 根据优先级排序
@@ -704,13 +705,13 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
     public <T> List<Class<? extends T>> getTypesBySuper(Class<T> superType) {
         List<Class<? extends T>> list = new ArrayList<>(4);
         // 使用类型工厂
-        Set<Class> keySet = classResourceWareHouse.keySet();
-        for (Class keyClass : keySet) {
+        Set<Class<?>> keySet = classResourceWareHouse.keySet();
+        for (Class<?> keyClass : keySet) {
             if (keyClass.equals(superType) || FieldUtils.isChild(keyClass, superType)) {
                 // 类型下的depend唯一
-                List<Depend> depends = classResourceWareHouse.get(keyClass);
+                List<Depend<?>> depends = classResourceWareHouse.get(keyClass);
                 if (depends.size() > 0) {
-                    list.add(keyClass);
+                    list.add((Class<? extends T>) keyClass);
                 }
             }
         }
@@ -763,7 +764,7 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
         }
 
         // 先直接获取
-        List<Depend> depends = classResourceWareHouse.get(type);
+        List<Depend<?>> depends = classResourceWareHouse.get(type);
         if (depends == null) {
             depends = Collections.emptyList();
         }
@@ -773,20 +774,20 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
 
         //没有获取到，尝试通过子类型获取
         if (depends.size() == 0) {
-            Set<Class> keys = classResourceWareHouse.keySet();
-            Class[] classes = keys.stream().filter(k -> FieldUtils.isChild(k, type)).toArray(Class[]::new);
+            Set<Class<?>> keys = classResourceWareHouse.keySet();
+            Class<?>[] classes = keys.stream().filter(k -> FieldUtils.isChild(k, type)).toArray(Class[]::new);
             if (classes.length == 0) {
                 //还是没有，返回null
                 depends = Collections.emptyList();
             } else if (classes.length > 1) {
                 //　多个子类，全部获取并排序
-                Depend[] dependsByClasses = Arrays.stream(classes).flatMap(c -> classResourceWareHouse.get(c).stream()).sorted().toArray(Depend[]::new);
+                Depend<?>[] dependsByClasses = Arrays.stream(classes).flatMap(c -> classResourceWareHouse.get(c).stream()).sorted().toArray(Depend[]::new);
 
                 if (dependsByClasses[0].getPriority() == dependsByClasses[1].getPriority()) {
                     //不止1个且最高优先级有多个，抛出异常
                     throw new DependResourceException("moreChildType", type, Arrays.toString(classes));
                 } else {
-                    depends = new ArrayList<Depend>() {{
+                    depends = new ArrayList<Depend<?>>() {{
                         add(dependsByClasses[0]);
                     }};
                     save = true;
@@ -802,11 +803,10 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
                 //不止1个且最高优先级有多个，抛出异常
                 throw new DependResourceException("moreChildType", type, depends);
             } else {
-                Depend first = depends.get(0);
+                Depend<?> first = depends.get(0);
                 // 否则，只留下最后一个并标记重新记录
-                depends = new ArrayList<Depend>() {{
-                    add(first);
-                }};
+                depends = new ArrayList<>();
+                depends.add(first);
                 save = true;
 
             }
@@ -826,29 +826,28 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
             }
         } else if (depends.size() > 1) {
             // 多于一个，判断优先级
-            final Depend first = depends.get(0);
-            Depend second = depends.get(1);
+            final Depend<?> first = depends.get(0);
+            Depend<?> second = depends.get(1);
             if (first.getPriority() == second.getPriority()) {
                 // 最高优先级相同，抛出异常。
                 //多于一个, 一般情况下是使用父类类型获取的时候会存在的情况
                 throw new DependResourceException("moreDepend", type);
             } else {
                 // 否则仅留下第一个，并标记重新保存。
-                depends = new ArrayList<Depend>() {{
-                    add(first);
-                }};
+                depends = new ArrayList<>() ;
+                depends.add(first);
                 save = true;
             }
         }
 
         // 获取唯一的一个，即第一个
-        Depend single = depends.get(0);
+        Depend<T> single = (Depend<T>) depends.get(0);
         if (save) {
             // 需要重新保存以实现缓存
             // 一般来讲，既然能够拿到，则说明这个依赖必定存在于name中，所以直接保存类型
-            classResourceWareHouse.put(type, new ArrayList<Depend>(1) {{
-                add(single);
-            }});
+            List<Depend<?>> list = new ArrayList<>();
+            list.add(single);
+            classResourceWareHouse.put(type, list);
         }
         return single;
 
@@ -1141,8 +1140,8 @@ public class DependCenter implements DependGetter, DependInjector, Closeable {
     private <T> List<T> getThisListByType(Class<T> superType) {
         List<T> list = new ArrayList<>(4);
         // 使用类型工厂
-        Set<Class> keySet = classResourceWareHouse.keySet();
-        for (Class keyClass : keySet) {
+        Set<Class<?>> keySet = classResourceWareHouse.keySet();
+        for (Class<?> keyClass : keySet) {
             if (keyClass.equals(superType) || FieldUtils.isChild(keyClass, superType)) {
                 list.add((T) get(keyClass));
             }
