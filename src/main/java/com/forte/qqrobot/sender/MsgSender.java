@@ -46,7 +46,6 @@ import com.forte.qqrobot.sender.senderlist.SenderSetList;
  * @author ForteScarlet <[163邮箱地址]ForteScarlet@163.com>
  * @since JDK1.8
  **/
-@SimbotTODO("设计有问题，借口化并抽象为builder") // TODO
 public class MsgSender implements Sender {
 
     /**

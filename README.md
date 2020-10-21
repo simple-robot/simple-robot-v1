@@ -28,6 +28,10 @@ https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 点击`star`后即可申请加入QQ群聊，QQ群号：**782930037**
 
 <br>
+
+未来2.x版本项目预览：https://github.com/ForteScarlet/simpler-robot
+
+<br>
 <br>
 
 ## 这是什么？
