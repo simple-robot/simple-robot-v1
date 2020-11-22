@@ -29,7 +29,7 @@ https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 
 <br>
 
-#### 未来2.x版本项目预览
+### 使用更新的2.x版本：
 https://github.com/ForteScarlet/simpler-robot
 
 <br>
