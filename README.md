@@ -90,8 +90,6 @@ https://github.com/ForteScarlet/simpler-robot
 
 > `酷Q已停止服务。R.I.P.`
 
-> `Mirai已停止维护。`
-
 #### 已经存在的**模组**：
 
 | 名称 |      描述       |                           项目地址                           |
