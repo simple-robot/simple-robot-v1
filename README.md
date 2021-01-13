@@ -13,6 +13,14 @@
 
 <br>
 
+
+# 使用2.x版本：
+https://github.com/ForteScarlet/simpler-robot
+
+当前仓库版本(1.x)将会进入停止更新状态（实际上也已经是这个状态了），请前往2.x版本。
+
+<br>
+
 **文档请见文档地址：**
 http://simple-robot-doc.forte.love
 或
@@ -29,11 +37,9 @@ https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 
 <br>
 
-### 使用目前的2.x版本：
-https://github.com/ForteScarlet/simpler-robot
-
-<br>
-<br>
+<br><br>
+<br><br>
+<br><br>
 
 ## 这是什么？
 这是一个基于网络通讯接口的通讯机器人开发框架，可以对接例如酷Q机器人等一系列通讯机器人应用。
