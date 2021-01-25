@@ -32,7 +32,7 @@ http://simple-robot-doc.forte.love
 https://www.kancloud.cn/forte-scarlet/simple-coolq-doc
 <br>
 
-**在线javadoc文档(由码云平台生成)：**
+**1.x在线javadoc文档(由码云平台生成)：**
  https://apidoc.gitee.com/ForteScarlet/simple-robot-core
 
 由于目前核心部分与组件部分相互分离，所以核心与组件的github地址也相互分离了。
