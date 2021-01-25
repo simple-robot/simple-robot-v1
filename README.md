@@ -17,11 +17,16 @@
 # 使用2.x版本：
 https://github.com/ForteScarlet/simpler-robot
 
-当前仓库版本(1.x)将会进入停止更新状态（实际上也已经是这个状态了），请前往2.x版本。
+当前仓库版本(1.x)已进入停止更新状态，请前往2.x版本。
 
 <br>
+<br>
+<br>
+<br>
 
-**文档请见文档地址：**
+
+
+**1.x文档请见文档地址：**
 http://simple-robot-doc.forte.love
 或
 https://www.kancloud.cn/forte-scarlet/simple-coolq-doc

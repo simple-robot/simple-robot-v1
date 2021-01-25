@@ -96,7 +96,6 @@ import java.util.stream.Collectors;
  * @since JDK1.8
  **/
 @SuppressWarnings("unused")
-@SimbotTODO("代码重构重灾区，过于强耦合")// TODO
 public abstract class BaseApplication<
         CONFIG extends BaseConfiguration,
         SEND extends SenderSendList,

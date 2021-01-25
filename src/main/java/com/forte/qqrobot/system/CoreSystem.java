@@ -32,8 +32,8 @@ import java.util.Properties;
  * @author ForteScarlet
  * @version  1.7.0
  */
-@Version(version = "1.16.3",
-        versionFamily = "1.16")
+@Version(version = "1.17.0",
+        versionFamily = "1.17")
 public final class CoreSystem {
 
     /** 当前程序的RUN_TIME对象 */
